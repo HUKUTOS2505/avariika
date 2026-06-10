@@ -6,7 +6,9 @@
 #include "Engine/Canvas.h"
 #include "Engine/Engine.h"
 #include "Engine/Font.h"
+#include "Game/ARunState.h"
 #include "Items/APickupItem.h"
+#include "World/ARepairable.h"
 
 namespace AvaryoHUDStyle
 {
@@ -80,6 +82,70 @@ void AAvaryoHUD::DrawHUD()
 		}
 	}
 
+	// ---------- Забег: задачи, таймер, фаза (справа сверху) ----------
+	if (ARunState* Run = ARunState::Get(GetWorld()))
+	{
+		const int32 Elapsed = FMath::FloorToInt(Run->GetElapsedSeconds());
+		const FString Header = FString::Printf(TEXT("ЗАДАЧИ %d/%d   %02d:%02d"),
+			Run->GetRepairedCount(), Run->GetTotalObjectives(), Elapsed / 60, Elapsed % 60);
+
+		float HeaderW = 0.f, HeaderH = 0.f;
+		GetTextSize(Header, HeaderW, HeaderH, Font, 1.15f);
+
+		const float PanelW = 250.f;
+		const float RowH = 20.f;
+		const float ListX = SizeX - PanelW - 24.f;
+		float ListY = 30.f;
+
+		DrawRect(BoxBG, ListX - 12.f, ListY - 8.f, PanelW + 24.f, HeaderH + Run->GetObjectives().Num() * RowH + 24.f);
+		DrawRect(Accent, ListX - 12.f, ListY - 8.f, PanelW + 24.f, 3.f);
+		DrawText(Header, Accent, ListX, ListY, Font, 1.15f);
+		ListY += HeaderH + 8.f;
+
+		for (const ARepairable* Objective : Run->GetObjectives())
+		{
+			if (!Objective)
+			{
+				continue;
+			}
+			FString Row;
+			FLinearColor RowColor;
+			if (!Objective->IsBroken())
+			{
+				Row = FString::Printf(TEXT("[+] %s"), *Objective->DisplayName.ToString());
+				RowColor = FLinearColor(0.3f, 0.8f, 0.3f);
+			}
+			else if (Objective->GetRepairProgress() > 0.f)
+			{
+				Row = FString::Printf(TEXT("[~] %s (%d%%)"), *Objective->DisplayName.ToString(),
+					FMath::RoundToInt(Objective->GetRepairProgress() * 100.f));
+				RowColor = Accent;
+			}
+			else
+			{
+				Row = FString::Printf(TEXT("[-] %s"), *Objective->DisplayName.ToString());
+				RowColor = TextDim;
+			}
+			DrawText(Row, RowColor, ListX, ListY, Font, 0.95f);
+			ListY += RowH;
+		}
+
+		// Баннеры фазы
+		if (Run->GetPhase() == ERunPhase::Won)
+		{
+			DrawCentered(TEXT("ПОБЕДА — ОБЪЕКТ СДАН, БРИГАДА В СБОРЕ"), FLinearColor(0.3f, 0.9f, 0.3f), SizeY * 0.3f, 1.9f);
+			DrawCentered(FString::Printf(TEXT("Время забега: %02d:%02d"), Elapsed / 60, Elapsed % 60), TextMain, SizeY * 0.3f + 44.f, 1.2f);
+		}
+		else if (Run->GetPhase() == ERunPhase::Lost)
+		{
+			DrawCentered(TEXT("ПОРАЖЕНИЕ — ВСЯ БРИГАДА ВЫВЕДЕНА ИЗ СТРОЯ"), FLinearColor(0.95f, 0.2f, 0.2f), SizeY * 0.3f, 1.9f);
+		}
+		else if (Run->AreAllObjectivesComplete() && Run->GetTotalObjectives() > 0)
+		{
+			DrawCentered(TEXT("Всё починено — вся бригада к ГАЗели!"), Accent, SizeY * 0.34f, 1.3f);
+		}
+	}
+
 	// ---------- Баннер ранения ----------
 	if (Vitals && Vitals->IsWounded())
 	{
@@ -107,6 +173,25 @@ void AAvaryoHUD::DrawHUD()
 		DrawRect(BarBG, BoxX, BoxY + 2.f, BarW, BarH);
 		DrawRect(BarFill, BoxX, BoxY + 2.f, BarW * Character->GetUseProgress(), BarH);
 	}
+	// ---------- Починка (держит E у объекта) ----------
+	else if (Character->IsRepairing() && Character->GetCurrentRepairable())
+	{
+		ARepairable* Repairing = Character->GetCurrentRepairable();
+		const int32 Percent = FMath::RoundToInt(Repairing->GetRepairProgress() * 100.f);
+		const FString Label = FString::Printf(TEXT("Ремонт: %s  %d%%"), *Repairing->DisplayName.ToString(), Percent);
+
+		const float BarW = 340.f, BarH = 20.f;
+		const float BoxX = (SizeX - BarW) * 0.5f;
+		const float BoxY = SizeY * 0.46f;
+
+		float LabelW = 0.f, LabelH = 0.f;
+		GetTextSize(Label, LabelW, LabelH, Font, 1.1f);
+
+		DrawRect(BoxBG, BoxX - 12.f, BoxY - LabelH - 10.f, BarW + 24.f, LabelH + BarH + 22.f);
+		DrawText(Label, TextMain, BoxX, BoxY - LabelH - 4.f, Font, 1.1f);
+		DrawRect(BarBG, BoxX, BoxY + 2.f, BarW, BarH);
+		DrawRect(Accent, BoxX, BoxY + 2.f, BarW * Repairing->GetRepairProgress(), BarH);
+	}
 	// ---------- Подсказка подбора (плашка как в референсе) ----------
 	else if (APickupItem* Focused = Character->GetFocusedItem())
 	{
@@ -120,6 +205,38 @@ void AAvaryoHUD::DrawHUD()
 
 		DrawRect(BoxBG, BoxX, BoxY, BoxW, BoxH);
 		DrawRect(Accent, BoxX, BoxY, BoxW, 3.f); // оранжевая кромка сверху
+		DrawText(Prompt, TextMain, BoxX + 18.f, BoxY + 8.f, Font, 1.3f);
+	}
+	// ---------- Подсказка починки ----------
+	else if (ARepairable* FocusedRep = Character->GetFocusedRepairable())
+	{
+		FString Prompt;
+		if (FocusedRep->CanBeRepairedBy(Character))
+		{
+			Prompt = FocusedRep->GetRepairProgress() > 0.f
+				? FString::Printf(TEXT("[E] Дочинить %s (%d%%)"), *FocusedRep->DisplayName.ToString(),
+					FMath::RoundToInt(FocusedRep->GetRepairProgress() * 100.f))
+				: FString::Printf(TEXT("[E] Чинить %s (держать)"), *FocusedRep->DisplayName.ToString());
+		}
+		else if (FocusedRep->IsBeingRepaired())
+		{
+			Prompt = FString::Printf(TEXT("%s уже чинят"), *FocusedRep->DisplayName.ToString());
+		}
+		else
+		{
+			Prompt = FString::Printf(TEXT("Для «%s» нужен инструмент: %s"),
+				*FocusedRep->DisplayName.ToString(), *FocusedRep->RequiredTool.ToString());
+		}
+
+		float W = 0.f, H = 0.f;
+		GetTextSize(Prompt, W, H, Font, 1.3f);
+
+		const float BoxW = W + 36.f, BoxH = H + 16.f;
+		const float BoxX = (SizeX - BoxW) * 0.5f;
+		const float BoxY = SizeY * 0.58f;
+
+		DrawRect(BoxBG, BoxX, BoxY, BoxW, BoxH);
+		DrawRect(Accent, BoxX, BoxY, BoxW, 3.f);
 		DrawText(Prompt, TextMain, BoxX + 18.f, BoxY + 8.f, Font, 1.3f);
 	}
 
