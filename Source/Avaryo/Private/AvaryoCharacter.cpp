@@ -893,6 +893,12 @@ void AAvaryoCharacter::BeginUseHeldItem()
 		RefreshHeldItem();
 	}
 
+	if (Item->ItemEffect == EItemEffect::Radio)
+	{
+		Item->SetToggledOn(!Item->IsToggledOn()); // тумблер: щёлк
+		return;
+	}
+
 	if (Item->ItemEffect == EItemEffect::Extinguish)
 	{
 		// Огнетушитель: распыляем, пока зажата кнопка и есть заряд

@@ -42,6 +42,14 @@ APickupItem::APickupItem()
 	CarryOffset = FVector(45.f, -45.f, -40.f);
 	RotationSpeed = 45.f;
 	bSpraying = false;
+	bToggledOn = false;
+	ToggleNoiseAccum = 0.f;
+}
+
+void APickupItem::SetToggledOn(bool bNewOn)
+{
+	bToggledOn = bNewOn;
+	ToggleNoiseAccum = 0.f;
 }
 
 void APickupItem::SetSpraying(bool bNewSpraying)
@@ -67,6 +75,7 @@ void APickupItem::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifet
 
 	DOREPLIFETIME(APickupItem, Charges);
 	DOREPLIFETIME(APickupItem, bSpraying);
+	DOREPLIFETIME(APickupItem, bToggledOn);
 }
 
 void APickupItem::Tick(float DeltaSeconds)
@@ -78,5 +87,16 @@ void APickupItem::Tick(float DeltaSeconds)
 	if (HasAuthority() && RotationSpeed != 0.f && !GetAttachParentActor() && !MeshComponent->IsSimulatingPhysics())
 	{
 		AddActorLocalRotation(FRotator(0.f, RotationSpeed * DeltaSeconds, 0.f));
+	}
+
+	// Включённая рация шипит эфиром — слышно даже из кармана (задел под монстра)
+	if (HasAuthority() && bToggledOn && ItemEffect == EItemEffect::Radio)
+	{
+		ToggleNoiseAccum += DeltaSeconds;
+		if (ToggleNoiseAccum >= 2.f)
+		{
+			ToggleNoiseAccum = 0.f;
+			MakeNoise(0.8f, Cast<APawn>(GetOwner()), GetActorLocation());
+		}
 	}
 }

@@ -6,6 +6,7 @@
 #include "Engine/Canvas.h"
 #include "Engine/Engine.h"
 #include "Engine/Font.h"
+#include "EngineUtils.h"
 #include "Game/ARunState.h"
 #include "GameFramework/PlayerState.h"
 #include "Items/APickupItem.h"
@@ -342,6 +343,12 @@ void AAvaryoHUD::DrawHUD()
 			{
 				Hint = TEXT("[ЛКМ] Распылять (держать)  •  [ПКМ] Передать");
 			}
+			else if (Held->ItemEffect == EItemEffect::Radio)
+			{
+				Hint = Held->IsToggledOn()
+					? TEXT("[ЛКМ] Выключить рацию — она шумит!")
+					: TEXT("[ЛКМ] Включить рацию  •  [ПКМ] Передать");
+			}
 			else if (Held->ItemEffect != EItemEffect::None)
 			{
 				Hint = TEXT("[ЛКМ] Применить (держать)  •  [ПКМ] Передать");
@@ -380,6 +387,10 @@ void AAvaryoHUD::DrawHUD()
 			{
 				ItemName += FString::Printf(TEXT(" (%d)"), Item->Charges);
 			}
+			if (Item->IsToggledOn())
+			{
+				ItemName += TEXT(" [ВКЛ]");
+			}
 		}
 		else
 		{
@@ -410,6 +421,17 @@ void AAvaryoHUD::DrawHUD()
 		if (Character->GetDraggedBy())    Statuses.Add(TEXT("Вас тащат"));
 		if (Vitals->IsIncidentSlowed())   Statuses.Add(TEXT("Санитарный инцидент!"));
 		else if (Vitals->IsSoiled())      Statuses.Add(TEXT("Испачкан"));
+
+		// В газовом облаке — не курить!
+		for (TActorIterator<ARepairable> It(GetWorld()); It; ++It)
+		{
+			if (It->IsLeakingGas()
+				&& FVector::DistSquared(Character->GetActorLocation(), It->GetActorLocation()) <= FMath::Square(It->GasRadius))
+			{
+				Statuses.Add(TEXT("ПАХНЕТ ГАЗОМ — НЕ КУРИТЬ!"));
+				break;
+			}
+		}
 
 		float StatusY = PanelY - Statuses.Num() * 22.f - 12.f;
 		for (const FString& Status : Statuses)

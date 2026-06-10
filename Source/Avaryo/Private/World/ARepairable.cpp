@@ -5,8 +5,10 @@
 #include "Components/TextRenderComponent.h"
 #include "Components/VitalsComponent.h"
 #include "Engine/World.h"
+#include "EngineUtils.h"
 #include "GameFramework/PlayerController.h"
 #include "Items/APickupItem.h"
+#include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 
 ARepairable::ARepairable()
@@ -29,9 +31,13 @@ ARepairable::ARepairable()
 	RepairDuration = 8.f;
 	RequiredTool = NAME_None;
 	RepairRange = 350.f;
+	bLeaksGasWhenBroken = false;
+	GasRadius = 450.f;
+	ExplosionDamage = 45.f;
 	bBroken = true;
 	RepairProgress = 0.f;
 	NoiseAccum = 0.f;
+	ExplosionCooldown = 0.f;
 	LastShownPercent = -1;
 }
 
@@ -80,6 +86,24 @@ void ARepairable::Tick(float DeltaSeconds)
 				bBroken = false;
 				RefreshStatusVisual(); // на листен-сервере OnRep не придёт
 				OnRepairFinished.Broadcast(this, FinishedBy);
+			}
+		}
+	}
+
+	// Сервер: газовая утечка — открытый огонь (перекур) в облаке = взрыв
+	if (HasAuthority())
+	{
+		ExplosionCooldown = FMath::Max(ExplosionCooldown - DeltaSeconds, 0.f);
+		if (IsLeakingGas() && ExplosionCooldown <= 0.f)
+		{
+			for (TActorIterator<AAvaryoCharacter> It(GetWorld()); It; ++It)
+			{
+				if (It->VitalsComponent && It->VitalsComponent->IsSmoking()
+					&& FVector::DistSquared(It->GetActorLocation(), GetActorLocation()) <= FMath::Square(GasRadius))
+				{
+					ExplodeGas(*It);
+					break;
+				}
 			}
 		}
 	}
@@ -161,6 +185,27 @@ void ARepairable::SetBroken(bool bNewBroken)
 	RepairProgress = 0.f;
 	Repairer = nullptr;
 	RefreshStatusVisual();
+}
+
+void ARepairable::ExplodeGas(AAvaryoCharacter* Culprit)
+{
+	ExplosionCooldown = 10.f;
+	RepairProgress = 0.f; // взрыв сжёг всю проделанную работу
+
+	// Урон по радиусу (через TakeDamage дойдёт до шкал) + скачок паники у всех рядом
+	UGameplayStatics::ApplyRadialDamage(this, ExplosionDamage, GetActorLocation(), GasRadius,
+		nullptr, {}, this, Culprit ? Culprit->GetController() : nullptr, true);
+	for (TActorIterator<AAvaryoCharacter> It(GetWorld()); It; ++It)
+	{
+		if (It->VitalsComponent
+			&& FVector::DistSquared(It->GetActorLocation(), GetActorLocation()) <= FMath::Square(GasRadius * 1.5f))
+		{
+			It->VitalsComponent->AddPanic(30.f);
+		}
+	}
+
+	// Громче этого ночью не бывает
+	MakeNoise(2.f, Culprit, GetActorLocation());
 }
 
 void ARepairable::OnRep_Broken()

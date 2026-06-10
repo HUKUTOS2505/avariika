@@ -23,7 +23,8 @@ enum class EItemEffect : uint8
 	Heal		UMETA(DisplayName = "Лечит (себя или раненого рядом)"),
 	Calm		UMETA(DisplayName = "Снижает панику"),
 	Extinguish	UMETA(DisplayName = "Огнетушитель (распыление, пока зажата кнопка)"),
-	Recharge	UMETA(DisplayName = "Заряжает налобный фонарь")
+	Recharge	UMETA(DisplayName = "Заряжает налобный фонарь"),
+	Radio		UMETA(DisplayName = "Рация (тумблер вкл/выкл, шумит)")
 };
 
 /**
@@ -104,10 +105,24 @@ public:
 	UFUNCTION(BlueprintPure, Category="Pickup|Use")
 	bool IsSpraying() const { return bSpraying; }
 
+	/** Тумблер (рация): включить/выключить. Только сервер. */
+	UFUNCTION(BlueprintCallable, Category="Pickup|Use")
+	void SetToggledOn(bool bNewOn);
+
+	UFUNCTION(BlueprintPure, Category="Pickup|Use")
+	bool IsToggledOn() const { return bToggledOn; }
+
 protected:
 	/** Идёт ли распыление (для огнетушителя), реплицируется. */
 	UPROPERTY(ReplicatedUsing=OnRep_Spraying)
 	bool bSpraying;
+
+	/** Включён ли тумблер (рация), реплицируется. */
+	UPROPERTY(Replicated)
+	bool bToggledOn;
+
+	/** Таймер шума включённой рации (сервер). */
+	float ToggleNoiseAccum;
 
 	UFUNCTION()
 	void OnRep_Spraying();

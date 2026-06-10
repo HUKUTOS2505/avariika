@@ -52,6 +52,22 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Repair")
 	float RepairRange;
 
+	/** Пока сломан — травит газ: открытый огонь рядом (курение) вызывает взрыв. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Repair|Gas")
+	bool bLeaksGasWhenBroken;
+
+	/** Радиус газового облака, см. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Repair|Gas")
+	float GasRadius;
+
+	/** Урон взрыва в эпицентре. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Repair|Gas")
+	float ExplosionDamage;
+
+	/** Травит ли газ прямо сейчас (для HUD «пахнет газом»). */
+	UFUNCTION(BlueprintPure, Category="Repair|Gas")
+	bool IsLeakingGas() const { return bBroken && bLeaksGasWhenBroken; }
+
 	/** Объект починен (для RunState и списка задач). Срабатывает на сервере. */
 	UPROPERTY(BlueprintAssignable, Category="Repair")
 	FOnRepairFinished OnRepairFinished;
@@ -93,6 +109,12 @@ protected:
 
 	/** Таймер шума починки (стук/сварка слышны — задел под монстра-слухача). */
 	float NoiseAccum;
+
+	/** Пауза между взрывами, чтобы не рвало каждый тик. */
+	float ExplosionCooldown;
+
+	/** Газ рванул: урон и паника по радиусу, очень громко, прогресс починки сгорает. */
+	void ExplodeGas(AAvaryoCharacter* Culprit);
 
 	/** Последний показанный на табличке процент — чтобы не перерисовывать текст каждый кадр. */
 	int32 LastShownPercent;
