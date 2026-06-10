@@ -22,7 +22,8 @@ enum class EItemEffect : uint8
 	None		UMETA(DisplayName = "Ничего"),
 	Heal		UMETA(DisplayName = "Лечит (себя или раненого рядом)"),
 	Calm		UMETA(DisplayName = "Снижает панику"),
-	Extinguish	UMETA(DisplayName = "Огнетушитель (распыление, пока зажата кнопка)")
+	Extinguish	UMETA(DisplayName = "Огнетушитель (распыление, пока зажата кнопка)"),
+	Recharge	UMETA(DisplayName = "Заряжает налобный фонарь")
 };
 
 /**

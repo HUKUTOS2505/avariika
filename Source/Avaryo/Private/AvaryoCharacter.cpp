@@ -576,6 +576,7 @@ bool AAvaryoCharacter::CanApplyEffect(APickupItem* Item) const
 	case EItemEffect::Heal:       return FindHealTarget() != nullptr;
 	case EItemEffect::Calm:       return VitalsComponent->GetPanic() > 1.f;
 	case EItemEffect::Extinguish: return Item->Charges != 0;
+	case EItemEffect::Recharge:   return FlashlightComponent && FlashlightComponent->GetBatteryLevel() < 99.f;
 	default:                      return false;
 	}
 }
@@ -604,6 +605,13 @@ void AAvaryoCharacter::ApplyItemEffect(APickupItem* Item)
 		if (VitalsComponent->GetPanic() > 1.f)
 		{
 			VitalsComponent->StartSmoking(); // 15 сек по 2 очка паники в секунду
+			ConsumeCharge(Item);
+		}
+		break;
+	case EItemEffect::Recharge:
+		if (FlashlightComponent && FlashlightComponent->GetBatteryLevel() < 99.f)
+		{
+			FlashlightComponent->Recharge(Item->EffectMagnitude);
 			ConsumeCharge(Item);
 		}
 		break;
