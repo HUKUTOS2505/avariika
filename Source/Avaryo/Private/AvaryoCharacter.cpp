@@ -15,6 +15,7 @@
 #include "Items/APickupItem.h"
 #include "Net/UnrealNetwork.h"
 #include "World/ARepairable.h"
+#include "World/AToilet.h"
 
 AAvaryoCharacter::AAvaryoCharacter()
 {
@@ -80,6 +81,7 @@ void AAvaryoCharacter::Tick(float DeltaSeconds)
 		FocusedItem = FindFocusedItem();
 		FocusedRepairable = FindFocusedRepairable();
 		FocusedWounded = FindFocusedWoundedTeammate();
+		FocusedToilet = FindFocusedToilet();
 	}
 
 	// Починка сорвалась на стороне объекта (ушёл, ранен) — чистим ссылку
@@ -506,6 +508,12 @@ void AAvaryoCharacter::InteractPressedAuth()
 		return;
 	}
 
+	if (AToilet* Toilet = FindFocusedToilet())
+	{
+		Toilet->UseBy(this);
+		return;
+	}
+
 	if (AAvaryoCharacter* Wounded = FindFocusedWoundedTeammate())
 	{
 		if (CanDrag(Wounded))
@@ -530,6 +538,22 @@ void AAvaryoCharacter::InteractReleasedAuth()
 		CurrentRepairable->EndRepairBy(this);
 		CurrentRepairable = nullptr;
 	}
+}
+
+AToilet* AAvaryoCharacter::FindFocusedToilet() const
+{
+	FVector ViewLoc;
+	FRotator ViewRot;
+	GetActorEyesViewPoint(ViewLoc, ViewRot);
+
+	FCollisionQueryParams Params(FName(TEXT("ToiletTrace")), false, this);
+	FHitResult Hit;
+	const FCollisionShape Probe = FCollisionShape::MakeSphere(12.f);
+	if (GetWorld()->SweepSingleByChannel(Hit, ViewLoc, ViewLoc + ViewRot.Vector() * PickupRange, FQuat::Identity, ECC_Visibility, Probe, Params))
+	{
+		return Cast<AToilet>(Hit.GetActor());
+	}
+	return nullptr;
 }
 
 // ---------- Перетаскивание раненого ----------

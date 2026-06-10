@@ -46,6 +46,16 @@ if gen:
 else:
     out.append('WARN: Repairable_Generator не найден')
 
+# Биотуалет в дальнем углу карты (пол z=-15, куб 100 см: z = -15 + 50*scale.z)
+if 'Toilet' not in by_label:
+    toilet = eas.spawn_actor_from_class(unreal.Toilet, unreal.Vector(-1650.0, -1550.0, 95.0), unreal.Rotator(0.0, 0.0, 0.0))
+    toilet.set_actor_label('Toilet')
+    toilet.set_actor_scale3d(unreal.Vector(0.9, 0.9, 2.2))
+    toilet.get_editor_property('MeshComponent').set_static_mesh(unreal.load_asset('/Engine/BasicShapes/Cube'))
+    out.append('Toilet заспавнен')
+else:
+    out.append('Toilet уже стоит')
+
 # Рация на платформе спавна
 if 'Radio' not in by_label:
     radio = eas.spawn_actor_from_class(unreal.PickupItem, unreal.Vector(150.0, -80.0, 342.0), unreal.Rotator(0.0, 0.0, 0.0))

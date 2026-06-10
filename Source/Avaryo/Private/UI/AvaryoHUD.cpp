@@ -11,6 +11,7 @@
 #include "GameFramework/PlayerState.h"
 #include "Items/APickupItem.h"
 #include "World/ARepairable.h"
+#include "World/AToilet.h"
 
 namespace AvaryoHUDStyle
 {
@@ -54,6 +55,37 @@ void AAvaryoHUD::DrawHUD()
 		GetTextSize(Text, W, H, Font, Scale);
 		DrawText(Text, Color, (SizeX - W) * 0.5f, Y, Font, Scale);
 		return H;
+	};
+
+	// Плашка-подсказка по центру с оранжевой кромкой ("[E] Поднять ...")
+	auto DrawPromptBox = [&](const FString& Prompt)
+	{
+		float W = 0.f, H = 0.f;
+		GetTextSize(Prompt, W, H, Font, 1.3f);
+
+		const float BoxW = W + 36.f, BoxH = H + 16.f;
+		const float BoxX = (SizeX - BoxW) * 0.5f;
+		const float BoxY = SizeY * 0.58f;
+
+		DrawRect(BoxBG, BoxX, BoxY, BoxW, BoxH);
+		DrawRect(Accent, BoxX, BoxY, BoxW, 3.f); // оранжевая кромка сверху
+		DrawText(Prompt, TextMain, BoxX + 18.f, BoxY + 8.f, Font, 1.3f);
+	};
+
+	// Полоса прогресса с подписью по центру экрана (применение, ремонт)
+	auto DrawCastBar = [&](const FString& Label, float Progress, const FLinearColor& Fill)
+	{
+		const float BarW = 340.f, BarH = 20.f;
+		const float BoxX = (SizeX - BarW) * 0.5f;
+		const float BoxY = SizeY * 0.46f;
+
+		float LabelW = 0.f, LabelH = 0.f;
+		GetTextSize(Label, LabelW, LabelH, Font, 1.1f);
+
+		DrawRect(BoxBG, BoxX - 12.f, BoxY - LabelH - 10.f, BarW + 24.f, LabelH + BarH + 22.f);
+		DrawText(Label, TextMain, BoxX, BoxY - LabelH - 4.f, Font, 1.1f);
+		DrawRect(BarBG, BoxX, BoxY + 2.f, BarW, BarH);
+		DrawRect(Fill, BoxX, BoxY + 2.f, BarW * FMath::Clamp(Progress, 0.f, 1.f), BarH);
 	};
 
 	// ---------- Шкалы (слева сверху) ----------
@@ -226,55 +258,22 @@ void AAvaryoHUD::DrawHUD()
 	{
 		APickupItem* Casting = Character->GetHeldItem();
 		const int32 Percent = FMath::RoundToInt(Character->GetUseProgress() * 100.f);
-		const FString Label = FString::Printf(TEXT("Применение: %s  %d%%"),
-			Casting ? *Casting->DisplayName.ToString() : TEXT("..."), Percent);
-
-		const float BarW = 340.f, BarH = 20.f;
-		const float BoxX = (SizeX - BarW) * 0.5f;
-		const float BoxY = SizeY * 0.46f;
-
-		float LabelW = 0.f, LabelH = 0.f;
-		GetTextSize(Label, LabelW, LabelH, Font, 1.1f);
-
-		// плашка под текст и полосу
-		DrawRect(BoxBG, BoxX - 12.f, BoxY - LabelH - 10.f, BarW + 24.f, LabelH + BarH + 22.f);
-		DrawText(Label, TextMain, BoxX, BoxY - LabelH - 4.f, Font, 1.1f);
-		DrawRect(BarBG, BoxX, BoxY + 2.f, BarW, BarH);
-		DrawRect(BarFill, BoxX, BoxY + 2.f, BarW * Character->GetUseProgress(), BarH);
+		DrawCastBar(FString::Printf(TEXT("Применение: %s  %d%%"),
+			Casting ? *Casting->DisplayName.ToString() : TEXT("..."), Percent),
+			Character->GetUseProgress(), BarFill);
 	}
 	// ---------- Починка (держит E у объекта) ----------
 	else if (Character->IsRepairing() && Character->GetCurrentRepairable())
 	{
 		ARepairable* Repairing = Character->GetCurrentRepairable();
 		const int32 Percent = FMath::RoundToInt(Repairing->GetRepairProgress() * 100.f);
-		const FString Label = FString::Printf(TEXT("Ремонт: %s  %d%%"), *Repairing->DisplayName.ToString(), Percent);
-
-		const float BarW = 340.f, BarH = 20.f;
-		const float BoxX = (SizeX - BarW) * 0.5f;
-		const float BoxY = SizeY * 0.46f;
-
-		float LabelW = 0.f, LabelH = 0.f;
-		GetTextSize(Label, LabelW, LabelH, Font, 1.1f);
-
-		DrawRect(BoxBG, BoxX - 12.f, BoxY - LabelH - 10.f, BarW + 24.f, LabelH + BarH + 22.f);
-		DrawText(Label, TextMain, BoxX, BoxY - LabelH - 4.f, Font, 1.1f);
-		DrawRect(BarBG, BoxX, BoxY + 2.f, BarW, BarH);
-		DrawRect(Accent, BoxX, BoxY + 2.f, BarW * Repairing->GetRepairProgress(), BarH);
+		DrawCastBar(FString::Printf(TEXT("Ремонт: %s  %d%%"), *Repairing->DisplayName.ToString(), Percent),
+			Repairing->GetRepairProgress(), Accent);
 	}
 	// ---------- Подсказка подбора (плашка как в референсе) ----------
 	else if (APickupItem* Focused = Character->GetFocusedItem())
 	{
-		const FString Prompt = FString::Printf(TEXT("[E] Поднять %s"), *Focused->DisplayName.ToString());
-		float W = 0.f, H = 0.f;
-		GetTextSize(Prompt, W, H, Font, 1.3f);
-
-		const float BoxW = W + 36.f, BoxH = H + 16.f;
-		const float BoxX = (SizeX - BoxW) * 0.5f;
-		const float BoxY = SizeY * 0.58f;
-
-		DrawRect(BoxBG, BoxX, BoxY, BoxW, BoxH);
-		DrawRect(Accent, BoxX, BoxY, BoxW, 3.f); // оранжевая кромка сверху
-		DrawText(Prompt, TextMain, BoxX + 18.f, BoxY + 8.f, Font, 1.3f);
+		DrawPromptBox(FString::Printf(TEXT("[E] Поднять %s"), *Focused->DisplayName.ToString()));
 	}
 	// ---------- Подсказка починки ----------
 	else if (ARepairable* FocusedRep = Character->GetFocusedRepairable())
@@ -296,34 +295,21 @@ void AAvaryoHUD::DrawHUD()
 			Prompt = FString::Printf(TEXT("Для «%s» нужен инструмент: %s"),
 				*FocusedRep->DisplayName.ToString(), *FocusedRep->RequiredTool.ToString());
 		}
-
-		float W = 0.f, H = 0.f;
-		GetTextSize(Prompt, W, H, Font, 1.3f);
-
-		const float BoxW = W + 36.f, BoxH = H + 16.f;
-		const float BoxX = (SizeX - BoxW) * 0.5f;
-		const float BoxY = SizeY * 0.58f;
-
-		DrawRect(BoxBG, BoxX, BoxY, BoxW, BoxH);
-		DrawRect(Accent, BoxX, BoxY, BoxW, 3.f);
-		DrawText(Prompt, TextMain, BoxX + 18.f, BoxY + 8.f, Font, 1.3f);
+		DrawPromptBox(Prompt);
+	}
+	// ---------- Подсказка биотуалета ----------
+	else if (AToilet* Toilet = Character->GetFocusedToilet())
+	{
+		DrawPromptBox(Toilet->CanUseBy(Character)
+			? TEXT("[E] Облегчиться")
+			: TEXT("Биотуалет: пока не хочется"));
 	}
 	// ---------- Подсказка драга раненого ----------
 	else if (Character->GetFocusedWounded() && !Character->IsDragging())
 	{
-		const FString Prompt = Character->IsCarryingHeavy()
+		DrawPromptBox(Character->IsCarryingHeavy()
 			? TEXT("Поставьте тяжёлое (G), чтобы тащить раненого")
-			: TEXT("[E] Тащить раненого");
-		float W = 0.f, H = 0.f;
-		GetTextSize(Prompt, W, H, Font, 1.3f);
-
-		const float BoxW = W + 36.f, BoxH = H + 16.f;
-		const float BoxX = (SizeX - BoxW) * 0.5f;
-		const float BoxY = SizeY * 0.58f;
-
-		DrawRect(BoxBG, BoxX, BoxY, BoxW, BoxH);
-		DrawRect(Accent, BoxX, BoxY, BoxW, 3.f);
-		DrawText(Prompt, TextMain, BoxX + 18.f, BoxY + 8.f, Font, 1.3f);
+			: TEXT("[E] Тащить раненого"));
 	}
 
 	// ---------- Подсказки использования / передачи ----------

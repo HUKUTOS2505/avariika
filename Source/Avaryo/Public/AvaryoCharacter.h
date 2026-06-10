@@ -6,6 +6,7 @@
 
 class APickupItem;
 class ARepairable;
+class AToilet;
 class UCameraComponent;
 class UFlashlightComponent;
 class UVitalsComponent;
@@ -90,6 +91,10 @@ public:
 
 	UFUNCTION(BlueprintPure, Category="Avaryo|Drag")
 	bool IsDragging() const { return DraggedTeammate != nullptr; }
+
+	/** Биотуалет под прицелом (для подсказки в HUD). */
+	UFUNCTION(BlueprintPure, Category="Avaryo|Interact")
+	AToilet* GetFocusedToilet() const { return FocusedToilet; }
 
 	/** Использовать предмет в руках (мгновенные эффекты): аптечка лечит, сигареты успокаивают. */
 	UFUNCTION(BlueprintCallable, Category="Avaryo|Inventory")
@@ -232,6 +237,10 @@ protected:
 	UPROPERTY(Transient, BlueprintReadOnly, Category="Avaryo|Drag")
 	TObjectPtr<AAvaryoCharacter> FocusedWounded;
 
+	/** Биотуалет под прицелом. Считается локально в Tick. */
+	UPROPERTY(Transient, BlueprintReadOnly, Category="Avaryo|Interact")
+	TObjectPtr<AToilet> FocusedToilet;
+
 	/** Таймер шороха волочения (слышно — задел под монстра). */
 	float DragNoiseAccum;
 
@@ -298,6 +307,9 @@ protected:
 
 	/** Найти раненого тиммейта под прицелом или рядом (для драга). */
 	AAvaryoCharacter* FindFocusedWoundedTeammate() const;
+
+	/** Найти биотуалет под прицелом. */
+	AToilet* FindFocusedToilet() const;
 
 	/** Можно ли начать тащить этого раненого. */
 	bool CanDrag(const AAvaryoCharacter* Wounded) const;
