@@ -38,6 +38,9 @@ AAvaryoCharacter::AAvaryoCharacter()
 	CrawlSpeed = 120.f;
 	IncidentSlowMultiplier = 0.7f;
 
+	DragSpeedMultiplier = 0.55f;
+	DragNoiseAccum = 0.f;
+
 	bWasWounded = false;
 	bSprayingHeld = false;
 	SprayDrainAccum = 0.f;
@@ -75,6 +78,7 @@ void AAvaryoCharacter::Tick(float DeltaSeconds)
 	{
 		FocusedItem = FindFocusedItem();
 		FocusedRepairable = FindFocusedRepairable();
+		FocusedWounded = FindFocusedWoundedTeammate();
 	}
 
 	// Починка сорвалась на стороне объекта (ушёл, ранен) — чистим ссылку
@@ -97,6 +101,7 @@ void AAvaryoCharacter::Tick(float DeltaSeconds)
 		{
 			StopSpraying();
 			CancelUseCast();
+			ReleaseDraggedTeammate(); // раненый никого не тащит
 			if (bOffering)
 			{
 				bOffering = false;
@@ -115,6 +120,12 @@ void AAvaryoCharacter::Tick(float DeltaSeconds)
 	if (HasAuthority() && bSprayingHeld)
 	{
 		TickSpray(DeltaSeconds);
+	}
+
+	// Волочение раненого
+	if (HasAuthority() && DraggedTeammate)
+	{
+		TickDrag(DeltaSeconds);
 	}
 
 	// Применение предмета (аптечка 6 сек, сигарета 2 сек)
@@ -180,6 +191,8 @@ void AAvaryoCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	DOREPLIFETIME(AAvaryoCharacter, UseCastDuration);
 	DOREPLIFETIME(AAvaryoCharacter, bOffering);
 	DOREPLIFETIME(AAvaryoCharacter, CurrentRepairable);
+	DOREPLIFETIME(AAvaryoCharacter, DraggedTeammate);
+	DOREPLIFETIME(AAvaryoCharacter, DraggedBy);
 }
 
 float AAvaryoCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -223,6 +236,14 @@ void AAvaryoCharacter::RefreshMoveSpeed()
 	if (IsCarryingHeavy())
 	{
 		Speed *= HeavyCarryMultiplier; // сварочник в руках — не побегаешь
+	}
+	if (DraggedTeammate)
+	{
+		Speed *= DragSpeedMultiplier; // тащишь тело — медленно
+	}
+	if (DraggedBy)
+	{
+		Speed = 0.f; // тебя волокут — не ползай против движения
 	}
 	if (VitalsComponent->IsIncidentSlowed())
 	{
@@ -461,8 +482,14 @@ void AAvaryoCharacter::OnInteractReleased()
 
 void AAvaryoCharacter::InteractPressedAuth()
 {
-	// Приоритет у предмета: смотришь на предмет — подбираешь,
-	// иначе сломанный объект под прицелом — начинаешь чинить
+	// Уже тащишь раненого — повторное E отпускает
+	if (DraggedTeammate)
+	{
+		ReleaseDraggedTeammate();
+		return;
+	}
+
+	// Приоритет: предмет → ремонт → раненый тиммейт
 	if (APickupItem* Item = FindFocusedItem())
 	{
 		PickupItem(Item);
@@ -475,6 +502,19 @@ void AAvaryoCharacter::InteractPressedAuth()
 		{
 			CurrentRepairable = Repairable;
 		}
+		return;
+	}
+
+	if (AAvaryoCharacter* Wounded = FindFocusedWoundedTeammate())
+	{
+		if (CanDrag(Wounded))
+		{
+			StopSpraying();
+			CancelUseCast();
+			DraggedTeammate = Wounded;
+			Wounded->DraggedBy = this;
+			DragNoiseAccum = 0.f;
+		}
 	}
 }
 
@@ -485,6 +525,102 @@ void AAvaryoCharacter::InteractReleasedAuth()
 		CurrentRepairable->EndRepairBy(this);
 		CurrentRepairable = nullptr;
 	}
+}
+
+// ---------- Перетаскивание раненого ----------
+
+AAvaryoCharacter* AAvaryoCharacter::FindFocusedWoundedTeammate() const
+{
+	// Свип из камеры — раненый, на которого смотрим
+	FVector ViewLoc;
+	FRotator ViewRot;
+	GetActorEyesViewPoint(ViewLoc, ViewRot);
+
+	FCollisionQueryParams Params(FName(TEXT("DragTrace")), false, this);
+	FHitResult Hit;
+	const FCollisionShape Probe = FCollisionShape::MakeSphere(30.f);
+	if (GetWorld()->SweepSingleByChannel(Hit, ViewLoc, ViewLoc + ViewRot.Vector() * PickupRange, FQuat::Identity, ECC_Visibility, Probe, Params))
+	{
+		AAvaryoCharacter* Other = Cast<AAvaryoCharacter>(Hit.GetActor());
+		if (Other && Other->VitalsComponent && Other->VitalsComponent->IsWounded())
+		{
+			return Other;
+		}
+	}
+
+	// Фолбэк: раненый вплотную (лежит под ногами — трейс легко промахивается)
+	for (TActorIterator<AAvaryoCharacter> It(GetWorld()); It; ++It)
+	{
+		AAvaryoCharacter* Other = *It;
+		if (Other != this && Other->VitalsComponent && Other->VitalsComponent->IsWounded()
+			&& FVector::DistSquared(Other->GetActorLocation(), GetActorLocation()) < FMath::Square(ReviveRange))
+		{
+			return Other;
+		}
+	}
+	return nullptr;
+}
+
+bool AAvaryoCharacter::CanDrag(const AAvaryoCharacter* Wounded) const
+{
+	if (!Wounded || Wounded == this || !Wounded->VitalsComponent || !Wounded->VitalsComponent->IsWounded())
+	{
+		return false;
+	}
+	if (Wounded->DraggedBy)
+	{
+		return false; // его уже тащат
+	}
+	if (VitalsComponent && VitalsComponent->IsWounded())
+	{
+		return false; // раненый не носильщик
+	}
+	if (IsCarryingHeavy())
+	{
+		return false; // руки заняты тяжёлым — сначала поставь (G)
+	}
+	return true;
+}
+
+void AAvaryoCharacter::ReleaseDraggedTeammate()
+{
+	if (DraggedTeammate)
+	{
+		DraggedTeammate->DraggedBy = nullptr;
+		DraggedTeammate = nullptr;
+	}
+}
+
+void AAvaryoCharacter::TickDrag(float DeltaSeconds)
+{
+	// Драг срывается: раненый встал, тащащий ранен, взял тяжёлое, тело застряло далеко
+	if (!CanDragContinue())
+	{
+		ReleaseDraggedTeammate();
+		return;
+	}
+
+	// Тянем тело за спину с интерполяцией; свип не даёт протащить сквозь стены
+	const FVector Target = GetActorLocation() - GetActorForwardVector() * 130.f;
+	const FVector NewLoc = FMath::VInterpTo(DraggedTeammate->GetActorLocation(), Target, DeltaSeconds, 6.f);
+	DraggedTeammate->SetActorLocation(NewLoc, true);
+
+	// Волочение тела шуршит — монстр-слухач оценит
+	DragNoiseAccum += DeltaSeconds;
+	if (DragNoiseAccum >= 1.f)
+	{
+		DragNoiseAccum = 0.f;
+		MakeNoise(0.5f, this, GetActorLocation());
+	}
+}
+
+bool AAvaryoCharacter::CanDragContinue() const
+{
+	return DraggedTeammate
+		&& DraggedTeammate->VitalsComponent && DraggedTeammate->VitalsComponent->IsWounded()
+		&& !(VitalsComponent && VitalsComponent->IsWounded())
+		&& !IsCarryingHeavy()
+		&& FVector::DistSquared(DraggedTeammate->GetActorLocation(), GetActorLocation()) < FMath::Square(450.f);
 }
 
 void AAvaryoCharacter::ServerInteractPressed_Implementation()

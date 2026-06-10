@@ -74,6 +74,23 @@ public:
 	UFUNCTION(BlueprintPure, Category="Avaryo|Repair")
 	ARepairable* GetCurrentRepairable() const { return CurrentRepairable; }
 
+	// ---------- Перетаскивание раненого ----------
+
+	/** Кого тащу (E на раненом — схватил, повторное E — отпустил). */
+	UFUNCTION(BlueprintPure, Category="Avaryo|Drag")
+	AAvaryoCharacter* GetDraggedTeammate() const { return DraggedTeammate; }
+
+	/** Кто тащит меня (я ранен). */
+	UFUNCTION(BlueprintPure, Category="Avaryo|Drag")
+	AAvaryoCharacter* GetDraggedBy() const { return DraggedBy; }
+
+	/** Раненый тиммейт под прицелом/рядом (для подсказки в HUD). */
+	UFUNCTION(BlueprintPure, Category="Avaryo|Drag")
+	AAvaryoCharacter* GetFocusedWounded() const { return FocusedWounded; }
+
+	UFUNCTION(BlueprintPure, Category="Avaryo|Drag")
+	bool IsDragging() const { return DraggedTeammate != nullptr; }
+
 	/** Использовать предмет в руках (мгновенные эффекты): аптечка лечит, сигареты успокаивают. */
 	UFUNCTION(BlueprintCallable, Category="Avaryo|Inventory")
 	void UseHeldItem();
@@ -174,6 +191,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Inventory")
 	float ReviveRange;
 
+	/** Множитель скорости, пока тащишь раненого. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Movement")
+	float DragSpeedMultiplier;
+
 protected:
 	/** Тяжёлый слот (один предмет), реплицируется. */
 	UPROPERTY(ReplicatedUsing=OnRep_Inventory, BlueprintReadOnly, Category="Avaryo|Inventory")
@@ -198,6 +219,21 @@ protected:
 	/** Что чиню сейчас (сервер пишет, реплицируется для HUD). */
 	UPROPERTY(Replicated, BlueprintReadOnly, Category="Avaryo|Repair")
 	TObjectPtr<ARepairable> CurrentRepairable;
+
+	/** Раненый, которого тащу (сервер пишет, реплицируется). */
+	UPROPERTY(Replicated, BlueprintReadOnly, Category="Avaryo|Drag")
+	TObjectPtr<AAvaryoCharacter> DraggedTeammate;
+
+	/** Кто тащит меня (обратная ссылка, реплицируется для HUD раненого). */
+	UPROPERTY(Replicated, BlueprintReadOnly, Category="Avaryo|Drag")
+	TObjectPtr<AAvaryoCharacter> DraggedBy;
+
+	/** Раненый под прицелом. Считается локально в Tick. */
+	UPROPERTY(Transient, BlueprintReadOnly, Category="Avaryo|Drag")
+	TObjectPtr<AAvaryoCharacter> FocusedWounded;
+
+	/** Таймер шороха волочения (слышно — задел под монстра). */
+	float DragNoiseAccum;
 
 	/** Камера персонажа (из Blueprint), к ней крепится предмет в руках. */
 	UPROPERTY(Transient)
@@ -259,6 +295,21 @@ protected:
 	/** Серверная логика нажатия/отпускания E. */
 	void InteractPressedAuth();
 	void InteractReleasedAuth();
+
+	/** Найти раненого тиммейта под прицелом или рядом (для драга). */
+	AAvaryoCharacter* FindFocusedWoundedTeammate() const;
+
+	/** Можно ли начать тащить этого раненого. */
+	bool CanDrag(const AAvaryoCharacter* Wounded) const;
+
+	/** Отпустить раненого. Только сервер. */
+	void ReleaseDraggedTeammate();
+
+	/** Серверный тик волочения: тянем раненого за собой, шуршим. */
+	void TickDrag(float DeltaSeconds);
+
+	/** Можно ли продолжать тащить (встал, сам ранен, взял тяжёлое, застрял). */
+	bool CanDragContinue() const;
 
 	/** Применить состояние инвентаря: активный в руки, тяжёлый опустить, лёгкие спрятать. */
 	void RefreshHeldItem();

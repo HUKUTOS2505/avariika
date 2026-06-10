@@ -239,6 +239,23 @@ void AAvaryoHUD::DrawHUD()
 		DrawRect(Accent, BoxX, BoxY, BoxW, 3.f);
 		DrawText(Prompt, TextMain, BoxX + 18.f, BoxY + 8.f, Font, 1.3f);
 	}
+	// ---------- Подсказка драга раненого ----------
+	else if (Character->GetFocusedWounded() && !Character->IsDragging())
+	{
+		const FString Prompt = Character->IsCarryingHeavy()
+			? TEXT("Поставьте тяжёлое (G), чтобы тащить раненого")
+			: TEXT("[E] Тащить раненого");
+		float W = 0.f, H = 0.f;
+		GetTextSize(Prompt, W, H, Font, 1.3f);
+
+		const float BoxW = W + 36.f, BoxH = H + 16.f;
+		const float BoxX = (SizeX - BoxW) * 0.5f;
+		const float BoxY = SizeY * 0.58f;
+
+		DrawRect(BoxBG, BoxX, BoxY, BoxW, BoxH);
+		DrawRect(Accent, BoxX, BoxY, BoxW, 3.f);
+		DrawText(Prompt, TextMain, BoxX + 18.f, BoxY + 8.f, Font, 1.3f);
+	}
 
 	// ---------- Подсказки использования / передачи ----------
 	if (!Character->IsUsingItem())
@@ -321,6 +338,8 @@ void AAvaryoHUD::DrawHUD()
 		if (Vitals->GetBladder() > 70.f)  Statuses.Add(TEXT("Хочет в туалет"));
 		if (Vitals->GetStamina() < 20.f)  Statuses.Add(TEXT("Устал"));
 		if (Character->IsCarryingHeavy()) Statuses.Add(TEXT("Несёт тяжёлое"));
+		if (Character->IsDragging())      Statuses.Add(TEXT("Тащит раненого ([E] отпустить)"));
+		if (Character->GetDraggedBy())    Statuses.Add(TEXT("Вас тащат"));
 		if (Vitals->IsIncidentSlowed())   Statuses.Add(TEXT("Санитарный инцидент!"));
 		else if (Vitals->IsSoiled())      Statuses.Add(TEXT("Испачкан"));
 
