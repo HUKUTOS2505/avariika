@@ -41,6 +41,7 @@ AAvaryoCharacter::AAvaryoCharacter()
 	bSprayingHeld = false;
 	SprayDrainAccum = 0.f;
 	SprayNoiseAccum = 0.f;
+	FootstepNoiseAccum = 0.f;
 	UseCastRemaining = 0.f;
 	UseCastDuration = 0.f;
 	bOffering = false;
@@ -112,6 +113,18 @@ void AAvaryoCharacter::Tick(float DeltaSeconds)
 	if (HasAuthority() && UseCastRemaining > 0.f)
 	{
 		TickUseCast(DeltaSeconds);
+	}
+
+	// Бег шумит — монстр-слухач это услышит
+	if (HasAuthority() && VitalsComponent && VitalsComponent->IsSprinting()
+		&& GetVelocity().SizeSquared2D() > 100.f)
+	{
+		FootstepNoiseAccum += DeltaSeconds;
+		if (FootstepNoiseAccum >= 0.5f)
+		{
+			FootstepNoiseAccum = 0.f;
+			MakeNoise(1.f, this, GetActorLocation());
+		}
 	}
 }
 
@@ -484,6 +497,9 @@ void AAvaryoCharacter::DropItem()
 			Prim->AddImpulse(GetActorForwardVector() * 200.f, NAME_None, true);
 		}
 	}
+
+	// Падение предмета слышно; тяжёлый — громче
+	MakeNoise(bHeavy ? 1.f : 0.6f, this, DropLocation);
 
 	RefreshHeldItem();
 }

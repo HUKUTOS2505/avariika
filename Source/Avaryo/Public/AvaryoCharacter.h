@@ -182,6 +182,7 @@ protected:
 	bool bSprayingHeld;
 	float SprayDrainAccum;  // накопитель дробного расхода зарядов
 	float SprayNoiseAccum;  // таймер шума для будущего монстра-слухача
+	float FootstepNoiseAccum; // таймер шума шагов при беге
 
 	/** Каст применения предмета: осталось/всего, реплицируется для HUD. */
 	UPROPERTY(Replicated)

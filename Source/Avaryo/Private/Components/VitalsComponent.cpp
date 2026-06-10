@@ -129,6 +129,7 @@ void UVitalsComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 		bSoiled = true;
 		IncidentSlowRemaining = IncidentSlowDuration;
 		Panic = FMath::Min(100.f, Panic + IncidentPanicSpike);
+		Char->MakeNoise(1.f, Char, Char->GetActorLocation()); // очень громко и стыдно
 		OnSanitaryIncident.Broadcast();
 	}
 
