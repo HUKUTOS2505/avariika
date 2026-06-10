@@ -5,7 +5,43 @@
 #include "Subsystems/WorldSubsystem.h"
 #include "ARunState.generated.h"
 
+class AAvaryoCharacter;
 class ARepairable;
+
+/** Статистика монтёра за забег — кормит «Акт выполненных работ». */
+USTRUCT(BlueprintType)
+struct FPlayerRunStats
+{
+	GENERATED_BODY()
+
+	UPROPERTY(BlueprintReadOnly, Category="Run")
+	TObjectPtr<AAvaryoCharacter> Character = nullptr;
+
+	UPROPERTY(BlueprintReadOnly, Category="Run")
+	int32 Repairs = 0;          // закончил починок
+
+	UPROPERTY(BlueprintReadOnly, Category="Run")
+	int32 TimesWounded = 0;     // сколько раз падал
+
+	UPROPERTY(BlueprintReadOnly, Category="Run")
+	int32 Revives = 0;          // поднял тиммейтов аптечкой
+
+	UPROPERTY(BlueprintReadOnly, Category="Run")
+	int32 Drags = 0;            // хватался тащить раненых
+
+	UPROPERTY(BlueprintReadOnly, Category="Run")
+	int32 Incidents = 0;        // санитарные инциденты
+
+	UPROPERTY(BlueprintReadOnly, Category="Run")
+	float PanicSeconds = 0.f;   // времени в панике
+
+	// Для детекции переходов на серверном тике (реплицируются заодно — безвредно)
+	UPROPERTY()
+	bool bWasWounded = false;
+
+	UPROPERTY()
+	bool bWasSoiled = false;
+};
 
 /** Фаза забега. */
 UENUM(BlueprintType)
@@ -54,6 +90,17 @@ public:
 	/** Зона выхода сообщает: вся команда у Газели. Только сервер. */
 	void NotifyTeamAtExit();
 
+	// ---------- Статистика (сервер пишет, клиенты читают для «Акта») ----------
+
+	UFUNCTION(BlueprintPure, Category="Run")
+	const TArray<FPlayerRunStats>& GetPlayerStats() const { return PlayerStats; }
+
+	/** Поднял раненого тиммейта аптечкой. Только сервер. */
+	void AddRevive(AAvaryoCharacter* Who);
+
+	/** Схватился тащить раненого. Только сервер. */
+	void AddDrag(AAvaryoCharacter* Who);
+
 protected:
 	UPROPERTY(Replicated)
 	ERunPhase Phase;
@@ -75,8 +122,15 @@ protected:
 	/** Есть ли на карте зона выхода (если нет — побеждаем сразу после починок). */
 	bool bHasExitZone;
 
+	/** Статистика всех монтёров (по мере появления персонажей). */
+	UPROPERTY(Replicated)
+	TArray<FPlayerRunStats> PlayerStats;
+
+	/** Найти/завести запись статистики. Только сервер. */
+	FPlayerRunStats& FindOrAddStats(AAvaryoCharacter* Who);
+
 	UFUNCTION()
-	void OnObjectiveRepaired(ARepairable* Repairable);
+	void OnObjectiveRepaired(ARepairable* Repairable, AAvaryoCharacter* FinishedBy);
 
 	/** Завершить забег. Только сервер. */
 	void FinishRun(ERunPhase NewPhase);

@@ -63,6 +63,7 @@ void ARunState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetim
 	DOREPLIFETIME(ARunState, RepairedCount);
 	DOREPLIFETIME(ARunState, RunStartServerTime);
 	DOREPLIFETIME(ARunState, RunEndServerTime);
+	DOREPLIFETIME(ARunState, PlayerStats);
 }
 
 ARunState* ARunState::Get(UWorld* World)
@@ -98,20 +99,37 @@ void ARunState::Tick(float DeltaSeconds)
 		return;
 	}
 
-	// Поражение: вся бригада ранена — поднимать некому
+	// Статистика + поражение (вся бригада ранена — поднимать некому)
 	int32 NumPlayers = 0;
 	int32 NumWounded = 0;
 	for (TActorIterator<AAvaryoCharacter> It(GetWorld()); It; ++It)
 	{
-		if (!It->VitalsComponent)
+		UVitalsComponent* Vitals = It->VitalsComponent;
+		if (!Vitals)
 		{
 			continue;
 		}
 		++NumPlayers;
-		if (It->VitalsComponent->IsWounded())
+		if (Vitals->IsWounded())
 		{
 			++NumWounded;
 		}
+
+		FPlayerRunStats& Stats = FindOrAddStats(*It);
+		if (Vitals->IsPanicking())
+		{
+			Stats.PanicSeconds += DeltaSeconds;
+		}
+		if (Vitals->IsWounded() && !Stats.bWasWounded)
+		{
+			++Stats.TimesWounded;
+		}
+		Stats.bWasWounded = Vitals->IsWounded();
+		if (Vitals->IsSoiled() && !Stats.bWasSoiled)
+		{
+			++Stats.Incidents;
+		}
+		Stats.bWasSoiled = Vitals->IsSoiled();
 	}
 	if (NumPlayers > 0 && NumWounded == NumPlayers)
 	{
@@ -119,11 +137,46 @@ void ARunState::Tick(float DeltaSeconds)
 	}
 }
 
-void ARunState::OnObjectiveRepaired(ARepairable* Repairable)
+FPlayerRunStats& ARunState::FindOrAddStats(AAvaryoCharacter* Who)
+{
+	for (FPlayerRunStats& Stats : PlayerStats)
+	{
+		if (Stats.Character == Who)
+		{
+			return Stats;
+		}
+	}
+	FPlayerRunStats& Stats = PlayerStats.AddDefaulted_GetRef();
+	Stats.Character = Who;
+	return Stats;
+}
+
+void ARunState::AddRevive(AAvaryoCharacter* Who)
+{
+	if (HasAuthority() && Who)
+	{
+		++FindOrAddStats(Who).Revives;
+	}
+}
+
+void ARunState::AddDrag(AAvaryoCharacter* Who)
+{
+	if (HasAuthority() && Who)
+	{
+		++FindOrAddStats(Who).Drags;
+	}
+}
+
+void ARunState::OnObjectiveRepaired(ARepairable* Repairable, AAvaryoCharacter* FinishedBy)
 {
 	if (!HasAuthority() || Phase != ERunPhase::InProgress)
 	{
 		return;
+	}
+
+	if (FinishedBy)
+	{
+		++FindOrAddStats(FinishedBy).Repairs;
 	}
 
 	RepairedCount = 0;

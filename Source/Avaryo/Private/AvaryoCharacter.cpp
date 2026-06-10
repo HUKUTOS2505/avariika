@@ -11,6 +11,7 @@
 #include "EngineUtils.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "InputCoreTypes.h"
+#include "Game/ARunState.h"
 #include "Items/APickupItem.h"
 #include "Net/UnrealNetwork.h"
 #include "World/ARepairable.h"
@@ -514,6 +515,10 @@ void AAvaryoCharacter::InteractPressedAuth()
 			DraggedTeammate = Wounded;
 			Wounded->DraggedBy = this;
 			DragNoiseAccum = 0.f;
+			if (ARunState* Run = ARunState::Get(GetWorld()))
+			{
+				Run->AddDrag(this); // эвакуация — в «Акт»
+			}
 		}
 	}
 }
@@ -831,7 +836,15 @@ void AAvaryoCharacter::ApplyItemEffect(APickupItem* Item)
 		{
 			return; // все здоровы, заряд не тратим
 		}
+		const bool bRevive = Target != this && Target->VitalsComponent->IsWounded();
 		Target->VitalsComponent->Heal(Item->EffectMagnitude);
+		if (bRevive && !Target->VitalsComponent->IsWounded())
+		{
+			if (ARunState* Run = ARunState::Get(GetWorld()))
+			{
+				Run->AddRevive(this); // поднял тиммейта — в «Акт»
+			}
+		}
 		ConsumeCharge(Item);
 		break;
 	}

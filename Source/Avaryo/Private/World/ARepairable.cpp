@@ -79,8 +79,7 @@ void ARepairable::Tick(float DeltaSeconds)
 				Repairer = nullptr;
 				bBroken = false;
 				RefreshStatusVisual(); // на листен-сервере OnRep не придёт
-				OnRepairFinished.Broadcast(this);
-				(void)FinishedBy; // статистика игроков подключится в RunState
+				OnRepairFinished.Broadcast(this, FinishedBy);
 			}
 		}
 	}

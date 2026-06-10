@@ -7,6 +7,7 @@
 #include "Engine/Engine.h"
 #include "Engine/Font.h"
 #include "Game/ARunState.h"
+#include "GameFramework/PlayerState.h"
 #include "Items/APickupItem.h"
 #include "World/ARepairable.h"
 
@@ -130,15 +131,82 @@ void AAvaryoHUD::DrawHUD()
 			ListY += RowH;
 		}
 
-		// Баннеры фазы
-		if (Run->GetPhase() == ERunPhase::Won)
+		// Финал: «Акт выполненных работ» — мемный итоговый отчёт
+		if (Run->GetPhase() == ERunPhase::Won || Run->GetPhase() == ERunPhase::Lost)
 		{
-			DrawCentered(TEXT("ПОБЕДА — ОБЪЕКТ СДАН, БРИГАДА В СБОРЕ"), FLinearColor(0.3f, 0.9f, 0.3f), SizeY * 0.3f, 1.9f);
-			DrawCentered(FString::Printf(TEXT("Время забега: %02d:%02d"), Elapsed / 60, Elapsed % 60), TextMain, SizeY * 0.3f + 44.f, 1.2f);
-		}
-		else if (Run->GetPhase() == ERunPhase::Lost)
-		{
-			DrawCentered(TEXT("ПОРАЖЕНИЕ — ВСЯ БРИГАДА ВЫВЕДЕНА ИЗ СТРОЯ"), FLinearColor(0.95f, 0.2f, 0.2f), SizeY * 0.3f, 1.9f);
+			const bool bWon = Run->GetPhase() == ERunPhase::Won;
+			const TArray<FPlayerRunStats>& AllStats = Run->GetPlayerStats();
+
+			// Максимумы для раздачи званий
+			int32 MaxRepairs = 0, MaxWounded = 0, MaxRevives = 0, MaxDrags = 0;
+			float MaxPanic = 0.f;
+			for (const FPlayerRunStats& S : AllStats)
+			{
+				MaxRepairs = FMath::Max(MaxRepairs, S.Repairs);
+				MaxWounded = FMath::Max(MaxWounded, S.TimesWounded);
+				MaxRevives = FMath::Max(MaxRevives, S.Revives);
+				MaxDrags   = FMath::Max(MaxDrags,   S.Drags);
+				MaxPanic   = FMath::Max(MaxPanic,   S.PanicSeconds);
+			}
+
+			const float ReportW = FMath::Min(820.f, SizeX - 80.f);
+			const float ReportRowH = 26.f;
+			const float ReportH = 170.f + AllStats.Num() * ReportRowH * 2.f;
+			const float PX = (SizeX - ReportW) * 0.5f;
+			float PY = FMath::Max(40.f, (SizeY - ReportH) * 0.5f);
+
+			DrawRect(PanelBG, PX, PY, ReportW, ReportH);
+			DrawRect(Accent, PX, PY, ReportW, 4.f);
+
+			float TY = PY + 18.f;
+			TY += DrawCentered(TEXT("АКТ ВЫПОЛНЕННЫХ РАБОТ № 001"), Accent, TY, 1.6f) + 6.f;
+			TY += DrawCentered(bWon
+				? FString::Printf(TEXT("Объект сдан. Время: %02d:%02d. Заказчик недоволен, но подписал."), Elapsed / 60, Elapsed % 60)
+				: TEXT("Объект НЕ сдан: вся бригада выведена из строя. Акт подписан задним числом."),
+				bWon ? FLinearColor(0.3f, 0.9f, 0.3f) : FLinearColor(0.95f, 0.25f, 0.25f), TY, 1.1f) + 14.f;
+
+			int32 CrewTotal = 0;
+			int32 PlayerIndex = 0;
+			for (const FPlayerRunStats& S : AllStats)
+			{
+				++PlayerIndex;
+				FString Name = FString::Printf(TEXT("Монтёр №%d"), PlayerIndex);
+				if (S.Character && S.Character->GetPlayerState())
+				{
+					Name = S.Character->GetPlayerState()->GetPlayerName();
+				}
+
+				// Звание: инциденты вне конкуренции, дальше — по лучшему показателю
+				FString Title;
+				if (S.Incidents > 0)                                   Title = TEXT("Биологическая угроза");
+				else if (S.Repairs > 0 && S.Repairs == MaxRepairs)     Title = TEXT("Работник месяца");
+				else if (S.Revives > 0 && S.Revives == MaxRevives)     Title = TEXT("Полевой медик");
+				else if (S.Drags > 0 && S.Drags == MaxDrags)           Title = TEXT("Эвакуатор");
+				else if (S.TimesWounded > 0 && S.TimesWounded == MaxWounded) Title = TEXT("Главный пострадавший");
+				else if (S.PanicSeconds > 1.f && S.PanicSeconds >= MaxPanic) Title = TEXT("Паникёр смены");
+				else                                                   Title = TEXT("Просто присутствовал");
+
+				// Бухгалтерия: премии и штрафы
+				const int32 Balance = S.Repairs * 1500 + S.Revives * 1000 + S.Drags * 500
+					- S.TimesWounded * 1000 - S.Incidents * 2000 - FMath::RoundToInt(S.PanicSeconds) * 10;
+				CrewTotal += Balance;
+
+				const FString Row1 = FString::Printf(TEXT("%s — «%s»"), *Name, *Title);
+				const FString Row2 = FString::Printf(TEXT("починки: %d   подъёмы: %d   эвакуации: %d   ранения: %d   инциденты: %d   паника: %d сек   итог: %s%d ₽"),
+					S.Repairs, S.Revives, S.Drags, S.TimesWounded, S.Incidents,
+					FMath::RoundToInt(S.PanicSeconds), Balance >= 0 ? TEXT("+") : TEXT(""), Balance);
+
+				DrawText(Row1, TextMain, PX + 28.f, TY, Font, 1.1f);
+				TY += ReportRowH;
+				DrawText(Row2, Balance >= 0 ? TextDim : FLinearColor(0.95f, 0.45f, 0.3f), PX + 28.f, TY, Font, 0.92f);
+				TY += ReportRowH;
+			}
+
+			TY += 8.f;
+			const FString TotalLine = CrewTotal >= 0
+				? FString::Printf(TEXT("Итого к выплате бригаде: +%d ₽"), CrewTotal)
+				: FString::Printf(TEXT("Итого: %d ₽ — вычтем из следующей смены"), CrewTotal);
+			DrawCentered(TotalLine, CrewTotal >= 0 ? FLinearColor(0.3f, 0.9f, 0.3f) : FLinearColor(0.95f, 0.45f, 0.3f), TY, 1.25f);
 		}
 		else if (Run->AreAllObjectivesComplete() && Run->GetTotalObjectives() > 0)
 		{

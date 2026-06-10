@@ -8,7 +8,7 @@ class AAvaryoCharacter;
 class UStaticMeshComponent;
 class UTextRenderComponent;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnRepairFinished, ARepairable*, Repairable);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnRepairFinished, ARepairable*, Repairable, AAvaryoCharacter*, FinishedBy);
 
 /**
  * Ремонтируемый объект (щиток, труба, генератор) — суть работы бригады.
