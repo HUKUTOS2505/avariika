@@ -1,6 +1,7 @@
 #include "UI/AvaryoHUD.h"
 
 #include "AvaryoCharacter.h"
+#include "Components/UFlashlightComponent.h"
 #include "Components/VitalsComponent.h"
 #include "Engine/Canvas.h"
 #include "Engine/Engine.h"
@@ -67,6 +68,16 @@ void AAvaryoHUD::DrawHUD()
 		DrawBar(TEXT("Выносливость"), Vitals->GetStamina(), FLinearColor(0.2f, 0.7f, 0.25f),  Y); Y += 22.f;
 		DrawBar(TEXT("Паника"),       Vitals->GetPanic(),   FLinearColor(0.25f, 0.7f, 0.85f), Y); Y += 22.f;
 		DrawBar(TEXT("Туалет"),       Vitals->GetBladder(), FLinearColor(0.8f, 0.6f, 0.12f),  Y);
+
+		// Батарея налобного фонаря: ярко-жёлтая когда включён, тусклая когда выключен
+		if (UFlashlightComponent* Flashlight = Character->FlashlightComponent)
+		{
+			Y += 22.f;
+			const bool bOn = Flashlight->IsOn();
+			DrawBar(bOn ? TEXT("Фонарь [F] вкл") : TEXT("Фонарь [F]"),
+				Flashlight->GetBatteryLevel(),
+				bOn ? FLinearColor(0.95f, 0.85f, 0.25f) : FLinearColor(0.45f, 0.42f, 0.2f), Y);
+		}
 	}
 
 	// ---------- Баннер ранения ----------
