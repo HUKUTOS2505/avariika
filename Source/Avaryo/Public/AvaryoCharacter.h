@@ -5,6 +5,7 @@
 #include "AvaryoCharacter.generated.h"
 
 class APickupItem;
+class ARepairable;
 class UCameraComponent;
 class UFlashlightComponent;
 class UVitalsComponent;
@@ -53,6 +54,25 @@ public:
 	/** Подобрать предмет под прицелом / рядом (клавиша E). */
 	UFUNCTION(BlueprintCallable, Category="Avaryo|Inventory")
 	void TryPickupNearbyItem();
+
+	// ---------- Взаимодействие (E) ----------
+
+	/** Нажатие E: подобрать предмет, иначе начать чинить объект под прицелом. */
+	void OnInteractPressed();
+
+	/** Отпускание E: прекратить починку (прогресс сохраняется). */
+	void OnInteractReleased();
+
+	/** Ремонтируемый объект под прицелом (для подсказки в HUD). */
+	UFUNCTION(BlueprintPure, Category="Avaryo|Repair")
+	ARepairable* GetFocusedRepairable() const { return FocusedRepairable; }
+
+	/** Чинит ли сейчас (держит E у объекта). */
+	UFUNCTION(BlueprintPure, Category="Avaryo|Repair")
+	bool IsRepairing() const { return CurrentRepairable != nullptr; }
+
+	UFUNCTION(BlueprintPure, Category="Avaryo|Repair")
+	ARepairable* GetCurrentRepairable() const { return CurrentRepairable; }
 
 	/** Использовать предмет в руках (мгновенные эффекты): аптечка лечит, сигареты успокаивают. */
 	UFUNCTION(BlueprintCallable, Category="Avaryo|Inventory")
@@ -171,6 +191,14 @@ protected:
 	UPROPERTY(Transient, BlueprintReadOnly, Category="Avaryo|Inventory")
 	TObjectPtr<APickupItem> FocusedItem;
 
+	/** Ремонтируемый объект под прицелом. Считается локально в Tick. */
+	UPROPERTY(Transient, BlueprintReadOnly, Category="Avaryo|Repair")
+	TObjectPtr<ARepairable> FocusedRepairable;
+
+	/** Что чиню сейчас (сервер пишет, реплицируется для HUD). */
+	UPROPERTY(Replicated, BlueprintReadOnly, Category="Avaryo|Repair")
+	TObjectPtr<ARepairable> CurrentRepairable;
+
 	/** Камера персонажа (из Blueprint), к ней крепится предмет в руках. */
 	UPROPERTY(Transient)
 	TObjectPtr<UCameraComponent> ViewCamera;
@@ -225,6 +253,13 @@ protected:
 	/** Найти предмет под прицелом (трейс из камеры) или ближайший рядом. */
 	APickupItem* FindFocusedItem() const;
 
+	/** Найти сломанный ремонтируемый объект под прицелом (трейс из камеры). */
+	ARepairable* FindFocusedRepairable() const;
+
+	/** Серверная логика нажатия/отпускания E. */
+	void InteractPressedAuth();
+	void InteractReleasedAuth();
+
 	/** Применить состояние инвентаря: активный в руки, тяжёлый опустить, лёгкие спрятать. */
 	void RefreshHeldItem();
 	void HoldItem(APickupItem* Item);
@@ -275,4 +310,10 @@ protected:
 
 	UFUNCTION(Server, Reliable)
 	void ServerSetSprinting(bool bNewSprinting);
+
+	UFUNCTION(Server, Reliable)
+	void ServerInteractPressed();
+
+	UFUNCTION(Server, Reliable)
+	void ServerInteractReleased();
 };

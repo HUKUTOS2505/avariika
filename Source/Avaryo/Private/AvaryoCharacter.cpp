@@ -13,6 +13,7 @@
 #include "InputCoreTypes.h"
 #include "Items/APickupItem.h"
 #include "Net/UnrealNetwork.h"
+#include "World/ARepairable.h"
 
 AAvaryoCharacter::AAvaryoCharacter()
 {
@@ -69,10 +70,17 @@ void AAvaryoCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	// Подсказка "[E] Подобрать" нужна только локальному игроку
+	// Подсказки "[E] Подобрать" / "[E] Чинить" нужны только локальному игроку
 	if (IsLocallyControlled())
 	{
 		FocusedItem = FindFocusedItem();
+		FocusedRepairable = FindFocusedRepairable();
+	}
+
+	// Починка сорвалась на стороне объекта (ушёл, ранен) — чистим ссылку
+	if (HasAuthority() && CurrentRepairable && CurrentRepairable->GetRepairer() != this)
+	{
+		CurrentRepairable = nullptr;
 	}
 
 	// Скорость зависит от состояния — обновляем на сервере и у владельца
@@ -134,7 +142,8 @@ void AAvaryoCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 	// Временные хардкод-бинды для теста; позже заменим на Enhanced Input
 	PlayerInputComponent->BindKey(EKeys::F, IE_Pressed, this, &AAvaryoCharacter::ToggleFlashlight);
-	PlayerInputComponent->BindKey(EKeys::E, IE_Pressed, this, &AAvaryoCharacter::TryPickupNearbyItem);
+	PlayerInputComponent->BindKey(EKeys::E, IE_Pressed, this, &AAvaryoCharacter::OnInteractPressed);
+	PlayerInputComponent->BindKey(EKeys::E, IE_Released, this, &AAvaryoCharacter::OnInteractReleased);
 	PlayerInputComponent->BindKey(EKeys::G, IE_Pressed, this, &AAvaryoCharacter::DropItem);
 	// Использование: ЛКМ или R (нажал — эффект/распыление, отпустил — конец распыления)
 	PlayerInputComponent->BindKey(EKeys::LeftMouseButton, IE_Pressed, this, &AAvaryoCharacter::BeginUseHeldItem);
@@ -170,6 +179,7 @@ void AAvaryoCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	DOREPLIFETIME(AAvaryoCharacter, UseCastRemaining);
 	DOREPLIFETIME(AAvaryoCharacter, UseCastDuration);
 	DOREPLIFETIME(AAvaryoCharacter, bOffering);
+	DOREPLIFETIME(AAvaryoCharacter, CurrentRepairable);
 }
 
 float AAvaryoCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -397,6 +407,94 @@ void AAvaryoCharacter::TryPickupNearbyItem()
 void AAvaryoCharacter::ServerTryPickupNearbyItem_Implementation()
 {
 	TryPickupNearbyItem();
+}
+
+// ---------- Взаимодействие (E) ----------
+
+ARepairable* AAvaryoCharacter::FindFocusedRepairable() const
+{
+	// Раненый не работник — подсказку ему не показываем
+	if (VitalsComponent && VitalsComponent->IsWounded())
+	{
+		return nullptr;
+	}
+
+	FVector ViewLoc;
+	FRotator ViewRot;
+	GetActorEyesViewPoint(ViewLoc, ViewRot);
+
+	FCollisionQueryParams Params(FName(TEXT("RepairTrace")), false, this);
+	FHitResult Hit;
+	const FCollisionShape Probe = FCollisionShape::MakeSphere(12.f);
+	if (GetWorld()->SweepSingleByChannel(Hit, ViewLoc, ViewLoc + ViewRot.Vector() * PickupRange, FQuat::Identity, ECC_Visibility, Probe, Params))
+	{
+		if (ARepairable* Repairable = Cast<ARepairable>(Hit.GetActor()))
+		{
+			if (Repairable->IsBroken())
+			{
+				return Repairable;
+			}
+		}
+	}
+	return nullptr;
+}
+
+void AAvaryoCharacter::OnInteractPressed()
+{
+	if (!HasAuthority())
+	{
+		ServerInteractPressed();
+		return;
+	}
+	InteractPressedAuth();
+}
+
+void AAvaryoCharacter::OnInteractReleased()
+{
+	if (!HasAuthority())
+	{
+		ServerInteractReleased();
+		return;
+	}
+	InteractReleasedAuth();
+}
+
+void AAvaryoCharacter::InteractPressedAuth()
+{
+	// Приоритет у предмета: смотришь на предмет — подбираешь,
+	// иначе сломанный объект под прицелом — начинаешь чинить
+	if (APickupItem* Item = FindFocusedItem())
+	{
+		PickupItem(Item);
+		return;
+	}
+
+	if (ARepairable* Repairable = FindFocusedRepairable())
+	{
+		if (Repairable->BeginRepairBy(this))
+		{
+			CurrentRepairable = Repairable;
+		}
+	}
+}
+
+void AAvaryoCharacter::InteractReleasedAuth()
+{
+	if (CurrentRepairable)
+	{
+		CurrentRepairable->EndRepairBy(this);
+		CurrentRepairable = nullptr;
+	}
+}
+
+void AAvaryoCharacter::ServerInteractPressed_Implementation()
+{
+	InteractPressedAuth();
+}
+
+void AAvaryoCharacter::ServerInteractReleased_Implementation()
+{
+	InteractReleasedAuth();
 }
 
 void AAvaryoCharacter::PickupItem(APickupItem* Item)

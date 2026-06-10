@@ -65,6 +65,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Pickup|Use")
 	EItemEffect ItemEffect;
 
+	/** Тег инструмента ("Wrench", "Welder"...). Ремонтируемые объекты сверяют его с RequiredTool. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Pickup|Use")
+	FName ToolTag;
+
 	/** Сила эффекта (сколько HP лечит / паники снимает). */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Pickup|Use")
 	float EffectMagnitude;
