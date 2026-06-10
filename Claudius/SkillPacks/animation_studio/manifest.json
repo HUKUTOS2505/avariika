@@ -1,0 +1,10 @@
+{
+    "name": "animation_studio",
+    "version": "0.1.0",
+    "author": "Claudius Code",
+    "description": "Studio helpers for shot-based animation work: batch CAD/FBX ingest, camera rig setup, exploded-view authoring, MRQ render shortcuts, and timed material reveals. Designed for technical explainers, forensic reconstructions, and historical recreations.",
+    "workflow_tags": ["animation", "shot", "asset", "level", "rendering"],
+    "requires": {
+        "claudius_version": "3.0.0"
+    }
+}

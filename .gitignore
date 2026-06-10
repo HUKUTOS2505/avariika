@@ -1,0 +1,22 @@
+# Unreal Engine — генерируемое, не храним
+Binaries/
+DerivedDataCache/
+Intermediate/
+Saved/
+Build/
+
+# IDE
+.vs/
+.vscode/
+.idea/
+*.sln
+*.code-workspace
+
+# Claudius runtime-мусор
+Plugins/Claudius/Responses/
+Plugins/Claudius/claudius_request.json
+Plugins/Claudius/claudius_response.json
+
+# Прочее
+*.tmp
+*.log

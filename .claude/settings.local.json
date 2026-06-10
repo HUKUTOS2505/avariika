@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Skill(update-config)",
+      "PowerShell(& D:\\unrealEngine\\avariika\\.claude\\scripts\\claudius.ps1 *)",
+      "Write(Plugins/Claudius/claudius_request.json)",
+      "Edit(Plugins/Claudius/claudius_request.json)",
+      "PowerShell(Get-Content D:\\unrealEngine\\avariika\\*)",
+      "PowerShell(Get-Item D:\\unrealEngine\\avariika\\*)",
+      "PowerShell(Get-ChildItem D:\\unrealEngine\\avariika\\*)",
+      "PowerShell(Test-Path *)",
+      "PowerShell(Test-NetConnection *)",
+      "PowerShell(Invoke-RestMethod -Uri http://127.0.0.1:8080*)",
+      "PowerShell(Invoke-RestMethod -Uri 'http://127.0.0.1:8080*)",
+      "PowerShell(Invoke-WebRequest -Uri http://127.0.0.1:8080*)",
+      "PowerShell(Invoke-WebRequest -Uri 'http://127.0.0.1:8080*)",
+      "PowerShell(Out-Null *)"
+    ],
+    "defaultMode": "dontAsk"
+  }
+}

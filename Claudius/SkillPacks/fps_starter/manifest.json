@@ -1,0 +1,10 @@
+{
+    "name": "fps_starter",
+    "version": "1.0.0",
+    "author": "Claudius Code",
+    "description": "Starter helpers for FPS development - weapon pickups, target dummies, spawn grids.",
+    "workflow_tags": ["fps", "level", "combat"],
+    "requires": {
+        "claudius_version": "3.0.0"
+    }
+}
