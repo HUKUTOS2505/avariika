@@ -32,13 +32,29 @@ void ARunState::BeginPlay()
 		return;
 	}
 
-	// Собираем задачи: все сломанные объекты карты на момент старта
+	// Рандомизация поломок: каждый забег ломается случайное подмножество
+	// объектов карты (минимум 2, либо все, если их меньше)
+	TArray<ARepairable*> AllRepairables;
 	for (TActorIterator<ARepairable> It(GetWorld()); It; ++It)
 	{
-		if (It->IsBroken())
+		AllRepairables.Add(*It);
+	}
+	for (int32 i = AllRepairables.Num() - 1; i > 0; --i)
+	{
+		AllRepairables.Swap(i, FMath::RandRange(0, i)); // Фишер-Йетс
+	}
+	const int32 NumBroken = AllRepairables.Num() <= 2
+		? AllRepairables.Num()
+		: FMath::RandRange(2, AllRepairables.Num());
+
+	for (int32 i = 0; i < AllRepairables.Num(); ++i)
+	{
+		ARepairable* Repairable = AllRepairables[i];
+		Repairable->SetBroken(i < NumBroken);
+		if (i < NumBroken)
 		{
-			Objectives.Add(*It);
-			It->OnRepairFinished.AddDynamic(this, &ARunState::OnObjectiveRepaired);
+			Objectives.Add(Repairable);
+			Repairable->OnRepairFinished.AddDynamic(this, &ARunState::OnObjectiveRepaired);
 		}
 	}
 
