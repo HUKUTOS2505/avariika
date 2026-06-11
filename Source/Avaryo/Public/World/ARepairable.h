@@ -5,6 +5,7 @@
 #include "ARepairable.generated.h"
 
 class AAvaryoCharacter;
+class UPointLightComponent;
 class UStaticMeshComponent;
 class UTextRenderComponent;
 
@@ -35,6 +36,10 @@ public:
 	/** Табличка статуса над объектом: "СЛОМАНО" / "ОК" + проценты починки. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Repair")
 	TObjectPtr<UTextRenderComponent> StatusText;
+
+	/** Аварийная лампа: красная пульсация пока сломан — видно в темноте. */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Repair")
+	TObjectPtr<UPointLightComponent> AlarmLight;
 
 	/** Название для HUD и таблички ("Щиток", "Газовая труба"). */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Repair")

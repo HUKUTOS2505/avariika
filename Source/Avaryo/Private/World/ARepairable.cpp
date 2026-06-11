@@ -1,6 +1,7 @@
 #include "World/ARepairable.h"
 
 #include "AvaryoCharacter.h"
+#include "Components/PointLightComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/TextRenderComponent.h"
 #include "Components/VitalsComponent.h"
@@ -26,6 +27,16 @@ ARepairable::ARepairable()
 	StatusText->SetRelativeLocation(FVector(0.f, 0.f, 120.f));
 	StatusText->SetHorizontalAlignment(EHTA_Center);
 	StatusText->SetWorldSize(28.f);
+
+	// Аварийная лампа: в ночной темноте сломанный объект видно по красной пульсации
+	AlarmLight = CreateDefaultSubobject<UPointLightComponent>(TEXT("AlarmLight"));
+	AlarmLight->SetupAttachment(MeshComponent);
+	AlarmLight->SetRelativeLocation(FVector(0.f, 0.f, 90.f));
+	AlarmLight->SetUsingAbsoluteScale(true); // масштаб меша не должен раздувать радиус света
+	AlarmLight->SetLightColor(FColor(255, 40, 20));
+	AlarmLight->SetIntensity(3000.f);
+	AlarmLight->SetAttenuationRadius(700.f);
+	AlarmLight->SetCastShadows(false); // дёшево: лампочек несколько, тени не нужны
 
 	DisplayName = FText::FromString(TEXT("Объект"));
 	RepairDuration = 8.f;
@@ -105,6 +116,21 @@ void ARepairable::Tick(float DeltaSeconds)
 					break;
 				}
 			}
+		}
+	}
+
+	// Все машины: красная пульсация аварийной лампы, пока сломан
+	if (AlarmLight)
+	{
+		const bool bLightOn = bBroken;
+		if (AlarmLight->IsVisible() != bLightOn)
+		{
+			AlarmLight->SetVisibility(bLightOn);
+		}
+		if (bLightOn)
+		{
+			const float Pulse = 0.55f + 0.45f * FMath::Sin(GetWorld()->GetTimeSeconds() * 4.f + GetUniqueID() % 7);
+			AlarmLight->SetIntensity(3000.f * Pulse);
 		}
 	}
 
