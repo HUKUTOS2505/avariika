@@ -121,6 +121,10 @@ protected:
 	/** Газ рванул: урон и паника по радиусу, очень громко, прогресс починки сгорает. */
 	void ExplodeGas(AAvaryoCharacter* Culprit);
 
+	/** Тряска камеры от взрыва у всех машин (затухает с расстоянием). */
+	UFUNCTION(NetMulticast, Unreliable)
+	void MulticastExplosionShake();
+
 	/** Последний показанный на табличке процент — чтобы не перерисовывать текст каждый кадр. */
 	int32 LastShownPercent;
 

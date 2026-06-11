@@ -284,6 +284,9 @@ protected:
 	/** Таймер шороха волочения (слышно — задел под монстра). */
 	float DragNoiseAccum;
 
+	/** Таймер ретриггера дрожи камеры от паники (локально). */
+	float PanicShakeAccum;
+
 	/** Камера персонажа (из Blueprint), к ней крепится предмет в руках. */
 	UPROPERTY(Transient)
 	TObjectPtr<UCameraComponent> ViewCamera;

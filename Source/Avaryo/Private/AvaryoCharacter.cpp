@@ -17,6 +17,7 @@
 #include "Game/ARunState.h"
 #include "Items/APickupItem.h"
 #include "Net/UnrealNetwork.h"
+#include "UI/AvaryoCameraShakes.h"
 #include "World/ARepairable.h"
 #include "World/AToilet.h"
 
@@ -56,6 +57,7 @@ AAvaryoCharacter::AAvaryoCharacter()
 
 	DragSpeedMultiplier = 0.55f;
 	DragNoiseAccum = 0.f;
+	PanicShakeAccum = 0.f;
 
 	bMonitorOpen = false;
 	bWasWounded = false;
@@ -118,6 +120,26 @@ void AAvaryoCharacter::Tick(float DeltaSeconds)
 			{
 				It->ChestCamera->bCaptureEveryFrame = bMonitorOpen;
 			}
+		}
+
+		// Паника трясёт камеру: ретриггер каждую секунду, сила растёт с паникой
+		if (VitalsComponent && VitalsComponent->IsPanicking())
+		{
+			PanicShakeAccum += DeltaSeconds;
+			if (PanicShakeAccum >= 0.9f)
+			{
+				PanicShakeAccum = 0.f;
+				if (APlayerController* PC = Cast<APlayerController>(GetController()))
+				{
+					const float Threshold = VitalsComponent->PanicThreshold;
+					const float Strength = 0.5f + (VitalsComponent->GetPanic() - Threshold) / FMath::Max(100.f - Threshold, 1.f);
+					PC->ClientStartCameraShake(UPanicCameraShake::StaticClass(), Strength);
+				}
+			}
+		}
+		else
+		{
+			PanicShakeAccum = 0.9f; // первая дрожь — сразу при входе в панику
 		}
 	}
 

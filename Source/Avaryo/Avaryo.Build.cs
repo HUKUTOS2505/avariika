@@ -12,8 +12,9 @@ public class Avaryo : ModuleRules
 			"Core",
 			"CoreUObject",
 			"Engine",
-			"InputCore", // EKeys для тестовых биндов F/E/Q
-			"NetCore"    // репликация
+			"InputCore",     // EKeys для тестовых биндов F/E/Q
+			"NetCore",       // репликация
+			"EngineCameras"  // PerlinNoiseCameraShakePattern для тряски камеры
 		});
 	}
 }

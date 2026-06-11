@@ -11,6 +11,7 @@
 #include "Items/APickupItem.h"
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
+#include "UI/AvaryoCameraShakes.h"
 
 ARepairable::ARepairable()
 {
@@ -232,6 +233,13 @@ void ARepairable::ExplodeGas(AAvaryoCharacter* Culprit)
 
 	// Громче этого ночью не бывает
 	MakeNoise(2.f, Culprit, GetActorLocation());
+	MulticastExplosionShake();
+}
+
+void ARepairable::MulticastExplosionShake_Implementation()
+{
+	UGameplayStatics::PlayWorldCameraShake(this, UExplosionCameraShake::StaticClass(),
+		GetActorLocation(), GasRadius * 0.5f, GasRadius * 2.5f);
 }
 
 void ARepairable::OnRep_Broken()
