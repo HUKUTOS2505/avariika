@@ -208,6 +208,11 @@ void UVitalsComponent::RelieveBladder()
 	Bladder = 0.f;
 }
 
+void UVitalsComponent::DrainBladder(float Amount)
+{
+	Bladder = FMath::Max(0.f, Bladder - Amount);
+}
+
 void UVitalsComponent::StartSmoking()
 {
 	SmokingRemaining = SmokingDuration;

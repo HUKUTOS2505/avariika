@@ -393,12 +393,39 @@ void AAvaryoHUD::DrawHUD()
 			Casting ? *Casting->DisplayName.ToString() : TEXT("..."), Percent),
 			Character->GetUseProgress(), BarFill);
 	}
-	// ---------- «Процесс» в биотуалете (держит E) ----------
-	else if (Character->IsUsingToilet() && Character->GetCurrentToilet())
+	// ---------- Мини-игра биотуалета ----------
+	else if (Character->IsUsingToilet() && Character->GetCurrentToilet() && Vitals)
 	{
-		const float Progress = Character->GetCurrentToilet()->GetUseProgress();
-		DrawCastBar(FString::Printf(TEXT("Процесс...  %d%%"), FMath::RoundToInt(Progress * 100.f)),
-			Progress, FLinearColor(0.45f, 0.75f, 1.f));
+		AToilet* T = Character->GetCurrentToilet();
+		const float BarW = 340.f, BarH = 18.f;
+		const float BoxX = (SizeX - BarW) * 0.5f;
+		float BoxY = SizeY * 0.42f;
+
+		const FString Label = FString::Printf(TEXT("Процесс... осталось %d%%"), FMath::RoundToInt(Vitals->GetBladder()));
+		float LabelW = 0.f, LabelH = 0.f;
+		GetTextSize(Label, LabelW, LabelH, Font, 1.1f);
+
+		// Плашка на обе полоски и подсказку
+		DrawRect(BoxBG, BoxX - 12.f, BoxY - LabelH - 10.f, BarW + 24.f, LabelH + BarH * 2.f + 56.f);
+		DrawText(Label, TextMain, BoxX, BoxY - LabelH - 4.f, Font, 1.1f);
+
+		// Верхняя полоска: сколько «содержимого» осталось
+		DrawRect(BarBG, BoxX, BoxY + 2.f, BarW, BarH);
+		DrawRect(FLinearColor(0.65f, 0.45f, 0.15f), BoxX, BoxY + 2.f, BarW * Vitals->GetBladder() / 100.f, BarH);
+
+		// Нижняя полоска: мини-игра — красный фон, жёлтая и зелёная зоны, белый курсор
+		BoxY += BarH + 12.f;
+		const float Green = T->GetGreenCenter();
+		DrawRect(FLinearColor(0.55f, 0.12f, 0.1f), BoxX, BoxY + 2.f, BarW, BarH);
+		const float YellowL = FMath::Clamp(Green - T->YellowHalfWidth, 0.f, 1.f);
+		const float YellowR = FMath::Clamp(Green + T->YellowHalfWidth, 0.f, 1.f);
+		DrawRect(FLinearColor(0.8f, 0.7f, 0.15f), BoxX + YellowL * BarW, BoxY + 2.f, (YellowR - YellowL) * BarW, BarH);
+		const float GreenL = FMath::Clamp(Green - T->GreenHalfWidth, 0.f, 1.f);
+		const float GreenR = FMath::Clamp(Green + T->GreenHalfWidth, 0.f, 1.f);
+		DrawRect(FLinearColor(0.25f, 0.8f, 0.25f), BoxX + GreenL * BarW, BoxY + 2.f, (GreenR - GreenL) * BarW, BarH);
+		DrawRect(TextMain, BoxX + T->GetCursorPos() * BarW - 2.f, BoxY - 2.f, 4.f, BarH + 8.f);
+
+		DrawText(TEXT("[E] — жми в зелёной зоне! Шаг в сторону — процесс сорван"), TextDim, BoxX, BoxY + BarH + 8.f, Font, 0.9f);
 	}
 	// ---------- Починка (держит E у объекта) ----------
 	else if (Character->IsRepairing() && Character->GetCurrentRepairable())
@@ -445,7 +472,7 @@ void AAvaryoHUD::DrawHUD()
 		}
 		else if (Toilet->CanUseBy(Character))
 		{
-			ToiletPrompt = TEXT("[E] Облегчиться (держать, не двигаться)");
+			ToiletPrompt = TEXT("[E] Облегчиться (мини-игра, не двигаться)");
 		}
 		else
 		{

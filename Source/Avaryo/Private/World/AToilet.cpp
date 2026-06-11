@@ -11,8 +11,9 @@
 
 AToilet::AToilet()
 {
-	PrimaryActorTick.bCanEverTick = true; // прогресс на сервере + поворот таблички
+	PrimaryActorTick.bCanEverTick = true; // курсор мини-игры + поворот таблички
 	bReplicates = true;
+	SetNetUpdateFrequency(30.f); // курсор должен идти плавно у клиентов
 
 	MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 	SetRootComponent(MeshComponent);
@@ -27,8 +28,18 @@ AToilet::AToilet()
 	Label->SetText(NSLOCTEXT("Toilet", "Label", "Биотуалет"));
 	Label->SetTextRenderColor(FColor(120, 200, 255));
 
-	UseDuration = 3.f;
-	UseProgress = 0.f;
+	CursorSpeed = 0.8f;
+	GreenHalfWidth = 0.07f;
+	YellowHalfWidth = 0.18f;
+	GreenDrain = 30.f;
+	YellowDrain = 12.f;
+	MissDrain = 2.f;
+	PassiveDrainPerSecond = 2.f;
+
+	CursorPos = 0.f;
+	GreenCenter = 0.5f;
+	CursorPhase = 0.f;
+	SpeedMultiplier = 1.f;
 }
 
 void AToilet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -36,38 +47,36 @@ void AToilet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeP
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(AToilet, Occupant);
-	DOREPLIFETIME(AToilet, UseProgress);
+	DOREPLIFETIME(AToilet, CursorPos);
+	DOREPLIFETIME(AToilet, GreenCenter);
 }
 
 void AToilet::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	// Сервер: тикаем «процесс»
+	// Сервер: курсор бегает, шкала медленно уходит сама
 	if (HasAuthority() && Occupant)
 	{
-		// Срыв: ранен/нечего делать (CanUseBy), пошёл, отошёл
-		const bool bMoved = Occupant->GetVelocity().SizeSquared2D() > 2500.f; // > 50 см/с — отошёл
+		UVitalsComponent* Vitals = Occupant->VitalsComponent;
+		const bool bMoved = Occupant->GetVelocity().SizeSquared2D() > 2500.f; // > 50 см/с — встал
 		const bool bNear = FVector::DistSquared(Occupant->GetActorLocation(), GetActorLocation()) <= FMath::Square(350.f);
-		if (!CanUseBy(Occupant) || bMoved || !bNear)
+		const bool bWounded = Vitals && Vitals->IsWounded();
+		if (!Vitals || bMoved || !bNear || bWounded)
 		{
-			EndUseBy(Occupant);
+			EndUseBy(Occupant); // процесс сорван
 		}
 		else
 		{
-			UseProgress = FMath::Min(UseProgress + DeltaSeconds / FMath::Max(UseDuration, 0.1f), 1.f);
-			if (UseProgress >= 1.f)
+			// Пинг-понг курсора (треугольная волна из фазы)
+			CursorPhase += DeltaSeconds * CursorSpeed * SpeedMultiplier;
+			const float Saw = FMath::Fmod(CursorPhase, 2.f);
+			CursorPos = Saw <= 1.f ? Saw : 2.f - Saw;
+
+			Vitals->DrainBladder(PassiveDrainPerSecond * DeltaSeconds);
+			if (Vitals->GetBladder() <= 0.5f)
 			{
-				AAvaryoCharacter* Done = Occupant;
-				Occupant = nullptr;
-				UseProgress = 0.f;
-				Done->VitalsComponent->RelieveBladder();
-				if (ARunState* Run = ARunState::Get(GetWorld()))
-				{
-					Run->AddToiletVisit(Done); // дисциплина — в «Акт»
-				}
-				// Слышно. Конечно слышно.
-				MakeNoise(0.7f, Done, GetActorLocation());
+				FinishSession(Occupant);
 			}
 		}
 	}
@@ -105,15 +114,70 @@ bool AToilet::BeginUseBy(AAvaryoCharacter* Who)
 		return false;
 	}
 	Occupant = Who;
-	UseProgress = 0.f;
+	CursorPhase = 0.f;
+	CursorPos = 0.f;
+	SpeedMultiplier = 1.f;
+	RerollGreenZone();
 	return true;
+}
+
+void AToilet::TryHitBy(AAvaryoCharacter* Who)
+{
+	if (!HasAuthority() || Occupant != Who || !Who->VitalsComponent)
+	{
+		return;
+	}
+
+	const float Dist = FMath::Abs(CursorPos - GreenCenter);
+	if (Dist <= GreenHalfWidth)
+	{
+		// Зелёная: дело спорится, почти бесшумно
+		Who->VitalsComponent->DrainBladder(GreenDrain);
+		MakeNoise(0.2f, Who, GetActorLocation());
+	}
+	else if (Dist <= YellowHalfWidth)
+	{
+		Who->VitalsComponent->DrainBladder(YellowDrain);
+		MakeNoise(0.4f, Who, GetActorLocation());
+	}
+	else
+	{
+		// Мимо: толку чуть, а конфуз слышен на всю карту
+		Who->VitalsComponent->DrainBladder(MissDrain);
+		MakeNoise(0.9f, Who, GetActorLocation());
+	}
+
+	if (Who->VitalsComponent->GetBladder() <= 0.5f)
+	{
+		FinishSession(Who);
+		return;
+	}
+
+	// Идём дальше: зона переезжает, курсор ускоряется (до x1.7)
+	RerollGreenZone();
+	SpeedMultiplier = FMath::Min(SpeedMultiplier + 0.12f, 1.7f);
 }
 
 void AToilet::EndUseBy(AAvaryoCharacter* Who)
 {
 	if (HasAuthority() && Occupant == Who)
 	{
-		Occupant = nullptr;
-		UseProgress = 0.f; // прерванный процесс не засчитывается
+		Occupant = nullptr; // недоделанное остаётся в шкале — приходи ещё
 	}
+}
+
+void AToilet::FinishSession(AAvaryoCharacter* Who)
+{
+	Occupant = nullptr;
+	Who->VitalsComponent->RelieveBladder();
+	if (ARunState* Run = ARunState::Get(GetWorld()))
+	{
+		Run->AddToiletVisit(Who); // дисциплина — в «Акт»
+	}
+	MakeNoise(0.6f, Who, GetActorLocation()); // финальный аккорд
+}
+
+void AToilet::RerollGreenZone()
+{
+	GreenCenter = FMath::FRandRange(0.15f, 0.85f);
 }

@@ -9,9 +9,11 @@ class UStaticMeshComponent;
 class UTextRenderComponent;
 
 /**
- * Биотуалет: держать E три секунды — «процесс» идёт, движение его срывает.
- * По завершении шкала туалета обнуляется, визит уходит в статистику «Акта».
- * Процесс слышно (задел под монстра-слухача).
+ * Биотуалет — мини-игра. E начинает «процесс»: шкала туалета медленно уходит сама,
+ * а по нижней полоске бегает курсор. Жми E в зелёной зоне — уходит быстро (-30),
+ * в жёлтой — средне (-12), мимо — почти ничего (-2) и громкий конфуз на всю карту.
+ * Зоны каждый раз в новом месте, курсор ускоряется. Шкала в ноль — визит зачтён.
+ * Движение срывает процесс.
  */
 UCLASS()
 class AVARYO_API AToilet : public AActor
@@ -32,30 +34,76 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Toilet")
 	TObjectPtr<UTextRenderComponent> Label;
 
-	/** Сколько секунд держать E. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Toilet")
-	float UseDuration;
+	// ---------- Настройки мини-игры ----------
 
-	/** Есть ли игроку смысл пользоваться (шкала туалета не пустая, не ранен, свободно). */
+	/** Скорость курсора на старте, проходов полоски в секунду. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Toilet|Minigame")
+	float CursorSpeed;
+
+	/** Полуширина зелёной зоны (доля полоски). */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Toilet|Minigame")
+	float GreenHalfWidth;
+
+	/** Полуширина жёлтой зоны (доля полоски, включает зелёную). */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Toilet|Minigame")
+	float YellowHalfWidth;
+
+	/** Снятие шкалы: зелёная / жёлтая / мимо. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Toilet|Minigame")
+	float GreenDrain;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Toilet|Minigame")
+	float YellowDrain;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Toilet|Minigame")
+	float MissDrain;
+
+	/** Пассивный слив, %/сек — процесс идёт, даже если не жать. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Toilet|Minigame")
+	float PassiveDrainPerSecond;
+
+	// ---------- API (сервер) ----------
+
+	/** Есть ли игроку смысл садиться (шкала не пустая, не ранен, свободно). */
 	UFUNCTION(BlueprintPure, Category="Toilet")
 	bool CanUseBy(const AAvaryoCharacter* Who) const;
 
-	/** Начать процесс (зажал E). Только сервер. */
+	/** Начать процесс (нажал E у кабинки). Только сервер. */
 	bool BeginUseBy(AAvaryoCharacter* Who);
 
-	/** Прервать процесс (отпустил E / ушёл). Прогресс сбрасывается. Только сервер. */
+	/** Попытка попадания (E во время процесса). Только сервер. */
+	void TryHitBy(AAvaryoCharacter* Who);
+
+	/** Прервать процесс (ушёл/ранен). Только сервер. */
 	void EndUseBy(AAvaryoCharacter* Who);
+
+	// ---------- Геттеры для HUD ----------
 
 	UFUNCTION(BlueprintPure, Category="Toilet") bool IsOccupied() const { return Occupant != nullptr; }
 	UFUNCTION(BlueprintPure, Category="Toilet") AAvaryoCharacter* GetOccupant() const { return Occupant; }
-	UFUNCTION(BlueprintPure, Category="Toilet") float GetUseProgress() const { return UseProgress; }
+	UFUNCTION(BlueprintPure, Category="Toilet") float GetCursorPos() const { return CursorPos; }
+	UFUNCTION(BlueprintPure, Category="Toilet") float GetGreenCenter() const { return GreenCenter; }
 
 protected:
-	/** Кто сейчас «в процессе» (держит E). */
+	/** Кто сейчас «в процессе». */
 	UPROPERTY(Replicated)
 	TObjectPtr<AAvaryoCharacter> Occupant;
 
-	/** Прогресс 0..1, реплицируется для HUD. */
+	/** Позиция курсора 0..1 (пинг-понг), реплицируется для HUD. */
 	UPROPERTY(Replicated)
-	float UseProgress;
+	float CursorPos;
+
+	/** Центр зелёной зоны 0..1 — после каждого нажатия переезжает. */
+	UPROPERTY(Replicated)
+	float GreenCenter;
+
+	/** Фаза курсора и текущий множитель скорости (сервер). */
+	float CursorPhase;
+	float SpeedMultiplier;
+
+	/** Завершить успешно: шкала в ноль, визит в статистику. Только сервер. */
+	void FinishSession(AAvaryoCharacter* Who);
+
+	/** Перекинуть зелёную зону в случайное место. */
+	void RerollGreenZone();
 };

@@ -554,6 +554,13 @@ void AAvaryoCharacter::OnInteractReleased()
 
 void AAvaryoCharacter::InteractPressedAuth()
 {
+	// Сидим в биотуалете — E бьёт по курсору мини-игры
+	if (CurrentToilet)
+	{
+		CurrentToilet->TryHitBy(this);
+		return;
+	}
+
 	// Уже тащишь раненого — повторное E отпускает
 	if (DraggedTeammate)
 	{
@@ -610,11 +617,8 @@ void AAvaryoCharacter::InteractReleasedAuth()
 		CurrentRepairable->EndRepairBy(this);
 		CurrentRepairable = nullptr;
 	}
-	if (CurrentToilet)
-	{
-		CurrentToilet->EndUseBy(this);
-		CurrentToilet = nullptr;
-	}
+	// Туалет НЕ завершается отпусканием E — мини-игра идёт до нуля шкалы,
+	// сорвать её можно только движением (или ранением)
 }
 
 void AAvaryoCharacter::TryRestartRun()

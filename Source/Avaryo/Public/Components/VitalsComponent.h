@@ -42,9 +42,13 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Vitals")
 	void SetSprinting(bool bNewSprinting);
 
-	/** Сходить в туалет (на будущее — туалеты на картах). */
+	/** Сходить в туалет полностью (шкала в ноль). */
 	UFUNCTION(BlueprintCallable, Category="Vitals")
 	void RelieveBladder();
+
+	/** Частично облегчиться (мини-игра биотуалета). */
+	UFUNCTION(BlueprintCallable, Category="Vitals")
+	void DrainBladder(float Amount);
 
 	/** Начать перекур: SmokingDuration секунд паника плавно снижается. */
 	UFUNCTION(BlueprintCallable, Category="Vitals")
