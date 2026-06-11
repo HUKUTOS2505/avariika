@@ -99,6 +99,20 @@ void UVitalsComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 		SmokingRemaining = FMath::Max(0.f, SmokingRemaining - DeltaTime);
 		PanicDelta = -SmokingPanicPerSecond;
 	}
+	else
+	{
+		// Совместный перекур: курящий рядом тиммейт успокаивает и тебя (вполовину слабее).
+		// Бригада сбивается в курилку — и дружно шумит на радость будущему монстру
+		for (TActorIterator<AAvaryoCharacter> It(GetWorld()); It; ++It)
+		{
+			if (*It != Char && It->VitalsComponent && It->VitalsComponent->IsSmoking()
+				&& FVector::DistSquared(It->GetActorLocation(), Char->GetActorLocation()) < FMath::Square(250.f))
+			{
+				PanicDelta = FMath::Min(PanicDelta, -SmokingPanicPerSecond * 0.5f);
+				break;
+			}
+		}
+	}
 
 	Panic = FMath::Clamp(Panic + PanicDelta * DeltaTime, 0.f, 100.f);
 
