@@ -9,6 +9,8 @@ class ARepairable;
 class AToilet;
 class UCameraComponent;
 class UFlashlightComponent;
+class USceneCaptureComponent2D;
+class UTextureRenderTarget2D;
 class UVitalsComponent;
 
 /**
@@ -95,6 +97,26 @@ public:
 	/** Биотуалет под прицелом (для подсказки в HUD). */
 	UFUNCTION(BlueprintPure, Category="Avaryo|Interact")
 	AToilet* GetFocusedToilet() const { return FocusedToilet; }
+
+	// ---------- Оператор: нагрудные камеры ----------
+
+	/** Открыть/закрыть монитор оператора (Tab). Работает только в зоне ГАЗели. */
+	void ToggleMonitor();
+
+	UFUNCTION(BlueprintPure, Category="Avaryo|Operator")
+	bool IsMonitorOpen() const { return bMonitorOpen; }
+
+	/** Можно ли смотреть камеры: стоим в зоне ГАЗели и не ранены. */
+	UFUNCTION(BlueprintPure, Category="Avaryo|Operator")
+	bool CanUseMonitor() const;
+
+	/** Картинка с нагрудной камеры этого монтёра (для монитора оператора). */
+	UFUNCTION(BlueprintPure, Category="Avaryo|Operator")
+	UTextureRenderTarget2D* GetChestCamTarget() const { return ChestCamTarget; }
+
+	/** Нагрудная камера. Захват включается локально, только пока кто-то смотрит монитор. */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Avaryo|Operator")
+	TObjectPtr<USceneCaptureComponent2D> ChestCamera;
 
 	/** Использовать предмет в руках (мгновенные эффекты): аптечка лечит, сигареты успокаивают. */
 	UFUNCTION(BlueprintCallable, Category="Avaryo|Inventory")
@@ -240,6 +262,13 @@ protected:
 	/** Биотуалет под прицелом. Считается локально в Tick. */
 	UPROPERTY(Transient, BlueprintReadOnly, Category="Avaryo|Interact")
 	TObjectPtr<AToilet> FocusedToilet;
+
+	/** Рендер-таргет нагрудной камеры (создаётся в BeginPlay, не реплицируется). */
+	UPROPERTY(Transient)
+	TObjectPtr<UTextureRenderTarget2D> ChestCamTarget;
+
+	/** Открыт ли монитор оператора (локальное состояние, не реплицируется). */
+	bool bMonitorOpen;
 
 	/** Таймер шороха волочения (слышно — задел под монстра). */
 	float DragNoiseAccum;

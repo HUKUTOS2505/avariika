@@ -6,6 +6,7 @@
 #include "Engine/Canvas.h"
 #include "Engine/Engine.h"
 #include "Engine/Font.h"
+#include "Engine/TextureRenderTarget2D.h"
 #include "EngineUtils.h"
 #include "Game/ARunState.h"
 #include "GameFramework/PlayerState.h"
@@ -47,6 +48,65 @@ void AAvaryoHUD::DrawHUD()
 	UVitalsComponent* Vitals = Character->VitalsComponent;
 	const float SizeX = Canvas->SizeX;
 	const float SizeY = Canvas->SizeY;
+
+	// ---------- Монитор оператора (Tab в зоне ГАЗели) ----------
+	if (Character->IsMonitorOpen())
+	{
+		DrawRect(FLinearColor(0.01f, 0.012f, 0.02f, 0.97f), 0.f, 0.f, SizeX, SizeY);
+		DrawText(TEXT("КАМЕРЫ БРИГАДЫ — [Tab] закрыть"), AvaryoHUDStyle::Accent, 30.f, 24.f, Font, 1.5f);
+
+		// Плитки 16:9 в две колонки
+		const float TileW = FMath::Min(SizeX * 0.42f, 560.f);
+		const float TileH = TileW * 9.f / 16.f;
+		const float PadX = (SizeX - TileW * 2.f) / 3.f;
+		float TileX = PadX;
+		float TileY = 80.f;
+		int32 Column = 0;
+
+		for (TActorIterator<AAvaryoCharacter> It(GetWorld()); It; ++It)
+		{
+			AAvaryoCharacter* Crew = *It;
+
+			DrawRect(FLinearColor(0.f, 0.f, 0.f, 1.f), TileX - 2.f, TileY - 2.f, TileW + 4.f, TileH + 4.f);
+			if (UTexture* CamImage = Crew->GetChestCamTarget())
+			{
+				DrawTexture(CamImage, TileX, TileY, TileW, TileH, 0.f, 0.f, 1.f, 1.f);
+			}
+
+			// Подпись: имя + состояние
+			FString Name = Crew->GetPlayerState() ? Crew->GetPlayerState()->GetPlayerName() : TEXT("Монтёр");
+			if (Crew == Character)
+			{
+				Name += TEXT(" (вы)");
+			}
+			if (Crew->VitalsComponent && Crew->VitalsComponent->IsWounded())
+			{
+				Name += TEXT(" — РАНЕН");
+			}
+			DrawText(Name, AvaryoHUDStyle::TextMain, TileX + 8.f, TileY + 6.f, Font, 1.0f);
+
+			// Мини-шкалы HP и паники под плиткой
+			if (UVitalsComponent* CrewVitals = Crew->VitalsComponent)
+			{
+				const float BarY = TileY + TileH + 6.f;
+				DrawRect(AvaryoHUDStyle::BarBG, TileX, BarY, TileW * 0.48f, 8.f);
+				DrawRect(FLinearColor(0.8f, 0.12f, 0.12f), TileX, BarY, TileW * 0.48f * CrewVitals->GetHealth() / 100.f, 8.f);
+				DrawRect(AvaryoHUDStyle::BarBG, TileX + TileW * 0.52f, BarY, TileW * 0.48f, 8.f);
+				DrawRect(FLinearColor(0.25f, 0.7f, 0.85f), TileX + TileW * 0.52f, BarY, TileW * 0.48f * CrewVitals->GetPanic() / 100.f, 8.f);
+			}
+
+			if (++Column % 2 == 0)
+			{
+				TileX = PadX;
+				TileY += TileH + 44.f;
+			}
+			else
+			{
+				TileX += TileW + PadX;
+			}
+		}
+		return; // монитор перекрывает обычный HUD
+	}
 
 	// Текст по центру (по X) на заданной высоте
 	auto DrawCentered = [&](const FString& Text, const FLinearColor& Color, float Y, float Scale)

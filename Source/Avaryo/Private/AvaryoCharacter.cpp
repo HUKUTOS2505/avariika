@@ -1,7 +1,10 @@
 #include "AvaryoCharacter.h"
 
 #include "Camera/CameraComponent.h"
+#include "Components/SceneCaptureComponent2D.h"
 #include "Components/UFlashlightComponent.h"
+#include "Engine/TextureRenderTarget2D.h"
+#include "World/AExitZone.h"
 #include "Components/VitalsComponent.h"
 #include "Components/InputComponent.h"
 #include "Components/PrimitiveComponent.h"
@@ -29,6 +32,17 @@ AAvaryoCharacter::AAvaryoCharacter()
 	// Шкалы игрока
 	VitalsComponent = CreateDefaultSubobject<UVitalsComponent>(TEXT("Vitals"));
 
+	// Нагрудная камера для монитора оператора. Захват выключен,
+	// включается локально только пока кто-то смотрит монитор (Tab в зоне ГАЗели)
+	ChestCamera = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("ChestCamera"));
+	ChestCamera->SetupAttachment(GetRootComponent());
+	ChestCamera->SetRelativeLocation(FVector(30.f, 0.f, 30.f));
+	ChestCamera->FOVAngle = 100.f;
+	ChestCamera->CaptureSource = SCS_FinalColorLDR;
+	ChestCamera->bCaptureEveryFrame = false;
+	ChestCamera->bCaptureOnMovement = false;
+	ChestCamera->SetComponentTickInterval(0.15f); // ~7 кадров/с — хватает и дёшево
+
 	LightSlots.SetNum(NumLightSlots);
 	ActiveSlot = 0;
 	PickupRange = 350.f;
@@ -43,6 +57,7 @@ AAvaryoCharacter::AAvaryoCharacter()
 	DragSpeedMultiplier = 0.55f;
 	DragNoiseAccum = 0.f;
 
+	bMonitorOpen = false;
 	bWasWounded = false;
 	bSprayingHeld = false;
 	SprayDrainAccum = 0.f;
@@ -69,6 +84,14 @@ void AAvaryoCharacter::BeginPlay()
 	{
 		FlashlightComponent->TurnOff();
 	}
+
+	// Картинка нагрудной камеры. Низкое разрешение — её смотрят плиткой на мониторе
+	ChestCamTarget = NewObject<UTextureRenderTarget2D>(this);
+	ChestCamTarget->InitAutoFormat(320, 180);
+	if (ChestCamera)
+	{
+		ChestCamera->TextureTarget = ChestCamTarget;
+	}
 }
 
 void AAvaryoCharacter::Tick(float DeltaSeconds)
@@ -82,6 +105,20 @@ void AAvaryoCharacter::Tick(float DeltaSeconds)
 		FocusedRepairable = FindFocusedRepairable();
 		FocusedWounded = FindFocusedWoundedTeammate();
 		FocusedToilet = FindFocusedToilet();
+
+		// Монитор оператора: закрывается, если вышел из зоны/ранен.
+		// Захват камер у ВСЕХ персонажей включён локально только пока монитор открыт
+		if (bMonitorOpen && !CanUseMonitor())
+		{
+			bMonitorOpen = false;
+		}
+		for (TActorIterator<AAvaryoCharacter> It(GetWorld()); It; ++It)
+		{
+			if (It->ChestCamera)
+			{
+				It->ChestCamera->bCaptureEveryFrame = bMonitorOpen;
+			}
+		}
 	}
 
 	// Починка сорвалась на стороне объекта (ушёл, ранен) — чистим ссылку
@@ -174,6 +211,9 @@ void AAvaryoCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	PlayerInputComponent->BindKey(EKeys::LeftControl, IE_Released, this, &AAvaryoCharacter::StopCrouchInput);
 	PlayerInputComponent->BindKey(EKeys::C, IE_Pressed, this, &AAvaryoCharacter::StartCrouchInput);
 	PlayerInputComponent->BindKey(EKeys::C, IE_Released, this, &AAvaryoCharacter::StopCrouchInput);
+
+	// Монитор оператора (только в зоне ГАЗели)
+	PlayerInputComponent->BindKey(EKeys::Tab, IE_Pressed, this, &AAvaryoCharacter::ToggleMonitor);
 
 	// Слоты инвентаря: 1 — тяжёлый, 2-5 — лёгкие
 	PlayerInputComponent->BindKey(EKeys::One, IE_Pressed, this, &AAvaryoCharacter::EquipSlot1);
@@ -538,6 +578,34 @@ void AAvaryoCharacter::InteractReleasedAuth()
 		CurrentRepairable->EndRepairBy(this);
 		CurrentRepairable = nullptr;
 	}
+}
+
+// ---------- Оператор: нагрудные камеры ----------
+
+bool AAvaryoCharacter::CanUseMonitor() const
+{
+	// Оператор сидит в машине: монитор доступен только в зоне ГАЗели и не раненому
+	if (VitalsComponent && VitalsComponent->IsWounded())
+	{
+		return false;
+	}
+	for (TActorIterator<AExitZone> It(GetWorld()); It; ++It)
+	{
+		if (It->IsOverlappingActor(this))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+void AAvaryoCharacter::ToggleMonitor()
+{
+	if (!bMonitorOpen && !CanUseMonitor())
+	{
+		return;
+	}
+	bMonitorOpen = !bMonitorOpen;
 }
 
 AToilet* AAvaryoCharacter::FindFocusedToilet() const
