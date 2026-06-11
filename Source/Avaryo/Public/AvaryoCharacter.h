@@ -408,4 +408,10 @@ protected:
 
 	UFUNCTION(Server, Reliable)
 	void ServerInteractReleased();
+
+	/** R на экране «Акта»: перезапуск смены. */
+	void TryRestartRun();
+
+	UFUNCTION(Server, Reliable)
+	void ServerRequestRestart();
 };

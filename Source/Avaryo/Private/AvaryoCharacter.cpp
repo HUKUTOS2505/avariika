@@ -201,6 +201,8 @@ void AAvaryoCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	PlayerInputComponent->BindKey(EKeys::LeftMouseButton, IE_Released, this, &AAvaryoCharacter::EndUseHeldItem);
 	PlayerInputComponent->BindKey(EKeys::R, IE_Pressed, this, &AAvaryoCharacter::BeginUseHeldItem);
 	PlayerInputComponent->BindKey(EKeys::R, IE_Released, this, &AAvaryoCharacter::EndUseHeldItem);
+	// Тот же R на экране «Акта» перезапускает смену (во время забега ничего не делает)
+	PlayerInputComponent->BindKey(EKeys::R, IE_Pressed, this, &AAvaryoCharacter::TryRestartRun);
 	// Передача предмета: держишь ПКМ — предмет вытянут вперёд, тиммейт забирает по E
 	PlayerInputComponent->BindKey(EKeys::RightMouseButton, IE_Pressed, this, &AAvaryoCharacter::BeginOfferItem);
 	PlayerInputComponent->BindKey(EKeys::RightMouseButton, IE_Released, this, &AAvaryoCharacter::EndOfferItem);
@@ -577,6 +579,31 @@ void AAvaryoCharacter::InteractReleasedAuth()
 	{
 		CurrentRepairable->EndRepairBy(this);
 		CurrentRepairable = nullptr;
+	}
+}
+
+void AAvaryoCharacter::TryRestartRun()
+{
+	ARunState* Run = ARunState::Get(GetWorld());
+	if (!Run || Run->GetPhase() == ERunPhase::InProgress)
+	{
+		return; // не финальный экран — R работает как применение предмета
+	}
+	if (HasAuthority())
+	{
+		Run->RequestRestart();
+	}
+	else
+	{
+		ServerRequestRestart();
+	}
+}
+
+void AAvaryoCharacter::ServerRequestRestart_Implementation()
+{
+	if (ARunState* Run = ARunState::Get(GetWorld()))
+	{
+		Run->RequestRestart();
 	}
 }
 

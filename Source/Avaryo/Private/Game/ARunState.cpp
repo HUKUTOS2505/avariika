@@ -4,6 +4,7 @@
 #include "Components/VitalsComponent.h"
 #include "Engine/World.h"
 #include "EngineUtils.h"
+#include "GameFramework/GameModeBase.h"
 #include "GameFramework/GameStateBase.h"
 #include "Net/UnrealNetwork.h"
 #include "World/AExitZone.h"
@@ -216,6 +217,18 @@ void ARunState::NotifyTeamAtExit()
 	if (HasAuthority() && Phase == ERunPhase::InProgress && AreAllObjectivesComplete())
 	{
 		FinishRun(ERunPhase::Won);
+	}
+}
+
+void ARunState::RequestRestart()
+{
+	if (!HasAuthority() || Phase == ERunPhase::InProgress)
+	{
+		return; // рестарт только с финального экрана
+	}
+	if (AGameModeBase* GameMode = GetWorld()->GetAuthGameMode())
+	{
+		GameMode->ProcessServerTravel(TEXT("?restart")); // новая смена, новые поломки
 	}
 }
 

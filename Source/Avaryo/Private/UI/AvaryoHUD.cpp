@@ -244,7 +244,7 @@ void AAvaryoHUD::DrawHUD()
 
 			const float ReportW = FMath::Min(820.f, SizeX - 80.f);
 			const float ReportRowH = 26.f;
-			const float ReportH = 170.f + AllStats.Num() * ReportRowH * 2.f;
+			const float ReportH = 200.f + AllStats.Num() * ReportRowH * 2.f;
 			const float PX = (SizeX - ReportW) * 0.5f;
 			float PY = FMath::Max(40.f, (SizeY - ReportH) * 0.5f);
 
@@ -299,7 +299,8 @@ void AAvaryoHUD::DrawHUD()
 			const FString TotalLine = CrewTotal >= 0
 				? FString::Printf(TEXT("Итого к выплате бригаде: +%d ₽"), CrewTotal)
 				: FString::Printf(TEXT("Итого: %d ₽ — вычтем из следующей смены"), CrewTotal);
-			DrawCentered(TotalLine, CrewTotal >= 0 ? FLinearColor(0.3f, 0.9f, 0.3f) : FLinearColor(0.95f, 0.45f, 0.3f), TY, 1.25f);
+			TY += DrawCentered(TotalLine, CrewTotal >= 0 ? FLinearColor(0.3f, 0.9f, 0.3f) : FLinearColor(0.95f, 0.45f, 0.3f), TY, 1.25f) + 10.f;
+			DrawCentered(TEXT("[R] Следующая смена"), TextDim, TY, 1.05f);
 		}
 		else if (Run->AreAllObjectivesComplete() && Run->GetTotalObjectives() > 0)
 		{
