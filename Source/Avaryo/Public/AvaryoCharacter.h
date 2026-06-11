@@ -98,6 +98,13 @@ public:
 	UFUNCTION(BlueprintPure, Category="Avaryo|Interact")
 	AToilet* GetFocusedToilet() const { return FocusedToilet; }
 
+	/** Идёт ли «процесс» в биотуалете (держит E). */
+	UFUNCTION(BlueprintPure, Category="Avaryo|Interact")
+	bool IsUsingToilet() const { return CurrentToilet != nullptr; }
+
+	UFUNCTION(BlueprintPure, Category="Avaryo|Interact")
+	AToilet* GetCurrentToilet() const { return CurrentToilet; }
+
 	// ---------- Оператор: нагрудные камеры ----------
 
 	/** Открыть/закрыть монитор оператора (Tab). Работает только в зоне ГАЗели. */
@@ -262,6 +269,10 @@ protected:
 	/** Биотуалет под прицелом. Считается локально в Tick. */
 	UPROPERTY(Transient, BlueprintReadOnly, Category="Avaryo|Interact")
 	TObjectPtr<AToilet> FocusedToilet;
+
+	/** Где идёт «процесс» (сервер пишет, реплицируется для HUD). */
+	UPROPERTY(Replicated, BlueprintReadOnly, Category="Avaryo|Interact")
+	TObjectPtr<AToilet> CurrentToilet;
 
 	/** Рендер-таргет нагрудной камеры (создаётся в BeginPlay, не реплицируется). */
 	UPROPERTY(Transient)

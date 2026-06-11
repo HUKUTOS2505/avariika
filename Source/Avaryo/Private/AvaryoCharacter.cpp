@@ -126,6 +126,10 @@ void AAvaryoCharacter::Tick(float DeltaSeconds)
 	{
 		CurrentRepairable = nullptr;
 	}
+	if (HasAuthority() && CurrentToilet && CurrentToilet->GetOccupant() != this)
+	{
+		CurrentToilet = nullptr; // «процесс» сорвался или завершился
+	}
 
 	// Скорость зависит от состояния — обновляем на сервере и у владельца
 	if (HasAuthority() || IsLocallyControlled())
@@ -236,6 +240,7 @@ void AAvaryoCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	DOREPLIFETIME(AAvaryoCharacter, UseCastDuration);
 	DOREPLIFETIME(AAvaryoCharacter, bOffering);
 	DOREPLIFETIME(AAvaryoCharacter, CurrentRepairable);
+	DOREPLIFETIME(AAvaryoCharacter, CurrentToilet);
 	DOREPLIFETIME(AAvaryoCharacter, DraggedTeammate);
 	DOREPLIFETIME(AAvaryoCharacter, DraggedBy);
 }
@@ -552,7 +557,10 @@ void AAvaryoCharacter::InteractPressedAuth()
 
 	if (AToilet* Toilet = FindFocusedToilet())
 	{
-		Toilet->UseBy(this);
+		if (Toilet->BeginUseBy(this))
+		{
+			CurrentToilet = Toilet;
+		}
 		return;
 	}
 
@@ -579,6 +587,11 @@ void AAvaryoCharacter::InteractReleasedAuth()
 	{
 		CurrentRepairable->EndRepairBy(this);
 		CurrentRepairable = nullptr;
+	}
+	if (CurrentToilet)
+	{
+		CurrentToilet->EndUseBy(this);
+		CurrentToilet = nullptr;
 	}
 }
 

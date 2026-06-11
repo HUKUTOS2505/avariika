@@ -272,6 +272,7 @@ void AAvaryoHUD::DrawHUD()
 				// Звание: инциденты вне конкуренции, дальше — по лучшему показателю
 				FString Title;
 				if (S.Incidents > 0)                                   Title = TEXT("Биологическая угроза");
+				else if (S.ToiletVisits >= 2)                          Title = TEXT("Дисциплинированный мочевой пузырь");
 				else if (S.Repairs > 0 && S.Repairs == MaxRepairs)     Title = TEXT("Работник месяца");
 				else if (S.Revives > 0 && S.Revives == MaxRevives)     Title = TEXT("Полевой медик");
 				else if (S.Drags > 0 && S.Drags == MaxDrags)           Title = TEXT("Эвакуатор");
@@ -280,13 +281,13 @@ void AAvaryoHUD::DrawHUD()
 				else                                                   Title = TEXT("Просто присутствовал");
 
 				// Бухгалтерия: премии и штрафы
-				const int32 Balance = S.Repairs * 1500 + S.Revives * 1000 + S.Drags * 500
+				const int32 Balance = S.Repairs * 1500 + S.Revives * 1000 + S.Drags * 500 + S.ToiletVisits * 300
 					- S.TimesWounded * 1000 - S.Incidents * 2000 - FMath::RoundToInt(S.PanicSeconds) * 10;
 				CrewTotal += Balance;
 
 				const FString Row1 = FString::Printf(TEXT("%s — «%s»"), *Name, *Title);
-				const FString Row2 = FString::Printf(TEXT("починки: %d   подъёмы: %d   эвакуации: %d   ранения: %d   инциденты: %d   паника: %d сек   итог: %s%d ₽"),
-					S.Repairs, S.Revives, S.Drags, S.TimesWounded, S.Incidents,
+				const FString Row2 = FString::Printf(TEXT("починки: %d   подъёмы: %d   эвакуации: %d   туалет: %d   ранения: %d   инциденты: %d   паника: %d сек   итог: %s%d ₽"),
+					S.Repairs, S.Revives, S.Drags, S.ToiletVisits, S.TimesWounded, S.Incidents,
 					FMath::RoundToInt(S.PanicSeconds), Balance >= 0 ? TEXT("+") : TEXT(""), Balance);
 
 				DrawText(Row1, TextMain, PX + 28.f, TY, Font, 1.1f);
@@ -322,6 +323,13 @@ void AAvaryoHUD::DrawHUD()
 		DrawCastBar(FString::Printf(TEXT("Применение: %s  %d%%"),
 			Casting ? *Casting->DisplayName.ToString() : TEXT("..."), Percent),
 			Character->GetUseProgress(), BarFill);
+	}
+	// ---------- «Процесс» в биотуалете (держит E) ----------
+	else if (Character->IsUsingToilet() && Character->GetCurrentToilet())
+	{
+		const float Progress = Character->GetCurrentToilet()->GetUseProgress();
+		DrawCastBar(FString::Printf(TEXT("Процесс...  %d%%"), FMath::RoundToInt(Progress * 100.f)),
+			Progress, FLinearColor(0.45f, 0.75f, 1.f));
 	}
 	// ---------- Починка (держит E у объекта) ----------
 	else if (Character->IsRepairing() && Character->GetCurrentRepairable())
@@ -361,9 +369,20 @@ void AAvaryoHUD::DrawHUD()
 	// ---------- Подсказка биотуалета ----------
 	else if (AToilet* Toilet = Character->GetFocusedToilet())
 	{
-		DrawPromptBox(Toilet->CanUseBy(Character)
-			? TEXT("[E] Облегчиться")
-			: TEXT("Биотуалет: пока не хочется"));
+		FString ToiletPrompt;
+		if (Toilet->IsOccupied() && Toilet->GetOccupant() != Character)
+		{
+			ToiletPrompt = TEXT("Биотуалет: ЗАНЯТО");
+		}
+		else if (Toilet->CanUseBy(Character))
+		{
+			ToiletPrompt = TEXT("[E] Облегчиться (держать, не двигаться)");
+		}
+		else
+		{
+			ToiletPrompt = TEXT("Биотуалет: пока не хочется");
+		}
+		DrawPromptBox(ToiletPrompt);
 	}
 	// ---------- Подсказка драга раненого ----------
 	else if (Character->GetFocusedWounded() && !Character->IsDragging())

@@ -33,6 +33,9 @@ struct FPlayerRunStats
 	int32 Incidents = 0;        // санитарные инциденты
 
 	UPROPERTY(BlueprintReadOnly, Category="Run")
+	int32 ToiletVisits = 0;     // дисциплинированные визиты в биотуалет
+
+	UPROPERTY(BlueprintReadOnly, Category="Run")
 	float PanicSeconds = 0.f;   // времени в панике
 
 	// Для детекции переходов на серверном тике (реплицируются заодно — безвредно)
@@ -103,6 +106,9 @@ public:
 
 	/** Схватился тащить раненого. Только сервер. */
 	void AddDrag(AAvaryoCharacter* Who);
+
+	/** Дошёл до биотуалета. Только сервер. */
+	void AddToiletVisit(AAvaryoCharacter* Who);
 
 protected:
 	UPROPERTY(Replicated)

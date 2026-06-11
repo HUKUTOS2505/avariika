@@ -184,6 +184,14 @@ void ARunState::AddDrag(AAvaryoCharacter* Who)
 	}
 }
 
+void ARunState::AddToiletVisit(AAvaryoCharacter* Who)
+{
+	if (HasAuthority() && Who)
+	{
+		++FindOrAddStats(Who).ToiletVisits;
+	}
+}
+
 void ARunState::OnObjectiveRepaired(ARepairable* Repairable, AAvaryoCharacter* FinishedBy)
 {
 	if (!HasAuthority() || Phase != ERunPhase::InProgress)
