@@ -11,6 +11,7 @@
 #include "Game/ARunState.h"
 #include "GameFramework/PlayerState.h"
 #include "Items/APickupItem.h"
+#include "World/AExitZone.h"
 #include "World/ARepairable.h"
 #include "World/AToilet.h"
 
@@ -307,6 +308,74 @@ void AAvaryoHUD::DrawHUD()
 		{
 			DrawCentered(TEXT("Всё починено — вся бригада к ГАЗели!"), Accent, SizeY * 0.34f, 1.3f);
 		}
+	}
+
+	// ---------- Миникарта (слева, под шкалами) ----------
+	{
+		const float MapSize = 150.f;
+		const float MapX = 30.f, MapY = 175.f;
+		const float WorldHalf = 2100.f; // пол карты ±2000 + запас
+
+		DrawRect(FLinearColor(0.f, 0.f, 0.f, 0.55f), MapX, MapY, MapSize, MapSize);
+		DrawRect(AccentDim, MapX, MapY, MapSize, 2.f);
+		DrawRect(AccentDim, MapX, MapY + MapSize - 2.f, MapSize, 2.f);
+		DrawRect(AccentDim, MapX, MapY, 2.f, MapSize);
+		DrawRect(AccentDim, MapX + MapSize - 2.f, MapY, 2.f, MapSize);
+
+		// Мир → миникарта: север (X+) сверху, восток (Y+) справа
+		auto WorldToMap = [&](const FVector& W, float& OutX, float& OutY)
+		{
+			OutX = MapX + FMath::Clamp((W.Y + WorldHalf) / (2.f * WorldHalf), 0.02f, 0.98f) * MapSize;
+			OutY = MapY + FMath::Clamp((WorldHalf - W.X) / (2.f * WorldHalf), 0.02f, 0.98f) * MapSize;
+		};
+		auto DrawDot = [&](const FVector& W, const FLinearColor& Color, float Half)
+		{
+			float X = 0.f, Y = 0.f;
+			WorldToMap(W, X, Y);
+			DrawRect(Color, X - Half, Y - Half, Half * 2.f, Half * 2.f);
+		};
+
+		// Зона ГАЗели и биотуалеты
+		for (TActorIterator<AExitZone> It(GetWorld()); It; ++It)
+		{
+			DrawDot(It->GetActorLocation(), Accent, 5.f);
+		}
+		for (TActorIterator<AToilet> It(GetWorld()); It; ++It)
+		{
+			DrawDot(It->GetActorLocation(), FLinearColor(0.45f, 0.75f, 1.f), 3.f);
+		}
+
+		// Задачи: сломанные красным, починенные зелёным
+		if (ARunState* Run = ARunState::Get(GetWorld()))
+		{
+			for (const ARepairable* Objective : Run->GetObjectives())
+			{
+				if (Objective)
+				{
+					DrawDot(Objective->GetActorLocation(),
+						Objective->IsBroken() ? FLinearColor(0.95f, 0.2f, 0.2f) : FLinearColor(0.3f, 0.85f, 0.3f), 3.f);
+				}
+			}
+		}
+
+		// Бригада: тиммейты белым (раненые красным), я — оранжевый с направлением взгляда
+		for (TActorIterator<AAvaryoCharacter> It(GetWorld()); It; ++It)
+		{
+			if (*It == Character)
+			{
+				continue;
+			}
+			const bool bCrewWounded = It->VitalsComponent && It->VitalsComponent->IsWounded();
+			DrawDot(It->GetActorLocation(), bCrewWounded ? FLinearColor(1.f, 0.3f, 0.3f) : TextMain, 2.5f);
+		}
+
+		float SelfX = 0.f, SelfY = 0.f;
+		WorldToMap(Character->GetActorLocation(), SelfX, SelfY);
+		DrawRect(Accent, SelfX - 3.f, SelfY - 3.f, 6.f, 6.f);
+		const FVector Forward = Character->GetControlRotation().Vector();
+		Draw2DLine(FMath::RoundToInt(SelfX), FMath::RoundToInt(SelfY),
+			FMath::RoundToInt(SelfX + Forward.Y * 10.f), FMath::RoundToInt(SelfY - Forward.X * 10.f),
+			Accent.ToFColor(true));
 	}
 
 	// ---------- Баннер ранения ----------
