@@ -415,6 +415,19 @@ protected:
 	/** Запустить спотыкание: стан скорости, шум, реплики, фумбл. Только сервер. */
 	void TriggerStumble();
 
+	// ---------- Паника: тряска прицела + адреналин ----------
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Avaryo|Panic")
+	float PanicSwayAmount;       // амплитуда дрожи прицела при панике
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Avaryo|Panic")
+	float AdrenalineHealthThreshold; // ниже этого HP включается адреналин
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Avaryo|Panic")
+	float AdrenalineSpeedMult;   // прибавка к скорости на адреналине
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Avaryo|Panic")
+	float AdrenalinePanicPerSecond; // паника растёт, пока на адреналине
+
 	float StumbleUntil;        // серверное время конца спотыкания
 
 	/** Сервер: розыгрыш спотыкания при беге (темнота/паника повышают шанс). */

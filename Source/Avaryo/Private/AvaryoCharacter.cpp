@@ -104,6 +104,11 @@ AAvaryoCharacter::AAvaryoCharacter()
 
 	FoamSlipPanic = 4.f;
 	FoamFallChancePerSecond = 0.25f;
+
+	PanicSwayAmount = 9.f;
+	AdrenalineHealthThreshold = 30.f;
+	AdrenalineSpeedMult = 1.15f;
+	AdrenalinePanicPerSecond = 3.f;
 	UseCastRemaining = 0.f;
 	UseCastDuration = 0.f;
 	bOffering = false;
@@ -242,6 +247,22 @@ void AAvaryoCharacter::Tick(float DeltaSeconds)
 	{
 		UpdateFoamSlip(DeltaSeconds);
 		UpdateTrip(DeltaSeconds);
+
+		// Адреналин на низком HP стоит нервов — паника подрастает
+		if (VitalsComponent && !VitalsComponent->IsWounded()
+			&& VitalsComponent->GetHealth() < AdrenalineHealthThreshold)
+		{
+			VitalsComponent->AddPanic(AdrenalinePanicPerSecond * DeltaSeconds);
+		}
+	}
+
+	// Дрожащие руки: лёгкая тряска прицела при панике (у владельца, Panic реплицируется)
+	if (IsLocallyControlled() && VitalsComponent && VitalsComponent->IsPanicking())
+	{
+		const float Sway = PanicSwayAmount * (VitalsComponent->GetPanic() / 100.f);
+		const float T = GetWorld()->GetTimeSeconds();
+		AddControllerYawInput(FMath::Sin(T * 7.3f) * Sway * DeltaSeconds);
+		AddControllerPitchInput(FMath::Sin(T * 9.1f) * Sway * DeltaSeconds);
 	}
 
 	// Волочение раненого
@@ -407,6 +428,11 @@ void AAvaryoCharacter::RefreshMoveSpeed()
 	if (bStumbling)
 	{
 		Speed = FMath::Min(Speed, TripSlowSpeed); // споткнулся — резко сбросил ход
+	}
+	// Адреналин: на низком HP (но ещё на ногах) — рывок скорости (паника за это растёт в Vitals)
+	if (!VitalsComponent->IsWounded() && VitalsComponent->GetHealth() < AdrenalineHealthThreshold)
+	{
+		Speed *= AdrenalineSpeedMult;
 	}
 	if (VitalsComponent->IsWounded())
 	{

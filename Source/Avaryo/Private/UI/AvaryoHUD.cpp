@@ -185,7 +185,22 @@ void AAvaryoHUD::DrawHUD()
 		DrawBar(TEXT("Выносливость"), Vitals->GetStamina(), FLinearColor(0.2f, 0.7f, 0.25f),  Y); Y += 22.f;
 		DrawBar(TEXT("Паника"),       Vitals->GetPanic(),   FLinearColor(0.25f, 0.7f, 0.85f), Y); Y += 22.f;
 		DrawBar(TEXT("Туалет"),       Vitals->GetBladder(), FLinearColor(0.8f, 0.6f, 0.12f),  Y); Y += 22.f;
-		DrawBar(TEXT("Амбре"),        Vitals->GetSmell(),   FLinearColor(0.5f, 0.45f, 0.12f), Y);
+		DrawBar(TEXT("Амбре"),        Vitals->GetSmell(),   FLinearColor(0.5f, 0.45f, 0.12f), Y); Y += 22.f;
+
+		// Шум: насколько ты сейчас слышен (бег/распыление громко, присед тихо) — задел под монстра-слухача
+		float Noise01 = FMath::Clamp(Character->GetVelocity().Size2D() / 750.f, 0.f, 1.f);
+		if (Character->bIsCrouched)
+		{
+			Noise01 *= 0.4f;
+		}
+		if (APickupItem* HeldNoisy = Character->GetHeldItem())
+		{
+			if (HeldNoisy->IsSpraying())
+			{
+				Noise01 = 1.f;
+			}
+		}
+		DrawBar(TEXT("Шум"), Noise01 * 100.f, FLinearColor(1.f, 0.55f, 0.2f), Y);
 
 		// Батарея налобного фонаря: ярко-жёлтая когда включён, тусклая когда выключен
 		if (UFlashlightComponent* Flashlight = Character->FlashlightComponent)
