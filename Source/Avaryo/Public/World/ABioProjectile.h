@@ -21,6 +21,7 @@ class AVARYO_API ABioProjectile : public AActor
 public:
 	ABioProjectile();
 
+	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaSeconds) override;
 
 	/** Корпус-комок (физика). */

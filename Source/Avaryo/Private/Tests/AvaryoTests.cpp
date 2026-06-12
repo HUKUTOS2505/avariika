@@ -2,11 +2,18 @@
 
 #if WITH_DEV_AUTOMATION_TESTS
 
+#include "AvaryoCharacter.h"
 #include "Components/VitalsComponent.h"
+#include "Engine/Engine.h"
 #include "Engine/GameInstance.h"
+#include "Engine/World.h"
 #include "Game/ARunState.h"
 #include "Game/CompanyLedgerSubsystem.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "UObject/Package.h"
+#include "World/AFloodlight.h"
+#include "World/ARepairable.h"
+#include "World/ATrap.h"
 
 // Формула премий/штрафов «Акта» (единая для сервера и HUD)
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FAvaryoBalanceTest, "Avariika.PlayerBalance",
@@ -120,6 +127,96 @@ bool FAvaryoVitalsTest::RunTest(const FString&)
 	V->DebugSetVital(TEXT("stamina"), 10.f);
 	TestEqual(TEXT("DebugSetVital stamina=10"), V->GetStamina(), 10.f);
 
+	return true;
+}
+
+// --- Рантайм-акторы в живом тест-мире (то, что не покрыть смоуком) ---
+
+static UWorld* AvaryoMakeTestWorld()
+{
+	UWorld* World = UWorld::CreateWorld(EWorldType::Game, /*bInformEngineOfWorld=*/false);
+	FWorldContext& Ctx = GEngine->CreateNewWorldContext(EWorldType::Game);
+	Ctx.SetCurrentWorld(World);
+	World->InitializeActorsForPlay(FURL());
+	World->BeginPlay();
+	return World;
+}
+
+static void AvaryoTickWorld(UWorld* World, float Seconds)
+{
+	const float Step = 0.05f;
+	for (float t = 0.f; t < Seconds; t += Step)
+	{
+		World->Tick(LEVELTICK_All, Step);
+	}
+}
+
+static void AvaryoDestroyTestWorld(UWorld* World)
+{
+	GEngine->DestroyWorldContext(World);
+	World->DestroyWorld(false);
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FAvaryoDeployablesTest, "Avariika.Deployables",
+	EAutomationTestFlags_ApplicationContextMask | EAutomationTestFlags::ProductFilter)
+bool FAvaryoDeployablesTest::RunTest(const FString&)
+{
+	UWorld* World = AvaryoMakeTestWorld();
+	if (!TestNotNull(TEXT("тест-мир создан"), World))
+	{
+		return false;
+	}
+
+	FActorSpawnParameters Always;
+	Always.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+	AAvaryoCharacter* Char = World->SpawnActor<AAvaryoCharacter>(AAvaryoCharacter::StaticClass(), FVector::ZeroVector, FRotator::ZeroRotator, Always);
+	if (!TestNotNull(TEXT("монтёр заспавнен"), Char) || !TestNotNull(TEXT("есть Vitals"), Char ? (UObject*)Char->VitalsComponent : nullptr))
+	{
+		AvaryoDestroyTestWorld(World);
+		return false;
+	}
+	Char->SetActorTickEnabled(false);
+	if (Char->GetCharacterMovement())
+	{
+		Char->GetCharacterMovement()->SetMovementMode(MOVE_None);
+	}
+
+	// Ставимые акторы должны безопасно спавниться, взводиться и тикать в живом мире (без падений).
+	// Поведение их Tick (гашение паники / срабатывание) проверяется в PIE — в ручном World->Tick
+	// хедлесс-мира тики акторов не диспатчатся надёжно.
+	AFloodlight* Lamp = World->SpawnActor<AFloodlight>(AFloodlight::StaticClass(), FVector(50.f, 0.f, 0.f), FRotator::ZeroRotator, Always);
+	TestNotNull(TEXT("прожектор заспавнен"), Lamp);
+
+	ATrap* Trap = World->SpawnActorDeferred<ATrap>(ATrap::StaticClass(), FTransform(FVector(60.f, 0.f, 0.f)),
+		nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+	TestNotNull(TEXT("растяжка заспавнена"), Trap);
+	if (Trap)
+	{
+		Trap->ArmDelay = 0.1f;
+		Trap->PlacerGraceTime = 0.f;
+		Trap->FinishSpawning(FTransform(FVector(60.f, 0.f, 0.f)));
+	}
+
+	AvaryoTickWorld(World, 0.6f); // не должно упасть на BeginPlay/Tick/таймере взвода
+
+	// --- Колхоз: ремонт инструментального объекта без инструмента (прямые вызовы, без зависимости от Tick) ---
+	ARepairable* Rep = World->SpawnActor<ARepairable>(ARepairable::StaticClass(), FVector(100.f, 0.f, 0.f), FRotator::ZeroRotator, Always);
+	if (TestNotNull(TEXT("объект заспавнен"), Rep))
+	{
+		Rep->RequiredTool = TEXT("Welder");
+		Rep->bAllowBotch = true;
+		TestTrue(TEXT("без инструмента можно колхозить"), Rep->CanBotchBy(Char));
+		TestTrue(TEXT("починка стартует колхозом"), Rep->BeginRepairBy(Char));
+		TestTrue(TEXT("идёт колхоз"), Rep->IsBotching());
+
+		// С правильным инструментом колхоз НЕ предлагается (нужна обычная мини-игра)
+		Rep->EndRepairBy(Char);
+		Rep->bAllowBotch = false;
+		TestFalse(TEXT("при bAllowBotch=false колхоз запрещён"), Rep->CanBotchBy(Char));
+	}
+
+	AvaryoDestroyTestWorld(World);
 	return true;
 }
 

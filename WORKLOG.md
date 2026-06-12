@@ -189,9 +189,11 @@
 
 ## АВТОТЕСТЫ 2026-06-12 (headless-верификация логики)
 
-`Source/Avaryo/Private/Tests/AvaryoTests.cpp` — 4 C++ Automation-теста (под `WITH_DEV_AUTOMATION_TESTS`):
-`Avariika.PlayerBalance` (формула денег), `Avariika.ReputationTitle`, `Avariika.CompanyLedger` (накопление баланса/репутации/смены, зажимы), `Avariika.Vitals` (зажимы запаха/паники, DebugSetVital). **Все 4 — Success.**
-Прогон headless: `UnrealEditor-Cmd <uproj> -ExecCmds="Automation RunTests Avariika; Quit" -unattended -nullrhi -nosound -abslog=<...>`; «EXIT CODE: 0» = всё прошло. Нюансы 5.7: маска контекста — `EAutomationTestFlags_ApplicationContextMask` (с подчёркиванием); `UCompanyLedgerSubsystem` (ClassWithin=GameInstance) в тесте создавать с `NewObject<UGameInstance>` овнером, не в пакете.
+`Source/Avaryo/Private/Tests/AvaryoTests.cpp` — 5 C++ Automation-тестов (под `WITH_DEV_AUTOMATION_TESTS`):
+`Avariika.PlayerBalance` (формула денег), `Avariika.ReputationTitle`, `Avariika.CompanyLedger` (накопление баланса/репутации/смены, зажимы), `Avariika.Vitals` (зажимы запаха/паники, DebugSetVital), `Avariika.Deployables` (живой тест-мир: безопасный спавн/тик персонажа+прожектора+растяжки+объекта; логика колхоза CanBotchBy/BeginRepairBy/IsBotching и запрет при bAllowBotch=false). **Все 5 — Success, EXIT CODE: 0.**
+Прогон headless: `UnrealEditor-Cmd <uproj> -ExecCmds="Automation RunTests Avariika; Quit" -unattended -nullrhi -nosound -abslog=<...>`.
+Нюансы 5.7: маска контекста — `EAutomationTestFlags_ApplicationContextMask` (с подчёркиванием); `UCompanyLedgerSubsystem` (ClassWithin=GameInstance) создавать с `NewObject<UGameInstance>` овнером; **тики акторов в ручном `World->Tick` хедлесс-мира не диспатчатся надёжно** — поведение Tick прожектора/ловушки (гашение/срабатывание паники) проверяется только в PIE, в автотесте оставлен лишь «не падает».
+Также фикс мультиплеера: `ABioProjectile` теперь симулирует физику только на сервере (в BeginPlay по HasAuthority), клиенты — по реплицированному движению (без дёрганья).
 
 ## ДЕВ-КОНСОЛЬ 2026-06-12 (ускорение PIE-теста)
 

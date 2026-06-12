@@ -24,8 +24,8 @@ ABioProjectile::ABioProjectile()
 	MeshComponent->SetRelativeScale3D(FVector(0.16f));
 	MeshComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	MeshComponent->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap); // о монтёров не отскакивает — шлёпает
-	MeshComponent->SetSimulatePhysics(true);
 	MeshComponent->SetNotifyRigidBodyCollision(true);
+	// Физику включаем только на сервере (BeginPlay) — клиентам приходит реплицированное движение
 
 	ThrowSpeed = 1200.f;
 	HitRadius = 90.f;
@@ -38,6 +38,16 @@ ABioProjectile::ABioProjectile()
 	SettledTime = 0.f;
 	LingerRemaining = 0.f;
 	StinkNoiseAccum = 0.f;
+}
+
+void ABioProjectile::BeginPlay()
+{
+	Super::BeginPlay();
+	// Симулирует только сервер; клиенты — кинематик + реплицированное движение (без дёрганья)
+	if (MeshComponent)
+	{
+		MeshComponent->SetSimulatePhysics(HasAuthority());
+	}
 }
 
 void ABioProjectile::Launch(const FVector& Direction)
