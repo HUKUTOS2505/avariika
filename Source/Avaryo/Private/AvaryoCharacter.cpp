@@ -77,6 +77,13 @@ AAvaryoCharacter::AAvaryoCharacter()
 	bSlipDefaultsSaved = false;
 	SlipDefaultGroundFriction = 8.f;
 	SlipDefaultBrakingDecel = 2048.f;
+
+	ShoveRange = 220.f;
+	ShoveForce = 750.f;
+	ShoveUp = 280.f;
+	ShovePanic = 10.f;
+	ShoveCooldownTime = 1.2f;
+	ShoveReadyTime = 0.f;
 	UseCastRemaining = 0.f;
 	UseCastDuration = 0.f;
 	bOffering = false;
@@ -250,6 +257,7 @@ void AAvaryoCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	PlayerInputComponent->BindKey(EKeys::E, IE_Pressed, this, &AAvaryoCharacter::OnInteractPressed);
 	PlayerInputComponent->BindKey(EKeys::E, IE_Released, this, &AAvaryoCharacter::OnInteractReleased);
 	PlayerInputComponent->BindKey(EKeys::G, IE_Pressed, this, &AAvaryoCharacter::DropItem);
+	PlayerInputComponent->BindKey(EKeys::Q, IE_Pressed, this, &AAvaryoCharacter::Shove);
 	// Использование: ЛКМ или R (нажал — эффект/распыление, отпустил — конец распыления)
 	PlayerInputComponent->BindKey(EKeys::LeftMouseButton, IE_Pressed, this, &AAvaryoCharacter::BeginUseHeldItem);
 	PlayerInputComponent->BindKey(EKeys::LeftMouseButton, IE_Released, this, &AAvaryoCharacter::EndUseHeldItem);
@@ -1507,6 +1515,78 @@ void AAvaryoCharacter::OnRep_Slipping()
 {
 	ApplySlipFriction(bSlipping); // клиент тоже снижает/возвращает трение — чтобы скольжение совпало
 }
+
+void AAvaryoCharacter::Shove()
+{
+	if (!HasAuthority())
+	{
+		ServerShove();
+		return;
+	}
+	ServerShove_Implementation();
+}
+
+void AAvaryoCharacter::ServerShove_Implementation()
+{
+	// Нельзя толкать, пока сам ранен или залочен в мини-игре
+	if ((VitalsComponent && VitalsComponent->IsWounded()) || bInteractionLocked)
+	{
+		return;
+	}
+	const float Now = GetWorld()->GetTimeSeconds();
+	if (Now < ShoveReadyTime)
+	{
+		return; // перезарядка
+	}
+	ShoveReadyTime = Now + ShoveCooldownTime;
+
+	FVector ViewLoc;
+	FRotator ViewRot;
+	GetActorEyesViewPoint(ViewLoc, ViewRot);
+	const FVector Dir = ViewRot.Vector().GetSafeNormal();
+	const FVector FlatDir = FVector(Dir.X, Dir.Y, 0.f).GetSafeNormal();
+
+	// Ищем ближайшего товарища в конусе перед собой
+	AAvaryoCharacter* Target = nullptr;
+	float BestDistSq = FMath::Square(ShoveRange);
+	const FVector MyLoc = GetActorLocation();
+	for (TActorIterator<AAvaryoCharacter> It(GetWorld()); It; ++It)
+	{
+		AAvaryoCharacter* Other = *It;
+		if (Other == this)
+		{
+			continue;
+		}
+		const FVector To = Other->GetActorLocation() - MyLoc;
+		const float DistSq = To.SizeSquared();
+		if (DistSq > BestDistSq)
+		{
+			continue;
+		}
+		if (FVector::DotProduct(To.GetSafeNormal(), Dir) < 0.35f) // ~70° конус
+		{
+			continue;
+		}
+		BestDistSq = DistSq;
+		Target = Other;
+	}
+
+	MakeNoise(0.5f, this, MyLoc); // кряхтение/возня — слышно
+
+	if (!Target)
+	{
+		return;
+	}
+
+	const FVector Push = FlatDir * ShoveForce + FVector(0.f, 0.f, ShoveUp);
+	Target->LaunchCharacter(Push, true, true); // реплицируется владельцу
+	if (Target->VitalsComponent)
+	{
+		Target->VitalsComponent->AddPanic(ShovePanic);
+	}
+}
+
+
 
 void AAvaryoCharacter::StartCrouchInput()
 {

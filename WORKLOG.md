@@ -84,7 +84,7 @@
 | `SM_Tester` | Тестер (инструмент щитка) | `Handheld digital multimeter, yellow rubber protective case, small LCD screen, rotary dial, red and black probe wires wrapped around body, worn used look, low-poly game prop, PBR, game-ready, single object, centered, no ground plane, no scene` |
 | `SM_GasPipe` | Газовая труба | `Vertical industrial gas pipe section with large red shut-off valve wheel, pressure gauge, yellow pipe paint peeling with rust, visible crack leaking, soviet factory style, low-poly game prop, PBR, game-ready, single object, centered, no ground plane, no scene` |
 | `SM_Generator` | Генератор | `Old diesel power generator unit on metal frame, exposed engine, fuel tank on top, control box with gauges, orange-red chipped paint, oil stains, soviet industrial, low-poly game prop, PBR, game-ready, single object, centered, no ground plane, no scene` |
-| `SM_Gazelle` | ГАЗель (база/выход) | `Russian GAZelle cargo van, white boxy delivery van 90s style, roof rack with ladder, mud splashes, orange emergency stripe and rotating beacon on roof, slightly rusty, low-poly game vehicle, PBR, game-ready, single object, centered, no ground plane, no scene` |
+| `SM_Gazelle` | SM_ServiceTruck | `American pickup truck with white service utility bed, toolboxes on sides, ladder rack, amber rotating beacon, worn municipal maintenance livery, mud and rust, low-poly game vehicle, PBR, game-ready, single object, centered, no ground plane, no scene` |
 | `SM_WeldingMachine` | Сварочник (тяжёлый) | `Portable arc welding machine, heavy metal box with carrying handle, cable with electrode holder wrapped around, dials and clamps, dark blue chipped paint, rust and burn marks, low-poly game prop, PBR, game-ready, single object, centered, no ground plane, no scene` |
 | `SM_FireExtinguisher` | Огнетушитель | `Red fire extinguisher with black hose and nozzle, pressure gauge, worn scratched paint, metal cylinder, low-poly game prop, PBR, game-ready, single object, centered, no ground plane, no scene` |
 | `SM_FirstAidKit` | Аптечка | `First aid kit, small white plastic case with red cross, clasp latch, scuffed and dirty, slightly open lid, low-poly game prop, PBR, game-ready, single object, centered, no ground plane, no scene` |
@@ -190,6 +190,17 @@
 - **HUD**: подсказка «[ЛКМ] Поставить прожектор (светит и успокаивает, но гудит)».
 
 ### Чек-лист теста — TESTING.md, раздел «НОВОЕ — Переносной прожектор» (2026-06-12).
+
+## МОДУЛЬ «Толчок/пинок» (§18 кооп-хаос) — КОД ГОТОВ 2026-06-13
+
+### Статус: собран, автотесты 5/5, смоук чистый. НЕ проверен пользователем в PIE.
+
+Можно толкнуть товарища — связка со всем хаосом (газ/пена/край/растяжка):
+- **Клавиша Q** (`BindKey` в `SetupPlayerInputComponent`) → `Shove()` → `ServerShove()` (Server/Reliable, как остальной ввод).
+- **Сервер**: перезарядка `ShoveCooldownTime`=1.2 с; нельзя пока сам ранен (`VitalsComponent->IsWounded()`) или залочен в мини-игре (`bInteractionLocked`). Ищет ближайшего `AAvaryoCharacter` в конусе ~70° перед собой в радиусе `ShoveRange`=220 см; `LaunchCharacter(FlatDir*ShoveForce + Up*ShoveUp, true, true)` (750/280), толкнутому `AddPanic(ShovePanic=10)`. `MakeNoise(0.5)` при каждом толчке (возня — задел под монстра). Все параметры EditAnywhere (`Avaryo|Shove`).
+- `LaunchCharacter` на сервере реплицирует скорость владельцу — отлёт виден у всех. Без ассетов и правки уровня. Дискаверабилити: Q добавлен в README (Управление); отдельной HUD-подсказки нет (глобальное действие).
+
+### Чек-лист теста — TESTING.md, раздел «НОВОЕ — Толчок / пинок» (2026-06-13).
 
 ## МОДУЛЬ «Скользкая пена» (§18 косяки/хаос) — КОД ГОТОВ 2026-06-13
 

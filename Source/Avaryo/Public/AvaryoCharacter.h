@@ -337,6 +337,30 @@ protected:
 	/** Применить/снять «скользкое» трение на CharacterMovement (сервер и клиент). */
 	void ApplySlipFriction(bool bOn);
 
+	// ---------- Толчок/пинок товарища (§18 кооп-хаос) ----------
+	/** Толкнуть того, на кого смотришь: в газ, на пену, с края, в растяжку. */
+	void Shove();
+
+	UFUNCTION(Server, Reliable)
+	void ServerShove();
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Avaryo|Shove")
+	float ShoveRange;        // дальность толчка, см
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Avaryo|Shove")
+	float ShoveForce;        // горизонтальный импульс толкаемому
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Avaryo|Shove")
+	float ShoveUp;           // подброс вверх
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Avaryo|Shove")
+	float ShovePanic;        // паника толкнутому
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Avaryo|Shove")
+	float ShoveCooldownTime; // перезарядка толчка, сек
+
+	float ShoveReadyTime;    // серверное время, когда снова можно толкать
+
 	/** Каст применения предмета: осталось/всего, реплицируется для HUD. */
 	UPROPERTY(Replicated)
 	float UseCastRemaining;
