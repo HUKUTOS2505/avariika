@@ -44,7 +44,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Toilet|Minigame")
 	float GreenHalfWidth;
 
-	/** Полуширина жёлтой зоны (доля полоски, включает зелёную). */
+	/** Полуширина жёлтой зоны (отдельная зона, не вокруг зелёной). */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Toilet|Minigame")
 	float YellowHalfWidth;
 
@@ -83,6 +83,7 @@ public:
 	UFUNCTION(BlueprintPure, Category="Toilet") AAvaryoCharacter* GetOccupant() const { return Occupant; }
 	UFUNCTION(BlueprintPure, Category="Toilet") float GetCursorPos() const { return CursorPos; }
 	UFUNCTION(BlueprintPure, Category="Toilet") float GetGreenCenter() const { return GreenCenter; }
+	UFUNCTION(BlueprintPure, Category="Toilet") float GetYellowCenter() const { return YellowCenter; }
 
 protected:
 	/** Кто сейчас «в процессе». */
@@ -93,9 +94,13 @@ protected:
 	UPROPERTY(Replicated)
 	float CursorPos;
 
-	/** Центр зелёной зоны 0..1 — после каждого нажатия переезжает. */
+	/** Центр зелёной зоны 0..1 — после каждого нажатия переезжает. На старте 0.2. */
 	UPROPERTY(Replicated)
 	float GreenCenter;
+
+	/** Центр жёлтой зоны 0..1 — отдельная зона. На старте 0.7. */
+	UPROPERTY(Replicated)
+	float YellowCenter;
 
 	/** Фаза курсора и текущий множитель скорости (сервер). */
 	float CursorPhase;
@@ -104,6 +109,6 @@ protected:
 	/** Завершить успешно: шкала в ноль, визит в статистику. Только сервер. */
 	void FinishSession(AAvaryoCharacter* Who);
 
-	/** Перекинуть зелёную зону в случайное место. */
-	void RerollGreenZone();
+	/** Перекинуть обе зоны в случайные непересекающиеся места. */
+	void RerollZones();
 };

@@ -98,12 +98,23 @@ public:
 	UFUNCTION(BlueprintPure, Category="Avaryo|Interact")
 	AToilet* GetFocusedToilet() const { return FocusedToilet; }
 
-	/** Идёт ли «процесс» в биотуалете (держит E). */
+	/** Идёт ли «процесс» в биотуалете (мини-игра). */
 	UFUNCTION(BlueprintPure, Category="Avaryo|Interact")
 	bool IsUsingToilet() const { return CurrentToilet != nullptr; }
 
 	UFUNCTION(BlueprintPure, Category="Avaryo|Interact")
 	AToilet* GetCurrentToilet() const { return CurrentToilet; }
+
+	/** Заблокирован ли ввод (сидим в туалете / чиним щиток в мини-игре). */
+	UFUNCTION(BlueprintPure, Category="Avaryo|Interact")
+	bool IsInteractionLocked() const { return bInteractionLocked; }
+
+	/** Заблокировать/освободить движение и камеру на время мини-игры. Только сервер. */
+	void SetInteractionLocked(bool bNewLocked);
+
+	/** Повернуть камеру владельца (сесть спиной в туалет). */
+	UFUNCTION(Client, Reliable)
+	void ClientSetControlYaw(float NewYaw);
 
 	// ---------- Оператор: нагрудные камеры ----------
 
@@ -284,8 +295,15 @@ protected:
 	/** Таймер шороха волочения (слышно — задел под монстра). */
 	float DragNoiseAccum;
 
-	/** Таймер ретриггера дрожи камеры от паники (локально). */
-	float PanicShakeAccum;
+	/** Включён ли сейчас бесконечный паник-шейк (локально). */
+	bool bPanicShakeActive;
+
+	/** Ввод заблокирован мини-игрой (сервер пишет, реплицируется). */
+	UPROPERTY(Replicated)
+	bool bInteractionLocked;
+
+	/** Применён ли лок к контроллеру (локальное состояние для переходов). */
+	bool bAppliedInputLock;
 
 	/** Камера персонажа (из Blueprint), к ней крепится предмет в руках. */
 	UPROPERTY(Transient)

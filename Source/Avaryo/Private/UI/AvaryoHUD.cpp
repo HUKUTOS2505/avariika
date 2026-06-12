@@ -413,19 +413,52 @@ void AAvaryoHUD::DrawHUD()
 		DrawRect(BarBG, BoxX, BoxY + 2.f, BarW, BarH);
 		DrawRect(FLinearColor(0.65f, 0.45f, 0.15f), BoxX, BoxY + 2.f, BarW * Vitals->GetBladder() / 100.f, BarH);
 
-		// Нижняя полоска: мини-игра — красный фон, жёлтая и зелёная зоны, белый курсор
+		// Нижняя полоска: мини-игра — красный фон, отдельные жёлтая и зелёная зоны, белый курсор
 		BoxY += BarH + 12.f;
-		const float Green = T->GetGreenCenter();
 		DrawRect(FLinearColor(0.55f, 0.12f, 0.1f), BoxX, BoxY + 2.f, BarW, BarH);
-		const float YellowL = FMath::Clamp(Green - T->YellowHalfWidth, 0.f, 1.f);
-		const float YellowR = FMath::Clamp(Green + T->YellowHalfWidth, 0.f, 1.f);
+		const float Yellow = T->GetYellowCenter();
+		const float YellowL = FMath::Clamp(Yellow - T->YellowHalfWidth, 0.f, 1.f);
+		const float YellowR = FMath::Clamp(Yellow + T->YellowHalfWidth, 0.f, 1.f);
 		DrawRect(FLinearColor(0.8f, 0.7f, 0.15f), BoxX + YellowL * BarW, BoxY + 2.f, (YellowR - YellowL) * BarW, BarH);
+		const float Green = T->GetGreenCenter();
 		const float GreenL = FMath::Clamp(Green - T->GreenHalfWidth, 0.f, 1.f);
 		const float GreenR = FMath::Clamp(Green + T->GreenHalfWidth, 0.f, 1.f);
 		DrawRect(FLinearColor(0.25f, 0.8f, 0.25f), BoxX + GreenL * BarW, BoxY + 2.f, (GreenR - GreenL) * BarW, BarH);
 		DrawRect(TextMain, BoxX + T->GetCursorPos() * BarW - 2.f, BoxY - 2.f, 4.f, BarH + 8.f);
 
-		DrawText(TEXT("[E] — жми в зелёной зоне! Шаг в сторону — процесс сорван"), TextDim, BoxX, BoxY + BarH + 8.f, Font, 0.9f);
+		DrawText(TEXT("[E] — жми в зелёной (или жёлтой) зоне!  [G] — встать"), TextDim, BoxX, BoxY + BarH + 8.f, Font, 0.9f);
+	}
+	// ---------- Мини-игра щитка ----------
+	else if (Character->IsRepairing() && Character->GetCurrentRepairable() && Character->GetCurrentRepairable()->IsMinigameRepair())
+	{
+		ARepairable* R = Character->GetCurrentRepairable();
+		const float BarW = 340.f, BarH = 18.f;
+		const float BoxX = (SizeX - BarW) * 0.5f;
+		float BoxY = SizeY * 0.42f;
+
+		const FString Label = FString::Printf(TEXT("Ремонт: %s  %d%%   промахи %d/%d"),
+			*R->DisplayName.ToString(), FMath::RoundToInt(R->GetRepairProgress() * 100.f),
+			R->GetMissCount(), R->MissesBeforeLockout);
+		float LabelW = 0.f, LabelH = 0.f;
+		GetTextSize(Label, LabelW, LabelH, Font, 1.1f);
+
+		DrawRect(BoxBG, BoxX - 12.f, BoxY - LabelH - 10.f, BarW + 24.f, LabelH + BarH * 2.f + 56.f);
+		DrawText(Label, TextMain, BoxX, BoxY - LabelH - 4.f, Font, 1.1f);
+
+		// Верхняя полоска: прогресс починки
+		DrawRect(BarBG, BoxX, BoxY + 2.f, BarW, BarH);
+		DrawRect(Accent, BoxX, BoxY + 2.f, BarW * R->GetRepairProgress(), BarH);
+
+		// Нижняя: мини-игра — красный фон, хаотичная зелёная зона, белый курсор
+		BoxY += BarH + 12.f;
+		DrawRect(FLinearColor(0.55f, 0.12f, 0.1f), BoxX, BoxY + 2.f, BarW, BarH);
+		const float Green = R->GetGreenCenter();
+		const float GreenL = FMath::Clamp(Green - R->MinigameGreenHalfWidth, 0.f, 1.f);
+		const float GreenR = FMath::Clamp(Green + R->MinigameGreenHalfWidth, 0.f, 1.f);
+		DrawRect(FLinearColor(0.25f, 0.8f, 0.25f), BoxX + GreenL * BarW, BoxY + 2.f, (GreenR - GreenL) * BarW, BarH);
+		DrawRect(TextMain, BoxX + R->GetCursorPos() * BarW - 2.f, BoxY - 2.f, 4.f, BarH + 8.f);
+
+		DrawText(TEXT("[E] — жми в зелёной! Промах бьёт током, 3 промаха — замыкание.  [G] — отойти"), TextDim, BoxX, BoxY + BarH + 8.f, Font, 0.9f);
 	}
 	// ---------- Починка (держит E у объекта) ----------
 	else if (Character->IsRepairing() && Character->GetCurrentRepairable())
@@ -444,12 +477,24 @@ void AAvaryoHUD::DrawHUD()
 	else if (ARepairable* FocusedRep = Character->GetFocusedRepairable())
 	{
 		FString Prompt;
-		if (FocusedRep->CanBeRepairedBy(Character))
+		if (FocusedRep->GetLockoutRemaining() > 0.f)
 		{
-			Prompt = FocusedRep->GetRepairProgress() > 0.f
-				? FString::Printf(TEXT("[E] Дочинить %s (%d%%)"), *FocusedRep->DisplayName.ToString(),
-					FMath::RoundToInt(FocusedRep->GetRepairProgress() * 100.f))
-				: FString::Printf(TEXT("[E] Чинить %s (держать)"), *FocusedRep->DisplayName.ToString());
+			Prompt = FString::Printf(TEXT("%s замкнуло — подождите %d с"),
+				*FocusedRep->DisplayName.ToString(), FMath::CeilToInt(FocusedRep->GetLockoutRemaining()));
+		}
+		else if (FocusedRep->CanBeRepairedBy(Character))
+		{
+			if (FocusedRep->IsMinigameRepair())
+			{
+				Prompt = FString::Printf(TEXT("[E] Чинить %s (мини-игра, нужен тестер)"), *FocusedRep->DisplayName.ToString());
+			}
+			else
+			{
+				Prompt = FocusedRep->GetRepairProgress() > 0.f
+					? FString::Printf(TEXT("[E] Дочинить %s (%d%%)"), *FocusedRep->DisplayName.ToString(),
+						FMath::RoundToInt(FocusedRep->GetRepairProgress() * 100.f))
+					: FString::Printf(TEXT("[E] Чинить %s (держать)"), *FocusedRep->DisplayName.ToString());
+			}
 		}
 		else if (FocusedRep->IsBeingRepaired())
 		{

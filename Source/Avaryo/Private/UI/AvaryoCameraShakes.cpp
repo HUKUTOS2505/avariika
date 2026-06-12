@@ -6,14 +6,16 @@ UPanicCameraShake::UPanicCameraShake(const FObjectInitializer& ObjectInitializer
 	: Super(ObjectInitializer)
 {
 	UPerlinNoiseCameraShakePattern* Pattern = ObjectInitializer.CreateDefaultSubobject<UPerlinNoiseCameraShakePattern>(this, TEXT("Pattern"));
-	Pattern->Duration = 1.1f;
-	Pattern->BlendInTime = 0.2f;
-	Pattern->BlendOutTime = 0.3f;
-	Pattern->Pitch.Amplitude = 0.5f;
-	Pattern->Pitch.Frequency = 9.f;
-	Pattern->Yaw.Amplitude = 0.45f;
-	Pattern->Yaw.Frequency = 7.f;
-	Pattern->Roll.Amplitude = 0.25f;
+	// Бесконечная плавная дрожь: запускается один раз при входе в панику,
+	// останавливается при выходе. Рестарты каждые N секунд давали рывок вбок.
+	Pattern->Duration = 0.f;
+	Pattern->BlendInTime = 0.6f;
+	Pattern->BlendOutTime = 0.5f;
+	Pattern->Pitch.Amplitude = 0.35f;
+	Pattern->Pitch.Frequency = 8.f;
+	Pattern->Yaw.Amplitude = 0.25f;
+	Pattern->Yaw.Frequency = 6.f;
+	Pattern->Roll.Amplitude = 0.15f;
 	Pattern->Roll.Frequency = 5.f;
 	SetRootShakePattern(Pattern);
 	bSingleInstance = true; // ретриггер обновляет, а не стакает

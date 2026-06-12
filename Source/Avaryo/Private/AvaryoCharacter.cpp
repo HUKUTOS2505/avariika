@@ -57,7 +57,9 @@ AAvaryoCharacter::AAvaryoCharacter()
 
 	DragSpeedMultiplier = 0.55f;
 	DragNoiseAccum = 0.f;
-	PanicShakeAccum = 0.f;
+	bPanicShakeActive = false;
+	bInteractionLocked = false;
+	bAppliedInputLock = false;
 
 	bMonitorOpen = false;
 	bWasWounded = false;
@@ -122,24 +124,34 @@ void AAvaryoCharacter::Tick(float DeltaSeconds)
 			}
 		}
 
-		// Паника трясёт камеру: ретриггер каждую секунду, сила растёт с паникой
-		if (VitalsComponent && VitalsComponent->IsPanicking())
+		// Паника трясёт камеру: бесконечный шейк включается при входе в панику
+		// и гасится при выходе (рестарты по таймеру давали рывки вбок)
+		const bool bPanicNow = VitalsComponent && VitalsComponent->IsPanicking();
+		if (bPanicNow != bPanicShakeActive)
 		{
-			PanicShakeAccum += DeltaSeconds;
-			if (PanicShakeAccum >= 0.9f)
+			bPanicShakeActive = bPanicNow;
+			if (APlayerController* PC = Cast<APlayerController>(GetController()))
 			{
-				PanicShakeAccum = 0.f;
-				if (APlayerController* PC = Cast<APlayerController>(GetController()))
+				if (bPanicNow)
 				{
-					const float Threshold = VitalsComponent->PanicThreshold;
-					const float Strength = 0.5f + (VitalsComponent->GetPanic() - Threshold) / FMath::Max(100.f - Threshold, 1.f);
-					PC->ClientStartCameraShake(UPanicCameraShake::StaticClass(), Strength);
+					PC->ClientStartCameraShake(UPanicCameraShake::StaticClass(), 1.f);
+				}
+				else
+				{
+					PC->ClientStopCameraShake(UPanicCameraShake::StaticClass(), false);
 				}
 			}
 		}
-		else
+
+		// Блокировка ввода (туалет/щиток): применяем к контроллеру на переходах
+		if (bInteractionLocked != bAppliedInputLock)
 		{
-			PanicShakeAccum = 0.9f; // первая дрожь — сразу при входе в панику
+			bAppliedInputLock = bInteractionLocked;
+			if (APlayerController* PC = Cast<APlayerController>(GetController()))
+			{
+				PC->SetIgnoreMoveInput(bInteractionLocked);
+				PC->SetIgnoreLookInput(bInteractionLocked);
+			}
 		}
 	}
 
@@ -265,6 +277,29 @@ void AAvaryoCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	DOREPLIFETIME(AAvaryoCharacter, CurrentToilet);
 	DOREPLIFETIME(AAvaryoCharacter, DraggedTeammate);
 	DOREPLIFETIME(AAvaryoCharacter, DraggedBy);
+	DOREPLIFETIME(AAvaryoCharacter, bInteractionLocked);
+}
+
+void AAvaryoCharacter::SetInteractionLocked(bool bNewLocked)
+{
+	if (!HasAuthority() || bInteractionLocked == bNewLocked)
+	{
+		return;
+	}
+	bInteractionLocked = bNewLocked;
+	// Движение глушим на сервере — позиция авторитетна
+	if (UCharacterMovementComponent* Move = GetCharacterMovement())
+	{
+		Move->SetMovementMode(bNewLocked ? MOVE_None : MOVE_Walking);
+	}
+}
+
+void AAvaryoCharacter::ClientSetControlYaw_Implementation(float NewYaw)
+{
+	if (APlayerController* PC = Cast<APlayerController>(GetController()))
+	{
+		PC->SetControlRotation(FRotator(0.f, NewYaw, 0.f));
+	}
 }
 
 float AAvaryoCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -561,6 +596,13 @@ void AAvaryoCharacter::InteractPressedAuth()
 		return;
 	}
 
+	// Чиним щиток в мини-игре — E бьёт по курсору
+	if (CurrentRepairable && CurrentRepairable->IsMinigameRepair())
+	{
+		CurrentRepairable->TryHitBy(this);
+		return;
+	}
+
 	// Уже тащишь раненого — повторное E отпускает
 	if (DraggedTeammate)
 	{
@@ -612,13 +654,13 @@ void AAvaryoCharacter::InteractPressedAuth()
 
 void AAvaryoCharacter::InteractReleasedAuth()
 {
-	if (CurrentRepairable)
+	// Мини-игры (щиток, туалет) НЕ завершаются отпусканием E — выход по G.
+	// Обычная починка (удержание E) — завершается
+	if (CurrentRepairable && !CurrentRepairable->IsMinigameRepair())
 	{
 		CurrentRepairable->EndRepairBy(this);
 		CurrentRepairable = nullptr;
 	}
-	// Туалет НЕ завершается отпусканием E — мини-игра идёт до нуля шкалы,
-	// сорвать её можно только движением (или ранением)
 }
 
 void AAvaryoCharacter::TryRestartRun()
@@ -850,6 +892,20 @@ void AAvaryoCharacter::DropItem()
 	if (!HasAuthority())
 	{
 		ServerDropItem();
+		return;
+	}
+
+	// G во время мини-игры — встать/отойти (движение заблокировано, иначе не выйти)
+	if (CurrentToilet)
+	{
+		CurrentToilet->EndUseBy(this);
+		CurrentToilet = nullptr;
+		return;
+	}
+	if (CurrentRepairable && CurrentRepairable->IsMinigameRepair())
+	{
+		CurrentRepairable->EndRepairBy(this);
+		CurrentRepairable = nullptr;
 		return;
 	}
 

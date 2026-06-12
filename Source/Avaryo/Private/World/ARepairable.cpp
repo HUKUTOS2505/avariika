@@ -5,6 +5,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "Components/TextRenderComponent.h"
 #include "Components/VitalsComponent.h"
+#include "Engine/DamageEvents.h"
 #include "Engine/World.h"
 #include "EngineUtils.h"
 #include "GameFramework/PlayerController.h"
@@ -51,6 +52,21 @@ ARepairable::ARepairable()
 	NoiseAccum = 0.f;
 	ExplosionCooldown = 0.f;
 	LastShownPercent = -1;
+
+	bMinigameRepair = false;
+	HitsToRepair = 4;
+	MinigameCursorSpeed = 0.9f;
+	MinigameGreenHalfWidth = 0.07f;
+	ShockDamage = 15.f;
+	ShockAoEDamage = 25.f;
+	MissesBeforeLockout = 3;
+	LockoutDuration = 60.f;
+	CursorPos = 0.f;
+	GreenCenter = 0.5f;
+	MissCount = 0;
+	LockoutRemaining = 0.f;
+	CursorPhase = 0.f;
+	MinigameSpeedMult = 1.f;
 }
 
 void ARepairable::BeginPlay()
@@ -66,11 +82,21 @@ void ARepairable::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifet
 	DOREPLIFETIME(ARepairable, bBroken);
 	DOREPLIFETIME(ARepairable, RepairProgress);
 	DOREPLIFETIME(ARepairable, Repairer);
+	DOREPLIFETIME(ARepairable, CursorPos);
+	DOREPLIFETIME(ARepairable, GreenCenter);
+	DOREPLIFETIME(ARepairable, MissCount);
+	DOREPLIFETIME(ARepairable, LockoutRemaining);
 }
 
 void ARepairable::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
+
+	// Сервер: блокировка после замыкания тает
+	if (HasAuthority() && LockoutRemaining > 0.f)
+	{
+		LockoutRemaining = FMath::Max(LockoutRemaining - DeltaSeconds, 0.f);
+	}
 
 	// Сервер: тикаем починку
 	if (HasAuthority() && Repairer)
@@ -78,6 +104,13 @@ void ARepairable::Tick(float DeltaSeconds)
 		if (!CanContinueRepair())
 		{
 			EndRepairBy(Repairer);
+		}
+		else if (bMinigameRepair)
+		{
+			// Мини-игра: курсор бегает, прогресс растёт только попаданиями (TryHitBy)
+			CursorPhase += DeltaSeconds * MinigameCursorSpeed * MinigameSpeedMult;
+			const float Saw = FMath::Fmod(CursorPhase, 2.f);
+			CursorPos = Saw <= 1.f ? Saw : 2.f - Saw;
 		}
 		else
 		{
@@ -153,6 +186,10 @@ bool ARepairable::CanBeRepairedBy(const AAvaryoCharacter* Who) const
 	{
 		return false;
 	}
+	if (LockoutRemaining > 0.f)
+	{
+		return false; // короткое замыкание — щиток остывает
+	}
 	if (Repairer && Repairer != Who)
 	{
 		return false; // объект уже кто-то чинит
@@ -191,6 +228,17 @@ bool ARepairable::BeginRepairBy(AAvaryoCharacter* Who)
 
 	Repairer = Who;
 	NoiseAccum = 0.f;
+
+	if (bMinigameRepair)
+	{
+		// Мини-игра: фиксируем ремонтника на месте, заводим курсор
+		CursorPhase = 0.f;
+		CursorPos = 0.f;
+		MinigameSpeedMult = 1.f;
+		MissCount = 0;
+		GreenCenter = FMath::FRandRange(0.1f, 0.9f);
+		Who->SetInteractionLocked(true);
+	}
 	return true;
 }
 
@@ -198,8 +246,79 @@ void ARepairable::EndRepairBy(AAvaryoCharacter* Who)
 {
 	if (HasAuthority() && Repairer == Who)
 	{
+		if (bMinigameRepair && Who)
+		{
+			Who->SetInteractionLocked(false);
+		}
 		Repairer = nullptr; // прогресс сохраняется — можно дочинить позже
 	}
+}
+
+void ARepairable::TryHitBy(AAvaryoCharacter* Who)
+{
+	if (!HasAuthority() || Repairer != Who || !bMinigameRepair || !Who)
+	{
+		return;
+	}
+
+	if (FMath::Abs(CursorPos - GreenCenter) <= MinigameGreenHalfWidth)
+	{
+		// Попадание: ещё один контакт прозвонен
+		RepairProgress = FMath::Min(RepairProgress + 1.f / FMath::Max(HitsToRepair, 1), 1.f);
+		MakeNoise(0.5f, Who, GetActorLocation());
+
+		if (RepairProgress >= 1.f)
+		{
+			Who->SetInteractionLocked(false);
+			Repairer = nullptr;
+			bBroken = false;
+			RefreshStatusVisual();
+			OnRepairFinished.Broadcast(this, Who);
+			return;
+		}
+	}
+	else
+	{
+		// Промах: бьёт током; серия промахов — короткое замыкание
+		++MissCount;
+		Who->TakeDamage(ShockDamage, FDamageEvent(), nullptr, this);
+		if (Who->VitalsComponent)
+		{
+			Who->VitalsComponent->AddPanic(8.f);
+		}
+		MakeNoise(0.8f, Who, GetActorLocation());
+
+		if (MissCount >= MissesBeforeLockout)
+		{
+			ShortCircuit(Who);
+			return;
+		}
+	}
+
+	// Идём дальше: зелёная зона хаотично переезжает, курсор ускоряется
+	GreenCenter = FMath::FRandRange(0.1f, 0.9f);
+	MinigameSpeedMult = FMath::Min(MinigameSpeedMult + 0.1f, 1.6f);
+}
+
+void ARepairable::ShortCircuit(AAvaryoCharacter* Culprit)
+{
+	// Дуга бьёт всех рядом — стоять у щитка во время ремонта плохая идея
+	for (TActorIterator<AAvaryoCharacter> It(GetWorld()); It; ++It)
+	{
+		if (FVector::DistSquared(It->GetActorLocation(), GetActorLocation()) <= FMath::Square(350.f))
+		{
+			It->TakeDamage(ShockAoEDamage, FDamageEvent(), nullptr, this);
+			if (It->VitalsComponent)
+			{
+				It->VitalsComponent->AddPanic(15.f);
+			}
+		}
+	}
+	MakeNoise(1.5f, Culprit, GetActorLocation());
+
+	LockoutRemaining = LockoutDuration;
+	EndRepairBy(Culprit); // выкидывает из мини-игры и снимает блокировку ввода
+	RefreshStatusVisual();
 }
 
 void ARepairable::SetBroken(bool bNewBroken)
@@ -255,7 +374,12 @@ void ARepairable::RefreshStatusVisual()
 	}
 
 	const int32 Percent = FMath::RoundToInt(RepairProgress * 100.f);
-	const int32 ShownPercent = bBroken ? Percent : 101; // 101 — маркер "починено"
+	// Код состояния для защиты от перерисовки: 101 — починено, 1000+N — блокировка N секунд
+	int32 ShownPercent = bBroken ? Percent : 101;
+	if (bBroken && LockoutRemaining > 0.f)
+	{
+		ShownPercent = 1000 + FMath::CeilToInt(LockoutRemaining);
+	}
 	if (ShownPercent == LastShownPercent)
 	{
 		return; // текст не менялся
@@ -266,6 +390,12 @@ void ARepairable::RefreshStatusVisual()
 	{
 		StatusText->SetText(FText::Format(NSLOCTEXT("Repair", "StatusOk", "{0} — ОК"), DisplayName));
 		StatusText->SetTextRenderColor(FColor(80, 220, 80));
+	}
+	else if (LockoutRemaining > 0.f)
+	{
+		StatusText->SetText(FText::Format(NSLOCTEXT("Repair", "StatusLockout", "{0} — ЗАМКНУЛО ({1} с)"),
+			DisplayName, FMath::CeilToInt(LockoutRemaining)));
+		StatusText->SetTextRenderColor(FColor(255, 60, 0)); // тревожный, не как обычная поломка
 	}
 	else if (Percent > 0)
 	{

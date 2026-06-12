@@ -30,14 +30,15 @@ AToilet::AToilet()
 
 	CursorSpeed = 0.8f;
 	GreenHalfWidth = 0.07f;
-	YellowHalfWidth = 0.18f;
+	YellowHalfWidth = 0.09f;
 	GreenDrain = 30.f;
 	YellowDrain = 12.f;
 	MissDrain = 2.f;
 	PassiveDrainPerSecond = 2.f;
 
 	CursorPos = 0.f;
-	GreenCenter = 0.5f;
+	GreenCenter = 0.2f;
+	YellowCenter = 0.7f;
 	CursorPhase = 0.f;
 	SpeedMultiplier = 1.f;
 }
@@ -49,20 +50,19 @@ void AToilet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeP
 	DOREPLIFETIME(AToilet, Occupant);
 	DOREPLIFETIME(AToilet, CursorPos);
 	DOREPLIFETIME(AToilet, GreenCenter);
+	DOREPLIFETIME(AToilet, YellowCenter);
 }
 
 void AToilet::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	// Сервер: курсор бегает, шкала медленно уходит сама
+	// Сервер: курсор бегает, шкала медленно уходит сама.
+	// Двигаться сидя нельзя (ввод заблокирован) — срыв только ранением или G
 	if (HasAuthority() && Occupant)
 	{
 		UVitalsComponent* Vitals = Occupant->VitalsComponent;
-		const bool bMoved = Occupant->GetVelocity().SizeSquared2D() > 2500.f; // > 50 см/с — встал
-		const bool bNear = FVector::DistSquared(Occupant->GetActorLocation(), GetActorLocation()) <= FMath::Square(350.f);
-		const bool bWounded = Vitals && Vitals->IsWounded();
-		if (!Vitals || bMoved || !bNear || bWounded)
+		if (!Vitals || Vitals->IsWounded())
 		{
 			EndUseBy(Occupant); // процесс сорван
 		}
@@ -117,7 +117,16 @@ bool AToilet::BeginUseBy(AAvaryoCharacter* Who)
 	CursorPhase = 0.f;
 	CursorPos = 0.f;
 	SpeedMultiplier = 1.f;
-	RerollGreenZone();
+	GreenCenter = 0.2f;  // стартовые позиции зон — как договорились
+	YellowCenter = 0.7f;
+
+	// Сесть: телепорт на куб, разворот на 180°, движение и камера блокируются
+	Who->SetInteractionLocked(true);
+	const float SeatZ = GetActorScale3D().Z * 50.f + 92.f; // верх куба + полувысота капсулы
+	Who->SetActorLocation(GetActorLocation() + FVector(0.f, 0.f, SeatZ), false, nullptr, ETeleportType::TeleportPhysics);
+	const float SeatYaw = Who->GetActorRotation().Yaw + 180.f;
+	Who->SetActorRotation(FRotator(0.f, SeatYaw, 0.f));
+	Who->ClientSetControlYaw(SeatYaw);
 	return true;
 }
 
@@ -128,14 +137,13 @@ void AToilet::TryHitBy(AAvaryoCharacter* Who)
 		return;
 	}
 
-	const float Dist = FMath::Abs(CursorPos - GreenCenter);
-	if (Dist <= GreenHalfWidth)
+	if (FMath::Abs(CursorPos - GreenCenter) <= GreenHalfWidth)
 	{
 		// Зелёная: дело спорится, почти бесшумно
 		Who->VitalsComponent->DrainBladder(GreenDrain);
 		MakeNoise(0.2f, Who, GetActorLocation());
 	}
-	else if (Dist <= YellowHalfWidth)
+	else if (FMath::Abs(CursorPos - YellowCenter) <= YellowHalfWidth)
 	{
 		Who->VitalsComponent->DrainBladder(YellowDrain);
 		MakeNoise(0.4f, Who, GetActorLocation());
@@ -153,8 +161,8 @@ void AToilet::TryHitBy(AAvaryoCharacter* Who)
 		return;
 	}
 
-	// Идём дальше: зона переезжает, курсор ускоряется (до x1.7)
-	RerollGreenZone();
+	// Идём дальше: зоны переезжают, курсор ускоряется (до x1.7)
+	RerollZones();
 	SpeedMultiplier = FMath::Min(SpeedMultiplier + 0.12f, 1.7f);
 }
 
@@ -163,12 +171,17 @@ void AToilet::EndUseBy(AAvaryoCharacter* Who)
 	if (HasAuthority() && Occupant == Who)
 	{
 		Occupant = nullptr; // недоделанное остаётся в шкале — приходи ещё
+		if (Who)
+		{
+			Who->SetInteractionLocked(false);
+		}
 	}
 }
 
 void AToilet::FinishSession(AAvaryoCharacter* Who)
 {
 	Occupant = nullptr;
+	Who->SetInteractionLocked(false);
 	Who->VitalsComponent->RelieveBladder();
 	if (ARunState* Run = ARunState::Get(GetWorld()))
 	{
@@ -177,7 +190,17 @@ void AToilet::FinishSession(AAvaryoCharacter* Who)
 	MakeNoise(0.6f, Who, GetActorLocation()); // финальный аккорд
 }
 
-void AToilet::RerollGreenZone()
+void AToilet::RerollZones()
 {
-	GreenCenter = FMath::FRandRange(0.15f, 0.85f);
+	GreenCenter = FMath::FRandRange(0.1f, 0.9f);
+	// Жёлтая — отдельно, не налезая на зелёную
+	const float MinGap = GreenHalfWidth + YellowHalfWidth + 0.04f;
+	for (int32 Attempt = 0; Attempt < 16; ++Attempt)
+	{
+		YellowCenter = FMath::FRandRange(0.1f, 0.9f);
+		if (FMath::Abs(YellowCenter - GreenCenter) > MinGap)
+		{
+			break;
+		}
+	}
 }

@@ -73,6 +73,49 @@ public:
 	UFUNCTION(BlueprintPure, Category="Repair|Gas")
 	bool IsLeakingGas() const { return bBroken && bLeaksGasWhenBroken; }
 
+	// ---------- Мини-игра (щиток) ----------
+
+	/** Чинится мини-игрой: курсор + зелёная зона, промах бьёт током. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Repair|Minigame")
+	bool bMinigameRepair;
+
+	/** Сколько попаданий в зелёную зону нужно для починки. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Repair|Minigame")
+	int32 HitsToRepair;
+
+	/** Скорость курсора, проходов полоски в секунду. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Repair|Minigame")
+	float MinigameCursorSpeed;
+
+	/** Полуширина зелёной зоны (доля полоски). */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Repair|Minigame")
+	float MinigameGreenHalfWidth;
+
+	/** Урон током за промах (ремонтнику). */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Repair|Minigame")
+	float ShockDamage;
+
+	/** Урон током по площади после серии промахов (всем рядом). */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Repair|Minigame")
+	float ShockAoEDamage;
+
+	/** Сколько промахов до короткого замыкания и блокировки. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Repair|Minigame")
+	int32 MissesBeforeLockout;
+
+	/** На сколько секунд щиток блокируется после замыкания. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Repair|Minigame")
+	float LockoutDuration;
+
+	UFUNCTION(BlueprintPure, Category="Repair|Minigame") bool IsMinigameRepair() const { return bMinigameRepair; }
+	UFUNCTION(BlueprintPure, Category="Repair|Minigame") float GetCursorPos() const { return CursorPos; }
+	UFUNCTION(BlueprintPure, Category="Repair|Minigame") float GetGreenCenter() const { return GreenCenter; }
+	UFUNCTION(BlueprintPure, Category="Repair|Minigame") int32 GetMissCount() const { return MissCount; }
+	UFUNCTION(BlueprintPure, Category="Repair|Minigame") float GetLockoutRemaining() const { return LockoutRemaining; }
+
+	/** Попытка попадания (E во время мини-игры). Только сервер. */
+	void TryHitBy(AAvaryoCharacter* Who);
+
 	/** Объект починен (для RunState и списка задач). Срабатывает на сервере. */
 	UPROPERTY(BlueprintAssignable, Category="Repair")
 	FOnRepairFinished OnRepairFinished;
@@ -117,6 +160,25 @@ protected:
 
 	/** Пауза между взрывами, чтобы не рвало каждый тик. */
 	float ExplosionCooldown;
+
+	/** Мини-игра: позиция курсора, центр зелёной зоны, промахи, блокировка. */
+	UPROPERTY(Replicated)
+	float CursorPos;
+
+	UPROPERTY(Replicated)
+	float GreenCenter;
+
+	UPROPERTY(Replicated)
+	int32 MissCount;
+
+	UPROPERTY(Replicated)
+	float LockoutRemaining;
+
+	float CursorPhase;
+	float MinigameSpeedMult;
+
+	/** Замыкание: ток по всем рядом, блокировка щитка. Только сервер. */
+	void ShortCircuit(AAvaryoCharacter* Culprit);
 
 	/** Газ рванул: урон и паника по радиусу, очень громко, прогресс починки сгорает. */
 	void ExplodeGas(AAvaryoCharacter* Culprit);
