@@ -171,6 +171,12 @@ public:
 	/** Споткнулся на бегу (§18). Who — споткнувшийся. Только сервер. */
 	void NotifyTripped(AAvaryoCharacter* Who);
 
+	/** Метнул предмет (§18). Только сервер. */
+	void NotifyThrow(AAvaryoCharacter* Who);
+
+	/** Хлебнул кофе из термоса. Только сервер. */
+	void NotifyCoffee(AAvaryoCharacter* Who);
+
 	/** Достался ли бригаде дешёвый комплект оборудования (косяки, §18). */
 	UFUNCTION(BlueprintPure, Category="Run")
 	bool HasCheapGear() const { return bCheapGear; }
@@ -281,6 +287,17 @@ protected:
 
 	/** Сервер: перегрузка сети — старое здание может снова выбить починенный щиток (§18). */
 	void TickOverload(float DeltaSeconds);
+
+	/** Сервер: фоновая жуть — редкий скрип/шум здания + реплика «показалось?». */
+	void TickAmbient(float Now);
+
+	float NextCreakTime; // когда следующий скрип
+
+	UPROPERTY(EditAnywhere, Category="Run|Ambient")
+	float CreakIntervalMin;
+
+	UPROPERTY(EditAnywhere, Category="Run|Ambient")
+	float CreakIntervalMax;
 
 	/** Сервер: выдать монтёру дешёвый фонарь, если на забег выпал дешёвый комплект (один раз). */
 	void ApplyCheapGear(AAvaryoCharacter* Who);

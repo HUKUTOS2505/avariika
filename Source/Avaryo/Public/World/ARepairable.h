@@ -266,6 +266,20 @@ protected:
 	/** Сколько ещё секунд газ сбит пеной (поджечь нельзя). */
 	float GasSuppressedTime;
 
+	/** Сколько уже травит (облако растёт со временем). */
+	float GasLeakElapsed;
+
+	/** Текущий (разросшийся) радиус облака — используется и во взрыве. */
+	float CurrentGasRadius;
+
+	/** Прирост радиуса облака в долях от базового в секунду. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Repair|Gas")
+	float GasSpreadPerSecond;
+
+	/** Максимальный множитель радиуса облака. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Repair|Gas")
+	float GasSpreadMaxScale;
+
 	/** Мини-игра: позиция курсора, центр зелёной зоны, промахи, блокировка. */
 	UPROPERTY(Replicated)
 	float CursorPos;

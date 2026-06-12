@@ -1110,6 +1110,14 @@ void AAvaryoCharacter::ReleaseHeldItem(bool bThrown)
 	// Бросок и падение слышно; тяжёлый — громче
 	MakeNoise(bThrown ? 0.8f : (bHeavy ? 1.f : 0.6f), this, DropLocation);
 
+	if (bThrown)
+	{
+		if (ARunState* Run = ARunState::Get(GetWorld()))
+		{
+			Run->NotifyThrow(this);
+		}
+	}
+
 	RefreshHeldItem();
 }
 
@@ -1241,6 +1249,10 @@ void AAvaryoCharacter::ApplyItemEffect(APickupItem* Item)
 		VitalsComponent->RestoreStamina(Item->EffectMagnitude > 0.f ? Item->EffectMagnitude : 60.f);
 		VitalsComponent->ReducePanic(5.f);
 		ConsumeCharge(Item);
+		if (ARunState* Run = ARunState::Get(GetWorld()))
+		{
+			Run->NotifyCoffee(this);
+		}
 		break;
 	case EItemEffect::DeployTrap:
 	{

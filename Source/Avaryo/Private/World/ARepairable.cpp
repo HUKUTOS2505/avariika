@@ -53,6 +53,10 @@ ARepairable::ARepairable()
 	NoiseAccum = 0.f;
 	ExplosionCooldown = 0.f;
 	GasSuppressedTime = 0.f;
+	GasLeakElapsed = 0.f;
+	GasSpreadPerSecond = 0.05f; // +5%/с — за ~20 с до максимума
+	GasSpreadMaxScale = 2.0f;
+	CurrentGasRadius = GasRadius;
 	LastShownPercent = -1;
 
 	MinigameType = ERepairMinigameType::None;
@@ -215,10 +219,13 @@ void ARepairable::Tick(float DeltaSeconds)
 		GasSuppressedTime = FMath::Max(GasSuppressedTime - DeltaSeconds, 0.f);
 		if (IsLeakingGas())
 		{
+			// Облако растёт, пока не перекрыли
+			GasLeakElapsed += DeltaSeconds;
+			CurrentGasRadius = GasRadius * FMath::Min(1.f + GasSpreadPerSecond * GasLeakElapsed, GasSpreadMaxScale);
 			for (TActorIterator<AAvaryoCharacter> It(GetWorld()); It; ++It)
 			{
 				if (!It->VitalsComponent
-					|| FVector::DistSquared(It->GetActorLocation(), GetActorLocation()) > FMath::Square(GasRadius))
+					|| FVector::DistSquared(It->GetActorLocation(), GetActorLocation()) > FMath::Square(CurrentGasRadius))
 				{
 					continue;
 				}
@@ -230,6 +237,11 @@ void ARepairable::Tick(float DeltaSeconds)
 					break;
 				}
 			}
+		}
+		else
+		{
+			GasLeakElapsed = 0.f; // перекрыли — облако опадает
+			CurrentGasRadius = GasRadius;
 		}
 	}
 
@@ -602,14 +614,17 @@ void ARepairable::ExplodeGas(AAvaryoCharacter* Culprit)
 {
 	ExplosionCooldown = 10.f;
 	RepairProgress = 0.f; // взрыв сжёг всю проделанную работу
+	GasLeakElapsed = 0.f; // облако вспыхнуло — копится заново
 
+	// Разросшееся облако = больше радиус взрыва
+	const float BlastRadius = CurrentGasRadius > 0.f ? CurrentGasRadius : GasRadius;
 	// Урон по радиусу (через TakeDamage дойдёт до шкал) + скачок паники у всех рядом
-	UGameplayStatics::ApplyRadialDamage(this, ExplosionDamage, GetActorLocation(), GasRadius,
+	UGameplayStatics::ApplyRadialDamage(this, ExplosionDamage, GetActorLocation(), BlastRadius,
 		nullptr, {}, this, Culprit ? Culprit->GetController() : nullptr, true);
 	for (TActorIterator<AAvaryoCharacter> It(GetWorld()); It; ++It)
 	{
 		if (It->VitalsComponent
-			&& FVector::DistSquared(It->GetActorLocation(), GetActorLocation()) <= FMath::Square(GasRadius * 1.5f))
+			&& FVector::DistSquared(It->GetActorLocation(), GetActorLocation()) <= FMath::Square(BlastRadius * 1.5f))
 		{
 			It->VitalsComponent->AddPanic(30.f);
 			It->FumbleHeavy(); // взрывом вышибает сварочник из рук

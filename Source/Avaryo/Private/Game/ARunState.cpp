@@ -138,6 +138,25 @@ namespace DispatcherLines
 		TEXT("Кто-то навернулся. Пол подлый, не спорю."),
 		TEXT("{X} собрал все провода разом. Изящно, но в акт."),
 	};
+	// Фоновая жуть: скрипы старого здания (без монстра — тревожность звуком/репликой)
+	const TArray<FString> Creak = {
+		TEXT("...слышу скрип где-то наверху. Показалось, наверное."),
+		TEXT("Кто-то ходит? ...Нет? Ну ладно. Здание старое, оседает."),
+		TEXT("Опять стукнуло в стене. Мужики, это трубы. Точно трубы."),
+		TEXT("Чувствуете? ...Нет, ничего. Работаем, работаем."),
+	};
+	// Метнул предмет (§18)
+	const TArray<FString> ThrowJab = {
+		TEXT("{X} что-то метнул. Бейсбол на смене — новаторски, в акт."),
+		TEXT("Летающий инструмент зафиксирован. Технику безопасности оформлю отдельно."),
+		TEXT("{X}, кидаться — это не передача по регламенту. Но красиво."),
+	};
+	// Кофе-брейк (термос)
+	const TArray<FString> CoffeeBreak = {
+		TEXT("{X} на кофе. Правильно, на ногах держаться надо."),
+		TEXT("Кофеёк? Мне б тоже, но диспетчерам нельзя. Завидую, {X}."),
+		TEXT("{X} заправляется. Только баллон с кофе не перепутай с огнетушителем."),
+	};
 	// Перегрузка сети (§18): старое здание снова выбило щиток
 	const TArray<FString> Overload = {
 		TEXT("Опять выбило! Старая проводка, мужики. Кто-то снова к щитку."),
@@ -170,6 +189,9 @@ ARunState::ARunState()
 	bElectricalOverload = true;
 	OverloadChancePerSecond = 0.015f; // ~раз в минуту, пока щиток под напряжением
 	OverloadCooldown = 0.f;
+	NextCreakTime = 0.f;
+	CreakIntervalMin = 22.f;
+	CreakIntervalMax = 50.f;
 	ShiftNumber = 1;
 	CompanyBalanceStart = 0;
 	Reputation = 0;
@@ -358,6 +380,7 @@ void ARunState::Tick(float DeltaSeconds)
 
 	TickRadioInterference(Now);
 	TickOverload(DeltaSeconds);
+	TickAmbient(Now);
 
 	if (NumPlayers > 0 && NumWounded == NumPlayers)
 	{
@@ -542,6 +565,50 @@ void ARunState::NotifyTripped(AAvaryoCharacter* Who)
 	{
 		DispatcherSay(DispatcherLines::Tripped, CrewName(Who), /*bImportant=*/false);
 	}
+}
+
+void ARunState::NotifyThrow(AAvaryoCharacter* Who)
+{
+	if (HasAuthority())
+	{
+		DispatcherSay(DispatcherLines::ThrowJab, CrewName(Who), /*bImportant=*/false);
+	}
+}
+
+void ARunState::NotifyCoffee(AAvaryoCharacter* Who)
+{
+	if (HasAuthority())
+	{
+		DispatcherSay(DispatcherLines::CoffeeBreak, CrewName(Who), /*bImportant=*/false);
+	}
+}
+
+void ARunState::TickAmbient(float Now)
+{
+	if (NextCreakTime <= 0.f)
+	{
+		NextCreakTime = Now + FMath::FRandRange(CreakIntervalMin, CreakIntervalMax);
+		return;
+	}
+	if (Now < NextCreakTime)
+	{
+		return;
+	}
+	NextCreakTime = Now + FMath::FRandRange(CreakIntervalMin, CreakIntervalMax);
+
+	// Скрип/стук где-то рядом со случайным монтёром — шумом seed под монстра + жуткая реплика
+	AAvaryoCharacter* Anyone = nullptr;
+	for (TActorIterator<AAvaryoCharacter> It(GetWorld()); It; ++It)
+	{
+		Anyone = *It;
+		break;
+	}
+	if (Anyone)
+	{
+		const FVector Around = Anyone->GetActorLocation() + FVector(FMath::FRandRange(-600.f, 600.f), FMath::FRandRange(-600.f, 600.f), 0.f);
+		MakeNoise(0.4f, nullptr, Around);
+	}
+	DispatcherSay(DispatcherLines::Creak, FString(), /*bImportant=*/false);
 }
 
 void ARunState::OnObjectiveRepaired(ARepairable* Repairable, AAvaryoCharacter* FinishedBy)
