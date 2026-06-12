@@ -120,6 +120,14 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Vitals|Panic")
 	float PanicThreshold;
 
+	/** Радиус заражения страхом: паникёр накручивает панику соседям, см. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Vitals|Panic")
+	float FearContagionRadius;
+
+	/** Сколько паники/сек добавляет паникёр каждому соседу в радиусе. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Vitals|Panic")
+	float FearContagionPerSecond;
+
 	/** Выносливость: расход при беге, %/сек. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Vitals|Stamina")
 	float StaminaDrainPerSecond;

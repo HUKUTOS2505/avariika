@@ -28,6 +28,8 @@ UVitalsComponent::UVitalsComponent()
 	TeammateRadius = 1000.f;
 	PanicRiseWoundedPerSecond = 3.f;
 	PanicThreshold = 70.f;
+	FearContagionRadius = 400.f;
+	FearContagionPerSecond = 1.5f;
 
 	StaminaDrainPerSecond = 12.f;
 	StaminaHeavyMultiplier = 1.6f;
@@ -179,6 +181,20 @@ void UVitalsComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 				&& FVector::DistSquared(It->GetActorLocation(), Char->GetActorLocation()) < FMath::Square(SmellRadius))
 			{
 				It->VitalsComponent->AddPanic(SmellTeammatePanicPerSecond * DeltaTime);
+			}
+		}
+	}
+
+	// Групповая паника (§18): паникёр заражает страхом соседей. Спокойный тиммейт рядом
+	// всё ещё успокаивает (выше), а вот трясущийся — наоборот накручивает.
+	if (IsPanicking())
+	{
+		for (TActorIterator<AAvaryoCharacter> It(GetWorld()); It; ++It)
+		{
+			if (*It != Char && It->VitalsComponent
+				&& FVector::DistSquared(It->GetActorLocation(), Char->GetActorLocation()) < FMath::Square(FearContagionRadius))
+			{
+				It->VitalsComponent->AddPanic(FearContagionPerSecond * DeltaTime);
 			}
 		}
 	}
