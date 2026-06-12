@@ -316,7 +316,26 @@ protected:
 	bool bSprayingHeld;
 	float SprayDrainAccum;  // накопитель дробного расхода зарядов
 	float SprayNoiseAccum;  // таймер шума для будущего монстра-слухача
+	float SprayFoamAccum;   // таймер спавна луж пены при распылении
 	float FootstepNoiseAccum; // таймер шума шагов при беге
+
+	/** Скользит ли сейчас по пене (реплицируется — клиент тоже снижает трение). */
+	UPROPERTY(ReplicatedUsing=OnRep_Slipping)
+	bool bSlipping;
+
+	UFUNCTION()
+	void OnRep_Slipping();
+
+	// Дефолты движения, чтобы вернуть сцепление после пены
+	bool bSlipDefaultsSaved;
+	float SlipDefaultGroundFriction;
+	float SlipDefaultBrakingDecel;
+
+	/** Сервер: проверяет, стоит ли монтёр в луже пены, и переключает скольжение. */
+	void UpdateFoamSlip();
+
+	/** Применить/снять «скользкое» трение на CharacterMovement (сервер и клиент). */
+	void ApplySlipFriction(bool bOn);
 
 	/** Каст применения предмета: осталось/всего, реплицируется для HUD. */
 	UPROPERTY(Replicated)

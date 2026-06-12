@@ -21,6 +21,7 @@
 #include "UI/AvaryoCameraShakes.h"
 #include "World/ABioProjectile.h"
 #include "World/AFloodlight.h"
+#include "World/AFoamPatch.h"
 #include "World/ARepairable.h"
 #include "World/AToilet.h"
 #include "World/ATrap.h"
@@ -70,7 +71,12 @@ AAvaryoCharacter::AAvaryoCharacter()
 	bSprayingHeld = false;
 	SprayDrainAccum = 0.f;
 	SprayNoiseAccum = 0.f;
+	SprayFoamAccum = 0.f;
 	FootstepNoiseAccum = 0.f;
+	bSlipping = false;
+	bSlipDefaultsSaved = false;
+	SlipDefaultGroundFriction = 8.f;
+	SlipDefaultBrakingDecel = 2048.f;
 	UseCastRemaining = 0.f;
 	UseCastDuration = 0.f;
 	bOffering = false;
@@ -204,6 +210,12 @@ void AAvaryoCharacter::Tick(float DeltaSeconds)
 		TickSpray(DeltaSeconds);
 	}
 
+	// Скольжение по пене (сервер решает, клиент узнаёт через bSlipping)
+	if (HasAuthority())
+	{
+		UpdateFoamSlip();
+	}
+
 	// Волочение раненого
 	if (HasAuthority() && DraggedTeammate)
 	{
@@ -282,6 +294,7 @@ void AAvaryoCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	DOREPLIFETIME(AAvaryoCharacter, DraggedTeammate);
 	DOREPLIFETIME(AAvaryoCharacter, DraggedBy);
 	DOREPLIFETIME(AAvaryoCharacter, bInteractionLocked);
+	DOREPLIFETIME(AAvaryoCharacter, bSlipping);
 }
 
 void AAvaryoCharacter::SetInteractionLocked(bool bNewLocked)
@@ -1418,6 +1431,81 @@ void AAvaryoCharacter::TickSpray(float DeltaSeconds)
 		SprayNoiseAccum = 0.f;
 		MakeNoise(1.f, this, GetActorLocation());
 	}
+
+	// Порошок оседает скользкой пеной: раз в ~0.6 с роняем лужу на пол перед собой
+	SprayFoamAccum += DeltaSeconds;
+	if (SprayFoamAccum >= 0.6f)
+	{
+		SprayFoamAccum = 0.f;
+		const FVector AheadFlat = GetActorLocation() + FVector(Dir.X, Dir.Y, 0.f).GetSafeNormal() * 160.f;
+		FHitResult FloorHit;
+		const FVector TraceStart = AheadFlat + FVector(0.f, 0.f, 60.f);
+		const FVector TraceEnd = AheadFlat - FVector(0.f, 0.f, 260.f);
+		if (GetWorld()->LineTraceSingleByChannel(FloorHit, TraceStart, TraceEnd, ECC_Visibility, QueryParams))
+		{
+			FActorSpawnParameters SpawnParams;
+			SpawnParams.Owner = this;
+			SpawnParams.Instigator = this;
+			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+			GetWorld()->SpawnActor<AFoamPatch>(AFoamPatch::StaticClass(), FloorHit.Location + FVector(0.f, 0.f, 2.f), FRotator::ZeroRotator, SpawnParams);
+		}
+	}
+}
+
+void AAvaryoCharacter::UpdateFoamSlip()
+{
+	bool bOverFoam = false;
+	const FVector Loc = GetActorLocation();
+	for (TActorIterator<AFoamPatch> It(GetWorld()); It; ++It)
+	{
+		const FVector P = It->GetActorLocation();
+		const float Dz = Loc.Z - P.Z;
+		if (Dz < -20.f || Dz > 160.f)
+		{
+			continue; // лужа на другом уровне (этаж/над головой) — не считаем
+		}
+		if (FVector::DistSquaredXY(Loc, P) <= FMath::Square(It->SlipRadius))
+		{
+			bOverFoam = true;
+			break;
+		}
+	}
+
+	if (bOverFoam != bSlipping)
+	{
+		bSlipping = bOverFoam;        // реплицируется -> OnRep_Slipping на клиентах
+		ApplySlipFriction(bSlipping); // и сразу применяем на сервере
+	}
+}
+
+void AAvaryoCharacter::ApplySlipFriction(bool bOn)
+{
+	UCharacterMovementComponent* Move = GetCharacterMovement();
+	if (!Move)
+	{
+		return;
+	}
+	if (!bSlipDefaultsSaved)
+	{
+		SlipDefaultGroundFriction = Move->GroundFriction;
+		SlipDefaultBrakingDecel = Move->BrakingDecelerationWalking;
+		bSlipDefaultsSaved = true;
+	}
+	if (bOn)
+	{
+		Move->GroundFriction = 0.4f;              // почти лёд
+		Move->BrakingDecelerationWalking = 120.f; // тормозить нечем — катится
+	}
+	else
+	{
+		Move->GroundFriction = SlipDefaultGroundFriction;
+		Move->BrakingDecelerationWalking = SlipDefaultBrakingDecel;
+	}
+}
+
+void AAvaryoCharacter::OnRep_Slipping()
+{
+	ApplySlipFriction(bSlipping); // клиент тоже снижает/возвращает трение — чтобы скольжение совпало
 }
 
 void AAvaryoCharacter::StartCrouchInput()
