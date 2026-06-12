@@ -169,10 +169,26 @@ for name, (target, max_dim) in MAPPING.items():
         unreal.EditorAssetLibrary.save_loaded_asset(bp)
         out.append('  назначен в CDO %s (масштаб предмета проверить руками в игре)' % key.split('/')[-1])
 
+# Нормал-карты от meshy импортируются как sRGB-цвет и роняют рендер
+# («Texture not valid! NormalMap»). Чиним КАЖДЫЙ импорт: sRGB off + TC_NORMALMAP.
+for asset_path in unreal.EditorAssetLibrary.list_assets(DEST, recursive=True):
+    nm = asset_path.split('.')[0]
+    base = nm.split('/')[-1].lower()
+    if 'normal' in base:
+        tex = unreal.load_asset(nm)
+        if isinstance(tex, unreal.Texture2D) and tex.get_editor_property('srgb'):
+            tex.set_editor_property('srgb', False)
+            tex.set_editor_property('compression_settings', unreal.TextureCompressionSettings.TC_NORMALMAP)
+            tex.set_editor_property('lod_group', unreal.TextureGroup.TEXTUREGROUP_WORLD_NORMAL_MAP)
+            unreal.EditorAssetLibrary.save_loaded_asset(tex)
+            out.append('нормаль поправлена: ' + base)
+
 if level_dirty:
-    if not les.save_current_level():
-        raise RuntimeError('Уровень не сохранился')
-    out.append('уровень сохранён')
+    # Уровень — World Partition (OFPA): акторы лежат во внешних пакетах, и
+    # save_current_level их НЕ пишет. Сохраняем все dirty-пакеты (карта + внешние акторы).
+    saved = unreal.EditorLoadingAndSavingUtils.save_dirty_packages(True, True)
+    les.save_current_level()
+    out.append('сохранено dirty-пакетов: ' + str(saved))
 
 with open(r'D:\unrealEngine\avariika\Saved\import_result.txt', 'w', encoding='utf-8') as f:
     f.write('\n'.join(out) if out else 'нечего импортировать')

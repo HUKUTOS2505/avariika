@@ -20,6 +20,19 @@ Claudius/Responses/
 Claudius/claudius_request.json
 Claudius/claudius_response.json
 
+# Секреты — НЕ коммитить
+.meshy_key
+
+# Исходники моделей meshy (тяжёлые, регенерируются) — в git не держим
+RawAssets/**/*.fbx
+RawAssets/**/*.png
+RawAssets/**/*.zip
+RawAssets/**/*.glb
+RawAssets/**/*.obj
+
+# Python-кэш
+Scripts/__pycache__/
+
 # Прочее
 *.tmp
 *.log
