@@ -46,6 +46,13 @@ struct FPlayerRunStats
 	bool bWasSoiled = false;
 };
 
+/** Реплика диспетчера, как её хранит клиент: текст + момент получения (HUD гасит по возрасту). */
+struct FDispatcherLine
+{
+	FString Text;
+	float ReceivedAt = 0.f;
+};
+
 /** Фаза забега. */
 UENUM(BlueprintType)
 enum class ERunPhase : uint8
@@ -110,6 +117,17 @@ public:
 	/** Дошёл до биотуалета. Только сервер. */
 	void AddToiletVisit(AAvaryoCharacter* Who);
 
+	// ---------- Диспетчер (комментирует хаос по рации) ----------
+
+	/** Последние реплики диспетчера на этой машине (HUD рисует и гасит сам). */
+	const TArray<FDispatcherLine>& GetDispatcherLines() const { return DispatcherLines; }
+
+	/** Газ рванул на объекте. Только сервер. */
+	void NotifyGasExplosion(AAvaryoCharacter* Culprit);
+
+	/** Щиток замкнуло после серии промахов. Только сервер. */
+	void NotifyShortCircuit(AAvaryoCharacter* Culprit);
+
 protected:
 	UPROPERTY(Replicated)
 	ERunPhase Phase;
@@ -137,6 +155,27 @@ protected:
 
 	/** Найти/завести запись статистики. Только сервер. */
 	FPlayerRunStats& FindOrAddStats(AAvaryoCharacter* Who);
+
+	/** Реплики диспетчера на этой машине (заполняется мультикастом, не реплицируется). */
+	TArray<FDispatcherLine> DispatcherLines;
+
+	/** Сервер: раньше этого времени неважные реплики глотаются (диспетчер не тараторит). */
+	float NextChatterTime;
+
+	/** Приветствие с задержкой: даём клиентам получить RunState, потом здороваемся. */
+	FTimerHandle GreetingTimer;
+
+	/** Сервер: случайная реплика из пула, «{X}» заменяется на Param, рассылка всем. */
+	void DispatcherSay(const TArray<FString>& Pool, const FString& Param = FString(), bool bImportant = false);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastDispatcherSay(const FString& Line);
+
+	/** Приветственная реплика по таймеру после старта смены. */
+	void SendGreeting();
+
+	/** Имя монтёра для реплик («Монтёр», пока PlayerState не приехал). */
+	static FString CrewName(const AAvaryoCharacter* Who);
 
 	UFUNCTION()
 	void OnObjectiveRepaired(ARepairable* Repairable, AAvaryoCharacter* FinishedBy);

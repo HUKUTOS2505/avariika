@@ -8,6 +8,7 @@
 #include "Engine/DamageEvents.h"
 #include "Engine/World.h"
 #include "EngineUtils.h"
+#include "Game/ARunState.h"
 #include "GameFramework/PlayerController.h"
 #include "Items/APickupItem.h"
 #include "Kismet/GameplayStatics.h"
@@ -455,6 +456,11 @@ void ARepairable::ShortCircuit(AAvaryoCharacter* Culprit)
 	LockoutRemaining = LockoutDuration;
 	EndRepairBy(Culprit); // выкидывает из мини-игры и снимает блокировку ввода
 	RefreshStatusVisual();
+
+	if (ARunState* Run = ARunState::Get(GetWorld()))
+	{
+		Run->NotifyShortCircuit(Culprit); // диспетчер прокомментирует
+	}
 }
 
 void ARepairable::SetBroken(bool bNewBroken)
@@ -489,6 +495,11 @@ void ARepairable::ExplodeGas(AAvaryoCharacter* Culprit)
 	// Громче этого ночью не бывает
 	MakeNoise(2.f, Culprit, GetActorLocation());
 	MulticastExplosionShake();
+
+	if (ARunState* Run = ARunState::Get(GetWorld()))
+	{
+		Run->NotifyGasExplosion(Culprit); // диспетчер уже в курсе
+	}
 }
 
 void ARepairable::MulticastExplosionShake_Implementation()

@@ -6,9 +6,64 @@
 #include "EngineUtils.h"
 #include "GameFramework/GameModeBase.h"
 #include "GameFramework/GameStateBase.h"
+#include "GameFramework/PlayerState.h"
 #include "Net/UnrealNetwork.h"
+#include "TimerManager.h"
 #include "World/AExitZone.h"
 #include "World/ARepairable.h"
+
+// Реплики диспетчера: сухой сарказм уставшего начальника смены. «{X}» — имя/название/число.
+namespace DispatcherLines
+{
+	const TArray<FString> Greeting = {
+		TEXT("Бригада, приём. Заявка плёвая: объектов всего {X}. Через полчаса жду в гараже."),
+		TEXT("Так, мужики. Поломок — {X}, на дворе ночь, премия под вопросом. Работаем."),
+		TEXT("Диспетчерская — бригаде: по заявке «обычная поломка минут на пять». По факту — {X}. Удачи."),
+		TEXT("Принята заявка №47: объектов {X}. Жильцы уже звонят. Не позорьте контору."),
+	};
+	const TArray<FString> RepairDone = {
+		TEXT("«{X}» — принято. Неужели сами справились."),
+		TEXT("Отметил: «{X}» готов. Продолжаем не ломать остальное."),
+		TEXT("«{X}» починен. Записал в акт, не благодарите."),
+	};
+	const TArray<FString> AllDone = {
+		TEXT("Всё?! Так, быстро все в ГАЗель, пока опять не заискрило."),
+		TEXT("Заявка закрыта. Сбор у машины, перекличка."),
+		TEXT("Принято, всё работает. В ГАЗель шагом марш. Курить — НЕ в машине."),
+	};
+	const TArray<FString> GasExplosion = {
+		TEXT("КТО КУРИЛ НА ГАЗОВОЙ ЗАЯВКЕ?! {X}, я ведь слышал щелчок зажигалки!"),
+		TEXT("Взрыв на объекте. {X}, это твоя зона ответственности. Премии не будет."),
+		TEXT("Диспетчерская фиксирует хлопок газа. Жильцам скажем — салют в честь дня монтажника."),
+	};
+	const TArray<FString> ShortCircuit = {
+		TEXT("Щиток замкнуло. {X}, тестером надо ТЫКАТЬ, а не ЛУПИТЬ."),
+		TEXT("Слышу, заискрило. Минута на остывание — и на пересдачу, {X}."),
+		TEXT("{X} устроил иллюминацию. В акте напишу «плановое отключение»."),
+	};
+	const TArray<FString> Wounded = {
+		TEXT("{X} ранен. Бывает. Кто-нибудь, поднимите его, он мне акт не подписал."),
+		TEXT("Минус один: {X} отдыхает на земле. Аптечка в зубы — и работать."),
+		TEXT("{X}, лежать на смене запрещено инструкцией. Подъём."),
+	};
+	const TArray<FString> Incident = {
+		TEXT("{X}... до биотуалета было сто метров. СТО. МЕТРОВ."),
+		TEXT("Фиксирую санитарный инцидент. {X}, химчистку вычту из зарплаты."),
+		TEXT("{X}, это пойдёт в акт отдельной строкой. С формулировкой."),
+	};
+	const TArray<FString> ToiletVisit = {
+		TEXT("{X} отошёл по регламенту. Не отвлекаем человека."),
+		TEXT("Зафиксировал технологический перерыв у {X}. Дисциплина!"),
+	};
+	const TArray<FString> Victory = {
+		TEXT("Объект сдан. Жалоб много, премии не будет, но все живы — уже праздник."),
+		TEXT("Заявка закрыта. По домам. Завтра в то же время, и не опаздывать."),
+	};
+	const TArray<FString> Defeat = {
+		TEXT("Бригада, приём... Приём!.. Так. Высылаю вторую бригаду. За вами."),
+		TEXT("Вся бригада лежит. В акте напишу «технический перерыв». Длинный."),
+	};
+}
 
 ARunState::ARunState()
 {
@@ -22,6 +77,7 @@ ARunState::ARunState()
 	RunStartServerTime = 0.f;
 	RunEndServerTime = 0.f;
 	bHasExitZone = false;
+	NextChatterTime = 0.f;
 }
 
 void ARunState::BeginPlay()
@@ -69,6 +125,9 @@ void ARunState::BeginPlay()
 	{
 		RunStartServerTime = GS->GetServerWorldTimeSeconds();
 	}
+
+	// Приветствие с задержкой: мультикаст в первый кадр клиенты ещё не получат
+	GetWorldTimerManager().SetTimer(GreetingTimer, this, &ARunState::SendGreeting, 6.f, false);
 }
 
 void ARunState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -140,11 +199,13 @@ void ARunState::Tick(float DeltaSeconds)
 		if (Vitals->IsWounded() && !Stats.bWasWounded)
 		{
 			++Stats.TimesWounded;
+			DispatcherSay(DispatcherLines::Wounded, CrewName(*It));
 		}
 		Stats.bWasWounded = Vitals->IsWounded();
 		if (Vitals->IsSoiled() && !Stats.bWasSoiled)
 		{
 			++Stats.Incidents;
+			DispatcherSay(DispatcherLines::Incident, CrewName(*It), /*bImportant=*/true);
 		}
 		Stats.bWasSoiled = Vitals->IsSoiled();
 	}
@@ -189,6 +250,26 @@ void ARunState::AddToiletVisit(AAvaryoCharacter* Who)
 	if (HasAuthority() && Who)
 	{
 		++FindOrAddStats(Who).ToiletVisits;
+		if (FMath::FRand() < 0.35f) // комментирует не каждый визит — туалетный юмор дозируем
+		{
+			DispatcherSay(DispatcherLines::ToiletVisit, CrewName(Who));
+		}
+	}
+}
+
+void ARunState::NotifyGasExplosion(AAvaryoCharacter* Culprit)
+{
+	if (HasAuthority())
+	{
+		DispatcherSay(DispatcherLines::GasExplosion, CrewName(Culprit), /*bImportant=*/true);
+	}
+}
+
+void ARunState::NotifyShortCircuit(AAvaryoCharacter* Culprit)
+{
+	if (HasAuthority())
+	{
+		DispatcherSay(DispatcherLines::ShortCircuit, CrewName(Culprit), /*bImportant=*/true);
 	}
 }
 
@@ -217,6 +298,14 @@ void ARunState::OnObjectiveRepaired(ARepairable* Repairable, AAvaryoCharacter* F
 	if (AreAllObjectivesComplete() && !bHasExitZone)
 	{
 		FinishRun(ERunPhase::Won);
+	}
+	else if (AreAllObjectivesComplete())
+	{
+		DispatcherSay(DispatcherLines::AllDone, FString(), /*bImportant=*/true);
+	}
+	else if (Repairable)
+	{
+		DispatcherSay(DispatcherLines::RepairDone, Repairable->DisplayName.ToString());
 	}
 }
 
@@ -247,6 +336,50 @@ void ARunState::FinishRun(ERunPhase NewPhase)
 	{
 		RunEndServerTime = GS->GetServerWorldTimeSeconds();
 	}
+	DispatcherSay(NewPhase == ERunPhase::Won ? DispatcherLines::Victory : DispatcherLines::Defeat,
+		FString(), /*bImportant=*/true);
+}
+
+// ---------- Диспетчер ----------
+
+void ARunState::SendGreeting()
+{
+	DispatcherSay(DispatcherLines::Greeting, FString::FromInt(Objectives.Num()), /*bImportant=*/true);
+}
+
+void ARunState::DispatcherSay(const TArray<FString>& Pool, const FString& Param, bool bImportant)
+{
+	if (!HasAuthority() || Pool.Num() == 0)
+	{
+		return;
+	}
+	const float Now = GetWorld()->GetTimeSeconds();
+	if (!bImportant && Now < NextChatterTime)
+	{
+		return; // диспетчер не тараторит — неважное глотаем
+	}
+	NextChatterTime = Now + 6.f;
+
+	FString Line = Pool[FMath::RandRange(0, Pool.Num() - 1)];
+	Line.ReplaceInline(TEXT("{X}"), *Param);
+	MulticastDispatcherSay(Line);
+}
+
+void ARunState::MulticastDispatcherSay_Implementation(const FString& Line)
+{
+	FDispatcherLine& Entry = DispatcherLines.AddDefaulted_GetRef();
+	Entry.Text = Line;
+	Entry.ReceivedAt = GetWorld()->GetTimeSeconds();
+	while (DispatcherLines.Num() > 3) // на экране держим максимум три плашки
+	{
+		DispatcherLines.RemoveAt(0);
+	}
+}
+
+FString ARunState::CrewName(const AAvaryoCharacter* Who)
+{
+	const APlayerState* PS = Who ? Who->GetPlayerState() : nullptr;
+	return PS ? PS->GetPlayerName() : TEXT("Монтёр");
 }
 
 // ---------- URunStateSubsystem ----------

@@ -177,6 +177,42 @@ void AAvaryoHUD::DrawHUD()
 		}
 	}
 
+	// ---------- Рация диспетчера (сверху по центру, плашки гаснут сами) ----------
+	if (ARunState* Run = ARunState::Get(GetWorld()))
+	{
+		const float Now = GetWorld()->GetTimeSeconds();
+		const FString Prefix = TEXT("ДИСПЕТЧЕР: ");
+		float PrefixW = 0.f, PrefixH = 0.f;
+		GetTextSize(Prefix, PrefixW, PrefixH, Font, 1.05f);
+
+		float LineY = 16.f;
+		for (const FDispatcherLine& Line : Run->GetDispatcherLines())
+		{
+			const float Age = Now - Line.ReceivedAt;
+			if (Age > 9.f)
+			{
+				continue; // отговорил — плашка погасла
+			}
+			const float Alpha = Age > 7.f ? 1.f - (Age - 7.f) / 2.f : 1.f; // последние 2 с тают
+
+			float TextW = 0.f, TextH = 0.f;
+			GetTextSize(Line.Text, TextW, TextH, Font, 1.05f);
+			const float BoxW = PrefixW + TextW + 28.f;
+			const float BoxX = (SizeX - BoxW) * 0.5f;
+
+			FLinearColor BG = BoxBG;        BG.A *= Alpha;
+			FLinearColor Edge = Accent;     Edge.A *= Alpha;
+			FLinearColor NameC = Accent;    NameC.A *= Alpha;
+			FLinearColor TextC = TextMain;  TextC.A *= Alpha;
+
+			DrawRect(BG, BoxX, LineY, BoxW, TextH + 14.f);
+			DrawRect(Edge, BoxX, LineY, 4.f, TextH + 14.f); // оранжевая кромка слева — «эфир»
+			DrawText(Prefix, NameC, BoxX + 14.f, LineY + 7.f, Font, 1.05f);
+			DrawText(Line.Text, TextC, BoxX + 14.f + PrefixW, LineY + 7.f, Font, 1.05f);
+			LineY += TextH + 20.f;
+		}
+	}
+
 	// ---------- Забег: задачи, таймер, фаза (справа сверху) ----------
 	if (ARunState* Run = ARunState::Get(GetWorld()))
 	{
