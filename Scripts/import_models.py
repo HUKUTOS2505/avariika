@@ -69,6 +69,30 @@ def import_mesh(name, source):
     return mesh
 
 
+def enable_nanite(mesh):
+    """Тяжёлые меши из meshy (сотни тысяч треугольников) включаем в Nanite —
+    UE5 рендерит их эффективно без ручного ремеша. Возвращает True, если включил."""
+    try:
+        tris = mesh.get_num_triangles(0)
+    except Exception:
+        tris = 0
+    if tris < 20000:
+        return False  # лёгкий меш — Nanite не нужен
+    try:
+        sub = unreal.get_editor_subsystem(unreal.StaticMeshEditorSubsystem)
+        sub.set_nanite_enabled(mesh, True)  # сам перестроит
+        return True
+    except Exception:
+        try:
+            ns = mesh.get_editor_property('nanite_settings')
+            ns.set_editor_property('enabled', True)
+            mesh.set_editor_property('nanite_settings', ns)
+            unreal.EditorAssetLibrary.save_loaded_asset(mesh)
+            return True
+        except Exception as e:
+            return 'err:' + str(e)
+
+
 les = unreal.get_editor_subsystem(unreal.LevelEditorSubsystem)
 if not les.load_level('/Game/FirstPerson/Lvl_FirstPerson'):
     raise RuntimeError('Не удалось загрузить уровень')
@@ -95,7 +119,17 @@ for name, (target, max_dim) in MAPPING.items():
         continue
     bounds = mesh.get_bounds().box_extent
     size = (bounds.x * 2, bounds.y * 2, bounds.z * 2)
-    out.append('OK %s: %.0fx%.0fx%.0f см из %s' % (name, size[0], size[1], size[2], os.path.basename(source)))
+    try:
+        tris = mesh.get_num_triangles(0)
+    except Exception:
+        tris = -1
+    out.append('OK %s: %.0fx%.0fx%.0f см, %d тр из %s' % (name, size[0], size[1], size[2], tris, os.path.basename(source)))
+
+    nanite = enable_nanite(mesh)
+    if nanite is True:
+        out.append('  Nanite ВКЛ (тяжёлый меш)')
+    elif isinstance(nanite, str):
+        out.append('  WARN Nanite не включился: ' + nanite)
 
     kind, _, key = target.partition(':')
     if kind == 'actor':
