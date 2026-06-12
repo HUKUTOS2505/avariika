@@ -732,6 +732,16 @@ void AAvaryoCharacter::AvCheapGear()
 }
 void AAvaryoCharacter::ServerAvCheapGear_Implementation() { AvCheapGear(); }
 
+void AAvaryoCharacter::AvFinish(const FString& Outcome)
+{
+	if (!HasAuthority()) { ServerAvFinish(Outcome); return; }
+	if (ARunState* Run = ARunState::Get(GetWorld()))
+	{
+		Run->DebugFinishRun(Outcome.StartsWith(TEXT("w"))); // "win" → победа, иначе поражение
+	}
+}
+void AAvaryoCharacter::ServerAvFinish_Implementation(const FString& Outcome) { AvFinish(Outcome); }
+
 // ---------- Оператор: нагрудные камеры ----------
 
 bool AAvaryoCharacter::CanUseMonitor() const

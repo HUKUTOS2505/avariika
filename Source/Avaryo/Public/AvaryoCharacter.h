@@ -465,6 +465,10 @@ protected:
 	UFUNCTION(Exec)
 	void AvCheapGear();
 
+	/** Завершить забег и показать «Акт»: `AvFinish win` или `AvFinish lose`. */
+	UFUNCTION(Exec)
+	void AvFinish(const FString& Outcome);
+
 	UFUNCTION(Server, Reliable)
 	void ServerAvVital(const FString& Which, float Value);
 
@@ -473,4 +477,7 @@ protected:
 
 	UFUNCTION(Server, Reliable)
 	void ServerAvCheapGear();
+
+	UFUNCTION(Server, Reliable)
+	void ServerAvFinish(const FString& Outcome);
 };

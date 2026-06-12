@@ -634,6 +634,14 @@ void ARunState::DebugForceCheapGear()
 	}
 }
 
+void ARunState::DebugFinishRun(bool bWon)
+{
+	if (HasAuthority() && Phase == ERunPhase::InProgress)
+	{
+		FinishRun(bWon ? ERunPhase::Won : ERunPhase::Lost);
+	}
+}
+
 void ARunState::ApplyCheapGear(AAvaryoCharacter* Who)
 {
 	if (!bCheapGear || !Who || CheapGearApplied.Contains(Who))

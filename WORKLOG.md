@@ -201,7 +201,7 @@
 
 ## ДЕВ-КОНСОЛЬ 2026-06-12 (ускорение PIE-теста)
 
-Exec-команды на персонаже (`AvaryoCharacter`), чтобы тестировать модули мгновенно (без ожидания шкал). Список и применение — TESTING.md, раздел «Дев-команды». Команды: `AvVital <health|panic|stamina|bladder|smell> <0..100>`, `AvIncident`, `AvGiveBio`, `AvCheapGear`. Маршрутизируются на сервер (работают и у клиента, и у хоста). UFUNCTION(Exec) нельзя оборачивать в `#if` — поэтому читы скомпилированы всегда (проект не шипится). Опираются на `VitalsComponent::DebugSetVital` и `ARunState::DebugForceCheapGear`.
+Exec-команды на персонаже (`AvaryoCharacter`), чтобы тестировать модули мгновенно (без ожидания шкал). Список и применение — TESTING.md, раздел «Дев-команды». Команды: `AvVital <health|panic|stamina|bladder|smell> <0..100>`, `AvIncident`, `AvGiveBio`, `AvCheapGear`, `AvFinish <win|lose>` (показать «Акт»). Маршрутизируются на сервер (работают и у клиента, и у хоста). UFUNCTION(Exec) нельзя оборачивать в `#if` — поэтому читы скомпилированы всегда (проект не шипится). Опираются на `VitalsComponent::DebugSetVital`, `ARunState::DebugForceCheapGear`, `ARunState::DebugFinishRun`.
 
 ## РЕВЬЮ-ПРОХОД 2026-06-12 (фиксы по своему коду сессии)
 
