@@ -210,12 +210,17 @@ void ARepairable::Tick(float DeltaSeconds)
 	if (HasAuthority())
 	{
 		ExplosionCooldown = FMath::Max(ExplosionCooldown - DeltaSeconds, 0.f);
-		if (IsLeakingGas() && ExplosionCooldown <= 0.f)
+		if (IsLeakingGas())
 		{
 			for (TActorIterator<AAvaryoCharacter> It(GetWorld()); It; ++It)
 			{
-				if (It->VitalsComponent && It->VitalsComponent->IsSmoking()
-					&& FVector::DistSquared(It->GetActorLocation(), GetActorLocation()) <= FMath::Square(GasRadius))
+				if (!It->VitalsComponent
+					|| FVector::DistSquared(It->GetActorLocation(), GetActorLocation()) > FMath::Square(GasRadius))
+				{
+					continue;
+				}
+				It->VitalsComponent->AddSmell(8.f * DeltaSeconds); // провонял газом
+				if (ExplosionCooldown <= 0.f && It->VitalsComponent->IsSmoking())
 				{
 					ExplodeGas(*It);
 					break;

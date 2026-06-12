@@ -43,6 +43,15 @@ UVitalsComponent::UVitalsComponent()
 	SmokingDuration = 15.f;
 	SmokingPanicPerSecond = 2.f;
 	SmokingRemaining = 0.f;
+
+	Smell = 0.f;
+	SmellThreshold = 50.f;
+	SmellDecayPerSecond = 1.5f;
+	SmellSmokingPerSecond = 5.f;
+	SmellPanicPerSecond = 1.f;
+	SmellIncidentJump = 70.f;
+	SmellTeammatePanicPerSecond = 2.f;
+	SmellRadius = 350.f;
 }
 
 void UVitalsComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -58,6 +67,7 @@ void UVitalsComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	DOREPLIFETIME(UVitalsComponent, IncidentSlowRemaining);
 	DOREPLIFETIME(UVitalsComponent, bSprinting);
 	DOREPLIFETIME(UVitalsComponent, SmokingRemaining);
+	DOREPLIFETIME(UVitalsComponent, Smell);
 }
 
 void UVitalsComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -143,6 +153,7 @@ void UVitalsComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 		bSoiled = true;
 		IncidentSlowRemaining = IncidentSlowDuration;
 		Panic = FMath::Min(100.f, Panic + IncidentPanicSpike);
+		Smell = FMath::Min(100.f, Smell + SmellIncidentJump); // и амбре теперь надолго
 		Char->MakeNoise(1.f, Char, Char->GetActorLocation()); // очень громко и стыдно
 		OnSanitaryIncident.Broadcast();
 	}
@@ -151,6 +162,31 @@ void UVitalsComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 	{
 		IncidentSlowRemaining = FMath::Max(0.f, IncidentSlowRemaining - DeltaTime);
 	}
+
+	// --- Запах / амбре ---
+	float SmellDelta = -SmellDecayPerSecond;        // постепенно выветривается
+	if (SmokingRemaining > 0.f) SmellDelta += SmellSmokingPerSecond; // дым липнет
+	if (IsPanicking())          SmellDelta += SmellPanicPerSecond;   // пот от страха
+	if (bSoiled)                SmellDelta = FMath::Max(SmellDelta, 0.f); // испачкан — не выветривается сам
+	Smell = FMath::Clamp(Smell + SmellDelta * DeltaTime, 0.f, 100.f);
+
+	// Вонючий монтёр травит тиммейтов рядом — у тех растёт паника
+	if (IsSmelly())
+	{
+		for (TActorIterator<AAvaryoCharacter> It(GetWorld()); It; ++It)
+		{
+			if (*It != Char && It->VitalsComponent
+				&& FVector::DistSquared(It->GetActorLocation(), Char->GetActorLocation()) < FMath::Square(SmellRadius))
+			{
+				It->VitalsComponent->AddPanic(SmellTeammatePanicPerSecond * DeltaTime);
+			}
+		}
+	}
+}
+
+void UVitalsComponent::AddSmell(float Amount)
+{
+	Smell = FMath::Clamp(Smell + Amount, 0.f, 100.f);
 }
 
 void UVitalsComponent::ApplyDamage(float Amount)

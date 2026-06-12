@@ -57,6 +57,10 @@ public:
 	UFUNCTION(BlueprintPure, Category="Vitals")
 	bool IsSmoking() const { return SmokingRemaining > 0.f; }
 
+	/** Добавить «амбре» (запах от газа, порошка, дыма, инцидента). Зажато 0..100. */
+	UFUNCTION(BlueprintCallable, Category="Vitals")
+	void AddSmell(float Amount);
+
 	// -- Геттеры --
 
 	UFUNCTION(BlueprintPure, Category="Vitals") float GetHealth() const { return Health; }
@@ -68,6 +72,8 @@ public:
 	UFUNCTION(BlueprintPure, Category="Vitals") bool IsPanicking() const { return Panic >= PanicThreshold; }
 	UFUNCTION(BlueprintPure, Category="Vitals") bool IsIncidentSlowed() const { return IncidentSlowRemaining > 0.f; }
 	UFUNCTION(BlueprintPure, Category="Vitals") bool IsSoiled() const { return bSoiled; }
+	UFUNCTION(BlueprintPure, Category="Vitals") float GetSmell() const { return Smell; }
+	UFUNCTION(BlueprintPure, Category="Vitals") bool IsSmelly() const { return Smell >= SmellThreshold; }
 
 	// -- События --
 
@@ -151,6 +157,36 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Vitals|Smoking")
 	float SmokingPanicPerSecond;
 
+	// --- Запах / амбре (§16) ---
+
+	/** Порог, выше которого монтёр «воняет» (тиммейтов рядом подташнивает). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Vitals|Smell")
+	float SmellThreshold;
+
+	/** Скорость выветривания запаха, ед/сек. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Vitals|Smell")
+	float SmellDecayPerSecond;
+
+	/** Прирост запаха за секунду курения. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Vitals|Smell")
+	float SmellSmokingPerSecond;
+
+	/** Прирост запаха за секунду паники (пот). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Vitals|Smell")
+	float SmellPanicPerSecond;
+
+	/** Скачок запаха при санитарном инциденте. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Vitals|Smell")
+	float SmellIncidentJump;
+
+	/** Сколько паники в секунду добавляет вонючий монтёр тиммейтам рядом. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Vitals|Smell")
+	float SmellTeammatePanicPerSecond;
+
+	/** Радиус, в котором чувствуется амбре, см. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Vitals|Smell")
+	float SmellRadius;
+
 protected:
 	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadOnly, Category="Vitals")
 	float Health;
@@ -180,4 +216,8 @@ protected:
 	/** Сколько секунд осталось курить. */
 	UPROPERTY(Replicated)
 	float SmokingRemaining;
+
+	/** Уровень запаха 0..100. */
+	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadOnly, Category="Vitals")
+	float Smell;
 };

@@ -41,12 +41,18 @@ struct FPlayerRunStats
 	UPROPERTY(BlueprintReadOnly, Category="Run")
 	float PanicSeconds = 0.f;   // времени в панике
 
+	UPROPERTY(BlueprintReadOnly, Category="Run")
+	float SmellSeconds = 0.f;   // времени «воняет» (§16)
+
 	// Для детекции переходов на серверном тике (реплицируются заодно — безвредно)
 	UPROPERTY()
 	bool bWasWounded = false;
 
 	UPROPERTY()
 	bool bWasSoiled = false;
+
+	UPROPERTY()
+	bool bWasSmelly = false;
 };
 
 /** Реплика в эфире рации, как её хранит клиент: кто + текст + момент получения (HUD гасит по возрасту). */

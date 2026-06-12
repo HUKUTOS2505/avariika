@@ -1297,6 +1297,11 @@ void AAvaryoCharacter::TickSpray(float DeltaSeconds)
 		return;
 	}
 
+	if (VitalsComponent)
+	{
+		VitalsComponent->AddSmell(6.f * DeltaSeconds); // облако порошка — сам пропах химией
+	}
+
 	FVector ViewLoc;
 	FRotator ViewRot;
 	GetActorEyesViewPoint(ViewLoc, ViewRot);

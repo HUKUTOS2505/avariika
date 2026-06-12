@@ -164,7 +164,8 @@ void AAvaryoHUD::DrawHUD()
 		DrawBar(TEXT("Здоровье"),     Vitals->GetHealth(),  FLinearColor(0.8f, 0.12f, 0.12f), Y); Y += 22.f;
 		DrawBar(TEXT("Выносливость"), Vitals->GetStamina(), FLinearColor(0.2f, 0.7f, 0.25f),  Y); Y += 22.f;
 		DrawBar(TEXT("Паника"),       Vitals->GetPanic(),   FLinearColor(0.25f, 0.7f, 0.85f), Y); Y += 22.f;
-		DrawBar(TEXT("Туалет"),       Vitals->GetBladder(), FLinearColor(0.8f, 0.6f, 0.12f),  Y);
+		DrawBar(TEXT("Туалет"),       Vitals->GetBladder(), FLinearColor(0.8f, 0.6f, 0.12f),  Y); Y += 22.f;
+		DrawBar(TEXT("Амбре"),        Vitals->GetSmell(),   FLinearColor(0.5f, 0.45f, 0.12f), Y);
 
 		// Батарея налобного фонаря: ярко-жёлтая когда включён, тусклая когда выключен
 		if (UFlashlightComponent* Flashlight = Character->FlashlightComponent)
@@ -269,7 +270,7 @@ void AAvaryoHUD::DrawHUD()
 
 			// Максимумы для раздачи званий
 			int32 MaxRepairs = 0, MaxWounded = 0, MaxRevives = 0, MaxDrags = 0, MaxBotched = 0;
-			float MaxPanic = 0.f;
+			float MaxPanic = 0.f, MaxSmell = 0.f;
 			for (const FPlayerRunStats& S : AllStats)
 			{
 				MaxRepairs = FMath::Max(MaxRepairs, S.Repairs);
@@ -278,6 +279,7 @@ void AAvaryoHUD::DrawHUD()
 				MaxDrags   = FMath::Max(MaxDrags,   S.Drags);
 				MaxBotched = FMath::Max(MaxBotched, S.BotchedRepairs);
 				MaxPanic   = FMath::Max(MaxPanic,   S.PanicSeconds);
+				MaxSmell   = FMath::Max(MaxSmell,   S.SmellSeconds);
 			}
 
 			const float ReportW = FMath::Min(820.f, SizeX - 80.f);
@@ -311,6 +313,7 @@ void AAvaryoHUD::DrawHUD()
 				FString Title;
 				if (S.Incidents > 0)                                   Title = TEXT("Биологическая угроза");
 				else if (S.BotchedRepairs > 0 && S.BotchedRepairs == MaxBotched) Title = TEXT("Народный умелец");
+				else if (S.SmellSeconds > 5.f && S.SmellSeconds >= MaxSmell) Title = TEXT("Амбре смены");
 				else if (S.ToiletVisits >= 2)                          Title = TEXT("Дисциплинированный мочевой пузырь");
 				else if (S.Repairs > 0 && S.Repairs == MaxRepairs)     Title = TEXT("Работник месяца");
 				else if (S.Revives > 0 && S.Revives == MaxRevives)     Title = TEXT("Полевой медик");
@@ -323,9 +326,9 @@ void AAvaryoHUD::DrawHUD()
 				const int32 Balance = ARunState::ComputePlayerBalance(S);
 
 				const FString Row1 = FString::Printf(TEXT("%s — «%s»"), *Name, *Title);
-				const FString Row2 = FString::Printf(TEXT("починки: %d   колхоз: %d   подъёмы: %d   эвакуации: %d   туалет: %d   ранения: %d   инциденты: %d   паника: %d сек   итог: %s%d ₽"),
+				const FString Row2 = FString::Printf(TEXT("починки: %d   колхоз: %d   подъёмы: %d   эвакуации: %d   туалет: %d   ранения: %d   инциденты: %d   паника: %d с   вонял: %d с   итог: %s%d ₽"),
 					S.Repairs, S.BotchedRepairs, S.Revives, S.Drags, S.ToiletVisits, S.TimesWounded, S.Incidents,
-					FMath::RoundToInt(S.PanicSeconds), Balance >= 0 ? TEXT("+") : TEXT(""), Balance);
+					FMath::RoundToInt(S.PanicSeconds), FMath::RoundToInt(S.SmellSeconds), Balance >= 0 ? TEXT("+") : TEXT(""), Balance);
 
 				DrawText(Row1, TextMain, PX + 28.f, TY, Font, 1.1f);
 				TY += ReportRowH;
@@ -741,6 +744,7 @@ void AAvaryoHUD::DrawHUD()
 		if (Character->GetDraggedBy())    Statuses.Add(TEXT("Вас тащат"));
 		if (Vitals->IsIncidentSlowed())   Statuses.Add(TEXT("Санитарный инцидент!"));
 		else if (Vitals->IsSoiled())      Statuses.Add(TEXT("Испачкан"));
+		if (Vitals->IsSmelly())           Statuses.Add(TEXT("Воняет"));
 
 		// В газовом облаке — не курить!
 		for (TActorIterator<ARepairable> It(GetWorld()); It; ++It)

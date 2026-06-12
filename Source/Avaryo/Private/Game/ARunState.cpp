@@ -88,6 +88,12 @@ namespace DispatcherLines
 		TEXT("...ещё один... нас тут уже семеро..."),
 		TEXT("...тёпленькие... приходите..."),
 	};
+	// Амбре: монтёр провонял (§16 «запах»)
+	const TArray<FString> SmellJab = {
+		TEXT("{X}, от тебя за версту несёт. Открой хоть окно... а, тут нет окон. Терпите, мужики."),
+		TEXT("Кто там надушился? {X}, это уже не амбре, это химоружие."),
+		TEXT("{X}, после смены — в душ. Приказ. Бригада задыхается."),
+	};
 	// Сработавшая растяжка (§18 «предметы-ловушки» — часто бьёт по своим)
 	const TArray<FString> TrapTriggered = {
 		TEXT("Это что за грохот?! {X}, ты что, в свою же растяжку влетел?"),
@@ -288,6 +294,16 @@ void ARunState::Tick(float DeltaSeconds)
 			DispatcherSay(DispatcherLines::Incident, CrewName(*It), /*bImportant=*/true);
 		}
 		Stats.bWasSoiled = Vitals->IsSoiled();
+
+		if (Vitals->IsSmelly())
+		{
+			Stats.SmellSeconds += DeltaSeconds;
+			if (!Stats.bWasSmelly)
+			{
+				DispatcherSay(DispatcherLines::SmellJab, CrewName(*It)); // неважная — глотается анти-спамом
+			}
+		}
+		Stats.bWasSmelly = Vitals->IsSmelly();
 	}
 
 	TickRadioInterference(Now);
