@@ -19,6 +19,7 @@
 #include "Net/UnrealNetwork.h"
 #include "UI/AvaryoCameraShakes.h"
 #include "World/ABioProjectile.h"
+#include "World/AFloodlight.h"
 #include "World/ARepairable.h"
 #include "World/AToilet.h"
 #include "World/ATrap.h"
@@ -1048,6 +1049,7 @@ bool AAvaryoCharacter::CanApplyEffect(APickupItem* Item) const
 	case EItemEffect::Recharge:   return FlashlightComponent && FlashlightComponent->GetBatteryLevel() < 99.f;
 	case EItemEffect::DeployTrap: return Item->Charges != 0;
 	case EItemEffect::ThrowBio:   return Item->Charges != 0;
+	case EItemEffect::DeployLight: return Item->Charges != 0;
 	default:                      return false;
 	}
 }
@@ -1124,6 +1126,21 @@ void AAvaryoCharacter::ApplyItemEffect(APickupItem* Item)
 		if (ABioProjectile* Bio = GetWorld()->SpawnActor<ABioProjectile>(ABioProjectile::StaticClass(), SpawnLoc, ViewRot, SpawnParams))
 		{
 			Bio->Launch(Dir);
+			ConsumeCharge(Item);
+		}
+		break;
+	}
+	case EItemEffect::DeployLight:
+	{
+		// Ставим прожектор у ног чуть впереди
+		const FVector Feet = GetActorLocation() - FVector(0.f, 0.f, GetSimpleCollisionHalfHeight());
+		const FVector SpawnLoc = Feet + GetActorForwardVector() * 120.f + FVector(0.f, 0.f, 10.f);
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.Owner = this;
+		SpawnParams.Instigator = this;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		if (GetWorld()->SpawnActor<AFloodlight>(AFloodlight::StaticClass(), SpawnLoc, GetActorRotation(), SpawnParams))
+		{
 			ConsumeCharge(Item);
 		}
 		break;

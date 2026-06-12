@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-"""Кладёт предмет «Растяжка» (ставит шумовую ловушку) на платформу спавна. §18.
+"""Кладёт ставимые предметы (растяжка, прожектор) на платформу спавна. §18.
 
-Запуск: UnrealEditor-Cmd.exe avariika.uproject -run=pythonscript -script="Scripts/setup_traps.py"
-Идемпотентен.
+Запуск: UnrealEditor-Cmd.exe avariika.uproject -run=pythonscript -script="D:\\unrealEngine\\avariika\\Scripts\\setup_traps.py"
+Путь к скрипту — АБСОЛЮТНЫЙ (относительный резолвится от папки движка). Идемпотентен.
 """
 import unreal
 
@@ -27,6 +27,19 @@ if 'TrapKit' not in by_label:
     out.append('TrapKit заспавнен')
 else:
     out.append('TrapKit уже стоит')
+
+if 'LightKit' not in by_label:
+    lamp = eas.spawn_actor_from_class(unreal.PickupItem, unreal.Vector(120.0, 180.0, 342.0), unreal.Rotator(0.0, 0.0, 0.0))
+    lamp.set_actor_label('LightKit')
+    lamp.set_actor_scale3d(unreal.Vector(0.14, 0.14, 0.18))
+    lamp.get_editor_property('MeshComponent').set_static_mesh(unreal.load_asset('/Engine/BasicShapes/Cube'))
+    lamp.set_editor_property('DisplayName', 'Прожектор')
+    lamp.set_editor_property('ItemEffect', unreal.ItemEffect.DEPLOY_LIGHT)
+    lamp.set_editor_property('ItemSize', unreal.ItemSize.LIGHT)
+    lamp.set_editor_property('Charges', 1)
+    out.append('LightKit заспавнен')
+else:
+    out.append('LightKit уже стоит')
 
 if not les.save_current_level():
     raise RuntimeError('Уровень не сохранился')

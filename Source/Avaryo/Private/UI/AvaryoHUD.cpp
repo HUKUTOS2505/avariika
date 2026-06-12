@@ -676,6 +676,10 @@ void AAvaryoHUD::DrawHUD()
 			{
 				Hint = TEXT("[ЛКМ] Метнуть комок (осторожно — зацепишь своих!)  •  [ПКМ] Передать");
 			}
+			else if (Held->ItemEffect == EItemEffect::DeployLight)
+			{
+				Hint = TEXT("[ЛКМ] Поставить прожектор (светит и успокаивает, но гудит)  •  [ПКМ] Передать");
+			}
 			else if (Held->ItemEffect != EItemEffect::None)
 			{
 				Hint = TEXT("[ЛКМ] Применить (держать)  •  [ПКМ] Передать");

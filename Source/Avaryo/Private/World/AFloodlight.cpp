@@ -1,0 +1,64 @@
+#include "World/AFloodlight.h"
+
+#include "AvaryoCharacter.h"
+#include "Components/PointLightComponent.h"
+#include "Components/StaticMeshComponent.h"
+#include "Components/VitalsComponent.h"
+#include "Engine/World.h"
+#include "EngineUtils.h"
+
+AFloodlight::AFloodlight()
+{
+	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.TickInterval = 0.25f; // успокоение и гул — не покадрово
+	bReplicates = true;
+
+	MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
+	SetRootComponent(MeshComponent);
+	MeshComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	MeshComponent->SetCollisionResponseToAllChannels(ECR_Ignore);
+
+	Light = CreateDefaultSubobject<UPointLightComponent>(TEXT("Light"));
+	Light->SetupAttachment(MeshComponent);
+	Light->SetRelativeLocation(FVector(0.f, 0.f, 90.f));
+	Light->SetUsingAbsoluteScale(true);
+	Light->SetLightColor(FColor(255, 240, 210)); // тёплый рабочий свет
+	Light->SetIntensity(12000.f);
+	Light->SetAttenuationRadius(1400.f);
+	Light->SetCastShadows(true);
+
+	CalmRadius = 700.f;
+	CalmPerSecond = 4.f;
+	NoiseInterval = 3.f;
+	NoiseLoudness = 0.5f;
+	NoiseAccum = 0.f;
+}
+
+void AFloodlight::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	if (!HasAuthority())
+	{
+		return;
+	}
+
+	// Свет успокаивает: всем монтёрам в радиусе тихо снимаем панику
+	const float CalmRadiusSq = FMath::Square(CalmRadius);
+	for (TActorIterator<AAvaryoCharacter> It(GetWorld()); It; ++It)
+	{
+		if (It->VitalsComponent
+			&& FVector::DistSquared(It->GetActorLocation(), GetActorLocation()) <= CalmRadiusSq)
+		{
+			It->VitalsComponent->ReducePanic(CalmPerSecond * DeltaSeconds);
+		}
+	}
+
+	// ...но гудит и выдаёт позицию — задел под монстра-слухача
+	NoiseAccum += DeltaSeconds;
+	if (NoiseAccum >= NoiseInterval)
+	{
+		NoiseAccum = 0.f;
+		MakeNoise(NoiseLoudness, nullptr, GetActorLocation());
+	}
+}
