@@ -129,6 +129,10 @@ public:
 	/** Щиток замкнуло после серии промахов. Только сервер. */
 	void NotifyShortCircuit(AAvaryoCharacter* Culprit);
 
+	/** Достался ли бригаде дешёвый комплект оборудования (косяки, §18). */
+	UFUNCTION(BlueprintPure, Category="Run")
+	bool HasCheapGear() const { return bCheapGear; }
+
 protected:
 	UPROPERTY(Replicated)
 	ERunPhase Phase;
@@ -149,6 +153,16 @@ protected:
 
 	/** Есть ли на карте зона выхода (если нет — побеждаем сразу после починок). */
 	bool bHasExitZone;
+
+	/** Дешёвый комплект на этот забег: фонари моргают, рация ловит чужой голос чаще. Реплицируется для HUD. */
+	UPROPERTY(Replicated)
+	bool bCheapGear;
+
+	/** Сервер: когда в эфир в следующий раз прорвётся чужой голос (только пока включена рация). */
+	float NextRadioGhostTime;
+
+	/** Сервер: фонарям каких монтёров уже выдали дешёвый статус (раздаём один раз). */
+	TSet<TWeakObjectPtr<AAvaryoCharacter>> CheapGearApplied;
 
 	/** Статистика всех монтёров (по мере появления персонажей). */
 	UPROPERTY(Replicated)
@@ -175,6 +189,12 @@ protected:
 
 	/** Сервер: паникующий монтёр сам кричит в рацию (и шумит — монстр оценит). */
 	void TickPanicCries(AAvaryoCharacter* Who, float Now);
+
+	/** Сервер: пока хоть одна рация включена, в эфир изредка прорывается чужой голос (паника + шум). */
+	void TickRadioInterference(float Now);
+
+	/** Сервер: выдать монтёру дешёвый фонарь, если на забег выпал дешёвый комплект (один раз). */
+	void ApplyCheapGear(AAvaryoCharacter* Who);
 
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastDispatcherSay(const FString& Speaker, const FString& Line);

@@ -41,6 +41,13 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Flashlight")
 	void Recharge(float Amount);
 
+	/** Пометить фонарь дешёвым: моргает даже при полном заряде. Только сервер. */
+	UFUNCTION(BlueprintCallable, Category="Flashlight")
+	void SetCheapUnit(bool bNewCheap);
+
+	UFUNCTION(BlueprintPure, Category="Flashlight")
+	bool IsCheapUnit() const { return bCheapUnit; }
+
 	UFUNCTION(BlueprintPure, Category="Flashlight")
 	bool IsOn() const { return bIsOn; }
 
@@ -75,7 +82,15 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Flashlight", meta=(ClampMin="0.0", ClampMax="1.0"))
 	float BlackoutChancePerSecond;
 
+	/** Вероятность короткого моргания в секунду у дешёвого фонаря при нормальном заряде. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Flashlight", meta=(ClampMin="0.0", ClampMax="1.0"))
+	float CheapGlitchChancePerSecond;
+
 protected:
+	/** Дешёвый комплект: моргает даже при полном заряде (косяк оборудования, §18). Реплицируется для клиентского мерцания. */
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadOnly, Category="Flashlight")
+	bool bCheapUnit;
+
 	/** Текущее состояние, реплицируется. */
 	UPROPERTY(ReplicatedUsing=OnRep_IsOn, BlueprintReadOnly, Category="Flashlight")
 	bool bIsOn;

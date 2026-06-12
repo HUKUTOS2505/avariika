@@ -1,12 +1,14 @@
 #include "Game/ARunState.h"
 
 #include "AvaryoCharacter.h"
+#include "Components/UFlashlightComponent.h"
 #include "Components/VitalsComponent.h"
 #include "Engine/World.h"
 #include "EngineUtils.h"
 #include "GameFramework/GameModeBase.h"
 #include "GameFramework/GameStateBase.h"
 #include "GameFramework/PlayerState.h"
+#include "Items/APickupItem.h"
 #include "Net/UnrealNetwork.h"
 #include "TimerManager.h"
 #include "World/AExitZone.h"
@@ -73,6 +75,23 @@ namespace DispatcherLines
 		TEXT("Что это был за звук?!"),
 		TEXT("Я домой хочу. Официально заявляю."),
 	};
+	// Чужой голос в эфире дешёвой рации (§18 «рация ловит чужой голос»): двусмысленно, жутко
+	const TArray<FString> RadioGhost = {
+		TEXT("...ш-ш-ш... за спиной... не оборачивайся..."),
+		TEXT("...я уже внутри... вы меня впустили..."),
+		TEXT("...слышу вас... иду на голос..."),
+		TEXT("...кто выключил свет... кто выключил све-е..."),
+		TEXT("...помогите... я застрял в подвале... с две тысячи третьего..."),
+		TEXT("...не туда чините... совсем не туда..."),
+		TEXT("...ещё один... нас тут уже семеро..."),
+		TEXT("...тёпленькие... приходите..."),
+	};
+	// Реплики начальника про выданный дешёвый комплект (§18 «дешёвое оборудование»)
+	const TArray<FString> CheapGearGreeting = {
+		TEXT("Да, и комплект вам выдали бюджетный — фонари с рынка, рация с помехами. Экономия, мужики."),
+		TEXT("Снаряга сегодня дешёвая: будет моргать и шипеть. Бухгалтерия так решила, не я."),
+		TEXT("Предупреждаю: оборудование уценённое. Глючит — это не монстр, это смета."),
+	};
 }
 
 ARunState::ARunState()
@@ -88,6 +107,8 @@ ARunState::ARunState()
 	RunEndServerTime = 0.f;
 	bHasExitZone = false;
 	NextChatterTime = 0.f;
+	bCheapGear = false;
+	NextRadioGhostTime = 0.f;
 }
 
 void ARunState::BeginPlay()
@@ -136,6 +157,9 @@ void ARunState::BeginPlay()
 		RunStartServerTime = GS->GetServerWorldTimeSeconds();
 	}
 
+	// Косяки оборудования (§18): иногда бригаде достаётся дешёвый комплект
+	bCheapGear = FMath::FRand() < 0.4f;
+
 	// Приветствие с задержкой: мультикаст в первый кадр клиенты ещё не получат
 	GetWorldTimerManager().SetTimer(GreetingTimer, this, &ARunState::SendGreeting, 6.f, false);
 }
@@ -150,6 +174,7 @@ void ARunState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetim
 	DOREPLIFETIME(ARunState, RunStartServerTime);
 	DOREPLIFETIME(ARunState, RunEndServerTime);
 	DOREPLIFETIME(ARunState, PlayerStats);
+	DOREPLIFETIME(ARunState, bCheapGear);
 }
 
 ARunState* ARunState::Get(UWorld* World)
@@ -202,6 +227,8 @@ void ARunState::Tick(float DeltaSeconds)
 			++NumWounded;
 		}
 
+		ApplyCheapGear(*It);
+
 		FPlayerRunStats& Stats = FindOrAddStats(*It);
 		if (Vitals->IsPanicking())
 		{
@@ -225,6 +252,9 @@ void ARunState::Tick(float DeltaSeconds)
 		}
 		Stats.bWasSoiled = Vitals->IsSoiled();
 	}
+
+	TickRadioInterference(Now);
+
 	if (NumPlayers > 0 && NumWounded == NumPlayers)
 	{
 		FinishRun(ERunPhase::Lost);
@@ -361,6 +391,10 @@ void ARunState::FinishRun(ERunPhase NewPhase)
 void ARunState::SendGreeting()
 {
 	DispatcherSay(DispatcherLines::Greeting, FString::FromInt(Objectives.Num()), /*bImportant=*/true);
+	if (bCheapGear)
+	{
+		DispatcherSay(DispatcherLines::CheapGearGreeting, FString(), /*bImportant=*/true);
+	}
 }
 
 void ARunState::DispatcherSay(const TArray<FString>& Pool, const FString& Param, bool bImportant, const FString& Speaker)
@@ -398,6 +432,70 @@ void ARunState::TickPanicCries(AAvaryoCharacter* Who, float Now)
 	DispatcherSay(DispatcherLines::PanicCries, FString(), /*bImportant=*/false,
 		CrewName(Who) + TEXT(" (паника)"));
 	Who->MakeNoise(0.6f, Who, Who->GetActorLocation()); // крик слышно — монстру понравится
+}
+
+void ARunState::TickRadioInterference(float Now)
+{
+	// Ищем включённую рацию: чужой голос лезет только в живой эфир
+	APickupItem* ActiveRadio = nullptr;
+	for (TActorIterator<APickupItem> It(GetWorld()); It; ++It)
+	{
+		if (It->ItemEffect == EItemEffect::Radio && It->IsToggledOn())
+		{
+			ActiveRadio = *It;
+			break;
+		}
+	}
+
+	if (!ActiveRadio)
+	{
+		NextRadioGhostTime = 0.f; // тумблер выключен — таймер сбрасываем
+		return;
+	}
+
+	// Рацию только что включили — заводим отсчёт (дешёвая ловит чужой голос заметно чаще)
+	if (NextRadioGhostTime <= 0.f)
+	{
+		NextRadioGhostTime = Now + (bCheapGear ? FMath::FRandRange(12.f, 25.f) : FMath::FRandRange(25.f, 50.f));
+		return;
+	}
+	if (Now < NextRadioGhostTime)
+	{
+		return;
+	}
+	NextRadioGhostTime = Now + (bCheapGear ? FMath::FRandRange(18.f, 35.f) : FMath::FRandRange(35.f, 70.f));
+
+	// Чужой голос прорывается в эфир — важная реплика, анти-спам её не глотает
+	DispatcherSay(DispatcherLines::RadioGhost, FString(), /*bImportant=*/true, TEXT("···помехи···"));
+
+	// Эфир шипит на всю округу — задел под монстра-слухача
+	ActiveRadio->MakeNoise(0.9f, Cast<APawn>(ActiveRadio->GetOwner()), ActiveRadio->GetActorLocation());
+
+	// Кто рядом с рацией — у того по спине пробегает холодок
+	const FVector RadioLoc = ActiveRadio->GetActorLocation();
+	for (TActorIterator<AAvaryoCharacter> It(GetWorld()); It; ++It)
+	{
+		if (UVitalsComponent* Vitals = It->VitalsComponent)
+		{
+			if (FVector::Dist(It->GetActorLocation(), RadioLoc) <= 900.f)
+			{
+				Vitals->AddPanic(8.f);
+			}
+		}
+	}
+}
+
+void ARunState::ApplyCheapGear(AAvaryoCharacter* Who)
+{
+	if (!bCheapGear || !Who || CheapGearApplied.Contains(Who))
+	{
+		return;
+	}
+	CheapGearApplied.Add(Who);
+	if (UFlashlightComponent* Flashlight = Who->FlashlightComponent)
+	{
+		Flashlight->SetCheapUnit(true); // дешёвый фонарь будет моргать и при полном заряде
+	}
 }
 
 void ARunState::MulticastDispatcherSay_Implementation(const FString& Speaker, const FString& Line)

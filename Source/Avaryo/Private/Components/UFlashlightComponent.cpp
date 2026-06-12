@@ -15,6 +15,8 @@ UFlashlightComponent::UFlashlightComponent()
 	DrainPerSecond = 0.5f;
 	LowBatteryThreshold = 15.f;
 	BlackoutChancePerSecond = 0.35f;
+	CheapGlitchChancePerSecond = 0.12f;
+	bCheapUnit = false;
 
 	DefaultIntensity = -1.f;
 	BlackoutTimeRemaining = 0.f;
@@ -74,6 +76,12 @@ void UFlashlightComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>&
 
 	DOREPLIFETIME(UFlashlightComponent, bIsOn);
 	DOREPLIFETIME(UFlashlightComponent, BatteryLevel);
+	DOREPLIFETIME(UFlashlightComponent, bCheapUnit);
+}
+
+void UFlashlightComponent::SetCheapUnit(bool bNewCheap)
+{
+	bCheapUnit = bNewCheap;
 }
 
 void UFlashlightComponent::TurnOn()
@@ -153,9 +161,27 @@ void UFlashlightComponent::UpdateFlicker(float DeltaTime)
 		return;
 	}
 
-	// Заряд в норме — горим ровно
+	// Заряд в норме
 	if (BatteryLevel >= LowBatteryThreshold)
 	{
+		// Дешёвый фонарь моргает и при полном заряде — но редко (косяк оборудования)
+		if (bCheapUnit)
+		{
+			if (BlackoutTimeRemaining > 0.f)
+			{
+				BlackoutTimeRemaining -= DeltaTime;
+				AttachedLight->SetIntensity(BlackoutTimeRemaining > 0.f ? 0.f : DefaultIntensity);
+				return;
+			}
+			if (FMath::FRand() < CheapGlitchChancePerSecond * DeltaTime)
+			{
+				BlackoutTimeRemaining = FMath::FRandRange(0.08f, 0.22f); // короткий «щёлк» темноты
+				AttachedLight->SetIntensity(0.f);
+				return;
+			}
+		}
+
+		// Иначе горим ровно
 		if (DefaultIntensity >= 0.f)
 		{
 			AttachedLight->SetIntensity(DefaultIntensity);
