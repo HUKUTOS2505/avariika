@@ -16,6 +16,9 @@ Build/
 Plugins/Claudius/Responses/
 Plugins/Claudius/claudius_request.json
 Plugins/Claudius/claudius_response.json
+Claudius/Responses/
+Claudius/claudius_request.json
+Claudius/claudius_response.json
 
 # Прочее
 *.tmp
