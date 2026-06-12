@@ -278,7 +278,14 @@ Greybox `L_Hospital` (каркас+комнаты+квест-акторы) по�
 - **TZ_Hospital_Map_UE5.md** оставлен как справочник по комнатам/пропсам/маршруту (§3-5) — переиспользуем при новом дизайне, если подойдёт.
 
 ### Безопасный импорт meshy-FBX (новый канон, без битой нормали)
-`Scripts/import_tester.py`: отключаем Interchange-FBX (`Interchange.FeatureFlags.Import.FBX 0`) → работает legacy-импортёр, который уважает `import_materials=False/import_textures=False` → **меш без авто-текстур и без проблемной meshy-нормали** (раньше mesh-only ломался в 0x0x0 именно из-за Interchange). Материал собираем из base color сами. Тестер так импортнулся: **0 орфанов** (против кучи Image_*/normal/Material_001 при полном импорте). Этот путь надо вшить в `meshy_import.py` для будущих моделей.
+`Scripts/import_tester.py`: отключаем Interchange-FBX (`Interchange.FeatureFlags.Import.FBX 0`) → работает legacy-импортёр, который уважает `import_materials=False/import_textures=False` → **меш без авто-текстур и без проблемной meshy-нормали** (раньше mesh-only ломался в 0x0x0 именно из-за Interchange). Материал собираем из base color сами. Тестер так импортнулся: **0 орфанов** (против кучи Image_*/normal/Material_001 при полном импорте).
+
+**Канонный импортёр: `Scripts/import_models_safe.py`** — `MAPPING` (папка → метка актора/None + max-dim), импортирует все модели из RawAssets, у которых есть .fbx и которых ещё нет в Meshes; legacy-путь, чистый материал, Nanite >20k, чистка орфанов, назначение на актор уровня по метке.
+- ⚠️ **FBX-импорт ТОЛЬКО в открытом редакторе** (через Claudius `editor.run_python_script`). Headless падает на Slate-assert `CurrentApplication.IsValid()` — проверено, даже legacy без Interchange. Спавн/правка/сейв акторов headless работают (`from_class`), а вот импорт FBX — нет.
+- **Стратегия:** C++-механики делаю с ЗАКРЫТым редактором (сборка), модели импортирую пачкой в открытом. Не дёргать редактор ради одной модели.
+
+### Модели — очередь импорта (2026-06-13)
+Пользователь грузит FBX в `RawAssets/`. Готов к импорту (есть .fbx, ещё не импортирован): **SM_GasPipe** (был частичный краш-импорт headless, ассеты подчищены). Папки без .fbx (ждут генерации): Generator, Gazelle, WeldingMachine, FireExtinguisher, FirstAidKit, Battery, Cigarettes, Radio, Fuse. Импортировать пачкой через `import_models_safe.py` в открытом редакторе, когда накопится несколько.
 
 ## Очередь модулей (дальше)
 
