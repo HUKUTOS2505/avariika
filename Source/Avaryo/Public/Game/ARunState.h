@@ -144,6 +144,9 @@ public:
 	/** Сработала растяжка-ловушка (§18). Только сервер. */
 	void NotifyTrapTriggered(AAvaryoCharacter* TriggeredBy);
 
+	/** Шлёпнул биологический снаряд (§15). TriggeredBy — прямая жертва или null. Только сервер. */
+	void NotifyBioSplat(AAvaryoCharacter* DirectHit);
+
 	/** Достался ли бригаде дешёвый комплект оборудования (косяки, §18). */
 	UFUNCTION(BlueprintPure, Category="Run")
 	bool HasCheapGear() const { return bCheapGear; }

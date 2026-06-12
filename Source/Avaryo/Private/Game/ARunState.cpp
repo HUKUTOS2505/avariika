@@ -10,6 +10,7 @@
 #include "GameFramework/GameModeBase.h"
 #include "GameFramework/GameStateBase.h"
 #include "GameFramework/PlayerState.h"
+#include "Items/ABioPickup.h"
 #include "Items/APickupItem.h"
 #include "Net/UnrealNetwork.h"
 #include "TimerManager.h"
@@ -87,6 +88,17 @@ namespace DispatcherLines
 		TEXT("...не туда чините... совсем не туда..."),
 		TEXT("...ещё один... нас тут уже семеро..."),
 		TEXT("...тёпленькие... приходите..."),
+	};
+	// Биологический снаряд (§15): прямое попадание в своего / падение мимо
+	const TArray<FString> BioHit = {
+		TEXT("{X} поймал биологический снаряд лицом. Бригада, я в восторге от уровня."),
+		TEXT("Прямое попадание в {X}. Это, конечно, в акт. С фотографией."),
+		TEXT("{X}, тебя только что... кхм. Соболезную. И штрафую — кого-нибудь."),
+	};
+	const TArray<FString> BioMiss = {
+		TEXT("Что-то шлёпнулось в темноте. Надеюсь, это была не еда."),
+		TEXT("Промах. Зато теперь там... ароматно. Монстр оценит."),
+		TEXT("Снаряд ушёл в молоко. Санитарной службе привет."),
 	};
 	// Амбре: монтёр провонял (§16 «запах»)
 	const TArray<FString> SmellJab = {
@@ -292,6 +304,12 @@ void ARunState::Tick(float DeltaSeconds)
 		{
 			++Stats.Incidents;
 			DispatcherSay(DispatcherLines::Incident, CrewName(*It), /*bImportant=*/true);
+
+			// Инцидент «произвёл» биологический снаряд — лежит у ног, кто рискнёт — подберёт (§15)
+			const FVector BioLoc = It->GetActorLocation() + It->GetActorForwardVector() * 60.f - FVector(0.f, 0.f, 40.f);
+			FActorSpawnParameters BioParams;
+			BioParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+			GetWorld()->SpawnActor<ABioPickup>(ABioPickup::StaticClass(), BioLoc, FRotator::ZeroRotator, BioParams);
 		}
 		Stats.bWasSoiled = Vitals->IsSoiled();
 
@@ -386,6 +404,22 @@ void ARunState::NotifyTrapTriggered(AAvaryoCharacter* TriggeredBy)
 	if (HasAuthority())
 	{
 		DispatcherSay(DispatcherLines::TrapTriggered, CrewName(TriggeredBy), /*bImportant=*/true);
+	}
+}
+
+void ARunState::NotifyBioSplat(AAvaryoCharacter* DirectHit)
+{
+	if (!HasAuthority())
+	{
+		return;
+	}
+	if (DirectHit)
+	{
+		DispatcherSay(DispatcherLines::BioHit, CrewName(DirectHit), /*bImportant=*/true);
+	}
+	else
+	{
+		DispatcherSay(DispatcherLines::BioMiss, FString(), /*bImportant=*/false);
 	}
 }
 

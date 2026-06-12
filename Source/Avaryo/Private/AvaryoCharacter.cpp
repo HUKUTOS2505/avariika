@@ -18,6 +18,7 @@
 #include "Items/APickupItem.h"
 #include "Net/UnrealNetwork.h"
 #include "UI/AvaryoCameraShakes.h"
+#include "World/ABioProjectile.h"
 #include "World/ARepairable.h"
 #include "World/AToilet.h"
 #include "World/ATrap.h"
@@ -894,6 +895,12 @@ void AAvaryoCharacter::PickupItem(APickupItem* Item)
 	ActiveSlot = TargetSlot; // взятый предмет сразу в руки
 	Item->SetOwner(this);
 	RefreshHeldItem();
+
+	// Голыми руками поднял «комок» — пропах сразу (концепт §15)
+	if (Item->ItemEffect == EItemEffect::ThrowBio && VitalsComponent)
+	{
+		VitalsComponent->AddSmell(40.f);
+	}
 }
 
 void AAvaryoCharacter::DropItem()
@@ -1040,6 +1047,7 @@ bool AAvaryoCharacter::CanApplyEffect(APickupItem* Item) const
 	case EItemEffect::Extinguish: return Item->Charges != 0;
 	case EItemEffect::Recharge:   return FlashlightComponent && FlashlightComponent->GetBatteryLevel() < 99.f;
 	case EItemEffect::DeployTrap: return Item->Charges != 0;
+	case EItemEffect::ThrowBio:   return Item->Charges != 0;
 	default:                      return false;
 	}
 }
@@ -1097,6 +1105,25 @@ void AAvaryoCharacter::ApplyItemEffect(APickupItem* Item)
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 		if (GetWorld()->SpawnActor<ATrap>(ATrap::StaticClass(), SpawnLoc, GetActorRotation(), SpawnParams))
 		{
+			ConsumeCharge(Item);
+		}
+		break;
+	}
+	case EItemEffect::ThrowBio:
+	{
+		// Метаем комок из камеры по направлению взгляда
+		FVector ViewLoc;
+		FRotator ViewRot;
+		GetActorEyesViewPoint(ViewLoc, ViewRot);
+		const FVector Dir = ViewRot.Vector();
+		const FVector SpawnLoc = ViewLoc + Dir * 80.f;
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.Owner = this;
+		SpawnParams.Instigator = this;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		if (ABioProjectile* Bio = GetWorld()->SpawnActor<ABioProjectile>(ABioProjectile::StaticClass(), SpawnLoc, ViewRot, SpawnParams))
+		{
+			Bio->Launch(Dir);
 			ConsumeCharge(Item);
 		}
 		break;
