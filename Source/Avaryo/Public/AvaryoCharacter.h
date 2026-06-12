@@ -380,6 +380,12 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Avaryo|Shove")
 	float ShoveFumbleChance; // шанс выбить тяжёлый предмет из рук толкнутого
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Avaryo|Shove")
+	float HeavyBonkChance;   // шанс уронить тяжёлое себе на ногу при фумбле
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Avaryo|Shove")
+	float HeavyBonkDamage;   // урон от удара по ноге
+
 	// ---------- Споткнуться (§18 хаос/хоррор) ----------
 	/** Спотыкается ли сейчас (реплицируется — клиент тоже сбрасывает скорость). */
 	UPROPERTY(Replicated)
@@ -492,6 +498,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Avaryo|Inventory")
 	float ThrowImpulseHeavy;  // сила броска тяжёлого (летит слабее)
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Avaryo|Inventory")
+	float ThrowMaxSpreadDeg;  // макс. разброс броска при полной панике, градусы
 	void CarryHeavyLowered(APickupItem* Item);
 	void StashItem(APickupItem* Item);
 

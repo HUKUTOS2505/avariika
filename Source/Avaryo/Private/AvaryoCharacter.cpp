@@ -85,9 +85,12 @@ AAvaryoCharacter::AAvaryoCharacter()
 	ShoveCooldownTime = 1.2f;
 	ShoveReadyTime = 0.f;
 	ShoveFumbleChance = 0.4f;
+	HeavyBonkChance = 0.3f;
+	HeavyBonkDamage = 5.f;
 
 	ThrowImpulseLight = 750.f;
 	ThrowImpulseHeavy = 350.f;
+	ThrowMaxSpreadDeg = 14.f;
 
 	bStumbling = false;
 	TripChancePerSecond = 0.03f;
@@ -1067,7 +1070,17 @@ void AAvaryoCharacter::ReleaseHeldItem(bool bThrown)
 	FVector ViewLoc;
 	FRotator ViewRot;
 	GetActorEyesViewPoint(ViewLoc, ViewRot);
-	const FVector AimDir = ViewRot.Vector();
+	FVector AimDir = ViewRot.Vector();
+
+	// Паника = трясущиеся руки: бросок уходит с разбросом
+	if (bThrown && VitalsComponent)
+	{
+		const float Spread01 = FMath::Clamp(VitalsComponent->GetPanic() / 100.f, 0.f, 1.f);
+		if (Spread01 > 0.f)
+		{
+			AimDir = FMath::VRandCone(AimDir, FMath::DegreesToRadians(ThrowMaxSpreadDeg * Spread01));
+		}
+	}
 
 	const float DropDistance = bHeavy ? 120.f : 150.f;
 	const FVector DropLocation = bThrown
@@ -1789,6 +1802,12 @@ void AAvaryoCharacter::FumbleHeavy()
 	{
 		ActiveSlot = 0;  // сделать тяжёлый активным и уронить через общий путь
 		DropItem();
+		if (FMath::FRand() < HeavyBonkChance)
+		{
+			// Уронил себе на ногу — больно и громко
+			TakeDamage(HeavyBonkDamage, FDamageEvent(), GetController(), this);
+			MakeNoise(0.6f, this, GetActorLocation());
+		}
 	}
 }
 

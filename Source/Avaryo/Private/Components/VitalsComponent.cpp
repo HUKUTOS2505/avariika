@@ -30,6 +30,8 @@ UVitalsComponent::UVitalsComponent()
 	PanicThreshold = 70.f;
 	FearContagionRadius = 400.f;
 	FearContagionPerSecond = 1.5f;
+	CoughInterval = 4.f;
+	CoughPanic = 1.f;
 
 	StaminaDrainPerSecond = 12.f;
 	StaminaHeavyMultiplier = 1.6f;
@@ -183,6 +185,22 @@ void UVitalsComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 				It->VitalsComponent->AddPanic(SmellTeammatePanicPerSecond * DeltaTime);
 			}
 		}
+	}
+
+	// Кашель: провонявшись газом/химией, монтёр кашляет — шум выдаёт позицию (задел под монстра)
+	if (IsSmelly())
+	{
+		CoughAccum += DeltaTime;
+		if (CoughAccum >= CoughInterval)
+		{
+			CoughAccum = 0.f;
+			Char->MakeNoise(0.5f, Char, Char->GetActorLocation());
+			AddPanic(CoughPanic);
+		}
+	}
+	else
+	{
+		CoughAccum = 0.f;
 	}
 
 	// Групповая паника (§18): паникёр заражает страхом соседей. Спокойный тиммейт рядом

@@ -202,7 +202,16 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Vitals|Smell")
 	float SmellRadius;
 
+	/** Как часто кашляешь, провонявшись (газ/химия/пот), сек. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Vitals|Smell")
+	float CoughInterval;
+
+	/** Паника за кашель (мелочь — но выдаёт шумом). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Vitals|Smell")
+	float CoughPanic;
+
 protected:
+	float CoughAccum = 0.f; // таймер кашля
 	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadOnly, Category="Vitals")
 	float Health;
 
