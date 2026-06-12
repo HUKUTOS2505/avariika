@@ -17,7 +17,7 @@ out = []
 
 # имя папки -> (куда ставить: 'actor:<label>' | 'bp:<путь BP>', целевой max-габарит см для level-актора или 0)
 MAPPING = {
-    'SM_Toilet':           ('actor:Toilet', 220.0),
+    'SM_Toilet':           ('actor:Toilet', 75.0),   # обычный унитаз (~75 см с бачком), НЕ кабинка
     'SM_Breaker':          ('actor:Repairable_Breaker', 160.0),
     'SM_GasPipe':          ('actor:Repairable_GasPipe', 240.0),
     'SM_Generator':        ('actor:Repairable_Generator', 160.0),

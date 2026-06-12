@@ -73,11 +73,13 @@
 
 **Пайплайн:** Text-to-3D → экспорт **FBX** с текстурами → положить файл в `D:\unrealEngine\avariika\RawAssets\<ИмяПапки>\` (имя папки строго из таблицы) → сказать Claude «импортируй модели» → он гоняет `Scripts/import_models.py` (закрытый редактор!): импорт в `/Game/Avariika/Meshes/`, автоназначение на акторы по меткам / в CDO BP-предметов, автомасштаб для объектов уровня.
 
+**СЕТТИНГ (важно для промптов):** первая карта — **условно больница** (старое лечебное/техническое здание), НЕ подвал-завод. Туалет = **обычный керамический унитаз** в больничном санузле, НЕ уличная кабинка-биотуалет. Остальные «индустриальные» пропсы (щиток/труба/генератор) ок как старое больничное хозяйство/подвал — если что-то выбьется из больничного тона, скажи, перепишу промпт.
+
 Промпты ниже финальные — копировать как есть (хвост `single object, centered, no ground plane, no scene` уже вшит).
 
 | Папка | Что | Промпт |
 |---|---|---|
-| `SM_Toilet` | Биотуалет (сиденье-куб → кабинка) | `Portable outdoor biotoilet cabin, blue plastic booth, slightly open door, dirty worn plastic with grime streaks, white roof, vent slots, low-poly game prop, PBR textures, game-ready, single object, centered, no ground plane, no scene` |
+| `SM_Toilet` | Унитаз (больничный санузел) | `White ceramic toilet with cistern tank and lid, hospital restroom style, slightly worn grimy porcelain, scuffed, low-poly game prop, PBR textures, game-ready, single object, centered, no ground plane, no scene` |
 | `SM_Breaker` | Электрощиток | `Industrial wall-mounted electrical breaker panel, open rusty metal door revealing fuses, wires and big switches, gray-green soviet industrial style, scorch marks, low-poly game prop, PBR, game-ready, single object, centered, no ground plane, no scene` |
 | `SM_Tester` | Тестер (инструмент щитка) | `Handheld digital multimeter, yellow rubber protective case, small LCD screen, rotary dial, red and black probe wires wrapped around body, worn used look, low-poly game prop, PBR, game-ready, single object, centered, no ground plane, no scene` |
 | `SM_GasPipe` | Газовая труба | `Vertical industrial gas pipe section with large red shut-off valve wheel, pressure gauge, yellow pipe paint peeling with rust, visible crack leaking, soviet factory style, low-poly game prop, PBR, game-ready, single object, centered, no ground plane, no scene` |
@@ -92,6 +94,8 @@
 | `SM_Fuse` | Предохранитель | `Ceramic electrical fuse plug, white ceramic body with metal cap and thread, small handle, vintage soviet fuse, low-poly game prop, PBR, game-ready, single object, centered, no ground plane, no scene` |
 
 Приоритет генерации: сперва модуль «Туалет + Щиток» — `SM_Toilet`, `SM_Breaker`, `SM_Tester`; потом крупняк (`SM_Gazelle`, `SM_Generator`, `SM_GasPipe`), потом мелочёвка.
+
+⚠️ После импорта унитаза (вместо высокого куба-«кабинки») в туалет-мини-игре, скорее всего, надо будет подправить точку посадки/разворота (`AToilet`/телепорт игрока на актор) и масштаб заглушки в `setup_items.py` (сейчас стоит `(0.9,0.9,2.2)` — под кабинку). Делаю это после того, как принесёшь модель и глянем в PIE.
 
 **Анимации (пользователь):** сидение на туалете, «тык щупами» у щитка, удар током (стан), волочение раненого, перекур. Когда будут файлы — обсудим скелет (UE5 Manny уже в проекте: `Content/Characters/Mannequins`) и подключим.
 
