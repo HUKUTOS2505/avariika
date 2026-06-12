@@ -284,7 +284,7 @@ void AAvaryoHUD::DrawHUD()
 
 			const float ReportW = FMath::Min(820.f, SizeX - 80.f);
 			const float ReportRowH = 26.f;
-			const float ReportH = 260.f + AllStats.Num() * ReportRowH * 2.f;
+			const float ReportH = 260.f + AllStats.Num() * ReportRowH * 3.f;
 			const float PX = (SizeX - ReportW) * 0.5f;
 			float PY = FMath::Max(40.f, (SizeY - ReportH) * 0.5f);
 
@@ -326,13 +326,18 @@ void AAvaryoHUD::DrawHUD()
 				const int32 Balance = ARunState::ComputePlayerBalance(S);
 
 				const FString Row1 = FString::Printf(TEXT("%s — «%s»"), *Name, *Title);
-				const FString Row2 = FString::Printf(TEXT("починки: %d   колхоз: %d   подъёмы: %d   эвакуации: %d   туалет: %d   ранения: %d   инциденты: %d   паника: %d с   вонял: %d с   итог: %s%d ₽"),
-					S.Repairs, S.BotchedRepairs, S.Revives, S.Drags, S.ToiletVisits, S.TimesWounded, S.Incidents,
-					FMath::RoundToInt(S.PanicSeconds), FMath::RoundToInt(S.SmellSeconds), Balance >= 0 ? TEXT("+") : TEXT(""), Balance);
+				// Длинную статистику делим на две строки, чтобы не вылезала за панель
+				const FString Row2 = FString::Printf(TEXT("починки: %d   колхоз: %d   подъёмы: %d   эвакуации: %d   туалет: %d"),
+					S.Repairs, S.BotchedRepairs, S.Revives, S.Drags, S.ToiletVisits);
+				const FString Row3 = FString::Printf(TEXT("ранения: %d   инциденты: %d   паника: %d с   вонял: %d с   итог: %s%d ₽"),
+					S.TimesWounded, S.Incidents, FMath::RoundToInt(S.PanicSeconds), FMath::RoundToInt(S.SmellSeconds),
+					Balance >= 0 ? TEXT("+") : TEXT(""), Balance);
 
 				DrawText(Row1, TextMain, PX + 28.f, TY, Font, 1.1f);
 				TY += ReportRowH;
-				DrawText(Row2, Balance >= 0 ? TextDim : FLinearColor(0.95f, 0.45f, 0.3f), PX + 28.f, TY, Font, 0.92f);
+				DrawText(Row2, TextDim, PX + 28.f, TY, Font, 0.92f);
+				TY += ReportRowH;
+				DrawText(Row3, Balance >= 0 ? TextDim : FLinearColor(0.95f, 0.45f, 0.3f), PX + 28.f, TY, Font, 0.92f);
 				TY += ReportRowH;
 			}
 
