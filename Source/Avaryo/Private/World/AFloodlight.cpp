@@ -6,6 +6,7 @@
 #include "Components/VitalsComponent.h"
 #include "Engine/World.h"
 #include "EngineUtils.h"
+#include "UObject/ConstructorHelpers.h"
 
 AFloodlight::AFloodlight()
 {
@@ -15,6 +16,12 @@ AFloodlight::AFloodlight()
 
 	MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 	SetRootComponent(MeshComponent);
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> CylinderMesh(TEXT("/Engine/BasicShapes/Cylinder.Cylinder"));
+	if (CylinderMesh.Succeeded())
+	{
+		MeshComponent->SetStaticMesh(CylinderMesh.Object); // видимая стойка-тренога
+	}
+	MeshComponent->SetRelativeScale3D(FVector(0.25f, 0.25f, 0.9f));
 	MeshComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	MeshComponent->SetCollisionResponseToAllChannels(ECR_Ignore);
 

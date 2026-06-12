@@ -11,6 +11,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 #include "UI/AvaryoCameraShakes.h"
+#include "UObject/ConstructorHelpers.h"
 
 ATrap::ATrap()
 {
@@ -20,6 +21,12 @@ ATrap::ATrap()
 
 	MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 	SetRootComponent(MeshComponent);
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> CubeMesh(TEXT("/Engine/BasicShapes/Cube.Cube"));
+	if (CubeMesh.Succeeded())
+	{
+		MeshComponent->SetStaticMesh(CubeMesh.Object); // видимая «банка» на полу
+	}
+	MeshComponent->SetRelativeScale3D(FVector(0.2f, 0.2f, 0.15f));
 	MeshComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	MeshComponent->SetCollisionResponseToAllChannels(ECR_Ignore);
 
