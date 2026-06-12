@@ -1735,16 +1735,19 @@ void AAvaryoCharacter::ServerShove_Implementation()
 
 void AAvaryoCharacter::FumbleHeavy()
 {
-	if (!HasAuthority() || !HeavySlot)
+	if (!HasAuthority() || CurrentRepairable || CurrentToilet)
 	{
-		return;
+		return; // в мини-игре ничего не выбиваем (DropItem там — выход из мини-игры)
 	}
-	if (CurrentRepairable || CurrentToilet)
+	if (DraggedTeammate)
 	{
-		return; // в мини-игре не выбиваем (DropItem там — выход из мини-игры)
+		ReleaseDraggedTeammate(); // от удара выпустил несомого раненого
 	}
-	ActiveSlot = 0;  // сделать тяжёлый активным и уронить через общий путь
-	DropItem();
+	if (HeavySlot)
+	{
+		ActiveSlot = 0;  // сделать тяжёлый активным и уронить через общий путь
+		DropItem();
+	}
 }
 
 
