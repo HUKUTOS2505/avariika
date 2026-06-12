@@ -39,6 +39,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Vitals")
 	void ReducePanic(float Amount);
 
+	/** Восстановить выносливость (кофе/термос). */
+	UFUNCTION(BlueprintCallable, Category="Vitals")
+	void RestoreStamina(float Amount);
+
 	UFUNCTION(BlueprintCallable, Category="Vitals")
 	void SetSprinting(bool bNewSprinting);
 

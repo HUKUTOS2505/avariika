@@ -50,6 +50,26 @@ void AAvaryoHUD::DrawHUD()
 	const float SizeX = Canvas->SizeX;
 	const float SizeY = Canvas->SizeY;
 
+	// ---------- Виньетка паники (хоррор-атмосфера, пульсирует как сердцебиение) ----------
+	if (Vitals && !Character->IsMonitorOpen())
+	{
+		const float P = Vitals->GetPanic();
+		if (P > 45.f)
+		{
+			const float Intensity = FMath::GetMappedRangeValueClamped(FVector2D(45.f, 100.f), FVector2D(0.f, 1.f), P);
+			const float Time = GetWorld() ? GetWorld()->GetTimeSeconds() : 0.f;
+			const float Beat = 0.6f + 0.4f * FMath::Sin(Time * (4.f + 6.f * Intensity)); // чем паничнее — тем чаще
+			const float A = 0.5f * Intensity * Beat;
+			const FLinearColor Edge(0.35f, 0.f, 0.f, A); // тёмно-красный (без фиолетового)
+			const float BandX = SizeX * 0.16f;
+			const float BandY = SizeY * 0.16f;
+			DrawRect(Edge, 0.f, 0.f, SizeX, BandY);           // верх
+			DrawRect(Edge, 0.f, SizeY - BandY, SizeX, BandY); // низ
+			DrawRect(Edge, 0.f, 0.f, BandX, SizeY);           // лево
+			DrawRect(Edge, SizeX - BandX, 0.f, BandX, SizeY); // право
+		}
+	}
+
 	// ---------- Монитор оператора (Tab в зоне ГАЗели) ----------
 	if (Character->IsMonitorOpen())
 	{

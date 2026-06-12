@@ -27,7 +27,8 @@ enum class EItemEffect : uint8
 	Radio		UMETA(DisplayName = "Рация (тумблер вкл/выкл, шумит)"),
 	DeployTrap	UMETA(DisplayName = "Ставит растяжку-шумелку"),
 	ThrowBio	UMETA(DisplayName = "Метает биологический снаряд"),
-	DeployLight	UMETA(DisplayName = "Ставит переносной прожектор")
+	DeployLight	UMETA(DisplayName = "Ставит переносной прожектор"),
+	Drink		UMETA(DisplayName = "Кофе/термос: восстанавливает выносливость")
 };
 
 /**

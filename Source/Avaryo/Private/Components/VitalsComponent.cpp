@@ -254,6 +254,11 @@ void UVitalsComponent::AddPanic(float Amount)
 	Panic = FMath::Clamp(Panic + Amount, 0.f, 100.f);
 }
 
+void UVitalsComponent::RestoreStamina(float Amount)
+{
+	Stamina = FMath::Clamp(Stamina + Amount, 0.f, 100.f);
+}
+
 void UVitalsComponent::ReducePanic(float Amount)
 {
 	Panic = FMath::Clamp(Panic - Amount, 0.f, 100.f);

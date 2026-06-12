@@ -1172,6 +1172,7 @@ bool AAvaryoCharacter::CanApplyEffect(APickupItem* Item) const
 	case EItemEffect::DeployTrap: return Item->Charges != 0;
 	case EItemEffect::ThrowBio:   return Item->Charges != 0;
 	case EItemEffect::DeployLight: return Item->Charges != 0;
+	case EItemEffect::Drink:      return VitalsComponent->GetStamina() < 99.f;
 	default:                      return false;
 	}
 }
@@ -1217,6 +1218,12 @@ void AAvaryoCharacter::ApplyItemEffect(APickupItem* Item)
 			FlashlightComponent->Recharge(Item->EffectMagnitude);
 			ConsumeCharge(Item);
 		}
+		break;
+	case EItemEffect::Drink:
+		// Кофе/термос: вернул выносливость и чуть успокоился
+		VitalsComponent->RestoreStamina(Item->EffectMagnitude > 0.f ? Item->EffectMagnitude : 60.f);
+		VitalsComponent->ReducePanic(5.f);
+		ConsumeCharge(Item);
 		break;
 	case EItemEffect::DeployTrap:
 	{
