@@ -46,9 +46,10 @@ struct FPlayerRunStats
 	bool bWasSoiled = false;
 };
 
-/** Реплика диспетчера, как её хранит клиент: текст + момент получения (HUD гасит по возрасту). */
+/** Реплика в эфире рации, как её хранит клиент: кто + текст + момент получения (HUD гасит по возрасту). */
 struct FDispatcherLine
 {
+	FString Speaker; // «ДИСПЕТЧЕР» или «Серёга (паника)»
 	FString Text;
 	float ReceivedAt = 0.f;
 };
@@ -165,11 +166,18 @@ protected:
 	/** Приветствие с задержкой: даём клиентам получить RunState, потом здороваемся. */
 	FTimerHandle GreetingTimer;
 
+	/** Сервер: когда кому из паникующих крикнуть в эфир в следующий раз. */
+	TMap<TWeakObjectPtr<AAvaryoCharacter>, float> NextPanicCryTime;
+
 	/** Сервер: случайная реплика из пула, «{X}» заменяется на Param, рассылка всем. */
-	void DispatcherSay(const TArray<FString>& Pool, const FString& Param = FString(), bool bImportant = false);
+	void DispatcherSay(const TArray<FString>& Pool, const FString& Param = FString(), bool bImportant = false,
+		const FString& Speaker = FString());
+
+	/** Сервер: паникующий монтёр сам кричит в рацию (и шумит — монстр оценит). */
+	void TickPanicCries(AAvaryoCharacter* Who, float Now);
 
 	UFUNCTION(NetMulticast, Reliable)
-	void MulticastDispatcherSay(const FString& Line);
+	void MulticastDispatcherSay(const FString& Speaker, const FString& Line);
 
 	/** Приветственная реплика по таймеру после старта смены. */
 	void SendGreeting();

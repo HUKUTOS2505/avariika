@@ -181,9 +181,6 @@ void AAvaryoHUD::DrawHUD()
 	if (ARunState* Run = ARunState::Get(GetWorld()))
 	{
 		const float Now = GetWorld()->GetTimeSeconds();
-		const FString Prefix = TEXT("ДИСПЕТЧЕР: ");
-		float PrefixW = 0.f, PrefixH = 0.f;
-		GetTextSize(Prefix, PrefixW, PrefixH, Font, 1.05f);
 
 		float LineY = 16.f;
 		for (const FDispatcherLine& Line : Run->GetDispatcherLines())
@@ -195,6 +192,9 @@ void AAvaryoHUD::DrawHUD()
 			}
 			const float Alpha = Age > 7.f ? 1.f - (Age - 7.f) / 2.f : 1.f; // последние 2 с тают
 
+			const FString Prefix = Line.Speaker + TEXT(": ");
+			float PrefixW = 0.f, PrefixH = 0.f;
+			GetTextSize(Prefix, PrefixW, PrefixH, Font, 1.05f);
 			float TextW = 0.f, TextH = 0.f;
 			GetTextSize(Line.Text, TextW, TextH, Font, 1.05f);
 			const float BoxW = PrefixW + TextW + 28.f;

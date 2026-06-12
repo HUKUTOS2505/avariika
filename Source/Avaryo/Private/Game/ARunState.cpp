@@ -63,6 +63,16 @@ namespace DispatcherLines
 		TEXT("Бригада, приём... Приём!.. Так. Высылаю вторую бригаду. За вами."),
 		TEXT("Вся бригада лежит. В акте напишу «технический перерыв». Длинный."),
 	};
+	// Крики паникующих монтёров (концепт §18): сами лезут в эфир и шумят
+	const TArray<FString> PanicCries = {
+		TEXT("Мужики, я не пойду туда!"),
+		TEXT("Я слышал шаги! Точно слышал!"),
+		TEXT("Мне надо в туалет... срочно..."),
+		TEXT("Кто-нибудь, посветите сюда!!"),
+		TEXT("Давайте быстрее, а?! Очень страшно!"),
+		TEXT("Что это был за звук?!"),
+		TEXT("Я домой хочу. Официально заявляю."),
+	};
 }
 
 ARunState::ARunState()
@@ -176,6 +186,7 @@ void ARunState::Tick(float DeltaSeconds)
 	}
 
 	// Статистика + поражение (вся бригада ранена — поднимать некому)
+	const float Now = GetWorld()->GetTimeSeconds();
 	int32 NumPlayers = 0;
 	int32 NumWounded = 0;
 	for (TActorIterator<AAvaryoCharacter> It(GetWorld()); It; ++It)
@@ -195,6 +206,11 @@ void ARunState::Tick(float DeltaSeconds)
 		if (Vitals->IsPanicking())
 		{
 			Stats.PanicSeconds += DeltaSeconds;
+			TickPanicCries(*It, Now);
+		}
+		else
+		{
+			NextPanicCryTime.Remove(*It); // успокоился — следующая паника заново отсчитает крик
 		}
 		if (Vitals->IsWounded() && !Stats.bWasWounded)
 		{
@@ -347,7 +363,7 @@ void ARunState::SendGreeting()
 	DispatcherSay(DispatcherLines::Greeting, FString::FromInt(Objectives.Num()), /*bImportant=*/true);
 }
 
-void ARunState::DispatcherSay(const TArray<FString>& Pool, const FString& Param, bool bImportant)
+void ARunState::DispatcherSay(const TArray<FString>& Pool, const FString& Param, bool bImportant, const FString& Speaker)
 {
 	if (!HasAuthority() || Pool.Num() == 0)
 	{
@@ -356,18 +372,38 @@ void ARunState::DispatcherSay(const TArray<FString>& Pool, const FString& Param,
 	const float Now = GetWorld()->GetTimeSeconds();
 	if (!bImportant && Now < NextChatterTime)
 	{
-		return; // диспетчер не тараторит — неважное глотаем
+		return; // эфир занят — неважное глотаем
 	}
 	NextChatterTime = Now + 6.f;
 
 	FString Line = Pool[FMath::RandRange(0, Pool.Num() - 1)];
 	Line.ReplaceInline(TEXT("{X}"), *Param);
-	MulticastDispatcherSay(Line);
+	MulticastDispatcherSay(Speaker.IsEmpty() ? TEXT("ДИСПЕТЧЕР") : Speaker, Line);
 }
 
-void ARunState::MulticastDispatcherSay_Implementation(const FString& Line)
+void ARunState::TickPanicCries(AAvaryoCharacter* Who, float Now)
+{
+	float& CryAt = NextPanicCryTime.FindOrAdd(Who);
+	if (CryAt <= 0.f)
+	{
+		CryAt = Now + FMath::FRandRange(4.f, 10.f); // паника началась — крик зреет
+		return;
+	}
+	if (Now < CryAt)
+	{
+		return;
+	}
+	CryAt = Now + FMath::FRandRange(12.f, 25.f);
+
+	DispatcherSay(DispatcherLines::PanicCries, FString(), /*bImportant=*/false,
+		CrewName(Who) + TEXT(" (паника)"));
+	Who->MakeNoise(0.6f, Who, Who->GetActorLocation()); // крик слышно — монстру понравится
+}
+
+void ARunState::MulticastDispatcherSay_Implementation(const FString& Speaker, const FString& Line)
 {
 	FDispatcherLine& Entry = DispatcherLines.AddDefaulted_GetRef();
+	Entry.Speaker = Speaker;
 	Entry.Text = Line;
 	Entry.ReceivedAt = GetWorld()->GetTimeSeconds();
 	while (DispatcherLines.Num() > 3) // на экране держим максимум три плашки
