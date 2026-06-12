@@ -665,6 +665,10 @@ void AAvaryoHUD::DrawHUD()
 					? TEXT("[ЛКМ] Выключить рацию — она шумит!")
 					: TEXT("[ЛКМ] Включить рацию  •  [ПКМ] Передать");
 			}
+			else if (Held->ItemEffect == EItemEffect::DeployTrap)
+			{
+				Hint = TEXT("[ЛКМ] Поставить растяжку (взведётся через пару секунд!)  •  [ПКМ] Передать");
+			}
 			else if (Held->ItemEffect != EItemEffect::None)
 			{
 				Hint = TEXT("[ЛКМ] Применить (держать)  •  [ПКМ] Передать");

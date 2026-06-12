@@ -20,6 +20,7 @@
 #include "UI/AvaryoCameraShakes.h"
 #include "World/ARepairable.h"
 #include "World/AToilet.h"
+#include "World/ATrap.h"
 
 AAvaryoCharacter::AAvaryoCharacter()
 {
@@ -1038,6 +1039,7 @@ bool AAvaryoCharacter::CanApplyEffect(APickupItem* Item) const
 	case EItemEffect::Calm:       return VitalsComponent->GetPanic() > 1.f;
 	case EItemEffect::Extinguish: return Item->Charges != 0;
 	case EItemEffect::Recharge:   return FlashlightComponent && FlashlightComponent->GetBatteryLevel() < 99.f;
+	case EItemEffect::DeployTrap: return Item->Charges != 0;
 	default:                      return false;
 	}
 }
@@ -1084,6 +1086,21 @@ void AAvaryoCharacter::ApplyItemEffect(APickupItem* Item)
 			ConsumeCharge(Item);
 		}
 		break;
+	case EItemEffect::DeployTrap:
+	{
+		// Ставим растяжку у ног, чуть впереди — взведётся через пару секунд
+		const FVector Feet = GetActorLocation() - FVector(0.f, 0.f, GetSimpleCollisionHalfHeight());
+		const FVector SpawnLoc = Feet + GetActorForwardVector() * 120.f + FVector(0.f, 0.f, 10.f);
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.Owner = this;
+		SpawnParams.Instigator = this;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		if (GetWorld()->SpawnActor<ATrap>(ATrap::StaticClass(), SpawnLoc, GetActorRotation(), SpawnParams))
+		{
+			ConsumeCharge(Item);
+		}
+		break;
+	}
 	default:
 		break;
 	}

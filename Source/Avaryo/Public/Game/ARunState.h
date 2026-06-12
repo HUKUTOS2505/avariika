@@ -135,6 +135,9 @@ public:
 	/** Щиток замкнуло после серии промахов. Только сервер. */
 	void NotifyShortCircuit(AAvaryoCharacter* Culprit);
 
+	/** Сработала растяжка-ловушка (§18). Только сервер. */
+	void NotifyTrapTriggered(AAvaryoCharacter* TriggeredBy);
+
 	/** Достался ли бригаде дешёвый комплект оборудования (косяки, §18). */
 	UFUNCTION(BlueprintPure, Category="Run")
 	bool HasCheapGear() const { return bCheapGear; }

@@ -88,6 +88,13 @@ namespace DispatcherLines
 		TEXT("...ещё один... нас тут уже семеро..."),
 		TEXT("...тёпленькие... приходите..."),
 	};
+	// Сработавшая растяжка (§18 «предметы-ловушки» — часто бьёт по своим)
+	const TArray<FString> TrapTriggered = {
+		TEXT("Это что за грохот?! {X}, ты что, в свою же растяжку влетел?"),
+		TEXT("Растяжка сработала. {X}, ловушки — для монстра, а не для бригады."),
+		TEXT("Бах! {X}, надеюсь, хоть штаны сухие. Хотя у нас и на это есть графа."),
+		TEXT("Шумелка отработала на отлично. Вся карта в курсе, где вы. Молодцы."),
+	};
 	// Колхозный ремонт без инструмента (§18 «не тот инструмент»)
 	const TArray<FString> BotchRepair = {
 		TEXT("{X}, это не ремонт, это художественная самодеятельность. Но раз держится — молчу."),
@@ -355,6 +362,14 @@ void ARunState::NotifyShortCircuit(AAvaryoCharacter* Culprit)
 	if (HasAuthority())
 	{
 		DispatcherSay(DispatcherLines::ShortCircuit, CrewName(Culprit), /*bImportant=*/true);
+	}
+}
+
+void ARunState::NotifyTrapTriggered(AAvaryoCharacter* TriggeredBy)
+{
+	if (HasAuthority())
+	{
+		DispatcherSay(DispatcherLines::TrapTriggered, CrewName(TriggeredBy), /*bImportant=*/true);
 	}
 }
 

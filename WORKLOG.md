@@ -135,12 +135,25 @@
 
 ### Чек-лист теста — TESTING.md, раздел «НОВОЕ — Не тот инструмент» (2026-06-12).
 
+## МОДУЛЬ «Предметы-ловушки» (§18) — КОД ГОТОВ 2026-06-12
+
+### Статус: собран, setup-скрипт прогнан, уровень сохранён, смоук чистый. НЕ проверен пользователем в PIE.
+
+Ставимая растяжка-шумелка (концепт §18 «предметы-ловушки», «может сработать против команды»):
+- **Новый актор `ATrap`** (`World/ATrap.{h,cpp}`): меш-куб + триггер-сфера + индикатор-лампа. После `ArmDelay` (2 с) взводится (`bArmed` реплицируется → лампа мигает оранжевым). Сервер перебором ищет любого `AAvaryoCharacter` в `TriggerRadius` (250 см) — при попадании срабатывает: `MakeNoise(1.5)`, +25 паники всем в радиусе ×1.5, `MulticastFlash` (белая вспышка + `UExplosionCameraShake`), реплика диспетчера, самоуничтожение через 0.3 с. Поставивший защищён `PlacerGraceTime` (3 с) после взвода — успевает отойти; дальше подрывает и своих.
+- **Новый эффект предмета** `EItemEffect::DeployTrap`: в `ApplyItemEffect`/`CanApplyEffect` спавнит `ATrap` у ног чуть впереди (instigator = ставящий) и тратит заряд. Мгновенный (UseCastTime 0).
+- **Предмет «Растяжка»** (`TrapKit`, лёгкий, `DeployTrap`, Charges=2) — на платформе спавна `(120,120,342)`, скрипт `Scripts/setup_traps.py` (идемпотентный, уровень сохранён).
+- **HUD**: подсказка «[ЛКМ] Поставить растяжку (взведётся через пару секунд!)»; диспетчер язвит из пула `TrapTriggered` (`ARunState::NotifyTrapTriggered`).
+- ⚠️ Headless-скрипты надо запускать с **абсолютным** путём к .py (`-script="D:\...\Scripts\x.py"`) — относительный резолвится от папки движка и не находится.
+
+### Чек-лист теста — TESTING.md, раздел «НОВОЕ — Предметы-ловушки» (2026-06-12).
+
 ## Очередь модулей (дальше)
 
-1. **Фиксы по фидбеку пользователя** из PIE-теста модулей (мини-игры, диспетчер, косяки оборудования, касса/репутация, колхоз).
+1. **Фиксы по фидбеку пользователя** из PIE-теста модулей (мини-игры, диспетчер, косяки оборудования, касса/репутация, колхоз, ловушки).
 2. **Модели и вид**: импорт meshy-моделей на все заглушки (когда пользователь сгенерит), материалы.
 3. **Анимации** (пользователь даёт файлы — подключаем AnimBP headless).
-4. Ещё асет-фри из концепта при желании: §15-16 запах/грязь/биоснаряд, §18 предметы-ловушки.
+4. Ещё асет-фри из концепта при желании: §15-16 запах/грязь/биоснаряд; §18 другие ловушки (датчик движения, прожектор, лужа пены, подпорка под дверь).
 5. **Монстр-слухач** — ТОЛЬКО по отмашке.
 
 ## Техсправка
@@ -148,5 +161,5 @@
 - Движок: UE 5.7, проект `D:\unrealEngine\avariika\avariika.uproject`, модуль C++ `Avaryo` (+ зависимость EngineCameras).
 - Структура: `Source/Avaryo/{AvaryoCharacter, Components/{Vitals,UFlashlight}, Items/APickupItem, World/{ARepairable,AExitZone,AToilet}, Game/ARunState, UI/{AvaryoHUD,AvaryoCameraShakes}}`.
 - Уровень `Content/FirstPerson/Lvl_FirstPerson`: PlayerStart на платформе (0,0,~300), пол z=-15 (±2000), объекты по меткам: Repairable_Breaker (1200,-1320), Repairable_GasPipe (1700,150), Repairable_Generator (-1200,1250), ExitZone_Gazelle (-250,0), Toilet (-1650,-1550), Radio/Tester/лут.
-- Скрипты: place_run_objects, setup_items, setup_minigames, night_atmosphere, scatter_loot, import_models (модели из RawAssets/), inspect_level (дамп акторов в Saved/level_actors.txt). Результаты скриптов пишутся в Saved/*.txt.
+- Скрипты: place_run_objects, setup_items, setup_minigames, setup_traps (растяжка), night_atmosphere, scatter_loot, import_models (модели из RawAssets/), inspect_level (дамп акторов в Saved/level_actors.txt). Результаты скриптов пишутся в Saved/*.txt. **Запускать с абсолютным путём:** `-script="D:\unrealEngine\avariika\Scripts\<имя>.py"`.
 - Полные механики и управление — README.md; тест-чек-листы — TESTING.md.

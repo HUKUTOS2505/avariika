@@ -24,7 +24,8 @@ enum class EItemEffect : uint8
 	Calm		UMETA(DisplayName = "Снижает панику"),
 	Extinguish	UMETA(DisplayName = "Огнетушитель (распыление, пока зажата кнопка)"),
 	Recharge	UMETA(DisplayName = "Заряжает налобный фонарь"),
-	Radio		UMETA(DisplayName = "Рация (тумблер вкл/выкл, шумит)")
+	Radio		UMETA(DisplayName = "Рация (тумблер вкл/выкл, шумит)"),
+	DeployTrap	UMETA(DisplayName = "Ставит растяжку-шумелку")
 };
 
 /**
