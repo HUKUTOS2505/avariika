@@ -25,6 +25,10 @@
 		{
 			"Name": "Claudius",
 			"Enabled": true
+		},
+		{
+			"Name": "meshy",
+			"Enabled": true
 		}
 	]
 }

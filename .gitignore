@@ -29,9 +29,18 @@ RawAssets/**/*.png
 RawAssets/**/*.zip
 RawAssets/**/*.glb
 RawAssets/**/*.obj
+RawAssets/**/*.jpg
+RawAssets/**/*.jpeg
+RawAssets/**/*.fbm/
 
 # Python-кэш
 Scripts/__pycache__/
+
+# Локальные плагины-инструменты (Claudius/meshy) — тяжёлые, не игровой контент
+Plugins/
+
+# Временные отладочные скрипты (префикс _)
+Scripts/_*.py
 
 # Прочее
 *.tmp
