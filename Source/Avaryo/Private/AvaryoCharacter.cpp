@@ -1497,6 +1497,13 @@ void AAvaryoCharacter::UpdateFoamSlip()
 	{
 		bSlipping = bOverFoam;        // реплицируется -> OnRep_Slipping на клиентах
 		ApplySlipFriction(bSlipping); // и сразу применяем на сервере
+		if (bSlipping)
+		{
+			if (ARunState* Run = ARunState::Get(GetWorld()))
+			{
+				Run->NotifySlipped(this); // диспетчер прокомментирует (неважная — анти-спам глотает)
+			}
+		}
 	}
 }
 
@@ -1569,6 +1576,10 @@ void AAvaryoCharacter::UpdateTrip(float DeltaSeconds)
 		bStumbling = true;
 		StumbleUntil = Now + TripRecoverTime;
 		MakeNoise(0.7f, this, GetActorLocation()); // грохнулся — слышно
+		if (ARunState* Run = ARunState::Get(GetWorld()))
+		{
+			Run->NotifyTripped(this);
+		}
 	}
 }
 
@@ -1639,6 +1650,10 @@ void AAvaryoCharacter::ServerShove_Implementation()
 	if (Target->VitalsComponent)
 	{
 		Target->VitalsComponent->AddPanic(ShovePanic);
+	}
+	if (ARunState* Run = ARunState::Get(GetWorld()))
+	{
+		Run->NotifyShoved(Target);
 	}
 }
 

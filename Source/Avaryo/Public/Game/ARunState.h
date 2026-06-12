@@ -147,6 +147,15 @@ public:
 	/** Шлёпнул биологический снаряд (§15). TriggeredBy — прямая жертва или null. Только сервер. */
 	void NotifyBioSplat(AAvaryoCharacter* DirectHit);
 
+	/** Поскользнулся на пене (§18). Who — поскользнувшийся. Только сервер. */
+	void NotifySlipped(AAvaryoCharacter* Who);
+
+	/** Толкнули товарища (§18). Victim — кого толкнули. Только сервер. */
+	void NotifyShoved(AAvaryoCharacter* Victim);
+
+	/** Споткнулся на бегу (§18). Who — споткнувшийся. Только сервер. */
+	void NotifyTripped(AAvaryoCharacter* Who);
+
 	/** Достался ли бригаде дешёвый комплект оборудования (косяки, §18). */
 	UFUNCTION(BlueprintPure, Category="Run")
 	bool HasCheapGear() const { return bCheapGear; }

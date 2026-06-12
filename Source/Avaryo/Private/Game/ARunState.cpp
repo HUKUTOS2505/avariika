@@ -120,6 +120,24 @@ namespace DispatcherLines
 		TEXT("{X} закрыл объект без инструмента. Гарантия — до выхода из подъезда."),
 		TEXT("Принято от {X}. Колхоз, но работает. Премию урежу за стиль."),
 	};
+	// Скользкая пена (§18): кто-то поехал по разлитой пене
+	const TArray<FString> SlipFoam = {
+		TEXT("{X} поехал по пене. Это огнетушитель, а не каток, мужики."),
+		TEXT("Опять кто-то катается. Кто залил пол — с того и химчистка."),
+		TEXT("{X} красиво проскользил. На акт не тянет, но я заценил."),
+	};
+	// Толчок (§18 кооп-хаос): прилетело от своих
+	const TArray<FString> Shoved = {
+		TEXT("Кто там толкается?! Бригада, мы вроде одна команда."),
+		TEXT("{X} словил плечо от своих же. Запишу как «производственная гимнастика»."),
+		TEXT("Толкотня на смене. {X}, держись от коллег подальше — целее будешь."),
+	};
+	// Споткнулся (§18): навернулся на бегу
+	const TArray<FString> Tripped = {
+		TEXT("{X}, под ноги смотри! Хотя тут темно, как у меня в премии."),
+		TEXT("Кто-то навернулся. Пол подлый, не спорю."),
+		TEXT("{X} собрал все провода разом. Изящно, но в акт."),
+	};
 	// Реплики начальника про выданный дешёвый комплект (§18 «дешёвое оборудование»)
 	const TArray<FString> CheapGearGreeting = {
 		TEXT("Да, и комплект вам выдали бюджетный — фонари с рынка, рация с помехами. Экономия, мужики."),
@@ -420,6 +438,30 @@ void ARunState::NotifyBioSplat(AAvaryoCharacter* DirectHit)
 	else
 	{
 		DispatcherSay(DispatcherLines::BioMiss, FString(), /*bImportant=*/false);
+	}
+}
+
+void ARunState::NotifySlipped(AAvaryoCharacter* Who)
+{
+	if (HasAuthority())
+	{
+		DispatcherSay(DispatcherLines::SlipFoam, CrewName(Who), /*bImportant=*/false);
+	}
+}
+
+void ARunState::NotifyShoved(AAvaryoCharacter* Victim)
+{
+	if (HasAuthority())
+	{
+		DispatcherSay(DispatcherLines::Shoved, CrewName(Victim), /*bImportant=*/false);
+	}
+}
+
+void ARunState::NotifyTripped(AAvaryoCharacter* Who)
+{
+	if (HasAuthority())
+	{
+		DispatcherSay(DispatcherLines::Tripped, CrewName(Who), /*bImportant=*/false);
 	}
 }
 
