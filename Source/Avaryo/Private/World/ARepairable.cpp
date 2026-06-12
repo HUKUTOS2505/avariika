@@ -58,6 +58,7 @@ ARepairable::ARepairable()
 	HitsToRepair = 4;
 	MinigameCursorSpeed = 0.9f;
 	MinigameGreenHalfWidth = 0.07f;
+	PanicHardenScale = 0.6f;
 	ShockDamage = 15.f;
 	ShockAoEDamage = 25.f;
 	MissesBeforeLockout = 3;
@@ -166,7 +167,7 @@ void ARepairable::Tick(float DeltaSeconds)
 		else if (MinigameType == ERepairMinigameType::Cursor)
 		{
 			// Мини-игра: курсор бегает, прогресс растёт только попаданиями (TryHitBy)
-			CursorPhase += DeltaSeconds * MinigameCursorSpeed * MinigameSpeedMult;
+			CursorPhase += DeltaSeconds * MinigameCursorSpeed * MinigameSpeedMult * (1.f + PanicHardenScale * RepairerPanic01());
 			const float Saw = FMath::Fmod(CursorPhase, 2.f);
 			CursorPos = Saw <= 1.f ? Saw : 2.f - Saw;
 		}
@@ -375,6 +376,15 @@ void ARepairable::EndRepairBy(AAvaryoCharacter* Who)
 	}
 }
 
+float ARepairable::RepairerPanic01() const
+{
+	if (Repairer && Repairer->VitalsComponent)
+	{
+		return FMath::Clamp(Repairer->VitalsComponent->GetPanic() / 100.f, 0.f, 1.f);
+	}
+	return 0.f;
+}
+
 void ARepairable::TryHitBy(AAvaryoCharacter* Who)
 {
 	if (!HasAuthority() || Repairer != Who || !Who)
@@ -404,7 +414,8 @@ void ARepairable::TryHitBy(AAvaryoCharacter* Who)
 		return;
 	}
 
-	if (FMath::Abs(CursorPos - GreenCenter) <= MinigameGreenHalfWidth)
+	const float EffGreenHalf = FMath::Max(MinigameGreenHalfWidth * (1.f - 0.5f * PanicHardenScale * RepairerPanic01()), 0.02f);
+	if (FMath::Abs(CursorPos - GreenCenter) <= EffGreenHalf)
 	{
 		// Попадание: ещё один контакт прозвонен
 		RepairProgress = FMath::Min(RepairProgress + 1.f / FMath::Max(HitsToRepair, 1), 1.f);
@@ -456,7 +467,10 @@ void ARepairable::TryReleaseBy(AAvaryoCharacter* Who)
 		return; // едва взялся и отпустил — просто перехват, без наказания
 	}
 
-	if (Tension >= StarterWindowStart && Tension <= StarterWindowEnd)
+	// Паника сужает окно рывка к центру (трясущиеся руки)
+	const float WinCenter = (StarterWindowStart + StarterWindowEnd) * 0.5f;
+	const float WinHalf = (StarterWindowEnd - StarterWindowStart) * 0.5f * (1.f - 0.5f * PanicHardenScale * RepairerPanic01());
+	if (Tension >= WinCenter - WinHalf && Tension <= WinCenter + WinHalf)
 	{
 		// Рывок удался: движок чихнул и провернулся
 		RepairProgress = FMath::Min(RepairProgress + 1.f / FMath::Max(StarterPullsToFix, 1), 1.f);

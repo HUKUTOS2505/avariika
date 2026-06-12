@@ -101,6 +101,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Repair|Minigame")
 	float MinigameGreenHalfWidth;
 
+	/** Насколько паника ремонтника усложняет мини-игру (0 — не влияет). */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Repair|Minigame")
+	float PanicHardenScale;
+
 	/** Урон током за промах (ремонтнику). */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Repair|Minigame")
 	float ShockDamage;
@@ -232,6 +236,9 @@ public:
 	/** Сломать объект (рандомизация поломок на старте забега, аварии). Только сервер. */
 	UFUNCTION(BlueprintCallable, Category="Repair")
 	void SetBroken(bool bNewBroken);
+
+	/** Паника ремонтника 0..1 (трясущиеся руки усложняют мини-игру). */
+	float RepairerPanic01() const;
 
 protected:
 	/** Сломан ли. Выставляется в редакторе/скриптом; чинится игроками. */
