@@ -133,6 +133,19 @@ public:
 	UFUNCTION(BlueprintPure, Category="Run")
 	bool HasCheapGear() const { return bCheapGear; }
 
+	// ---------- Бухгалтерия конторы (§19, переживает смены через UCompanyLedgerSubsystem) ----------
+
+	/** Премии/штрафы одного монтёра за смену — единая формула для сервера и HUD. */
+	static int32 ComputePlayerBalance(const FPlayerRunStats& S);
+
+	UFUNCTION(BlueprintPure, Category="Run") int32 GetShiftNumber() const { return ShiftNumber; }
+	UFUNCTION(BlueprintPure, Category="Run") int32 GetCompanyBalanceStart() const { return CompanyBalanceStart; }
+	UFUNCTION(BlueprintPure, Category="Run") int32 GetShiftNet() const { return ShiftNet; }
+	UFUNCTION(BlueprintPure, Category="Run") int32 GetReputation() const { return Reputation; }
+
+	/** Название репутационного статуса конторы по очкам. */
+	static FString ReputationTitle(int32 Points);
+
 protected:
 	UPROPERTY(Replicated)
 	ERunPhase Phase;
@@ -157,6 +170,21 @@ protected:
 	/** Дешёвый комплект на этот забег: фонари моргают, рация ловит чужой голос чаще. Реплицируется для HUD. */
 	UPROPERTY(Replicated)
 	bool bCheapGear;
+
+	/** Номер смены и баланс конторы на её начало (прочитаны из леджера в BeginPlay). Реплицируются для «Акта». */
+	UPROPERTY(Replicated)
+	int32 ShiftNumber;
+
+	UPROPERTY(Replicated)
+	int32 CompanyBalanceStart;
+
+	/** Очки репутации конторы на начало смены. */
+	UPROPERTY(Replicated)
+	int32 Reputation;
+
+	/** Итог смены (сумма по бригаде), считается на финише. Реплицируется для «Акта». */
+	UPROPERTY(Replicated)
+	int32 ShiftNet;
 
 	/** Сервер: когда в эфир в следующий раз прорвётся чужой голос (только пока включена рация). */
 	float NextRadioGhostTime;

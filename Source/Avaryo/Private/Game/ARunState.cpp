@@ -3,7 +3,9 @@
 #include "AvaryoCharacter.h"
 #include "Components/UFlashlightComponent.h"
 #include "Components/VitalsComponent.h"
+#include "Engine/GameInstance.h"
 #include "Engine/World.h"
+#include "Game/CompanyLedgerSubsystem.h"
 #include "EngineUtils.h"
 #include "GameFramework/GameModeBase.h"
 #include "GameFramework/GameStateBase.h"
@@ -109,6 +111,10 @@ ARunState::ARunState()
 	NextChatterTime = 0.f;
 	bCheapGear = false;
 	NextRadioGhostTime = 0.f;
+	ShiftNumber = 1;
+	CompanyBalanceStart = 0;
+	Reputation = 0;
+	ShiftNet = 0;
 }
 
 void ARunState::BeginPlay()
@@ -157,8 +163,21 @@ void ARunState::BeginPlay()
 		RunStartServerTime = GS->GetServerWorldTimeSeconds();
 	}
 
-	// Косяки оборудования (§18): иногда бригаде достаётся дешёвый комплект
-	bCheapGear = FMath::FRand() < 0.4f;
+	// Бухгалтерия конторы (§19): подтягиваем баланс/смену/репутацию из леджера, переживающего рестарт
+	if (const UGameInstance* GI = GetWorld()->GetGameInstance())
+	{
+		if (const UCompanyLedgerSubsystem* Ledger = GI->GetSubsystem<UCompanyLedgerSubsystem>())
+		{
+			ShiftNumber = Ledger->GetShiftNumber();
+			CompanyBalanceStart = Ledger->GetBalance();
+			Reputation = Ledger->GetReputation();
+		}
+	}
+
+	// Косяки оборудования (§18): шанс дешёвого комплекта зависит от репутации
+	// (хорошая контора реже получает рыночный хлам, плохая — чаще).
+	const float CheapChance = FMath::Clamp(0.4f - 0.03f * Reputation, 0.1f, 0.7f);
+	bCheapGear = FMath::FRand() < CheapChance;
 
 	// Приветствие с задержкой: мультикаст в первый кадр клиенты ещё не получат
 	GetWorldTimerManager().SetTimer(GreetingTimer, this, &ARunState::SendGreeting, 6.f, false);
@@ -175,6 +194,10 @@ void ARunState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetim
 	DOREPLIFETIME(ARunState, RunEndServerTime);
 	DOREPLIFETIME(ARunState, PlayerStats);
 	DOREPLIFETIME(ARunState, bCheapGear);
+	DOREPLIFETIME(ARunState, ShiftNumber);
+	DOREPLIFETIME(ARunState, CompanyBalanceStart);
+	DOREPLIFETIME(ARunState, Reputation);
+	DOREPLIFETIME(ARunState, ShiftNet);
 }
 
 ARunState* ARunState::Get(UWorld* World)
@@ -382,8 +405,39 @@ void ARunState::FinishRun(ERunPhase NewPhase)
 	{
 		RunEndServerTime = GS->GetServerWorldTimeSeconds();
 	}
-	DispatcherSay(NewPhase == ERunPhase::Won ? DispatcherLines::Victory : DispatcherLines::Defeat,
+
+	// Бухгалтерия (§19): сумма по бригаде → итог смены, фиксируем в леджере на следующую смену
+	ShiftNet = 0;
+	for (const FPlayerRunStats& S : PlayerStats)
+	{
+		ShiftNet += ComputePlayerBalance(S);
+	}
+	const bool bWon = NewPhase == ERunPhase::Won;
+	if (UGameInstance* GI = GetWorld()->GetGameInstance())
+	{
+		if (UCompanyLedgerSubsystem* Ledger = GI->GetSubsystem<UCompanyLedgerSubsystem>())
+		{
+			Ledger->CommitShift(ShiftNet, bWon);
+		}
+	}
+
+	DispatcherSay(bWon ? DispatcherLines::Victory : DispatcherLines::Defeat,
 		FString(), /*bImportant=*/true);
+}
+
+int32 ARunState::ComputePlayerBalance(const FPlayerRunStats& S)
+{
+	return S.Repairs * 1500 + S.Revives * 1000 + S.Drags * 500 + S.ToiletVisits * 300
+		- S.TimesWounded * 1000 - S.Incidents * 2000 - FMath::RoundToInt(S.PanicSeconds) * 10;
+}
+
+FString ARunState::ReputationTitle(int32 Points)
+{
+	if (Points >= 6)  return TEXT("Контора на хорошем счету");
+	if (Points >= 2)  return TEXT("Репутация так себе, но берут");
+	if (Points >= -1) return TEXT("Серая контора без лица");
+	if (Points >= -5) return TEXT("Жалоб больше, чем заявок");
+	return TEXT("На грани отзыва лицензии");
 }
 
 // ---------- Диспетчер ----------

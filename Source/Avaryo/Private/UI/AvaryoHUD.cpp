@@ -281,7 +281,7 @@ void AAvaryoHUD::DrawHUD()
 
 			const float ReportW = FMath::Min(820.f, SizeX - 80.f);
 			const float ReportRowH = 26.f;
-			const float ReportH = 200.f + AllStats.Num() * ReportRowH * 2.f;
+			const float ReportH = 260.f + AllStats.Num() * ReportRowH * 2.f;
 			const float PX = (SizeX - ReportW) * 0.5f;
 			float PY = FMath::Max(40.f, (SizeY - ReportH) * 0.5f);
 
@@ -289,13 +289,13 @@ void AAvaryoHUD::DrawHUD()
 			DrawRect(Accent, PX, PY, ReportW, 4.f);
 
 			float TY = PY + 18.f;
-			TY += DrawCentered(TEXT("АКТ ВЫПОЛНЕННЫХ РАБОТ № 001"), Accent, TY, 1.6f) + 6.f;
+			TY += DrawCentered(FString::Printf(TEXT("АКТ ВЫПОЛНЕННЫХ РАБОТ № %03d"), Run->GetShiftNumber()),
+				Accent, TY, 1.6f) + 6.f;
 			TY += DrawCentered(bWon
 				? FString::Printf(TEXT("Объект сдан. Время: %02d:%02d. Заказчик недоволен, но подписал."), Elapsed / 60, Elapsed % 60)
 				: TEXT("Объект НЕ сдан: вся бригада выведена из строя. Акт подписан задним числом."),
 				bWon ? FLinearColor(0.3f, 0.9f, 0.3f) : FLinearColor(0.95f, 0.25f, 0.25f), TY, 1.1f) + 14.f;
 
-			int32 CrewTotal = 0;
 			int32 PlayerIndex = 0;
 			for (const FPlayerRunStats& S : AllStats)
 			{
@@ -317,10 +317,8 @@ void AAvaryoHUD::DrawHUD()
 				else if (S.PanicSeconds > 1.f && S.PanicSeconds >= MaxPanic) Title = TEXT("Паникёр смены");
 				else                                                   Title = TEXT("Просто присутствовал");
 
-				// Бухгалтерия: премии и штрафы
-				const int32 Balance = S.Repairs * 1500 + S.Revives * 1000 + S.Drags * 500 + S.ToiletVisits * 300
-					- S.TimesWounded * 1000 - S.Incidents * 2000 - FMath::RoundToInt(S.PanicSeconds) * 10;
-				CrewTotal += Balance;
+				// Бухгалтерия: премии и штрафы (единая формула с сервером)
+				const int32 Balance = ARunState::ComputePlayerBalance(S);
 
 				const FString Row1 = FString::Printf(TEXT("%s — «%s»"), *Name, *Title);
 				const FString Row2 = FString::Printf(TEXT("починки: %d   подъёмы: %d   эвакуации: %d   туалет: %d   ранения: %d   инциденты: %d   паника: %d сек   итог: %s%d ₽"),
@@ -334,10 +332,25 @@ void AAvaryoHUD::DrawHUD()
 			}
 
 			TY += 8.f;
-			const FString TotalLine = CrewTotal >= 0
-				? FString::Printf(TEXT("Итого к выплате бригаде: +%d ₽"), CrewTotal)
-				: FString::Printf(TEXT("Итого: %d ₽ — вычтем из следующей смены"), CrewTotal);
-			TY += DrawCentered(TotalLine, CrewTotal >= 0 ? FLinearColor(0.3f, 0.9f, 0.3f) : FLinearColor(0.95f, 0.45f, 0.3f), TY, 1.25f) + 10.f;
+			const int32 ShiftNet = Run->GetShiftNet();
+			const FLinearColor PosC(0.3f, 0.9f, 0.3f);
+			const FLinearColor NegC(0.95f, 0.45f, 0.3f);
+
+			const FString TotalLine = ShiftNet >= 0
+				? FString::Printf(TEXT("Итог смены: +%d ₽"), ShiftNet)
+				: FString::Printf(TEXT("Итог смены: %d ₽ (в минус)"), ShiftNet);
+			TY += DrawCentered(TotalLine, ShiftNet >= 0 ? PosC : NegC, TY, 1.25f) + 6.f;
+
+			// Баланс конторы: было → стало (§19, копится между сменами)
+			const int32 BalBefore = Run->GetCompanyBalanceStart();
+			const int32 BalAfter = BalBefore + ShiftNet;
+			const FString BalLine = FString::Printf(TEXT("Касса конторы: %d ₽  →  %d ₽"), BalBefore, BalAfter);
+			TY += DrawCentered(BalLine, BalAfter >= 0 ? TextMain : NegC, TY, 1.1f) + 4.f;
+
+			// Репутация конторы — влияет на качество выдаваемого комплекта в следующих сменах
+			const FString RepLine = FString::Printf(TEXT("Репутация: %s"), *ARunState::ReputationTitle(Run->GetReputation()));
+			TY += DrawCentered(RepLine, TextDim, TY, 1.0f) + 10.f;
+
 			DrawCentered(TEXT("[R] Следующая смена"), TextDim, TY, 1.05f);
 		}
 		else if (Run->AreAllObjectivesComplete() && Run->GetTotalObjectives() > 0)
