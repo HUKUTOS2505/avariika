@@ -112,6 +112,9 @@ public:
 	/** Заблокировать/освободить движение и камеру на время мини-игры. Только сервер. */
 	void SetInteractionLocked(bool bNewLocked);
 
+	/** Выронить тяжёлый предмет из рук (толчок/взрыв вышибает сварочник). Только сервер. */
+	void FumbleHeavy();
+
 	/** Повернуть камеру владельца (сесть спиной в туалет). */
 	UFUNCTION(Client, Reliable)
 	void ClientSetControlYaw(float NewYaw);
@@ -361,6 +364,9 @@ protected:
 
 	float ShoveReadyTime;    // серверное время, когда снова можно толкать
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Avaryo|Shove")
+	float ShoveFumbleChance; // шанс выбить тяжёлый предмет из рук толкнутого
+
 	// ---------- Споткнуться (§18 хаос/хоррор) ----------
 	/** Спотыкается ли сейчас (реплицируется — клиент тоже сбрасывает скорость). */
 	UPROPERTY(Replicated)
@@ -380,6 +386,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Avaryo|Trip")
 	float TripSlowSpeed;       // скорость во время спотыкания
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Avaryo|Trip")
+	float TripFumbleChance;    // шанс выронить активный лёгкий предмет при спотыкании
 
 	float StumbleUntil;        // серверное время конца спотыкания
 

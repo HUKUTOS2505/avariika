@@ -84,6 +84,7 @@ AAvaryoCharacter::AAvaryoCharacter()
 	ShovePanic = 10.f;
 	ShoveCooldownTime = 1.2f;
 	ShoveReadyTime = 0.f;
+	ShoveFumbleChance = 0.4f;
 
 	bStumbling = false;
 	TripChancePerSecond = 0.03f;
@@ -91,6 +92,7 @@ AAvaryoCharacter::AAvaryoCharacter()
 	TripPanicMultiplier = 1.5f;
 	TripRecoverTime = 0.8f;
 	TripSlowSpeed = 150.f;
+	TripFumbleChance = 0.5f;
 	StumbleUntil = 0.f;
 	UseCastRemaining = 0.f;
 	UseCastDuration = 0.f;
@@ -1580,6 +1582,14 @@ void AAvaryoCharacter::UpdateTrip(float DeltaSeconds)
 		{
 			Run->NotifyTripped(this);
 		}
+		// При падении можно выронить активный ЛЁГКИЙ предмет (тяжёлый не трогаем — он и так роняется при ранении)
+		APickupItem* Held = GetHeldItem();
+		if (Held && Held->ItemSize == EItemSize::Light
+			&& !CurrentRepairable && !CurrentToilet
+			&& FMath::FRand() < TripFumbleChance)
+		{
+			DropItem(); // выронил из рук — катится по полу
+		}
 	}
 }
 
@@ -1655,6 +1665,24 @@ void AAvaryoCharacter::ServerShove_Implementation()
 	{
 		Run->NotifyShoved(Target);
 	}
+	if (FMath::FRand() < ShoveFumbleChance)
+	{
+		Target->FumbleHeavy(); // от толчка можно выронить сварочник
+	}
+}
+
+void AAvaryoCharacter::FumbleHeavy()
+{
+	if (!HasAuthority() || !HeavySlot)
+	{
+		return;
+	}
+	if (CurrentRepairable || CurrentToilet)
+	{
+		return; // в мини-игре не выбиваем (DropItem там — выход из мини-игры)
+	}
+	ActiveSlot = 0;  // сделать тяжёлый активным и уронить через общий путь
+	DropItem();
 }
 
 

@@ -587,6 +587,7 @@ void ARepairable::ExplodeGas(AAvaryoCharacter* Culprit)
 			&& FVector::DistSquared(It->GetActorLocation(), GetActorLocation()) <= FMath::Square(GasRadius * 1.5f))
 		{
 			It->VitalsComponent->AddPanic(30.f);
+			It->FumbleHeavy(); // взрывом вышибает сварочник из рук
 		}
 	}
 
