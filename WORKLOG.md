@@ -224,12 +224,32 @@ DCC-мост meshy (`Plugins/meshy`) **крашит** импорт на текс
 
 **Импортирован первый ассет: унитаз (`SM_Toilet`)** — 10k тр, ~75 см, назначен на актор `Toilet` (scale 1.0), в `main`. Сейчас стоит с ПРОСТЫМ материалом (BasicShapeMaterial), без текстур — потому что meshy-нормаль импортируется битой и роняет рендер («Texture not valid! NormalMap»). **Следующий шаг по унитазу:** собрать чистый материал из base color (`Image_0`), без проблемной нормали, и назначить на меш.
 
+**Щиток (`SM_Breaker`) — импортирован 2026-06-13**, новая модель пользователя (775k тр). Чистый материал `M_SM_Breaker` (base color `SM_Breaker_BaseColor`, без нормали), **Nanite включён** (775k → GPU-децимация, дешёвый). Назначен на `Repairable_Breaker` в `Lvl_FirstPerson`, в `main`. Орфанные авто-ассеты от FBX (normal/Image_2/Image_3/Material_001/texture_0) удалены — meshy-нормаль (29 МБ) роняла build текстур (assert `Layers.Num()==NumLayers`) при открытии редактора. **Урок:** FBX-импорт с текстурами всё равно плодит битую нормаль; удалять её сразу после импорта, до открытия редактора.
+
 ### Грабли импорта (важно для всех будущих моделей)
 - **Headless-импорт FBX падает** (UE5.7 Interchange дёргает Content Browser → Slate assert в commandlet). Импортировать только в **открытом редакторе** через Claudius `editor.run_python_script` (Slate есть).
 - **`les.load_level()` внутри открытого редактора** плодит отдельный мир — правки туда не сохраняются. Менять акторы надо в УЖЕ открытом уровне (см. `Scripts/assign_toilet.py`), без load_level.
 - **OFPA/World Partition**: акторы — внешние пакеты; `save_current_level()` их НЕ пишет. Нужен `EditorLoadingAndSavingUtils.save_dirty_packages(True, True)` (вшито в `import_models.py`).
 - **meshy normal map**: приходит битой/sRGB; рендер крашится. `import_models.py` пытается чинить (TC_NORMALMAP), но надёжнее строить материал из base color без нормали. Тяжёлые меши (>20k тр) импортёр сам ставит в Nanite.
 - Тяжёлые исходники (`RawAssets/*.fbx/*.png`) в git НЕ коммитим (gitignore); коммитим только `/Game/Avariika/Meshes/*` + изменения уровня.
+
+## КАРТА «Больница» (L_Hospital) — TZ_Hospital_Map_UE5.md, в работе с 2026-06-12
+
+Уровень `Content/Hospital/Maps/L_Hospital` — **обычный (не World Partition)**, строится греybox-проходами. Скрипты headless (редактор открывать НЕ нужно, см. ниже).
+
+### Сделано
+- **Проход 1+2 (каркас + вертикали)** — `Scripts/build_hospital_greybox.py`: перекрытия Б/1/2/3/крыша, наружные стены + проём главного входа (ось 6), стены коридора с дверными проёмами по модулю 6 м, проёмы в перекрытиях под ЛК-А/ЛК-Б/лифт, рампы-лестницы между этажами, стены шахты лифта, парапет, PlayerStart.
+- **Проход 3 (комнаты)** — `Scripts/build_hospital_rooms.py`: 64 поперечные перегородки делят южную/северную полосы на 6-м комнаты на всех 4 этажах. Доступ в комнаты — через дверные проёмы в стенах коридора (сплошные перегородки, софтлока нет). **Адаптации к ТЗ:** 12-м комнаты (морг, котельная, вестибюль, столовая, венткамера, операционная, реанимация, кабинет главврача) пока две 6-м ячейки; внутрикомнатные двери (вестибюль↔гардероб и т.п.) — на проход детализации.
+- **Свет** — рабочий дневной (для видимости; ночь по §7 — отдельный проход). Movable Directional 100000 lux + atmosphere sun + realtime SkyLight 3 + SkyAtmosphere + Fog. Вшито в `build_hospital_greybox.py` (раньше солнце было 3 lux → чёрный экран). На сегодня уровень = каркас + комнаты + дневной свет, 200 акторов, GB_Sun=100000.
+
+### Важно: greybox теперь EDITOR-FREE
+`spawn_actor_from_object(mesh, ...)` **падает headless** (EXCEPTION_ACCESS_VIOLATION в EditorFramework). Замена: `spawn_actor_from_class(StaticMeshActor) → static_mesh_component.set_static_mesh(CUBE)` — работает в commandlet. Оба скрипта карты переведены на это; запуск: `UnrealEditor-Cmd <uproj> -run=pythonscript -script="<абс путь>" -unattended -nullrhi -nosound`. `les.load_level` + spawn(from_class) + `save_current_level` headless проходят на обычном уровне.
+
+### СЛЕДУЮЩИЙ ШАГ по карте
+1. **Квест-акторы в L_Hospital** (route §5 проходим): починить позицию PlayerStart (сейчас улетел на 3 этаж 3960,1030,810 — должен быть у входа/ГАЗели), ГАЗель+AExitZone у входа (ось 6 юг), ARepairable генератор (генераторная, подвал 9-10 С), щиток ГРЩ (подвал 8-9 С), газовая труба (газовый узел, подвал 4-5 С), пикапы (тестер/сварочник/предохранители/канистра/ключи) в мастерской и т.д. Аналог `place_run_objects.py`/`setup_minigames.py`, но координаты больницы.
+2. Пропсы по §4 (модели meshy на заглушки).
+3. Ночной свет §7 (3 фазы), дождь Niagara.
+4. BP_QuestManager (стейт-машина §5), BP_Door с замками §6, ключи.
 
 ## Очередь модулей (дальше)
 

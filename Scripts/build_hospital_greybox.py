@@ -57,8 +57,10 @@ out.append('удалено GB_: %d' % n)
 
 
 def box(name, cx, cy, cz, sx, sy, sz, roll=0.0):
-    a = eas.spawn_actor_from_object(CUBE, unreal.Vector(cx, cy, cz), unreal.Rotator(0.0, 0.0, roll))
+    # from_class + set_mesh работает headless; spawn_actor_from_object падает (EditorFramework AV).
+    a = eas.spawn_actor_from_class(unreal.StaticMeshActor, unreal.Vector(cx, cy, cz), unreal.Rotator(0.0, 0.0, roll))
     a.set_actor_label(name)
+    a.static_mesh_component.set_static_mesh(CUBE)
     a.set_actor_scale3d(unreal.Vector(sx / 100.0, sy / 100.0, sz / 100.0))
     return a
 
@@ -156,16 +158,34 @@ box('GB_ParE', LEN_X - EXT / 2, DEP_Y / 2, pz, EXT, DEP_Y, 90.0)
 ps = eas.spawn_actor_from_class(unreal.PlayerStart, unreal.Vector(ENTR_X, -250.0, 100.0), unreal.Rotator(0.0, 90.0, 0.0))
 ps.set_actor_label('GB_PlayerStart')
 
-# Свет (если ещё нет) — для просмотра
-have = {a.get_actor_label() for a in eas.get_all_level_actors()}
-if 'GB_Sun' not in have:
-    d = eas.spawn_actor_from_class(unreal.DirectionalLight, unreal.Vector(0, 0, 2200), unreal.Rotator(-50, 30, 0))
-    d.set_actor_label('GB_Sun')
-    lc = d.get_component_by_class(unreal.DirectionalLightComponent)
-    if lc:
-        lc.set_intensity(3.0)
-    s = eas.spawn_actor_from_class(unreal.SkyLight, unreal.Vector(0, 0, 1800)); s.set_actor_label('GB_Sky')
-    atm = eas.spawn_actor_from_class(unreal.SkyAtmosphere, unreal.Vector(0, 0, 0)); atm.set_actor_label('GB_Atmo')
+# Свет — рабочий дневной (видимость greybox; ночь по ТЗ §7 — отдельный проход).
+# Movable-солнце 100000 lux + atmosphere sun + realtime SkyLight: без запекания,
+# PIE сразу светлый. Значения проверены (иначе чёрный экран). Пересобираем всегда.
+MOV = unreal.ComponentMobility.MOVABLE
+for a in list(eas.get_all_level_actors()):
+    if a.get_actor_label() in ('GB_Sun', 'GB_Sky', 'GB_Atmo', 'GB_Fog'):
+        eas.destroy_actor(a)
+sun = eas.spawn_actor_from_class(unreal.DirectionalLight, unreal.Vector(0, 0, 2200), unreal.Rotator(-45, -45, 0))
+sun.set_actor_label('GB_Sun')
+sc = sun.get_component_by_class(unreal.DirectionalLightComponent)
+sc.set_mobility(MOV)
+sc.set_intensity(100000.0)
+for p in ('atmosphere_sun_light', 'used_as_atmosphere_sun_light'):
+    try:
+        sc.set_editor_property(p, True)
+    except Exception:
+        pass
+sky = eas.spawn_actor_from_class(unreal.SkyLight, unreal.Vector(0, 0, 1800))
+sky.set_actor_label('GB_Sky')
+skc = sky.get_component_by_class(unreal.SkyLightComponent)
+skc.set_mobility(MOV)
+try:
+    skc.set_editor_property('real_time_capture', True)
+except Exception:
+    pass
+skc.set_intensity(3.0)
+eas.spawn_actor_from_class(unreal.SkyAtmosphere, unreal.Vector(0, 0, 0)).set_actor_label('GB_Atmo')
+eas.spawn_actor_from_class(unreal.ExponentialHeightFog, unreal.Vector(0, 0, 0)).set_actor_label('GB_Fog')
 
 les.save_current_level()
 unreal.EditorLoadingAndSavingUtils.save_dirty_packages(True, True)
