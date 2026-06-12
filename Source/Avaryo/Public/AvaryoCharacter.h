@@ -119,6 +119,9 @@ public:
 	/** Выронить тяжёлый предмет из рук (толчок/взрыв вышибает сварочник). Только сервер. */
 	void FumbleHeavy();
 
+	/** Скользит ли сейчас по пене (для «Акта» и т.п.). */
+	bool IsSlipping() const { return bSlipping; }
+
 	/** Повернуть камеру владельца (сесть спиной в туалет). */
 	UFUNCTION(Client, Reliable)
 	void ClientSetControlYaw(float NewYaw);

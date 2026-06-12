@@ -44,6 +44,15 @@ struct FPlayerRunStats
 	UPROPERTY(BlueprintReadOnly, Category="Run")
 	float SmellSeconds = 0.f;   // времени «воняет» (§16)
 
+	UPROPERTY(BlueprintReadOnly, Category="Run")
+	int32 ShovedOthers = 0;     // сколько раз толкнул товарищей (§18)
+
+	UPROPERTY(BlueprintReadOnly, Category="Run")
+	int32 TimesTripped = 0;     // сколько раз споткнулся (§18)
+
+	UPROPERTY(BlueprintReadOnly, Category="Run")
+	float SlipSeconds = 0.f;    // времени катался по пене (§18)
+
 	// Для детекции переходов на серверном тике (реплицируются заодно — безвредно)
 	UPROPERTY()
 	bool bWasWounded = false;
@@ -123,6 +132,12 @@ public:
 
 	/** Схватился тащить раненого. Только сервер. */
 	void AddDrag(AAvaryoCharacter* Who);
+
+	/** Толкнул товарища (§18). Только сервер. */
+	void AddShove(AAvaryoCharacter* Who);
+
+	/** Споткнулся на бегу (§18). Только сервер. */
+	void AddTrip(AAvaryoCharacter* Who);
 
 	/** Дошёл до биотуалета. Только сервер. */
 	void AddToiletVisit(AAvaryoCharacter* Who);

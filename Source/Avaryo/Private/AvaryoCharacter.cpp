@@ -1623,6 +1623,7 @@ void AAvaryoCharacter::UpdateTrip(float DeltaSeconds)
 		if (ARunState* Run = ARunState::Get(GetWorld()))
 		{
 			Run->NotifyTripped(this);
+			Run->AddTrip(this); // счётчик «споткнулся» — в «Акт»
 		}
 		// При падении можно выронить активный ЛЁГКИЙ предмет (тяжёлый не трогаем — он и так роняется при ранении)
 		APickupItem* Held = GetHeldItem();
@@ -1706,6 +1707,7 @@ void AAvaryoCharacter::ServerShove_Implementation()
 	if (ARunState* Run = ARunState::Get(GetWorld()))
 	{
 		Run->NotifyShoved(Target);
+		Run->AddShove(this); // счётчик «толкнул» — в «Акт»
 	}
 	if (FMath::FRand() < ShoveFumbleChance)
 	{

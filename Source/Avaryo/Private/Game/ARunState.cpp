@@ -349,6 +349,11 @@ void ARunState::Tick(float DeltaSeconds)
 			}
 		}
 		Stats.bWasSmelly = Vitals->IsSmelly();
+
+		if (It->IsSlipping())
+		{
+			Stats.SlipSeconds += DeltaSeconds; // катается по пене
+		}
 	}
 
 	TickRadioInterference(Now);
@@ -435,6 +440,22 @@ void ARunState::AddDrag(AAvaryoCharacter* Who)
 	if (HasAuthority() && Who)
 	{
 		++FindOrAddStats(Who).Drags;
+	}
+}
+
+void ARunState::AddShove(AAvaryoCharacter* Who)
+{
+	if (HasAuthority() && Who)
+	{
+		++FindOrAddStats(Who).ShovedOthers;
+	}
+}
+
+void ARunState::AddTrip(AAvaryoCharacter* Who)
+{
+	if (HasAuthority() && Who)
+	{
+		++FindOrAddStats(Who).TimesTripped;
 	}
 }
 

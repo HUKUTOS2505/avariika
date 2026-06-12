@@ -270,6 +270,7 @@ void AAvaryoHUD::DrawHUD()
 
 			// Максимумы для раздачи званий
 			int32 MaxRepairs = 0, MaxWounded = 0, MaxRevives = 0, MaxDrags = 0, MaxBotched = 0;
+			int32 MaxShoved = 0, MaxTripped = 0;
 			float MaxPanic = 0.f, MaxSmell = 0.f;
 			for (const FPlayerRunStats& S : AllStats)
 			{
@@ -278,13 +279,15 @@ void AAvaryoHUD::DrawHUD()
 				MaxRevives = FMath::Max(MaxRevives, S.Revives);
 				MaxDrags   = FMath::Max(MaxDrags,   S.Drags);
 				MaxBotched = FMath::Max(MaxBotched, S.BotchedRepairs);
+				MaxShoved  = FMath::Max(MaxShoved,  S.ShovedOthers);
+				MaxTripped = FMath::Max(MaxTripped, S.TimesTripped);
 				MaxPanic   = FMath::Max(MaxPanic,   S.PanicSeconds);
 				MaxSmell   = FMath::Max(MaxSmell,   S.SmellSeconds);
 			}
 
 			const float ReportW = FMath::Min(820.f, SizeX - 80.f);
 			const float ReportRowH = 26.f;
-			const float ReportH = 260.f + AllStats.Num() * ReportRowH * 3.f;
+			const float ReportH = 260.f + AllStats.Num() * ReportRowH * 4.f;
 			const float PX = (SizeX - ReportW) * 0.5f;
 			float PY = FMath::Max(40.f, (SizeY - ReportH) * 0.5f);
 
@@ -318,6 +321,8 @@ void AAvaryoHUD::DrawHUD()
 				else if (S.Repairs > 0 && S.Repairs == MaxRepairs)     Title = TEXT("Работник месяца");
 				else if (S.Revives > 0 && S.Revives == MaxRevives)     Title = TEXT("Полевой медик");
 				else if (S.Drags > 0 && S.Drags == MaxDrags)           Title = TEXT("Эвакуатор");
+				else if (S.ShovedOthers > 0 && S.ShovedOthers == MaxShoved) Title = TEXT("Гроза коллектива");
+				else if (S.TimesTripped > 1 && S.TimesTripped == MaxTripped) Title = TEXT("Спотыкач смены");
 				else if (S.TimesWounded > 0 && S.TimesWounded == MaxWounded) Title = TEXT("Главный пострадавший");
 				else if (S.PanicSeconds > 1.f && S.PanicSeconds >= MaxPanic) Title = TEXT("Паникёр смены");
 				else                                                   Title = TEXT("Просто присутствовал");
@@ -333,11 +338,16 @@ void AAvaryoHUD::DrawHUD()
 					S.TimesWounded, S.Incidents, FMath::RoundToInt(S.PanicSeconds), FMath::RoundToInt(S.SmellSeconds),
 					Balance >= 0 ? TEXT("+") : TEXT(""), Balance);
 
+				const FString Row4 = FString::Printf(TEXT("толкнул: %d   споткнулся: %d   катался по пене: %d с"),
+					S.ShovedOthers, S.TimesTripped, FMath::RoundToInt(S.SlipSeconds));
+
 				DrawText(Row1, TextMain, PX + 28.f, TY, Font, 1.1f);
 				TY += ReportRowH;
 				DrawText(Row2, TextDim, PX + 28.f, TY, Font, 0.92f);
 				TY += ReportRowH;
 				DrawText(Row3, Balance >= 0 ? TextDim : FLinearColor(0.95f, 0.45f, 0.3f), PX + 28.f, TY, Font, 0.92f);
+				TY += ReportRowH;
+				DrawText(Row4, TextDim, PX + 28.f, TY, Font, 0.92f);
 				TY += ReportRowH;
 			}
 
