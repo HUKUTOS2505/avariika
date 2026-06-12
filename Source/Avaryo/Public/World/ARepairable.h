@@ -11,6 +11,16 @@ class UTextRenderComponent;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnRepairFinished, ARepairable*, Repairable, AAvaryoCharacter*, FinishedBy);
 
+/** Тип мини-игры починки. None — обычное удержание E. */
+UENUM(BlueprintType)
+enum class ERepairMinigameType : uint8
+{
+	None,    // держать E, прогресс растёт сам
+	Cursor,  // щиток: E по бегающему курсору, промах бьёт током
+	Valve,   // труба: размеренные тыки E докручивают вентиль, частить = срыв резьбы
+	Starter  // генератор: держать E (натяжение шнура), отпустить в зелёном окне
+};
+
 /**
  * Ремонтируемый объект (щиток, труба, генератор) — суть работы бригады.
  * Игрок смотрит на сломанный объект и держит E: прогресс растёт, по завершении
@@ -73,11 +83,11 @@ public:
 	UFUNCTION(BlueprintPure, Category="Repair|Gas")
 	bool IsLeakingGas() const { return bBroken && bLeaksGasWhenBroken; }
 
-	// ---------- Мини-игра (щиток) ----------
+	// ---------- Мини-игры ----------
 
-	/** Чинится мини-игрой: курсор + зелёная зона, промах бьёт током. */
+	/** Какой мини-игрой чинится: None (держать E) / Cursor (щиток) / Valve (труба) / Starter (генератор). */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Repair|Minigame")
-	bool bMinigameRepair;
+	ERepairMinigameType MinigameType;
 
 	/** Сколько попаданий в зелёную зону нужно для починки. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Repair|Minigame")
@@ -107,14 +117,65 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Repair|Minigame")
 	float LockoutDuration;
 
-	UFUNCTION(BlueprintPure, Category="Repair|Minigame") bool IsMinigameRepair() const { return bMinigameRepair; }
+	// ---------- Вентиль (труба) ----------
+
+	/** Докрутка вентиля за один тык E (доля прогресса). */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Repair|Valve")
+	float ValveTurnAmount;
+
+	/** Тыкать E реже этого интервала (сек), иначе «срыв резьбы». */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Repair|Valve")
+	float ValveMinInterval;
+
+	/** Сколько прогресса сгорает при срыве резьбы. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Repair|Valve")
+	float ValveSlipPenalty;
+
+	// ---------- Стартер (генератор) ----------
+
+	/** За сколько секунд натяжение шнура растёт 0→100% при зажатом E. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Repair|Starter")
+	float StarterChargeTime;
+
+	/** Начало зелёного окна (доля натяжения): отпускать здесь. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Repair|Starter")
+	float StarterWindowStart;
+
+	/** Конец зелёного окна. Дотянул до 100% — обратный удар сам по себе. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Repair|Starter")
+	float StarterWindowEnd;
+
+	/** Сколько успешных рывков нужно для запуска. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Repair|Starter")
+	int32 StarterPullsToFix;
+
+	/** Урон от обратного удара шнура (рано отпустил / перетянул). */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Repair|Starter")
+	float StarterKickDamage;
+
+	/** Паника от обратного удара. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Repair|Starter")
+	float StarterKickPanic;
+
+	/** Ниже этого натяжения отпускание — просто перехват, без наказания. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Repair|Starter")
+	float StarterGraceTension;
+
+	UFUNCTION(BlueprintPure, Category="Repair|Minigame") bool IsMinigameRepair() const { return MinigameType != ERepairMinigameType::None; }
+	UFUNCTION(BlueprintPure, Category="Repair|Minigame") ERepairMinigameType GetMinigameType() const { return MinigameType; }
 	UFUNCTION(BlueprintPure, Category="Repair|Minigame") float GetCursorPos() const { return CursorPos; }
 	UFUNCTION(BlueprintPure, Category="Repair|Minigame") float GetGreenCenter() const { return GreenCenter; }
 	UFUNCTION(BlueprintPure, Category="Repair|Minigame") int32 GetMissCount() const { return MissCount; }
 	UFUNCTION(BlueprintPure, Category="Repair|Minigame") float GetLockoutRemaining() const { return LockoutRemaining; }
+	UFUNCTION(BlueprintPure, Category="Repair|Valve") float GetValveCooldown() const { return ValveCooldown; }
+	UFUNCTION(BlueprintPure, Category="Repair|Starter") bool IsStarterPulling() const { return bStarterPulling; }
+	UFUNCTION(BlueprintPure, Category="Repair|Starter") float GetStarterTension() const { return StarterTension; }
 
-	/** Попытка попадания (E во время мини-игры). Только сервер. */
+	/** Нажатие E во время мини-игры: курсор — попадание, вентиль — докрутка, стартер — начать тянуть. Только сервер. */
 	void TryHitBy(AAvaryoCharacter* Who);
+
+	/** Отпускание E во время мини-игры: стартер оценивает рывок. Только сервер. */
+	void TryReleaseBy(AAvaryoCharacter* Who);
 
 	/** Объект починен (для RunState и списка задач). Срабатывает на сервере. */
 	UPROPERTY(BlueprintAssignable, Category="Repair")
@@ -176,6 +237,27 @@ protected:
 
 	float CursorPhase;
 	float MinigameSpeedMult;
+
+	/** Вентиль: сколько осталось до «безопасно тыкать» (HUD рисует индикатор ритма). */
+	UPROPERTY(Replicated)
+	float ValveCooldown;
+
+	/** Стартер: тянет ли шнур прямо сейчас (E зажат). */
+	UPROPERTY(Replicated)
+	bool bStarterPulling;
+
+	/** Стартер: текущее натяжение шнура 0..1. */
+	UPROPERTY(Replicated)
+	float StarterTension;
+
+	/** Докрутка вентиля одним тыком: попал в ритм или сорвал резьбу. Только сервер. */
+	void HandleValveTurn(AAvaryoCharacter* Who);
+
+	/** Обратный удар шнура стартера: урон, паника, шум, попытка не засчитана. Только сервер. */
+	void StarterKickback(AAvaryoCharacter* Who);
+
+	/** Успешное завершение: снять лок, погасить лампу, разослать событие. Только сервер. */
+	void FinishRepair(AAvaryoCharacter* Who);
 
 	/** Замыкание: ток по всем рядом, блокировка щитка. Только сервер. */
 	void ShortCircuit(AAvaryoCharacter* Culprit);

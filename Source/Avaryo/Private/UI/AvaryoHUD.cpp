@@ -428,7 +428,7 @@ void AAvaryoHUD::DrawHUD()
 
 		DrawText(TEXT("[E] — жми в зелёной (или жёлтой) зоне!  [G] — встать"), TextDim, BoxX, BoxY + BarH + 8.f, Font, 0.9f);
 	}
-	// ---------- Мини-игра щитка ----------
+	// ---------- Мини-игры починки (щиток/вентиль/стартер) ----------
 	else if (Character->IsRepairing() && Character->GetCurrentRepairable() && Character->GetCurrentRepairable()->IsMinigameRepair())
 	{
 		ARepairable* R = Character->GetCurrentRepairable();
@@ -436,9 +436,23 @@ void AAvaryoHUD::DrawHUD()
 		const float BoxX = (SizeX - BarW) * 0.5f;
 		float BoxY = SizeY * 0.42f;
 
-		const FString Label = FString::Printf(TEXT("Ремонт: %s  %d%%   промахи %d/%d"),
-			*R->DisplayName.ToString(), FMath::RoundToInt(R->GetRepairProgress() * 100.f),
-			R->GetMissCount(), R->MissesBeforeLockout);
+		FString Label;
+		switch (R->GetMinigameType())
+		{
+		case ERepairMinigameType::Valve:
+			Label = FString::Printf(TEXT("Вентиль: %s  %d%%"),
+				*R->DisplayName.ToString(), FMath::RoundToInt(R->GetRepairProgress() * 100.f));
+			break;
+		case ERepairMinigameType::Starter:
+			Label = FString::Printf(TEXT("Стартер: %s  %d%%"),
+				*R->DisplayName.ToString(), FMath::RoundToInt(R->GetRepairProgress() * 100.f));
+			break;
+		default:
+			Label = FString::Printf(TEXT("Ремонт: %s  %d%%   промахи %d/%d"),
+				*R->DisplayName.ToString(), FMath::RoundToInt(R->GetRepairProgress() * 100.f),
+				R->GetMissCount(), R->MissesBeforeLockout);
+			break;
+		}
 		float LabelW = 0.f, LabelH = 0.f;
 		GetTextSize(Label, LabelW, LabelH, Font, 1.1f);
 
@@ -449,16 +463,44 @@ void AAvaryoHUD::DrawHUD()
 		DrawRect(BarBG, BoxX, BoxY + 2.f, BarW, BarH);
 		DrawRect(Accent, BoxX, BoxY + 2.f, BarW * R->GetRepairProgress(), BarH);
 
-		// Нижняя: мини-игра — красный фон, хаотичная зелёная зона, белый курсор
+		// Нижняя полоска — своя на каждый режим
 		BoxY += BarH + 12.f;
-		DrawRect(FLinearColor(0.55f, 0.12f, 0.1f), BoxX, BoxY + 2.f, BarW, BarH);
-		const float Green = R->GetGreenCenter();
-		const float GreenL = FMath::Clamp(Green - R->MinigameGreenHalfWidth, 0.f, 1.f);
-		const float GreenR = FMath::Clamp(Green + R->MinigameGreenHalfWidth, 0.f, 1.f);
-		DrawRect(FLinearColor(0.25f, 0.8f, 0.25f), BoxX + GreenL * BarW, BoxY + 2.f, (GreenR - GreenL) * BarW, BarH);
-		DrawRect(TextMain, BoxX + R->GetCursorPos() * BarW - 2.f, BoxY - 2.f, 4.f, BarH + 8.f);
-
-		DrawText(TEXT("[E] — жми в зелёной! Промах бьёт током, 3 промаха — замыкание.  [G] — отойти"), TextDim, BoxX, BoxY + BarH + 8.f, Font, 0.9f);
+		if (R->GetMinigameType() == ERepairMinigameType::Valve)
+		{
+			// Ритм: полоска наполняется к «безопасно тыкать»; тык до зелёного = срыв резьбы
+			const float Ready = 1.f - FMath::Clamp(R->GetValveCooldown() / FMath::Max(R->ValveMinInterval, 0.01f), 0.f, 1.f);
+			DrawRect(BarBG, BoxX, BoxY + 2.f, BarW, BarH);
+			DrawRect(Ready >= 1.f ? FLinearColor(0.25f, 0.8f, 0.25f) : FLinearColor(0.55f, 0.12f, 0.1f),
+				BoxX, BoxY + 2.f, BarW * Ready, BarH);
+			DrawText(TEXT("[E] — докручивай РАЗМЕРЕННО: зелёная полоска = можно. Частить = срыв резьбы!  [G] — отойти"),
+				TextDim, BoxX, BoxY + BarH + 8.f, Font, 0.9f);
+		}
+		else if (R->GetMinigameType() == ERepairMinigameType::Starter)
+		{
+			// Натяжение шнура: зелёное окно, белая полоса растёт пока держишь E
+			DrawRect(BarBG, BoxX, BoxY + 2.f, BarW, BarH);
+			const float WinL = FMath::Clamp(R->StarterWindowStart, 0.f, 1.f);
+			const float WinR = FMath::Clamp(R->StarterWindowEnd, 0.f, 1.f);
+			DrawRect(FLinearColor(0.25f, 0.8f, 0.25f), BoxX + WinL * BarW, BoxY + 2.f, (WinR - WinL) * BarW, BarH);
+			const float Tension = R->GetStarterTension();
+			DrawRect(FLinearColor(0.9f, 0.9f, 0.9f), BoxX, BoxY + 4.f, BarW * Tension, BarH - 4.f);
+			DrawRect(TextMain, BoxX + Tension * BarW - 2.f, BoxY - 2.f, 4.f, BarH + 8.f);
+			DrawText(R->IsStarterPulling()
+				? TEXT("Тяни шнур... отпусти E в ЗЕЛЁНОМ окне! Перетянешь — ударит.  [G] — отойти")
+				: TEXT("[E] (держать) — дёрнуть стартер. Нужно 3 удачных рывка.  [G] — отойти"),
+				TextDim, BoxX, BoxY + BarH + 8.f, Font, 0.9f);
+		}
+		else
+		{
+			// Щиток: красный фон, хаотичная зелёная зона, белый курсор
+			DrawRect(FLinearColor(0.55f, 0.12f, 0.1f), BoxX, BoxY + 2.f, BarW, BarH);
+			const float Green = R->GetGreenCenter();
+			const float GreenL = FMath::Clamp(Green - R->MinigameGreenHalfWidth, 0.f, 1.f);
+			const float GreenR = FMath::Clamp(Green + R->MinigameGreenHalfWidth, 0.f, 1.f);
+			DrawRect(FLinearColor(0.25f, 0.8f, 0.25f), BoxX + GreenL * BarW, BoxY + 2.f, (GreenR - GreenL) * BarW, BarH);
+			DrawRect(TextMain, BoxX + R->GetCursorPos() * BarW - 2.f, BoxY - 2.f, 4.f, BarH + 8.f);
+			DrawText(TEXT("[E] — жми в зелёной! Промах бьёт током, 3 промаха — замыкание.  [G] — отойти"), TextDim, BoxX, BoxY + BarH + 8.f, Font, 0.9f);
+		}
 	}
 	// ---------- Починка (держит E у объекта) ----------
 	else if (Character->IsRepairing() && Character->GetCurrentRepairable())
@@ -484,7 +526,15 @@ void AAvaryoHUD::DrawHUD()
 		}
 		else if (FocusedRep->CanBeRepairedBy(Character))
 		{
-			if (FocusedRep->IsMinigameRepair())
+			if (FocusedRep->GetMinigameType() == ERepairMinigameType::Valve)
+			{
+				Prompt = FString::Printf(TEXT("[E] Закрутить вентиль: %s (жми размеренно!)"), *FocusedRep->DisplayName.ToString());
+			}
+			else if (FocusedRep->GetMinigameType() == ERepairMinigameType::Starter)
+			{
+				Prompt = FString::Printf(TEXT("[E] Заводить %s (держать и отпустить вовремя)"), *FocusedRep->DisplayName.ToString());
+			}
+			else if (FocusedRep->IsMinigameRepair())
 			{
 				Prompt = FString::Printf(TEXT("[E] Чинить %s (мини-игра, нужен тестер)"), *FocusedRep->DisplayName.ToString());
 			}

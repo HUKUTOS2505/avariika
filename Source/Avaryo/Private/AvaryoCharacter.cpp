@@ -596,7 +596,7 @@ void AAvaryoCharacter::InteractPressedAuth()
 		return;
 	}
 
-	// Чиним щиток в мини-игре — E бьёт по курсору
+	// Чиним в мини-игре — E по типу: щиток — удар по курсору, вентиль — докрутка, стартер — потянуть шнур
 	if (CurrentRepairable && CurrentRepairable->IsMinigameRepair())
 	{
 		CurrentRepairable->TryHitBy(this);
@@ -654,9 +654,15 @@ void AAvaryoCharacter::InteractPressedAuth()
 
 void AAvaryoCharacter::InteractReleasedAuth()
 {
-	// Мини-игры (щиток, туалет) НЕ завершаются отпусканием E — выход по G.
+	// Мини-игры НЕ завершаются отпусканием E (выход по G), но стартеру важен момент отпускания
+	if (CurrentRepairable && CurrentRepairable->IsMinigameRepair())
+	{
+		CurrentRepairable->TryReleaseBy(this);
+		return;
+	}
+
 	// Обычная починка (удержание E) — завершается
-	if (CurrentRepairable && !CurrentRepairable->IsMinigameRepair())
+	if (CurrentRepairable)
 	{
 		CurrentRepairable->EndRepairBy(this);
 		CurrentRepairable = nullptr;

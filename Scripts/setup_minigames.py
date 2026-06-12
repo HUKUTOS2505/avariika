@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Модуль «туалет + щиток»: тестер в мир, щиток на мини-игру, туалет-сиденье.
+"""Мини-игры: щиток (курсор), труба (вентиль), генератор (стартер), туалет-сиденье, тестер в мир.
 
 Запуск: UnrealEditor-Cmd.exe avariika.uproject -run=pythonscript -script="Scripts/setup_minigames.py"
 Идемпотентен.
@@ -15,14 +15,32 @@ if not les.load_level('/Game/FirstPerson/Lvl_FirstPerson'):
 eas = unreal.get_editor_subsystem(unreal.EditorActorSubsystem)
 by_label = {a.get_actor_label(): a for a in eas.get_all_level_actors()}
 
-# Щиток: мини-игра + требуется тестер
+# Щиток: мини-игра «курсор» + требуется тестер
 breaker = by_label.get('Repairable_Breaker')
 if breaker:
-    breaker.set_editor_property('bMinigameRepair', True)
+    breaker.set_editor_property('MinigameType', unreal.RepairMinigameType.CURSOR)
     breaker.set_editor_property('RequiredTool', 'Tester')
-    out.append('Breaker: minigame on, RequiredTool=Tester')
+    out.append('Breaker: MinigameType=Cursor, RequiredTool=Tester')
 else:
     out.append('WARN: Repairable_Breaker не найден')
+
+# Труба: мини-игра «вентиль» — без инструмента, жать E размеренно
+pipe = by_label.get('Repairable_GasPipe')
+if pipe:
+    pipe.set_editor_property('MinigameType', unreal.RepairMinigameType.VALVE)
+    pipe.set_editor_property('RequiredTool', 'None')
+    out.append('GasPipe: MinigameType=Valve, без инструмента')
+else:
+    out.append('WARN: Repairable_GasPipe не найдена')
+
+# Генератор: мини-игра «стартер» — сварочник в руках остаётся обязательным
+gen = by_label.get('Repairable_Generator')
+if gen:
+    gen.set_editor_property('MinigameType', unreal.RepairMinigameType.STARTER)
+    gen.set_editor_property('RequiredTool', 'Welder')
+    out.append('Generator: MinigameType=Starter, RequiredTool=Welder')
+else:
+    out.append('WARN: Repairable_Generator не найден')
 
 # Туалет: низкий куб-сиденье (на него телепортируемся при посадке)
 toilet = by_label.get('Toilet')

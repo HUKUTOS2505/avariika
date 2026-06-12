@@ -53,7 +53,7 @@ ARepairable::ARepairable()
 	ExplosionCooldown = 0.f;
 	LastShownPercent = -1;
 
-	bMinigameRepair = false;
+	MinigameType = ERepairMinigameType::None;
 	HitsToRepair = 4;
 	MinigameCursorSpeed = 0.9f;
 	MinigameGreenHalfWidth = 0.07f;
@@ -67,6 +67,21 @@ ARepairable::ARepairable()
 	LockoutRemaining = 0.f;
 	CursorPhase = 0.f;
 	MinigameSpeedMult = 1.f;
+
+	ValveTurnAmount = 0.12f;
+	ValveMinInterval = 0.7f;
+	ValveSlipPenalty = 0.2f;
+	ValveCooldown = 0.f;
+
+	StarterChargeTime = 1.6f;
+	StarterWindowStart = 0.7f;
+	StarterWindowEnd = 0.9f;
+	StarterPullsToFix = 3;
+	StarterKickDamage = 5.f;
+	StarterKickPanic = 5.f;
+	StarterGraceTension = 0.15f;
+	bStarterPulling = false;
+	StarterTension = 0.f;
 }
 
 void ARepairable::BeginPlay()
@@ -86,6 +101,9 @@ void ARepairable::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifet
 	DOREPLIFETIME(ARepairable, GreenCenter);
 	DOREPLIFETIME(ARepairable, MissCount);
 	DOREPLIFETIME(ARepairable, LockoutRemaining);
+	DOREPLIFETIME(ARepairable, ValveCooldown);
+	DOREPLIFETIME(ARepairable, bStarterPulling);
+	DOREPLIFETIME(ARepairable, StarterTension);
 }
 
 void ARepairable::Tick(float DeltaSeconds)
@@ -105,12 +123,29 @@ void ARepairable::Tick(float DeltaSeconds)
 		{
 			EndRepairBy(Repairer);
 		}
-		else if (bMinigameRepair)
+		else if (MinigameType == ERepairMinigameType::Cursor)
 		{
 			// Мини-игра: курсор бегает, прогресс растёт только попаданиями (TryHitBy)
 			CursorPhase += DeltaSeconds * MinigameCursorSpeed * MinigameSpeedMult;
 			const float Saw = FMath::Fmod(CursorPhase, 2.f);
 			CursorPos = Saw <= 1.f ? Saw : 2.f - Saw;
+		}
+		else if (MinigameType == ERepairMinigameType::Valve)
+		{
+			// Вентиль: тает «кулдаун ритма» — HUD показывает, когда безопасно тыкать
+			ValveCooldown = FMath::Max(ValveCooldown - DeltaSeconds, 0.f);
+		}
+		else if (MinigameType == ERepairMinigameType::Starter)
+		{
+			// Стартер: при зажатом E натяжение растёт; дотянул до упора — обратный удар
+			if (bStarterPulling)
+			{
+				StarterTension = FMath::Min(StarterTension + DeltaSeconds / FMath::Max(StarterChargeTime, 0.1f), 1.f);
+				if (StarterTension >= 1.f)
+				{
+					StarterKickback(Repairer);
+				}
+			}
 		}
 		else
 		{
@@ -126,11 +161,7 @@ void ARepairable::Tick(float DeltaSeconds)
 
 			if (RepairProgress >= 1.f)
 			{
-				AAvaryoCharacter* FinishedBy = Repairer;
-				Repairer = nullptr;
-				bBroken = false;
-				RefreshStatusVisual(); // на листен-сервере OnRep не придёт
-				OnRepairFinished.Broadcast(this, FinishedBy);
+				FinishRepair(Repairer);
 			}
 		}
 	}
@@ -229,14 +260,18 @@ bool ARepairable::BeginRepairBy(AAvaryoCharacter* Who)
 	Repairer = Who;
 	NoiseAccum = 0.f;
 
-	if (bMinigameRepair)
+	if (IsMinigameRepair())
 	{
-		// Мини-игра: фиксируем ремонтника на месте, заводим курсор
+		// Мини-игра: фиксируем ремонтника на месте, сбрасываем состояние режима
 		CursorPhase = 0.f;
 		CursorPos = 0.f;
 		MinigameSpeedMult = 1.f;
 		MissCount = 0;
 		GreenCenter = FMath::FRandRange(0.1f, 0.9f);
+		ValveCooldown = 0.f; // первый тык вентиля — бесплатный
+		StarterTension = 0.f;
+		// Стартер: E уже зажат этим самым нажатием — первый рывок пошёл
+		bStarterPulling = MinigameType == ERepairMinigameType::Starter;
 		Who->SetInteractionLocked(true);
 	}
 	return true;
@@ -246,18 +281,42 @@ void ARepairable::EndRepairBy(AAvaryoCharacter* Who)
 {
 	if (HasAuthority() && Repairer == Who)
 	{
-		if (bMinigameRepair && Who)
+		if (IsMinigameRepair() && Who)
 		{
 			Who->SetInteractionLocked(false);
 		}
+		bStarterPulling = false;
+		StarterTension = 0.f;
 		Repairer = nullptr; // прогресс сохраняется — можно дочинить позже
 	}
 }
 
 void ARepairable::TryHitBy(AAvaryoCharacter* Who)
 {
-	if (!HasAuthority() || Repairer != Who || !bMinigameRepair || !Who)
+	if (!HasAuthority() || Repairer != Who || !Who)
 	{
+		return;
+	}
+
+	switch (MinigameType)
+	{
+	case ERepairMinigameType::Valve:
+		HandleValveTurn(Who);
+		return;
+
+	case ERepairMinigameType::Starter:
+		// Новое нажатие E — начали тянуть шнур заново
+		if (!bStarterPulling)
+		{
+			bStarterPulling = true;
+			StarterTension = 0.f;
+		}
+		return;
+
+	case ERepairMinigameType::Cursor:
+		break; // ниже
+
+	default:
 		return;
 	}
 
@@ -269,11 +328,7 @@ void ARepairable::TryHitBy(AAvaryoCharacter* Who)
 
 		if (RepairProgress >= 1.f)
 		{
-			Who->SetInteractionLocked(false);
-			Repairer = nullptr;
-			bBroken = false;
-			RefreshStatusVisual();
-			OnRepairFinished.Broadcast(this, Who);
+			FinishRepair(Who);
 			return;
 		}
 	}
@@ -298,6 +353,87 @@ void ARepairable::TryHitBy(AAvaryoCharacter* Who)
 	// Идём дальше: зелёная зона хаотично переезжает, курсор ускоряется
 	GreenCenter = FMath::FRandRange(0.1f, 0.9f);
 	MinigameSpeedMult = FMath::Min(MinigameSpeedMult + 0.1f, 1.6f);
+}
+
+void ARepairable::TryReleaseBy(AAvaryoCharacter* Who)
+{
+	if (!HasAuthority() || Repairer != Who || !Who
+		|| MinigameType != ERepairMinigameType::Starter || !bStarterPulling)
+	{
+		return;
+	}
+
+	bStarterPulling = false;
+	const float Tension = StarterTension;
+	StarterTension = 0.f;
+
+	if (Tension < StarterGraceTension)
+	{
+		return; // едва взялся и отпустил — просто перехват, без наказания
+	}
+
+	if (Tension >= StarterWindowStart && Tension <= StarterWindowEnd)
+	{
+		// Рывок удался: движок чихнул и провернулся
+		RepairProgress = FMath::Min(RepairProgress + 1.f / FMath::Max(StarterPullsToFix, 1), 1.f);
+		MakeNoise(0.6f, Who, GetActorLocation());
+		if (RepairProgress >= 1.f)
+		{
+			FinishRepair(Who);
+		}
+	}
+	else
+	{
+		StarterKickback(Who); // отпустил рано — шнур хлестнул обратно
+	}
+}
+
+void ARepairable::HandleValveTurn(AAvaryoCharacter* Who)
+{
+	if (ValveCooldown > 0.f)
+	{
+		// Засуетился — резьба сорвалась, вентиль провернулся назад с громким шипением
+		RepairProgress = FMath::Max(RepairProgress - ValveSlipPenalty, 0.f);
+		MakeNoise(1.f, Who, GetActorLocation());
+	}
+	else
+	{
+		RepairProgress = FMath::Min(RepairProgress + ValveTurnAmount, 1.f);
+		MakeNoise(0.4f, Who, GetActorLocation());
+		if (RepairProgress >= 1.f)
+		{
+			FinishRepair(Who);
+			return;
+		}
+	}
+	ValveCooldown = ValveMinInterval; // ритм отсчитывается от любого тыка, даже сорванного
+}
+
+void ARepairable::StarterKickback(AAvaryoCharacter* Who)
+{
+	bStarterPulling = false;
+	StarterTension = 0.f;
+
+	Who->TakeDamage(StarterKickDamage, FDamageEvent(), nullptr, this);
+	if (Who->VitalsComponent)
+	{
+		Who->VitalsComponent->AddPanic(StarterKickPanic);
+	}
+	MakeNoise(0.8f, Who, GetActorLocation());
+}
+
+void ARepairable::FinishRepair(AAvaryoCharacter* Who)
+{
+	if (IsMinigameRepair() && Who)
+	{
+		Who->SetInteractionLocked(false);
+	}
+	bStarterPulling = false;
+	StarterTension = 0.f;
+	Repairer = nullptr;
+	bBroken = false;
+	RefreshStatusVisual(); // на листен-сервере OnRep не придёт
+	OnRepairFinished.Broadcast(this, Who);
 }
 
 void ARepairable::ShortCircuit(AAvaryoCharacter* Culprit)
