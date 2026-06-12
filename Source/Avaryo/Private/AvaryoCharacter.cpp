@@ -596,8 +596,9 @@ void AAvaryoCharacter::InteractPressedAuth()
 		return;
 	}
 
-	// Чиним в мини-игре — E по типу: щиток — удар по курсору, вентиль — докрутка, стартер — потянуть шнур
-	if (CurrentRepairable && CurrentRepairable->IsMinigameRepair())
+	// Чиним в мини-игре — E по типу: щиток — удар по курсору, вентиль — докрутка, стартер — потянуть шнур.
+	// Колхоз (без инструмента) — это удержание E, а не мини-игра.
+	if (CurrentRepairable && CurrentRepairable->IsMinigameRepair() && !CurrentRepairable->IsBotching())
 	{
 		CurrentRepairable->TryHitBy(this);
 		return;
@@ -654,8 +655,9 @@ void AAvaryoCharacter::InteractPressedAuth()
 
 void AAvaryoCharacter::InteractReleasedAuth()
 {
-	// Мини-игры НЕ завершаются отпусканием E (выход по G), но стартеру важен момент отпускания
-	if (CurrentRepairable && CurrentRepairable->IsMinigameRepair())
+	// Мини-игры НЕ завершаются отпусканием E (выход по G), но стартеру важен момент отпускания.
+	// Колхоз — обычное удержание E, отпускание его завершает (ниже).
+	if (CurrentRepairable && CurrentRepairable->IsMinigameRepair() && !CurrentRepairable->IsBotching())
 	{
 		CurrentRepairable->TryReleaseBy(this);
 		return;

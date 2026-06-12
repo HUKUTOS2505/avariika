@@ -161,6 +161,32 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Repair|Starter")
 	float StarterGraceTension;
 
+	// ---------- «Не тот инструмент» — колхозный ремонт (§18) ----------
+
+	/** Можно ли чинить объект «на коленке» без нужного инструмента (только если RequiredTool задан). */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Repair|Botch")
+	bool bAllowBotch;
+
+	/** Во сколько раз дольше держать E при колхозе (мини-игра при этом не работает). */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Repair|Botch")
+	float BotchDurationMultiplier;
+
+	/** Шанс косяка в секунду при колхозе. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Repair|Botch")
+	float BotchMishapChancePerSecond;
+
+	/** Сколько прогресса сгорает при косяке. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Repair|Botch")
+	float BotchMishapProgressLoss;
+
+	/** Урон ремонтнику при косяке. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Repair|Botch")
+	float BotchMishapDamage;
+
+	/** Паника при косяке. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Repair|Botch")
+	float BotchMishapPanic;
+
 	UFUNCTION(BlueprintPure, Category="Repair|Minigame") bool IsMinigameRepair() const { return MinigameType != ERepairMinigameType::None; }
 	UFUNCTION(BlueprintPure, Category="Repair|Minigame") ERepairMinigameType GetMinigameType() const { return MinigameType; }
 	UFUNCTION(BlueprintPure, Category="Repair|Minigame") float GetCursorPos() const { return CursorPos; }
@@ -170,6 +196,10 @@ public:
 	UFUNCTION(BlueprintPure, Category="Repair|Valve") float GetValveCooldown() const { return ValveCooldown; }
 	UFUNCTION(BlueprintPure, Category="Repair|Starter") bool IsStarterPulling() const { return bStarterPulling; }
 	UFUNCTION(BlueprintPure, Category="Repair|Starter") float GetStarterTension() const { return StarterTension; }
+	UFUNCTION(BlueprintPure, Category="Repair|Botch") bool IsBotching() const { return bBotching; }
+
+	/** Можно ли колхозить: сломан, свободен, не ранен, нужен инструмент, а в руках не он. */
+	bool CanBotchBy(const AAvaryoCharacter* Who) const;
 
 	/** Нажатие E во время мини-игры: курсор — попадание, вентиль — докрутка, стартер — начать тянуть. Только сервер. */
 	void TryHitBy(AAvaryoCharacter* Who);
@@ -249,6 +279,10 @@ protected:
 	/** Стартер: текущее натяжение шнура 0..1. */
 	UPROPERTY(Replicated)
 	float StarterTension;
+
+	/** Текущая починка идёт колхозом (без инструмента). Реплицируется для HUD и маршрутизации E. */
+	UPROPERTY(Replicated)
+	bool bBotching;
 
 	/** Докрутка вентиля одним тыком: попал в ритм или сорвал резьбу. Только сервер. */
 	void HandleValveTurn(AAvaryoCharacter* Who);

@@ -83,6 +83,14 @@ ARepairable::ARepairable()
 	StarterGraceTension = 0.15f;
 	bStarterPulling = false;
 	StarterTension = 0.f;
+
+	bAllowBotch = true;
+	BotchDurationMultiplier = 2.0f;
+	BotchMishapChancePerSecond = 0.25f;
+	BotchMishapProgressLoss = 0.15f;
+	BotchMishapDamage = 6.f;
+	BotchMishapPanic = 6.f;
+	bBotching = false;
 }
 
 void ARepairable::BeginPlay()
@@ -105,6 +113,7 @@ void ARepairable::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifet
 	DOREPLIFETIME(ARepairable, ValveCooldown);
 	DOREPLIFETIME(ARepairable, bStarterPulling);
 	DOREPLIFETIME(ARepairable, StarterTension);
+	DOREPLIFETIME(ARepairable, bBotching);
 }
 
 void ARepairable::Tick(float DeltaSeconds)
@@ -123,6 +132,36 @@ void ARepairable::Tick(float DeltaSeconds)
 		if (!CanContinueRepair())
 		{
 			EndRepairBy(Repairer);
+		}
+		else if (bBotching)
+		{
+			// Колхоз: держим E, прогресс ползёт медленно, периодически всё идёт наперекосяк
+			const float BotchDur = FMath::Max(RepairDuration * BotchDurationMultiplier, 0.1f);
+			RepairProgress = FMath::Min(RepairProgress + DeltaSeconds / BotchDur, 1.f);
+
+			if (FMath::FRand() < BotchMishapChancePerSecond * DeltaSeconds)
+			{
+				// Соскочило/искрануло/сорвало — часть работы насмарку, по рукам и громко
+				RepairProgress = FMath::Max(RepairProgress - BotchMishapProgressLoss, 0.f);
+				Repairer->TakeDamage(BotchMishapDamage, FDamageEvent(), nullptr, this);
+				if (Repairer->VitalsComponent)
+				{
+					Repairer->VitalsComponent->AddPanic(BotchMishapPanic);
+				}
+				MakeNoise(1.f, Repairer, GetActorLocation());
+			}
+
+			NoiseAccum += DeltaSeconds;
+			if (NoiseAccum >= 0.8f)
+			{
+				NoiseAccum = 0.f;
+				MakeNoise(1.2f, Repairer, GetActorLocation()); // колхоз шумнее обычной починки
+			}
+
+			if (RepairProgress >= 1.f)
+			{
+				FinishRepair(Repairer);
+			}
 		}
 		else if (MinigameType == ERepairMinigameType::Cursor)
 		{
@@ -241,15 +280,38 @@ bool ARepairable::CanBeRepairedBy(const AAvaryoCharacter* Who) const
 	return true;
 }
 
+bool ARepairable::CanBotchBy(const AAvaryoCharacter* Who) const
+{
+	if (!Who || !bBroken || !bAllowBotch || RequiredTool == NAME_None)
+	{
+		return false; // колхозят только то, что вообще требует инструмент
+	}
+	if (LockoutRemaining > 0.f || (Repairer && Repairer != Who))
+	{
+		return false;
+	}
+	if (Who->VitalsComponent && Who->VitalsComponent->IsWounded())
+	{
+		return false;
+	}
+	// Колхоз именно тогда, когда нужного инструмента в руках НЕТ (иначе это обычная починка)
+	const APickupItem* Held = Who->GetHeldItem();
+	return !Held || Held->ToolTag != RequiredTool;
+}
+
 bool ARepairable::CanContinueRepair() const
 {
-	return CanBeRepairedBy(Repairer)
-		&& FVector::DistSquared(Repairer->GetActorLocation(), GetActorLocation()) <= FMath::Square(RepairRange);
+	const bool bInRange = FVector::DistSquared(Repairer->GetActorLocation(), GetActorLocation()) <= FMath::Square(RepairRange);
+	if (bBotching)
+	{
+		return CanBotchBy(Repairer) && bInRange;
+	}
+	return CanBeRepairedBy(Repairer) && bInRange;
 }
 
 bool ARepairable::BeginRepairBy(AAvaryoCharacter* Who)
 {
-	if (!HasAuthority() || !CanBeRepairedBy(Who))
+	if (!HasAuthority() || !Who)
 	{
 		return false;
 	}
@@ -258,8 +320,23 @@ bool ARepairable::BeginRepairBy(AAvaryoCharacter* Who)
 		return false;
 	}
 
+	// Нет нужного инструмента, но можно колхозить — крудовый ремонт удержанием E (без мини-игры)
+	const bool bProper = CanBeRepairedBy(Who);
+	if (!bProper)
+	{
+		if (!CanBotchBy(Who))
+		{
+			return false;
+		}
+		Repairer = Who;
+		NoiseAccum = 0.f;
+		bBotching = true;
+		return true; // колхоз не блокирует движение и не запускает мини-игру
+	}
+
 	Repairer = Who;
 	NoiseAccum = 0.f;
+	bBotching = false;
 
 	if (IsMinigameRepair())
 	{
@@ -282,12 +359,13 @@ void ARepairable::EndRepairBy(AAvaryoCharacter* Who)
 {
 	if (HasAuthority() && Repairer == Who)
 	{
-		if (IsMinigameRepair() && Who)
+		if (IsMinigameRepair() && !bBotching && Who)
 		{
 			Who->SetInteractionLocked(false);
 		}
 		bStarterPulling = false;
 		StarterTension = 0.f;
+		bBotching = false;
 		Repairer = nullptr; // прогресс сохраняется — можно дочинить позже
 	}
 }
@@ -425,15 +503,29 @@ void ARepairable::StarterKickback(AAvaryoCharacter* Who)
 
 void ARepairable::FinishRepair(AAvaryoCharacter* Who)
 {
-	if (IsMinigameRepair() && Who)
+	const bool bWasBotch = bBotching;
+
+	if (IsMinigameRepair() && !bWasBotch && Who)
 	{
 		Who->SetInteractionLocked(false);
 	}
 	bStarterPulling = false;
 	StarterTension = 0.f;
+	bBotching = false;
 	Repairer = nullptr;
 	bBroken = false;
 	RefreshStatusVisual(); // на листен-сервере OnRep не придёт
+
+	if (bWasBotch)
+	{
+		// Кустарно, но «работает». Громко, и в акт отдельной строкой со штрафом.
+		MakeNoise(1.5f, Who, GetActorLocation());
+		if (ARunState* Run = ARunState::Get(GetWorld()))
+		{
+			Run->AddBotchedRepair(Who);
+		}
+	}
+
 	OnRepairFinished.Broadcast(this, Who);
 }
 
@@ -472,6 +564,7 @@ void ARepairable::SetBroken(bool bNewBroken)
 	bBroken = bNewBroken;
 	RepairProgress = 0.f;
 	Repairer = nullptr;
+	bBotching = false;
 	RefreshStatusVisual();
 }
 

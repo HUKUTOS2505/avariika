@@ -268,7 +268,7 @@ void AAvaryoHUD::DrawHUD()
 			const TArray<FPlayerRunStats>& AllStats = Run->GetPlayerStats();
 
 			// Максимумы для раздачи званий
-			int32 MaxRepairs = 0, MaxWounded = 0, MaxRevives = 0, MaxDrags = 0;
+			int32 MaxRepairs = 0, MaxWounded = 0, MaxRevives = 0, MaxDrags = 0, MaxBotched = 0;
 			float MaxPanic = 0.f;
 			for (const FPlayerRunStats& S : AllStats)
 			{
@@ -276,6 +276,7 @@ void AAvaryoHUD::DrawHUD()
 				MaxWounded = FMath::Max(MaxWounded, S.TimesWounded);
 				MaxRevives = FMath::Max(MaxRevives, S.Revives);
 				MaxDrags   = FMath::Max(MaxDrags,   S.Drags);
+				MaxBotched = FMath::Max(MaxBotched, S.BotchedRepairs);
 				MaxPanic   = FMath::Max(MaxPanic,   S.PanicSeconds);
 			}
 
@@ -309,6 +310,7 @@ void AAvaryoHUD::DrawHUD()
 				// Звание: инциденты вне конкуренции, дальше — по лучшему показателю
 				FString Title;
 				if (S.Incidents > 0)                                   Title = TEXT("Биологическая угроза");
+				else if (S.BotchedRepairs > 0 && S.BotchedRepairs == MaxBotched) Title = TEXT("Народный умелец");
 				else if (S.ToiletVisits >= 2)                          Title = TEXT("Дисциплинированный мочевой пузырь");
 				else if (S.Repairs > 0 && S.Repairs == MaxRepairs)     Title = TEXT("Работник месяца");
 				else if (S.Revives > 0 && S.Revives == MaxRevives)     Title = TEXT("Полевой медик");
@@ -321,8 +323,8 @@ void AAvaryoHUD::DrawHUD()
 				const int32 Balance = ARunState::ComputePlayerBalance(S);
 
 				const FString Row1 = FString::Printf(TEXT("%s — «%s»"), *Name, *Title);
-				const FString Row2 = FString::Printf(TEXT("починки: %d   подъёмы: %d   эвакуации: %d   туалет: %d   ранения: %d   инциденты: %d   паника: %d сек   итог: %s%d ₽"),
-					S.Repairs, S.Revives, S.Drags, S.ToiletVisits, S.TimesWounded, S.Incidents,
+				const FString Row2 = FString::Printf(TEXT("починки: %d   колхоз: %d   подъёмы: %d   эвакуации: %d   туалет: %d   ранения: %d   инциденты: %d   паника: %d сек   итог: %s%d ₽"),
+					S.Repairs, S.BotchedRepairs, S.Revives, S.Drags, S.ToiletVisits, S.TimesWounded, S.Incidents,
 					FMath::RoundToInt(S.PanicSeconds), Balance >= 0 ? TEXT("+") : TEXT(""), Balance);
 
 				DrawText(Row1, TextMain, PX + 28.f, TY, Font, 1.1f);
@@ -478,7 +480,8 @@ void AAvaryoHUD::DrawHUD()
 		DrawText(TEXT("[E] — жми в зелёной (или жёлтой) зоне!  [G] — встать"), TextDim, BoxX, BoxY + BarH + 8.f, Font, 0.9f);
 	}
 	// ---------- Мини-игры починки (щиток/вентиль/стартер) ----------
-	else if (Character->IsRepairing() && Character->GetCurrentRepairable() && Character->GetCurrentRepairable()->IsMinigameRepair())
+	else if (Character->IsRepairing() && Character->GetCurrentRepairable()
+		&& Character->GetCurrentRepairable()->IsMinigameRepair() && !Character->GetCurrentRepairable()->IsBotching())
 	{
 		ARepairable* R = Character->GetCurrentRepairable();
 		const float BarW = 340.f, BarH = 18.f;
@@ -556,8 +559,10 @@ void AAvaryoHUD::DrawHUD()
 	{
 		ARepairable* Repairing = Character->GetCurrentRepairable();
 		const int32 Percent = FMath::RoundToInt(Repairing->GetRepairProgress() * 100.f);
-		DrawCastBar(FString::Printf(TEXT("Ремонт: %s  %d%%"), *Repairing->DisplayName.ToString(), Percent),
-			Repairing->GetRepairProgress(), Accent);
+		const FString RepairLabel = Repairing->IsBotching()
+			? FString::Printf(TEXT("Колхоз: %s  %d%% (без инструмента)"), *Repairing->DisplayName.ToString(), Percent)
+			: FString::Printf(TEXT("Ремонт: %s  %d%%"), *Repairing->DisplayName.ToString(), Percent);
+		DrawCastBar(RepairLabel, Repairing->GetRepairProgress(), Accent);
 	}
 	// ---------- Подсказка подбора (плашка как в референсе) ----------
 	else if (APickupItem* Focused = Character->GetFocusedItem())
@@ -598,6 +603,11 @@ void AAvaryoHUD::DrawHUD()
 		else if (FocusedRep->IsBeingRepaired())
 		{
 			Prompt = FString::Printf(TEXT("%s уже чинят"), *FocusedRep->DisplayName.ToString());
+		}
+		else if (FocusedRep->CanBotchBy(Character))
+		{
+			Prompt = FString::Printf(TEXT("[E] Чинить «%s» на коленке (без инструмента — рискованно)"),
+				*FocusedRep->DisplayName.ToString());
 		}
 		else
 		{

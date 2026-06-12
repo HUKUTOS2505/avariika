@@ -36,6 +36,9 @@ struct FPlayerRunStats
 	int32 ToiletVisits = 0;     // дисциплинированные визиты в биотуалет
 
 	UPROPERTY(BlueprintReadOnly, Category="Run")
+	int32 BotchedRepairs = 0;   // починки «на коленке» без инструмента (§18)
+
+	UPROPERTY(BlueprintReadOnly, Category="Run")
 	float PanicSeconds = 0.f;   // времени в панике
 
 	// Для детекции переходов на серверном тике (реплицируются заодно — безвредно)
@@ -117,6 +120,9 @@ public:
 
 	/** Дошёл до биотуалета. Только сервер. */
 	void AddToiletVisit(AAvaryoCharacter* Who);
+
+	/** Закончил колхозный ремонт без инструмента (§18). Только сервер. */
+	void AddBotchedRepair(AAvaryoCharacter* Who);
 
 	// ---------- Диспетчер (комментирует хаос по рации) ----------
 

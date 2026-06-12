@@ -88,6 +88,13 @@ namespace DispatcherLines
 		TEXT("...ещё один... нас тут уже семеро..."),
 		TEXT("...тёпленькие... приходите..."),
 	};
+	// Колхозный ремонт без инструмента (§18 «не тот инструмент»)
+	const TArray<FString> BotchRepair = {
+		TEXT("{X}, это не ремонт, это художественная самодеятельность. Но раз держится — молчу."),
+		TEXT("Чем ты это чинил, {X}, коленкой? В акте так и напишу: «восстановлено народными методами»."),
+		TEXT("{X} закрыл объект без инструмента. Гарантия — до выхода из подъезда."),
+		TEXT("Принято от {X}. Колхоз, но работает. Премию урежу за стиль."),
+	};
 	// Реплики начальника про выданный дешёвый комплект (§18 «дешёвое оборудование»)
 	const TArray<FString> CheapGearGreeting = {
 		TEXT("Да, и комплект вам выдали бюджетный — фонари с рынка, рация с помехами. Экономия, мужики."),
@@ -326,6 +333,15 @@ void ARunState::AddToiletVisit(AAvaryoCharacter* Who)
 	}
 }
 
+void ARunState::AddBotchedRepair(AAvaryoCharacter* Who)
+{
+	if (HasAuthority() && Who)
+	{
+		++FindOrAddStats(Who).BotchedRepairs;
+		DispatcherSay(DispatcherLines::BotchRepair, CrewName(Who), /*bImportant=*/true);
+	}
+}
+
 void ARunState::NotifyGasExplosion(AAvaryoCharacter* Culprit)
 {
 	if (HasAuthority())
@@ -428,7 +444,8 @@ void ARunState::FinishRun(ERunPhase NewPhase)
 int32 ARunState::ComputePlayerBalance(const FPlayerRunStats& S)
 {
 	return S.Repairs * 1500 + S.Revives * 1000 + S.Drags * 500 + S.ToiletVisits * 300
-		- S.TimesWounded * 1000 - S.Incidents * 2000 - FMath::RoundToInt(S.PanicSeconds) * 10;
+		- S.TimesWounded * 1000 - S.Incidents * 2000 - S.BotchedRepairs * 800
+		- FMath::RoundToInt(S.PanicSeconds) * 10;
 }
 
 FString ARunState::ReputationTitle(int32 Points)
