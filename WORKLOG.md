@@ -50,18 +50,31 @@
 - [ ] G выкидывает из обеих мини-игр и НЕ бросает предмет в этот момент.
 - [ ] Раненый в мини-игре (током до 0 HP) — мини-игра рвётся, лок снимается, ползает.
 
-### Промпты для meshy.ai (модуль «Туалет + Щиток»)
+### Модели meshy.ai — ПОЛНЫЙ список и пайплайн
 
-Генерить в режиме Text-to-3D, экспорт FBX, развёртка+текстуры включены. Складывать в `D:\unrealEngine\avariika\RawAssets\<имя>\` — Claude импортирует сам.
+**Пайплайн:** Text-to-3D → экспорт **FBX** с текстурами → положить файл в `D:\unrealEngine\avariika\RawAssets\<ИмяПапки>\` (имя папки строго из таблицы) → сказать Claude «импортируй модели» → он гоняет `Scripts/import_models.py` (закрытый редактор!): импорт в `/Game/Avariika/Meshes/`, автоназначение на акторы по меткам / в CDO BP-предметов, автомасштаб для объектов уровня.
 
-1. **Биотуалет (`SM_Toilet`)** — заменит куб `Toilet`:
-   `Portable toilet cabin, blue plastic outdoor biotoilet booth with closed door, dirty worn plastic, white roof, vent slots, slightly grimy, low-poly game prop, PBR textures, game-ready`
-2. **Электрощиток (`SM_Breaker`)** — заменит куб `Repairable_Breaker`:
-   `Industrial electrical breaker panel box mounted unit, open metal door showing fuses wires and switches inside, rusty gray-green metal, sparks damage, soviet industrial style, low-poly game prop, PBR, game-ready`
-3. **Тестер (`SM_Tester`)** — заменит куб `Tester`:
-   `Handheld digital multimeter tester device, yellow rubber case, small LCD screen, two probe wires red and black wrapped around, worn used look, low-poly game prop, PBR, game-ready`
+К каждому промпту meshy можно добавить негатив/уточнение: *«single object, centered, no ground plane, no scene»*.
 
-Следом (после этого модуля) пригодятся: ГАЗель-фургон, газовая труба с вентилем, дизельный генератор, сварочный аппарат, рация, огнетушитель, аптечка — промпты дам, когда дойдём.
+| Папка | Что | Промпт |
+|---|---|---|
+| `SM_Toilet` | Биотуалет (сиденье-куб → кабинка) | `Portable outdoor biotoilet cabin, blue plastic booth, slightly open door, dirty worn plastic with grime streaks, white roof, vent slots, low-poly game prop, PBR textures, game-ready, single object` |
+| `SM_Breaker` | Электрощиток | `Industrial wall-mounted electrical breaker panel, open rusty metal door revealing fuses, wires and big switches, gray-green soviet industrial style, scorch marks, low-poly game prop, PBR, game-ready` |
+| `SM_Tester` | Тестер (инструмент щитка) | `Handheld digital multimeter, yellow rubber protective case, small LCD screen, rotary dial, red and black probe wires wrapped around body, worn used look, low-poly game prop, PBR, game-ready` |
+| `SM_GasPipe` | Газовая труба | `Vertical industrial gas pipe section with large red shut-off valve wheel, pressure gauge, yellow pipe paint peeling with rust, visible crack leaking, soviet factory style, low-poly game prop, PBR, game-ready` |
+| `SM_Generator` | Генератор | `Old diesel power generator unit on metal frame, exposed engine, fuel tank on top, control box with gauges, orange-red chipped paint, oil stains, soviet industrial, low-poly game prop, PBR, game-ready` |
+| `SM_Gazelle` | ГАЗель (база/выход) | `Russian GAZelle cargo van, white boxy delivery van 90s style, roof rack with ladder, mud splashes, orange emergency stripe and rotating beacon on roof, slightly rusty, low-poly game vehicle, PBR, game-ready` |
+| `SM_WeldingMachine` | Сварочник (тяжёлый) | `Portable arc welding machine, heavy metal box with carrying handle, cable with electrode holder wrapped around, dials and clamps, dark blue chipped paint, rust and burn marks, low-poly game prop, PBR, game-ready` |
+| `SM_FireExtinguisher` | Огнетушитель | `Red fire extinguisher with black hose and nozzle, pressure gauge, worn scratched paint, metal cylinder, low-poly game prop, PBR, game-ready` |
+| `SM_FirstAidKit` | Аптечка | `First aid kit, small white plastic case with red cross, clasp latch, scuffed and dirty, slightly open lid, low-poly game prop, PBR, game-ready` |
+| `SM_Cigarettes` | Сигареты | `Crumpled cigarette pack, soviet style plain white-red paper pack, one cigarette sticking out, with a small matchbox, low-poly game prop, PBR, game-ready` |
+| `SM_Radio` | Рация | `Handheld walkie-talkie radio, black rubber body with orange accents, stubby antenna, speaker grille, belt clip, volume knob, worn scratched, low-poly game prop, PBR, game-ready` |
+| `SM_Battery` | Батарея фонаря | `Big chunky lantern battery, blue metal casing with paper label, two spring terminals on top, slightly corroded, retro soviet style, low-poly game prop, PBR, game-ready` |
+| `SM_Fuse` | Предохранитель | `Ceramic electrical fuse plug, white ceramic body with metal cap and thread, small handle, vintage soviet fuse, low-poly game prop, PBR, game-ready` |
+
+Приоритет генерации: сперва модуль «Туалет + Щиток» — `SM_Toilet`, `SM_Breaker`, `SM_Tester`; потом крупняк (`SM_Gazelle`, `SM_Generator`, `SM_GasPipe`), потом мелочёвка.
+
+**Анимации (пользователь):** сидение на туалете, «тык щупами» у щитка, удар током (стан), волочение раненого, перекур. Когда будут файлы — обсудим скелет (UE5 Manny уже в проекте: `Content/Characters/Mannequins`) и подключим.
 
 ## Очередь модулей (после текущего)
 
@@ -75,5 +88,5 @@
 - Движок: UE 5.7, проект `D:\unrealEngine\avariika\avariika.uproject`, модуль C++ `Avaryo` (+ зависимость EngineCameras).
 - Структура: `Source/Avaryo/{AvaryoCharacter, Components/{Vitals,UFlashlight}, Items/APickupItem, World/{ARepairable,AExitZone,AToilet}, Game/ARunState, UI/{AvaryoHUD,AvaryoCameraShakes}}`.
 - Уровень `Content/FirstPerson/Lvl_FirstPerson`: PlayerStart на платформе (0,0,~300), пол z=-15 (±2000), объекты по меткам: Repairable_Breaker (1200,-1320), Repairable_GasPipe (1700,150), Repairable_Generator (-1200,1250), ExitZone_Gazelle (-250,0), Toilet (-1650,-1550), Radio/Tester/лут.
-- Скрипты: place_run_objects, setup_items, setup_minigames, night_atmosphere, scatter_loot, inspect_level (дамп акторов в Saved/level_actors.txt).
+- Скрипты: place_run_objects, setup_items, setup_minigames, night_atmosphere, scatter_loot, import_models (модели из RawAssets/), inspect_level (дамп акторов в Saved/level_actors.txt). Результаты скриптов пишутся в Saved/*.txt.
 - Полные механики и управление — README.md; тест-чек-листы — TESTING.md.
