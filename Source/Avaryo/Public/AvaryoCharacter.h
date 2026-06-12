@@ -342,7 +342,13 @@ protected:
 	float SlipDefaultBrakingDecel;
 
 	/** Сервер: проверяет, стоит ли монтёр в луже пены, и переключает скольжение. */
-	void UpdateFoamSlip();
+	void UpdateFoamSlip(float DeltaSeconds);
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Avaryo|Foam")
+	float FoamSlipPanic;            // паника при попадании на пену
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Avaryo|Foam")
+	float FoamFallChancePerSecond;  // шанс/сек навернуться, пока быстро скользишь
 
 	/** Применить/снять «скользкое» трение на CharacterMovement (сервер и клиент). */
 	void ApplySlipFriction(bool bOn);
@@ -396,6 +402,12 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Avaryo|Trip")
 	float TripFumbleChance;    // шанс выронить активный лёгкий предмет при спотыкании
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Avaryo|Trip")
+	float TripTiredScale;      // насколько усталость (низкая выносливость) повышает шанс споткнуться
+
+	/** Запустить спотыкание: стан скорости, шум, реплики, фумбл. Только сервер. */
+	void TriggerStumble();
 
 	float StumbleUntil;        // серверное время конца спотыкания
 

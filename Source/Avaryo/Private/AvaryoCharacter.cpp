@@ -96,7 +96,11 @@ AAvaryoCharacter::AAvaryoCharacter()
 	TripRecoverTime = 0.8f;
 	TripSlowSpeed = 150.f;
 	TripFumbleChance = 0.5f;
+	TripTiredScale = 1.5f;
 	StumbleUntil = 0.f;
+
+	FoamSlipPanic = 4.f;
+	FoamFallChancePerSecond = 0.25f;
 	UseCastRemaining = 0.f;
 	UseCastDuration = 0.f;
 	bOffering = false;
@@ -233,7 +237,7 @@ void AAvaryoCharacter::Tick(float DeltaSeconds)
 	// Скольжение по пене (сервер решает, клиент узнаёт через bSlipping)
 	if (HasAuthority())
 	{
-		UpdateFoamSlip();
+		UpdateFoamSlip(DeltaSeconds);
 		UpdateTrip(DeltaSeconds);
 	}
 
@@ -1536,7 +1540,7 @@ void AAvaryoCharacter::TickSpray(float DeltaSeconds)
 	}
 }
 
-void AAvaryoCharacter::UpdateFoamSlip()
+void AAvaryoCharacter::UpdateFoamSlip(float DeltaSeconds)
 {
 	bool bOverFoam = false;
 	const FVector Loc = GetActorLocation();
@@ -1561,10 +1565,25 @@ void AAvaryoCharacter::UpdateFoamSlip()
 		ApplySlipFriction(bSlipping); // и сразу применяем на сервере
 		if (bSlipping)
 		{
+			if (VitalsComponent)
+			{
+				VitalsComponent->AddPanic(FoamSlipPanic); // «ой!» — небольшой испуг
+			}
 			if (ARunState* Run = ARunState::Get(GetWorld()))
 			{
 				Run->NotifySlipped(this); // диспетчер прокомментирует (неважная — анти-спам глотает)
 			}
+		}
+	}
+
+	// Быстро катишься по пене — можно и навернуться (стан)
+	if (bSlipping && !bStumbling)
+	{
+		UCharacterMovementComponent* Move = GetCharacterMovement();
+		if (Move && Move->Velocity.SizeSquared2D() > FMath::Square(350.f)
+			&& FMath::FRand() < FoamFallChancePerSecond * DeltaSeconds)
+		{
+			TriggerStumble();
 		}
 	}
 }
@@ -1626,31 +1645,54 @@ void AAvaryoCharacter::UpdateTrip(float DeltaSeconds)
 		return;
 	}
 
+	// Споткнуться о лежащего раненого товарища прямо по курсу — гарантированно
+	const FVector Loc = GetActorLocation();
+	const FVector Fwd = GetActorForwardVector();
+	for (TActorIterator<AAvaryoCharacter> It(GetWorld()); It; ++It)
+	{
+		if (*It == this || !It->VitalsComponent || !It->VitalsComponent->IsWounded())
+		{
+			continue;
+		}
+		const FVector To = It->GetActorLocation() - Loc;
+		if (To.SizeSquared() <= FMath::Square(120.f) && FVector::DotProduct(To.GetSafeNormal(), Fwd) > 0.2f)
+		{
+			TriggerStumble(); // влетел в лежащего — оба в осадке
+			return;
+		}
+	}
+
 	float Mult = 1.f;
 	if (FlashlightComponent && !FlashlightComponent->IsOn())
 	{
 		Mult *= TripDarkMultiplier; // в темноте не видно, обо что споткнуться
 	}
 	Mult *= 1.f + (VitalsComponent->GetPanic() / 100.f) * TripPanicMultiplier; // паника — суетятся ноги
+	Mult *= 1.f + (1.f - VitalsComponent->GetStamina() / 100.f) * TripTiredScale; // устал — заплетаются ноги
 
 	if (FMath::FRand() < TripChancePerSecond * DeltaSeconds * Mult)
 	{
-		bStumbling = true;
-		StumbleUntil = Now + TripRecoverTime;
-		MakeNoise(0.7f, this, GetActorLocation()); // грохнулся — слышно
-		if (ARunState* Run = ARunState::Get(GetWorld()))
-		{
-			Run->NotifyTripped(this);
-			Run->AddTrip(this); // счётчик «споткнулся» — в «Акт»
-		}
-		// При падении можно выронить активный ЛЁГКИЙ предмет (тяжёлый не трогаем — он и так роняется при ранении)
-		APickupItem* Held = GetHeldItem();
-		if (Held && Held->ItemSize == EItemSize::Light
-			&& !CurrentRepairable && !CurrentToilet
-			&& FMath::FRand() < TripFumbleChance)
-		{
-			DropItem(); // выронил из рук — катится по полу
-		}
+		TriggerStumble();
+	}
+}
+
+void AAvaryoCharacter::TriggerStumble()
+{
+	bStumbling = true;
+	StumbleUntil = GetWorld()->GetTimeSeconds() + TripRecoverTime;
+	MakeNoise(0.7f, this, GetActorLocation()); // грохнулся — слышно
+	if (ARunState* Run = ARunState::Get(GetWorld()))
+	{
+		Run->NotifyTripped(this);
+		Run->AddTrip(this); // счётчик «споткнулся» — в «Акт»
+	}
+	// При падении можно выронить активный ЛЁГКИЙ предмет (тяжёлый и так роняется при ранении)
+	APickupItem* Held = GetHeldItem();
+	if (Held && Held->ItemSize == EItemSize::Light
+		&& !CurrentRepairable && !CurrentToilet
+		&& FMath::FRand() < TripFumbleChance)
+	{
+		DropItem(); // выронил из рук — катится по полу
 	}
 }
 
