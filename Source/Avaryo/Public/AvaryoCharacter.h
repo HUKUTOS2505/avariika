@@ -50,6 +50,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Avaryo|Inventory")
 	void DropItem();
 
+	/** Метнуть предмет из рук по прицелу (клавиша T): передать через провал / запулить. */
+	UFUNCTION(BlueprintCallable, Category="Avaryo|Inventory")
+	void ThrowItem();
+
 	/** Переключить активный слот (клавиши 1-5). 0 — тяжёлый, 1-4 — лёгкие. */
 	UFUNCTION(BlueprintCallable, Category="Avaryo|Inventory")
 	void EquipSlot(int32 SlotIndex);
@@ -464,6 +468,15 @@ protected:
 	/** Применить состояние инвентаря: активный в руки, тяжёлый опустить, лёгкие спрятать. */
 	void RefreshHeldItem();
 	void HoldItem(APickupItem* Item);
+
+	/** Выложить активный предмет в мир: bThrown=false — уронить/поставить, true — метнуть по прицелу. */
+	void ReleaseHeldItem(bool bThrown);
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Avaryo|Inventory")
+	float ThrowImpulseLight;  // сила броска лёгкого предмета
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Avaryo|Inventory")
+	float ThrowImpulseHeavy;  // сила броска тяжёлого (летит слабее)
 	void CarryHeavyLowered(APickupItem* Item);
 	void StashItem(APickupItem* Item);
 
@@ -490,6 +503,9 @@ protected:
 
 	UFUNCTION(Server, Reliable)
 	void ServerDropItem();
+
+	UFUNCTION(Server, Reliable)
+	void ServerThrowItem();
 
 	UFUNCTION(Server, Reliable)
 	void ServerEquipSlot(int32 SlotIndex);

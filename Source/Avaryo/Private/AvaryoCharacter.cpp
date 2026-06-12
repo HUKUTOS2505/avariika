@@ -86,6 +86,9 @@ AAvaryoCharacter::AAvaryoCharacter()
 	ShoveReadyTime = 0.f;
 	ShoveFumbleChance = 0.4f;
 
+	ThrowImpulseLight = 750.f;
+	ThrowImpulseHeavy = 350.f;
+
 	bStumbling = false;
 	TripChancePerSecond = 0.03f;
 	TripDarkMultiplier = 2.5f;
@@ -269,6 +272,7 @@ void AAvaryoCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	PlayerInputComponent->BindKey(EKeys::E, IE_Released, this, &AAvaryoCharacter::OnInteractReleased);
 	PlayerInputComponent->BindKey(EKeys::G, IE_Pressed, this, &AAvaryoCharacter::DropItem);
 	PlayerInputComponent->BindKey(EKeys::Q, IE_Pressed, this, &AAvaryoCharacter::Shove);
+	PlayerInputComponent->BindKey(EKeys::T, IE_Pressed, this, &AAvaryoCharacter::ThrowItem);
 	// Использование: ЛКМ или R (нажал — эффект/распыление, отпустил — конец распыления)
 	PlayerInputComponent->BindKey(EKeys::LeftMouseButton, IE_Pressed, this, &AAvaryoCharacter::BeginUseHeldItem);
 	PlayerInputComponent->BindKey(EKeys::LeftMouseButton, IE_Released, this, &AAvaryoCharacter::EndUseHeldItem);
@@ -1006,6 +1010,31 @@ void AAvaryoCharacter::DropItem()
 		return;
 	}
 
+	ReleaseHeldItem(/*bThrown=*/false);
+}
+
+void AAvaryoCharacter::ThrowItem()
+{
+	if (!HasAuthority())
+	{
+		ServerThrowItem();
+		return;
+	}
+	// В мини-игре/туалете бросок не работает (там G — это «встать»)
+	if (CurrentToilet || (CurrentRepairable && CurrentRepairable->IsMinigameRepair()))
+	{
+		return;
+	}
+	ReleaseHeldItem(/*bThrown=*/true);
+}
+
+void AAvaryoCharacter::ServerThrowItem_Implementation()
+{
+	ThrowItem();
+}
+
+void AAvaryoCharacter::ReleaseHeldItem(bool bThrown)
+{
 	APickupItem* Item = GetHeldItem();
 	if (!Item)
 	{
@@ -1031,8 +1060,15 @@ void AAvaryoCharacter::DropItem()
 	Item->SetActorHiddenInGame(false);
 	Item->SetOwner(nullptr);
 
+	FVector ViewLoc;
+	FRotator ViewRot;
+	GetActorEyesViewPoint(ViewLoc, ViewRot);
+	const FVector AimDir = ViewRot.Vector();
+
 	const float DropDistance = bHeavy ? 120.f : 150.f;
-	const FVector DropLocation = GetActorLocation() + GetActorForwardVector() * DropDistance;
+	const FVector DropLocation = bThrown
+		? ViewLoc + AimDir * 60.f // из рук, чтобы летело по прицелу
+		: GetActorLocation() + GetActorForwardVector() * DropDistance;
 	Item->SetActorLocation(DropLocation, false, nullptr, ETeleportType::TeleportPhysics);
 	Item->SetActorRotation(FRotator(0.f, GetActorRotation().Yaw, 0.f));
 
@@ -1041,15 +1077,21 @@ void AAvaryoCharacter::DropItem()
 	{
 		Prim->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 		Prim->SetSimulatePhysics(true);
-		if (!bHeavy)
+		if (bThrown)
 		{
-			// Лёгкий — бросаем; тяжёлый аккуратно ставим (без импульса)
+			// Бросок: запуляем по прицелу (тяжёлый летит слабее), с подбросом
+			const float Power = bHeavy ? ThrowImpulseHeavy : ThrowImpulseLight;
+			Prim->AddImpulse(AimDir * Power + FVector(0.f, 0.f, 150.f), NAME_None, true);
+		}
+		else if (!bHeavy)
+		{
+			// Лёгкий — роняем с лёгким толчком; тяжёлый аккуратно ставим
 			Prim->AddImpulse(GetActorForwardVector() * 200.f, NAME_None, true);
 		}
 	}
 
-	// Падение предмета слышно; тяжёлый — громче
-	MakeNoise(bHeavy ? 1.f : 0.6f, this, DropLocation);
+	// Бросок и падение слышно; тяжёлый — громче
+	MakeNoise(bThrown ? 0.8f : (bHeavy ? 1.f : 0.6f), this, DropLocation);
 
 	RefreshHeldItem();
 }
