@@ -138,6 +138,12 @@ namespace DispatcherLines
 		TEXT("Кто-то навернулся. Пол подлый, не спорю."),
 		TEXT("{X} собрал все провода разом. Изящно, но в акт."),
 	};
+	// Перегрузка сети (§18): старое здание снова выбило щиток
+	const TArray<FString> Overload = {
+		TEXT("Опять выбило! Старая проводка, мужики. Кто-то снова к щитку."),
+		TEXT("Свет моргнул — перегрузка. Щиток обесточился, чините заново."),
+		TEXT("Здание девятьсот лохматого года: автомат выбило сам по себе. Бегом к ГРЩ."),
+	};
 	// Реплики начальника про выданный дешёвый комплект (§18 «дешёвое оборудование»)
 	const TArray<FString> CheapGearGreeting = {
 		TEXT("Да, и комплект вам выдали бюджетный — фонари с рынка, рация с помехами. Экономия, мужики."),
@@ -161,6 +167,9 @@ ARunState::ARunState()
 	NextChatterTime = 0.f;
 	bCheapGear = false;
 	NextRadioGhostTime = 0.f;
+	bElectricalOverload = true;
+	OverloadChancePerSecond = 0.015f; // ~раз в минуту, пока щиток под напряжением
+	OverloadCooldown = 0.f;
 	ShiftNumber = 1;
 	CompanyBalanceStart = 0;
 	Reputation = 0;
@@ -343,10 +352,59 @@ void ARunState::Tick(float DeltaSeconds)
 	}
 
 	TickRadioInterference(Now);
+	TickOverload(DeltaSeconds);
 
 	if (NumPlayers > 0 && NumWounded == NumPlayers)
 	{
 		FinishRun(ERunPhase::Lost);
+	}
+}
+
+void ARunState::TickOverload(float DeltaSeconds)
+{
+	if (!bElectricalOverload)
+	{
+		return;
+	}
+	if (OverloadCooldown > 0.f)
+	{
+		OverloadCooldown = FMath::Max(0.f, OverloadCooldown - DeltaSeconds);
+		return;
+	}
+
+	// Щиток — объект с курсорной мини-игрой; выбиваем только починенный и который сейчас никто не чинит
+	ARepairable* Breaker = nullptr;
+	for (const TObjectPtr<ARepairable>& Obj : Objectives)
+	{
+		if (Obj && Obj->GetMinigameType() == ERepairMinigameType::Cursor
+			&& !Obj->IsBroken() && !Obj->IsBeingRepaired())
+		{
+			Breaker = Obj;
+			break;
+		}
+	}
+	if (!Breaker)
+	{
+		return; // щиток сломан/чинится/его нет — перегружать нечего
+	}
+
+	if (FMath::FRand() < OverloadChancePerSecond * DeltaSeconds)
+	{
+		Breaker->SetBroken(true); // снова обесточились (OnRep_Broken оживит аварийные лампы)
+
+		// Пересчитать прогресс задач — иначе победа сработает с выбитым щитком
+		RepairedCount = 0;
+		for (const ARepairable* Objective : Objectives)
+		{
+			if (Objective && !Objective->IsBroken())
+			{
+				++RepairedCount;
+			}
+		}
+
+		OverloadCooldown = 12.f; // не выбивать снова сразу
+		DispatcherSay(DispatcherLines::Overload, FString(), /*bImportant=*/true);
+		MakeNoise(0.9f, nullptr, Breaker->GetActorLocation());
 	}
 }
 

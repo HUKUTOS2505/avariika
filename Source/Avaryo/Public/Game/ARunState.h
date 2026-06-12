@@ -200,6 +200,16 @@ protected:
 	/** Есть ли на карте зона выхода (если нет — побеждаем сразу после починок). */
 	bool bHasExitZone;
 
+	/** Перегрузка сети: старое здание изредка снова выбивает починенный щиток. */
+	UPROPERTY(EditAnywhere, Category="Run|Overload")
+	bool bElectricalOverload;
+
+	/** Шанс/сек выбить щиток заново (только пока он починен и его никто не чинит). */
+	UPROPERTY(EditAnywhere, Category="Run|Overload")
+	float OverloadChancePerSecond;
+
+	float OverloadCooldown; // пауза после выбивания, чтобы не зациклить
+
 	/** Дешёвый комплект на этот забег: фонари моргают, рация ловит чужой голос чаще. Реплицируется для HUD. */
 	UPROPERTY(Replicated)
 	bool bCheapGear;
@@ -253,6 +263,9 @@ protected:
 
 	/** Сервер: пока хоть одна рация включена, в эфир изредка прорывается чужой голос (паника + шум). */
 	void TickRadioInterference(float Now);
+
+	/** Сервер: перегрузка сети — старое здание может снова выбить починенный щиток (§18). */
+	void TickOverload(float DeltaSeconds);
 
 	/** Сервер: выдать монтёру дешёвый фонарь, если на забег выпал дешёвый комплект (один раз). */
 	void ApplyCheapGear(AAvaryoCharacter* Who);
