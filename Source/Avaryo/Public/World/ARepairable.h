@@ -83,6 +83,10 @@ public:
 	UFUNCTION(BlueprintPure, Category="Repair|Gas")
 	bool IsLeakingGas() const { return bBroken && bLeaksGasWhenBroken; }
 
+	/** Сбить облако газа струёй огнетушителя: пока сбито, поджечь его нельзя. Только сервер. */
+	void SuppressGas(float Duration);
+	bool IsGasSuppressed() const { return GasSuppressedTime > 0.f; }
+
 	// ---------- Мини-игры ----------
 
 	/** Какой мини-игрой чинится: None (держать E) / Cursor (щиток) / Valve (труба) / Starter (генератор). */
@@ -258,6 +262,9 @@ protected:
 
 	/** Пауза между взрывами, чтобы не рвало каждый тик. */
 	float ExplosionCooldown;
+
+	/** Сколько ещё секунд газ сбит пеной (поджечь нельзя). */
+	float GasSuppressedTime;
 
 	/** Мини-игра: позиция курсора, центр зелёной зоны, промахи, блокировка. */
 	UPROPERTY(Replicated)

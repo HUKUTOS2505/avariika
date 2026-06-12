@@ -52,6 +52,7 @@ ARepairable::ARepairable()
 	RepairProgress = 0.f;
 	NoiseAccum = 0.f;
 	ExplosionCooldown = 0.f;
+	GasSuppressedTime = 0.f;
 	LastShownPercent = -1;
 
 	MinigameType = ERepairMinigameType::None;
@@ -211,6 +212,7 @@ void ARepairable::Tick(float DeltaSeconds)
 	if (HasAuthority())
 	{
 		ExplosionCooldown = FMath::Max(ExplosionCooldown - DeltaSeconds, 0.f);
+		GasSuppressedTime = FMath::Max(GasSuppressedTime - DeltaSeconds, 0.f);
 		if (IsLeakingGas())
 		{
 			for (TActorIterator<AAvaryoCharacter> It(GetWorld()); It; ++It)
@@ -221,7 +223,8 @@ void ARepairable::Tick(float DeltaSeconds)
 					continue;
 				}
 				It->VitalsComponent->AddSmell(8.f * DeltaSeconds); // провонял газом
-				if (ExplosionCooldown <= 0.f && It->VitalsComponent->IsSmoking())
+				// Пока облако сбито пеной — поджечь нельзя (огнетушитель спасает от взрыва)
+				if (GasSuppressedTime <= 0.f && ExplosionCooldown <= 0.f && It->VitalsComponent->IsSmoking())
 				{
 					ExplodeGas(*It);
 					break;
@@ -373,6 +376,14 @@ void ARepairable::EndRepairBy(AAvaryoCharacter* Who)
 		StarterTension = 0.f;
 		bBotching = false;
 		Repairer = nullptr; // прогресс сохраняется — можно дочинить позже
+	}
+}
+
+void ARepairable::SuppressGas(float Duration)
+{
+	if (HasAuthority() && IsLeakingGas())
+	{
+		GasSuppressedTime = FMath::Max(GasSuppressedTime, Duration);
 	}
 }
 
