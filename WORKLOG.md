@@ -54,23 +54,23 @@
 
 **Пайплайн:** Text-to-3D → экспорт **FBX** с текстурами → положить файл в `D:\unrealEngine\avariika\RawAssets\<ИмяПапки>\` (имя папки строго из таблицы) → сказать Claude «импортируй модели» → он гоняет `Scripts/import_models.py` (закрытый редактор!): импорт в `/Game/Avariika/Meshes/`, автоназначение на акторы по меткам / в CDO BP-предметов, автомасштаб для объектов уровня.
 
-К каждому промпту meshy можно добавить негатив/уточнение: *«single object, centered, no ground plane, no scene»*.
+Промпты ниже финальные — копировать как есть (хвост `single object, centered, no ground plane, no scene` уже вшит).
 
 | Папка | Что | Промпт |
 |---|---|---|
-| `SM_Toilet` | Биотуалет (сиденье-куб → кабинка) | `Portable outdoor biotoilet cabin, blue plastic booth, slightly open door, dirty worn plastic with grime streaks, white roof, vent slots, low-poly game prop, PBR textures, game-ready, single object` |
-| `SM_Breaker` | Электрощиток | `Industrial wall-mounted electrical breaker panel, open rusty metal door revealing fuses, wires and big switches, gray-green soviet industrial style, scorch marks, low-poly game prop, PBR, game-ready` |
-| `SM_Tester` | Тестер (инструмент щитка) | `Handheld digital multimeter, yellow rubber protective case, small LCD screen, rotary dial, red and black probe wires wrapped around body, worn used look, low-poly game prop, PBR, game-ready` |
-| `SM_GasPipe` | Газовая труба | `Vertical industrial gas pipe section with large red shut-off valve wheel, pressure gauge, yellow pipe paint peeling with rust, visible crack leaking, soviet factory style, low-poly game prop, PBR, game-ready` |
-| `SM_Generator` | Генератор | `Old diesel power generator unit on metal frame, exposed engine, fuel tank on top, control box with gauges, orange-red chipped paint, oil stains, soviet industrial, low-poly game prop, PBR, game-ready` |
-| `SM_Gazelle` | ГАЗель (база/выход) | `Russian GAZelle cargo van, white boxy delivery van 90s style, roof rack with ladder, mud splashes, orange emergency stripe and rotating beacon on roof, slightly rusty, low-poly game vehicle, PBR, game-ready` |
-| `SM_WeldingMachine` | Сварочник (тяжёлый) | `Portable arc welding machine, heavy metal box with carrying handle, cable with electrode holder wrapped around, dials and clamps, dark blue chipped paint, rust and burn marks, low-poly game prop, PBR, game-ready` |
-| `SM_FireExtinguisher` | Огнетушитель | `Red fire extinguisher with black hose and nozzle, pressure gauge, worn scratched paint, metal cylinder, low-poly game prop, PBR, game-ready` |
-| `SM_FirstAidKit` | Аптечка | `First aid kit, small white plastic case with red cross, clasp latch, scuffed and dirty, slightly open lid, low-poly game prop, PBR, game-ready` |
-| `SM_Cigarettes` | Сигареты | `Crumpled cigarette pack, soviet style plain white-red paper pack, one cigarette sticking out, with a small matchbox, low-poly game prop, PBR, game-ready` |
-| `SM_Radio` | Рация | `Handheld walkie-talkie radio, black rubber body with orange accents, stubby antenna, speaker grille, belt clip, volume knob, worn scratched, low-poly game prop, PBR, game-ready` |
-| `SM_Battery` | Батарея фонаря | `Big chunky lantern battery, blue metal casing with paper label, two spring terminals on top, slightly corroded, retro soviet style, low-poly game prop, PBR, game-ready` |
-| `SM_Fuse` | Предохранитель | `Ceramic electrical fuse plug, white ceramic body with metal cap and thread, small handle, vintage soviet fuse, low-poly game prop, PBR, game-ready` |
+| `SM_Toilet` | Биотуалет (сиденье-куб → кабинка) | `Portable outdoor biotoilet cabin, blue plastic booth, slightly open door, dirty worn plastic with grime streaks, white roof, vent slots, low-poly game prop, PBR textures, game-ready, single object, centered, no ground plane, no scene` |
+| `SM_Breaker` | Электрощиток | `Industrial wall-mounted electrical breaker panel, open rusty metal door revealing fuses, wires and big switches, gray-green soviet industrial style, scorch marks, low-poly game prop, PBR, game-ready, single object, centered, no ground plane, no scene` |
+| `SM_Tester` | Тестер (инструмент щитка) | `Handheld digital multimeter, yellow rubber protective case, small LCD screen, rotary dial, red and black probe wires wrapped around body, worn used look, low-poly game prop, PBR, game-ready, single object, centered, no ground plane, no scene` |
+| `SM_GasPipe` | Газовая труба | `Vertical industrial gas pipe section with large red shut-off valve wheel, pressure gauge, yellow pipe paint peeling with rust, visible crack leaking, soviet factory style, low-poly game prop, PBR, game-ready, single object, centered, no ground plane, no scene` |
+| `SM_Generator` | Генератор | `Old diesel power generator unit on metal frame, exposed engine, fuel tank on top, control box with gauges, orange-red chipped paint, oil stains, soviet industrial, low-poly game prop, PBR, game-ready, single object, centered, no ground plane, no scene` |
+| `SM_Gazelle` | ГАЗель (база/выход) | `Russian GAZelle cargo van, white boxy delivery van 90s style, roof rack with ladder, mud splashes, orange emergency stripe and rotating beacon on roof, slightly rusty, low-poly game vehicle, PBR, game-ready, single object, centered, no ground plane, no scene` |
+| `SM_WeldingMachine` | Сварочник (тяжёлый) | `Portable arc welding machine, heavy metal box with carrying handle, cable with electrode holder wrapped around, dials and clamps, dark blue chipped paint, rust and burn marks, low-poly game prop, PBR, game-ready, single object, centered, no ground plane, no scene` |
+| `SM_FireExtinguisher` | Огнетушитель | `Red fire extinguisher with black hose and nozzle, pressure gauge, worn scratched paint, metal cylinder, low-poly game prop, PBR, game-ready, single object, centered, no ground plane, no scene` |
+| `SM_FirstAidKit` | Аптечка | `First aid kit, small white plastic case with red cross, clasp latch, scuffed and dirty, slightly open lid, low-poly game prop, PBR, game-ready, single object, centered, no ground plane, no scene` |
+| `SM_Cigarettes` | Сигареты | `Crumpled cigarette pack, soviet style plain white-red paper pack, one cigarette sticking out, with a small matchbox, low-poly game prop, PBR, game-ready, single object, centered, no ground plane, no scene` |
+| `SM_Radio` | Рация | `Handheld walkie-talkie radio, black rubber body with orange accents, stubby antenna, speaker grille, belt clip, volume knob, worn scratched, low-poly game prop, PBR, game-ready, single object, centered, no ground plane, no scene` |
+| `SM_Battery` | Батарея фонаря | `Big chunky lantern battery, blue metal casing with paper label, two spring terminals on top, slightly corroded, retro soviet style, low-poly game prop, PBR, game-ready, single object, centered, no ground plane, no scene` |
+| `SM_Fuse` | Предохранитель | `Ceramic electrical fuse plug, white ceramic body with metal cap and thread, small handle, vintage soviet fuse, low-poly game prop, PBR, game-ready, single object, centered, no ground plane, no scene` |
 
 Приоритет генерации: сперва модуль «Туалет + Щиток» — `SM_Toilet`, `SM_Breaker`, `SM_Tester`; потом крупняк (`SM_Gazelle`, `SM_Generator`, `SM_GasPipe`), потом мелочёвка.
 
