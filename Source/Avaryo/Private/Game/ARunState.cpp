@@ -621,6 +621,19 @@ void ARunState::TickRadioInterference(float Now)
 	}
 }
 
+void ARunState::DebugForceCheapGear()
+{
+	if (!HasAuthority())
+	{
+		return;
+	}
+	bCheapGear = true;
+	for (TActorIterator<AAvaryoCharacter> It(GetWorld()); It; ++It)
+	{
+		ApplyCheapGear(*It);
+	}
+}
+
 void ARunState::ApplyCheapGear(AAvaryoCharacter* Who)
 {
 	if (!bCheapGear || !Who || CheapGearApplied.Contains(Who))

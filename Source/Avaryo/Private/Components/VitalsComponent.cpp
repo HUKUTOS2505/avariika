@@ -189,6 +189,16 @@ void UVitalsComponent::AddSmell(float Amount)
 	Smell = FMath::Clamp(Smell + Amount, 0.f, 100.f);
 }
 
+void UVitalsComponent::DebugSetVital(FName Which, float Value)
+{
+	const float V = FMath::Clamp(Value, 0.f, 100.f);
+	if (Which == TEXT("health"))       { Health = V; if (bWounded && Health >= WoundedReviveThreshold) { bWounded = false; OnRevived.Broadcast(); } }
+	else if (Which == TEXT("panic"))   { Panic = V; }
+	else if (Which == TEXT("stamina")) { Stamina = V; }
+	else if (Which == TEXT("bladder")) { Bladder = V; } // 100 → инцидент сработает на ближайшем тике
+	else if (Which == TEXT("smell"))   { Smell = V; }
+}
+
 void UVitalsComponent::ApplyDamage(float Amount)
 {
 	if (Amount <= 0.f)

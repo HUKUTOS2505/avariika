@@ -15,6 +15,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "InputCoreTypes.h"
 #include "Game/ARunState.h"
+#include "Items/ABioPickup.h"
 #include "Items/APickupItem.h"
 #include "Net/UnrealNetwork.h"
 #include "UI/AvaryoCameraShakes.h"
@@ -698,6 +699,38 @@ void AAvaryoCharacter::ServerRequestRestart_Implementation()
 		Run->RequestRestart();
 	}
 }
+
+void AAvaryoCharacter::AvVital(const FString& Which, float Value)
+{
+	if (!HasAuthority()) { ServerAvVital(Which, Value); return; }
+	if (VitalsComponent) { VitalsComponent->DebugSetVital(FName(*Which), Value); }
+}
+void AAvaryoCharacter::ServerAvVital_Implementation(const FString& Which, float Value) { AvVital(Which, Value); }
+
+void AAvaryoCharacter::AvIncident()
+{
+	AvVital(TEXT("bladder"), 100.f); // шкала переполнена → инцидент сработает на ближайшем тике
+}
+
+void AAvaryoCharacter::AvGiveBio()
+{
+	if (!HasAuthority()) { ServerAvGiveBio(); return; }
+	const FVector Loc = GetActorLocation() + GetActorForwardVector() * 120.f;
+	FActorSpawnParameters P;
+	P.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+	if (ABioPickup* Bio = GetWorld()->SpawnActor<ABioPickup>(ABioPickup::StaticClass(), Loc, FRotator::ZeroRotator, P))
+	{
+		PickupItem(Bio); // сразу в руки (и руки пропахнут — как при обычном подборе)
+	}
+}
+void AAvaryoCharacter::ServerAvGiveBio_Implementation() { AvGiveBio(); }
+
+void AAvaryoCharacter::AvCheapGear()
+{
+	if (!HasAuthority()) { ServerAvCheapGear(); return; }
+	if (ARunState* Run = ARunState::Get(GetWorld())) { Run->DebugForceCheapGear(); }
+}
+void AAvaryoCharacter::ServerAvCheapGear_Implementation() { AvCheapGear(); }
 
 // ---------- Оператор: нагрудные камеры ----------
 

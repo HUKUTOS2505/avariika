@@ -151,6 +151,9 @@ public:
 	UFUNCTION(BlueprintPure, Category="Run")
 	bool HasCheapGear() const { return bCheapGear; }
 
+	/** Дев-режим: принудительно включить дешёвый комплект и раздать фонарям. Только сервер. */
+	void DebugForceCheapGear();
+
 	// ---------- Бухгалтерия конторы (§19, переживает смены через UCompanyLedgerSubsystem) ----------
 
 	/** Премии/штрафы одного монтёра за смену — единая формула для сервера и HUD. */

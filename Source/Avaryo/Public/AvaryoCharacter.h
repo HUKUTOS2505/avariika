@@ -446,4 +446,31 @@ protected:
 
 	UFUNCTION(Server, Reliable)
 	void ServerRequestRestart();
+
+	// ---------- Дев-консоль: быстрый тест модулей ----------
+
+	/** Выставить шкалу: `AvVital panic 100` (health/panic/stamina/bladder/smell, 0..100). */
+	UFUNCTION(Exec)
+	void AvVital(const FString& Which, float Value);
+
+	/** Мгновенный санитарный инцидент (роняет биоснаряд, скачок паники/запаха). */
+	UFUNCTION(Exec)
+	void AvIncident();
+
+	/** Дать «подозрительный комок» в руки (для теста биоснаряда). */
+	UFUNCTION(Exec)
+	void AvGiveBio();
+
+	/** Принудительно включить дешёвый комплект (моргающий фонарь + помехи рации). */
+	UFUNCTION(Exec)
+	void AvCheapGear();
+
+	UFUNCTION(Server, Reliable)
+	void ServerAvVital(const FString& Which, float Value);
+
+	UFUNCTION(Server, Reliable)
+	void ServerAvGiveBio();
+
+	UFUNCTION(Server, Reliable)
+	void ServerAvCheapGear();
 };

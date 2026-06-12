@@ -61,6 +61,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Vitals")
 	void AddSmell(float Amount);
 
+	/** Дев-режим: жёстко выставить шкалу по имени (health/panic/stamina/bladder/smell). Только сервер. */
+	void DebugSetVital(FName Which, float Value);
+
 	// -- Геттеры --
 
 	UFUNCTION(BlueprintPure, Category="Vitals") float GetHealth() const { return Health; }
