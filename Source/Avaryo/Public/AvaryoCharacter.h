@@ -361,6 +361,31 @@ protected:
 
 	float ShoveReadyTime;    // серверное время, когда снова можно толкать
 
+	// ---------- Споткнуться (§18 хаос/хоррор) ----------
+	/** Спотыкается ли сейчас (реплицируется — клиент тоже сбрасывает скорость). */
+	UPROPERTY(Replicated)
+	bool bStumbling;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Avaryo|Trip")
+	float TripChancePerSecond; // базовый шанс споткнуться при беге, в секунду
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Avaryo|Trip")
+	float TripDarkMultiplier;  // во сколько раз чаще без фонаря (в темноте)
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Avaryo|Trip")
+	float TripPanicMultiplier; // надбавка к шансу при полной панике
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Avaryo|Trip")
+	float TripRecoverTime;     // длительность спотыкания, сек
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Avaryo|Trip")
+	float TripSlowSpeed;       // скорость во время спотыкания
+
+	float StumbleUntil;        // серверное время конца спотыкания
+
+	/** Сервер: розыгрыш спотыкания при беге (темнота/паника повышают шанс). */
+	void UpdateTrip(float DeltaSeconds);
+
 	/** Каст применения предмета: осталось/всего, реплицируется для HUD. */
 	UPROPERTY(Replicated)
 	float UseCastRemaining;

@@ -84,6 +84,14 @@ AAvaryoCharacter::AAvaryoCharacter()
 	ShovePanic = 10.f;
 	ShoveCooldownTime = 1.2f;
 	ShoveReadyTime = 0.f;
+
+	bStumbling = false;
+	TripChancePerSecond = 0.03f;
+	TripDarkMultiplier = 2.5f;
+	TripPanicMultiplier = 1.5f;
+	TripRecoverTime = 0.8f;
+	TripSlowSpeed = 150.f;
+	StumbleUntil = 0.f;
 	UseCastRemaining = 0.f;
 	UseCastDuration = 0.f;
 	bOffering = false;
@@ -221,6 +229,7 @@ void AAvaryoCharacter::Tick(float DeltaSeconds)
 	if (HasAuthority())
 	{
 		UpdateFoamSlip();
+		UpdateTrip(DeltaSeconds);
 	}
 
 	// Волочение раненого
@@ -303,6 +312,7 @@ void AAvaryoCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	DOREPLIFETIME(AAvaryoCharacter, DraggedBy);
 	DOREPLIFETIME(AAvaryoCharacter, bInteractionLocked);
 	DOREPLIFETIME(AAvaryoCharacter, bSlipping);
+	DOREPLIFETIME(AAvaryoCharacter, bStumbling);
 }
 
 void AAvaryoCharacter::SetInteractionLocked(bool bNewLocked)
@@ -380,6 +390,10 @@ void AAvaryoCharacter::RefreshMoveSpeed()
 	if (VitalsComponent->IsIncidentSlowed())
 	{
 		Speed *= IncidentSlowMultiplier;
+	}
+	if (bStumbling)
+	{
+		Speed = FMath::Min(Speed, TripSlowSpeed); // споткнулся — резко сбросил ход
 	}
 	if (VitalsComponent->IsWounded())
 	{
@@ -1514,6 +1528,48 @@ void AAvaryoCharacter::ApplySlipFriction(bool bOn)
 void AAvaryoCharacter::OnRep_Slipping()
 {
 	ApplySlipFriction(bSlipping); // клиент тоже снижает/возвращает трение — чтобы скольжение совпало
+}
+
+void AAvaryoCharacter::UpdateTrip(float DeltaSeconds)
+{
+	const float Now = GetWorld()->GetTimeSeconds();
+	if (bStumbling)
+	{
+		if (Now >= StumbleUntil)
+		{
+			bStumbling = false; // отпустило — RefreshMoveSpeed вернёт ход
+		}
+		return;
+	}
+
+	UCharacterMovementComponent* Move = GetCharacterMovement();
+	if (!Move || !VitalsComponent)
+	{
+		return;
+	}
+
+	// Спотыкаемся только на бегу по земле, не раненым
+	if (VitalsComponent->IsWounded()
+		|| !VitalsComponent->IsSprinting()
+		|| !Move->IsMovingOnGround()
+		|| Move->Velocity.SizeSquared2D() < FMath::Square(300.f))
+	{
+		return;
+	}
+
+	float Mult = 1.f;
+	if (FlashlightComponent && !FlashlightComponent->IsOn())
+	{
+		Mult *= TripDarkMultiplier; // в темноте не видно, обо что споткнуться
+	}
+	Mult *= 1.f + (VitalsComponent->GetPanic() / 100.f) * TripPanicMultiplier; // паника — суетятся ноги
+
+	if (FMath::FRand() < TripChancePerSecond * DeltaSeconds * Mult)
+	{
+		bStumbling = true;
+		StumbleUntil = Now + TripRecoverTime;
+		MakeNoise(0.7f, this, GetActorLocation()); // грохнулся — слышно
+	}
 }
 
 void AAvaryoCharacter::Shove()
