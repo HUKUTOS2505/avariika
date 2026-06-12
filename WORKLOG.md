@@ -187,6 +187,12 @@
 
 ### Чек-лист теста — TESTING.md, раздел «НОВОЕ — Переносной прожектор» (2026-06-12).
 
+## АВТОТЕСТЫ 2026-06-12 (headless-верификация логики)
+
+`Source/Avaryo/Private/Tests/AvaryoTests.cpp` — 4 C++ Automation-теста (под `WITH_DEV_AUTOMATION_TESTS`):
+`Avariika.PlayerBalance` (формула денег), `Avariika.ReputationTitle`, `Avariika.CompanyLedger` (накопление баланса/репутации/смены, зажимы), `Avariika.Vitals` (зажимы запаха/паники, DebugSetVital). **Все 4 — Success.**
+Прогон headless: `UnrealEditor-Cmd <uproj> -ExecCmds="Automation RunTests Avariika; Quit" -unattended -nullrhi -nosound -abslog=<...>`; «EXIT CODE: 0» = всё прошло. Нюансы 5.7: маска контекста — `EAutomationTestFlags_ApplicationContextMask` (с подчёркиванием); `UCompanyLedgerSubsystem` (ClassWithin=GameInstance) в тесте создавать с `NewObject<UGameInstance>` овнером, не в пакете.
+
 ## ДЕВ-КОНСОЛЬ 2026-06-12 (ускорение PIE-теста)
 
 Exec-команды на персонаже (`AvaryoCharacter`), чтобы тестировать модули мгновенно (без ожидания шкал). Список и применение — TESTING.md, раздел «Дев-команды». Команды: `AvVital <health|panic|stamina|bladder|smell> <0..100>`, `AvIncident`, `AvGiveBio`, `AvCheapGear`. Маршрутизируются на сервер (работают и у клиента, и у хоста). UFUNCTION(Exec) нельзя оборачивать в `#if` — поэтому читы скомпилированы всегда (проект не шипится). Опираются на `VitalsComponent::DebugSetVital` и `ARunState::DebugForceCheapGear`.
