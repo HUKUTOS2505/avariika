@@ -196,6 +196,9 @@ ARunState::ARunState()
 	bDarknessFear = true;
 	DarknessPanicPerSecond = 2.5f; // ~25 c в полной темноте до паники
 	DarknessSafeRadius = 900.f;    // 9 м от прожектора — спокойно
+	bPanicContagion = true;
+	PanicContagionRadius = 500.f;     // 5 м — «вижу что соседу плохо»
+	PanicContagionPerSecond = 1.5f;   // мягче темноты (вторичный источник)
 	ShiftNumber = 1;
 	CompanyBalanceStart = 0;
 	Reputation = 0;
@@ -349,6 +352,9 @@ void ARunState::Tick(float DeltaSeconds)
 	}
 	const float DarkRadiusSq = DarknessSafeRadius * DarknessSafeRadius;
 
+	// Паника заразна: собираем позиции паникующих, ниже разносим тревогу соседям
+	TArray<FVector> PanickyLocs;
+
 	// Статистика + поражение (вся бригада ранена — поднимать некому)
 	const float Now = GetWorld()->GetTimeSeconds();
 	int32 NumPlayers = 0;
@@ -373,6 +379,7 @@ void ARunState::Tick(float DeltaSeconds)
 		{
 			Stats.PanicSeconds += DeltaSeconds;
 			TickPanicCries(*It, Now);
+			if (bPanicContagion) { PanickyLocs.Add(It->GetActorLocation()); }
 		}
 		else
 		{
@@ -432,6 +439,29 @@ void ARunState::Tick(float DeltaSeconds)
 			if (!bSafeLit)
 			{
 				Vitals->AddPanic(DarknessPanicPerSecond * DeltaSeconds);
+			}
+		}
+	}
+
+	// Паника заразна: спокойные рядом с паникующим товарищем тоже начинают нервничать
+	if (bPanicContagion && PanickyLocs.Num() > 0)
+	{
+		const float ContRadSq = PanicContagionRadius * PanicContagionRadius;
+		for (TActorIterator<AAvaryoCharacter> It(GetWorld()); It; ++It)
+		{
+			UVitalsComponent* V = It->VitalsComponent;
+			if (!V || V->IsPanicking() || V->IsWounded())
+			{
+				continue;
+			}
+			const FVector P = It->GetActorLocation();
+			for (const FVector& PL : PanickyLocs)
+			{
+				if (FVector::DistSquared(P, PL) < ContRadSq)
+				{
+					V->AddPanic(PanicContagionPerSecond * DeltaSeconds);
+					break;
+				}
 			}
 		}
 	}

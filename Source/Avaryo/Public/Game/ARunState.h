@@ -346,6 +346,18 @@ protected:
 	UPROPERTY(EditAnywhere, Category="Run|Darkness")
 	float DarknessSafeRadius;
 
+	/** Паника заразна: рядом с паникующим спокойные тоже начинают нервничать. */
+	UPROPERTY(EditAnywhere, Category="Run|Panic")
+	bool bPanicContagion;
+
+	/** Радиус заражения паникой, см. */
+	UPROPERTY(EditAnywhere, Category="Run|Panic")
+	float PanicContagionRadius;
+
+	/** Сколько паники/сек набегает рядом с паникующим товарищем. */
+	UPROPERTY(EditAnywhere, Category="Run|Panic")
+	float PanicContagionPerSecond;
+
 	/** Сервер: выдать монтёру дешёвый фонарь, если на забег выпал дешёвый комплект (один раз). */
 	void ApplyCheapGear(AAvaryoCharacter* Who);
 
