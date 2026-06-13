@@ -21,6 +21,37 @@ enum class ERepairMinigameType : uint8
 	Starter  // генератор: держать E (натяжение шнура), отпустить в зелёном окне
 };
 
+/** Тип подготовительного этапа (выполняется ДО основной мини-игры/починки). */
+UENUM(BlueprintType)
+enum class ERepairStageKind : uint8
+{
+	HoldHand,   // держать E руками (починить корпус, и т.п.)
+	HoldTool,   // держать E с инструментом ItemTag в руках (заварить сваркой)
+	InsertItem  // нажать E с предметом ItemTag в руках — предмет тратится (кабель, канистра, предохранитель)
+};
+
+/** Один подготовительный этап ремонта. */
+USTRUCT(BlueprintType)
+struct FRepairStage
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="RepairStage")
+	ERepairStageKind Kind = ERepairStageKind::HoldHand;
+
+	/** Для HoldTool — ToolTag инструмента; для InsertItem — ToolTag расходника. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="RepairStage")
+	FName ItemTag;
+
+	/** Сколько секунд держать E (для Hold-этапов). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="RepairStage")
+	float Duration = 3.f;
+
+	/** Подсказка на табличке: "Заварить", "Залить бензин", "Вставить предохранитель"... */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="RepairStage")
+	FText Label;
+};
+
 /**
  * Ремонтируемый объект (щиток, труба, генератор) — суть работы бригады.
  * Игрок смотрит на сломанный объект и держит E: прогресс растёт, по завершении
@@ -66,6 +97,11 @@ public:
 	/** Дальше этой дистанции починка срывается, см. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Repair")
 	float RepairRange;
+
+	/** Подготовительные этапы ДО основной починки/мини-игры (заварить, залить, вставить...).
+	 *  Пусто — объект чинится сразу. Выполняются по порядку. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Repair|Stages")
+	TArray<FRepairStage> PrereqStages;
 
 	/** Пока сломан — травит газ: открытый огонь рядом (курение) вызывает взрыв. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Repair|Gas")
@@ -241,6 +277,20 @@ public:
 	UFUNCTION(BlueprintPure, Category="Repair") float GetRepairProgress() const { return RepairProgress; }
 	UFUNCTION(BlueprintPure, Category="Repair") AAvaryoCharacter* GetRepairer() const { return Repairer; }
 
+	// ---------- Этапы ----------
+	UFUNCTION(BlueprintPure, Category="Repair|Stages") bool ArePrereqsDone() const { return PrereqIndex >= PrereqStages.Num(); }
+	UFUNCTION(BlueprintPure, Category="Repair|Stages") int32 GetPrereqIndex() const { return PrereqIndex; }
+	UFUNCTION(BlueprintPure, Category="Repair|Stages") float GetPrereqProgress() const { return PrereqProgress; }
+
+	/** Текущий этап (если не все пройдены). Возвращает false, если этапов больше нет. */
+	bool GetCurrentStage(FRepairStage& OutStage) const;
+
+	/** Нужно ли сейчас вставлять предмет (текущий этап = InsertItem). */
+	UFUNCTION(BlueprintPure, Category="Repair|Stages") bool NeedsInsertNow() const;
+
+	/** Нажатие E с предметом для этапа InsertItem: тратит предмет, продвигает этап. Только сервер. */
+	bool TryInsertBy(AAvaryoCharacter* Who);
+
 	/** Сломать объект (рандомизация поломок на старте забега, аварии). Только сервер. */
 	UFUNCTION(BlueprintCallable, Category="Repair")
 	void SetBroken(bool bNewBroken);
@@ -315,6 +365,18 @@ protected:
 	/** Текущая починка идёт колхозом (без инструмента). Реплицируется для HUD и маршрутизации E. */
 	UPROPERTY(Replicated)
 	bool bBotching;
+
+	/** Сколько подготовительных этапов уже пройдено. */
+	UPROPERTY(Replicated)
+	int32 PrereqIndex;
+
+	/** Прогресс текущего Hold-этапа 0..1. */
+	UPROPERTY(Replicated)
+	float PrereqProgress;
+
+	/** Идёт ли сейчас Hold-этап (держим E на подготовке, а не на основной починке). */
+	UPROPERTY(Replicated)
+	bool bDoingPrereqHold;
 
 	/** Докрутка вентиля одним тыком: попал в ритм или сорвал резьбу. Только сервер. */
 	void HandleValveTurn(AAvaryoCharacter* Who);

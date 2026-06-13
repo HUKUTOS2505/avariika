@@ -97,6 +97,10 @@ ARepairable::ARepairable()
 	BotchMishapDamage = 6.f;
 	BotchMishapPanic = 6.f;
 	bBotching = false;
+
+	PrereqIndex = 0;
+	PrereqProgress = 0.f;
+	bDoingPrereqHold = false;
 }
 
 void ARepairable::BeginPlay()
@@ -120,6 +124,54 @@ void ARepairable::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifet
 	DOREPLIFETIME(ARepairable, bStarterPulling);
 	DOREPLIFETIME(ARepairable, StarterTension);
 	DOREPLIFETIME(ARepairable, bBotching);
+	DOREPLIFETIME(ARepairable, PrereqIndex);
+	DOREPLIFETIME(ARepairable, PrereqProgress);
+	DOREPLIFETIME(ARepairable, bDoingPrereqHold);
+}
+
+bool ARepairable::GetCurrentStage(FRepairStage& OutStage) const
+{
+	if (PrereqIndex >= 0 && PrereqIndex < PrereqStages.Num())
+	{
+		OutStage = PrereqStages[PrereqIndex];
+		return true;
+	}
+	return false;
+}
+
+bool ARepairable::NeedsInsertNow() const
+{
+	FRepairStage S;
+	return bBroken && GetCurrentStage(S) && S.Kind == ERepairStageKind::InsertItem;
+}
+
+bool ARepairable::TryInsertBy(AAvaryoCharacter* Who)
+{
+	if (!HasAuthority() || !Who || !bBroken)
+	{
+		return false;
+	}
+	FRepairStage S;
+	if (!GetCurrentStage(S) || S.Kind != ERepairStageKind::InsertItem)
+	{
+		return false;
+	}
+	if (FVector::DistSquared(Who->GetActorLocation(), GetActorLocation()) > FMath::Square(RepairRange))
+	{
+		return false;
+	}
+	APickupItem* Held = Who->GetHeldItem();
+	if (!Held || Held->ToolTag != S.ItemTag)
+	{
+		return false; // нужен правильный расходник в руках
+	}
+	// Потратить предмет (кабель/канистра/предохранитель)
+	Who->ConsumeHeldItemCharge();
+	PrereqIndex++;
+	PrereqProgress = 0.f;
+	MakeNoise(0.6f, Who, GetActorLocation());
+	RefreshStatusVisual();
+	return true;
 }
 
 void ARepairable::Tick(float DeltaSeconds)
@@ -138,6 +190,38 @@ void ARepairable::Tick(float DeltaSeconds)
 		if (!CanContinueRepair())
 		{
 			EndRepairBy(Repairer);
+		}
+		else if (bDoingPrereqHold)
+		{
+			// Подготовительный Hold-этап: держим E, прогресс этапа растёт; по завершении — следующий этап
+			FRepairStage S;
+			if (GetCurrentStage(S) && (S.Kind == ERepairStageKind::HoldHand || S.Kind == ERepairStageKind::HoldTool))
+			{
+				PrereqProgress = FMath::Min(PrereqProgress + DeltaSeconds / FMath::Max(S.Duration, 0.1f), 1.f);
+				NoiseAccum += DeltaSeconds;
+				if (NoiseAccum >= 1.f)
+				{
+					NoiseAccum = 0.f;
+					MakeNoise(1.f, Repairer, GetActorLocation());
+				}
+				if (PrereqProgress >= 1.f)
+				{
+					PrereqIndex++;
+					PrereqProgress = 0.f;
+					bDoingPrereqHold = false;
+					if (Repairer)
+					{
+						Repairer->SetInteractionLocked(false);
+					}
+					Repairer = nullptr; // этап пройден — игрок заново жмёт E для следующего шага
+					RefreshStatusVisual();
+				}
+			}
+			else
+			{
+				bDoingPrereqHold = false;
+				EndRepairBy(Repairer);
+			}
 		}
 		else if (bBotching)
 		{
@@ -323,6 +407,31 @@ bool ARepairable::CanBotchBy(const AAvaryoCharacter* Who) const
 bool ARepairable::CanContinueRepair() const
 {
 	const bool bInRange = FVector::DistSquared(Repairer->GetActorLocation(), GetActorLocation()) <= FMath::Square(RepairRange);
+	if (bDoingPrereqHold)
+	{
+		if (!bInRange)
+		{
+			return false;
+		}
+		if (Repairer->VitalsComponent && Repairer->VitalsComponent->IsWounded())
+		{
+			return false;
+		}
+		FRepairStage S;
+		if (!GetCurrentStage(S))
+		{
+			return false;
+		}
+		if (S.Kind == ERepairStageKind::HoldTool)
+		{
+			const APickupItem* Held = Repairer->GetHeldItem();
+			if (!Held || Held->ToolTag != S.ItemTag)
+			{
+				return false;
+			}
+		}
+		return true;
+	}
 	if (bBotching)
 	{
 		return CanBotchBy(Repairer) && bInRange;
@@ -341,7 +450,41 @@ bool ARepairable::BeginRepairBy(AAvaryoCharacter* Who)
 		return false;
 	}
 
+	// --- Подготовительные этапы (заварить / починить руками / залить) ДО основной починки ---
+	if (!ArePrereqsDone())
+	{
+		FRepairStage S;
+		GetCurrentStage(S);
+		if (S.Kind == ERepairStageKind::InsertItem)
+		{
+			return false; // вставка расходника — отдельным нажатием E (TryInsertBy)
+		}
+		if (LockoutRemaining > 0.f || (Repairer && Repairer != Who))
+		{
+			return false;
+		}
+		if (Who->VitalsComponent && Who->VitalsComponent->IsWounded())
+		{
+			return false;
+		}
+		if (S.Kind == ERepairStageKind::HoldTool)
+		{
+			const APickupItem* Held = Who->GetHeldItem();
+			if (!Held || Held->ToolTag != S.ItemTag)
+			{
+				return false; // нужен инструмент этапа в руках (напр. сварочник)
+			}
+		}
+		Repairer = Who;
+		NoiseAccum = 0.f;
+		bBotching = false;
+		bDoingPrereqHold = true;
+		Who->SetInteractionLocked(true);
+		return true;
+	}
+
 	// Нет нужного инструмента, но можно колхозить — крудовый ремонт удержанием E (без мини-игры)
+	bDoingPrereqHold = false;
 	const bool bProper = CanBeRepairedBy(Who);
 	if (!bProper)
 	{
@@ -380,14 +523,15 @@ void ARepairable::EndRepairBy(AAvaryoCharacter* Who)
 {
 	if (HasAuthority() && Repairer == Who)
 	{
-		if (IsMinigameRepair() && !bBotching && Who)
+		if (Who && (bDoingPrereqHold || (IsMinigameRepair() && !bBotching)))
 		{
 			Who->SetInteractionLocked(false);
 		}
 		bStarterPulling = false;
 		StarterTension = 0.f;
 		bBotching = false;
-		Repairer = nullptr; // прогресс сохраняется — можно дочинить позже
+		bDoingPrereqHold = false;
+		Repairer = nullptr; // прогресс сохраняется — можно дочинить позже (этапы тоже)
 	}
 }
 
@@ -607,6 +751,12 @@ void ARepairable::SetBroken(bool bNewBroken)
 	RepairProgress = 0.f;
 	Repairer = nullptr;
 	bBotching = false;
+	bDoingPrereqHold = false;
+	if (bNewBroken)
+	{
+		PrereqIndex = 0;       // сломали заново — этапы с нуля
+		PrereqProgress = 0.f;
+	}
 	RefreshStatusVisual();
 }
 
@@ -666,6 +816,10 @@ void ARepairable::RefreshStatusVisual()
 	{
 		ShownPercent = 1000 + FMath::CeilToInt(LockoutRemaining);
 	}
+	else if (bBroken && !ArePrereqsDone())
+	{
+		ShownPercent = 2000 + PrereqIndex; // показываем текущий этап
+	}
 	if (ShownPercent == LastShownPercent)
 	{
 		return; // текст не менялся
@@ -682,6 +836,15 @@ void ARepairable::RefreshStatusVisual()
 		StatusText->SetText(FText::Format(NSLOCTEXT("Repair", "StatusLockout", "{0} — ЗАМКНУЛО ({1} с)"),
 			DisplayName, FMath::CeilToInt(LockoutRemaining)));
 		StatusText->SetTextRenderColor(FColor(255, 60, 0)); // тревожный, не как обычная поломка
+	}
+	else if (!ArePrereqsDone())
+	{
+		FRepairStage S;
+		GetCurrentStage(S);
+		const FText Step = S.Label.IsEmpty() ? NSLOCTEXT("Repair", "StepGeneric", "подготовка") : S.Label;
+		StatusText->SetText(FText::Format(NSLOCTEXT("Repair", "StatusStage", "{0}: {1} ({2}/{3})"),
+			DisplayName, Step, FText::AsNumber(PrereqIndex + 1), FText::AsNumber(PrereqStages.Num())));
+		StatusText->SetTextRenderColor(FColor(255, 200, 0)); // жёлтый — этап подготовки
 	}
 	else if (Percent > 0)
 	{

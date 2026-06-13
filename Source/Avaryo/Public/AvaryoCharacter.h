@@ -193,6 +193,9 @@ public:
 	UFUNCTION(BlueprintPure, Category="Avaryo|Inventory")
 	bool HasItem() const { return GetHeldItem() != nullptr; }
 
+	/** Потратить заряд предмета в руках (этапы ремонта: вставить кабель/предохранитель, залить канистру). Только сервер. */
+	void ConsumeHeldItemCharge();
+
 	/** Можно ли сейчас подобрать предмет: есть место, тяжёлый не берётся раненым/вторым. */
 	UFUNCTION(BlueprintPure, Category="Avaryo|Inventory")
 	bool CanPickupItem(APickupItem* Item) const;

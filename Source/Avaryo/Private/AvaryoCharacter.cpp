@@ -687,6 +687,15 @@ void AAvaryoCharacter::InteractPressedAuth()
 		return;
 	}
 
+	// Этап «вставить расходник»: смотрим на объект, в руках нужный предмет (кабель/канистра/предохранитель) — E вставляет
+	if (ARepairable* RInsert = FindFocusedRepairable())
+	{
+		if (RInsert->NeedsInsertNow() && RInsert->TryInsertBy(this))
+		{
+			return;
+		}
+	}
+
 	// Уже тащишь раненого — повторное E отпускает
 	if (DraggedTeammate)
 	{
@@ -1866,6 +1875,18 @@ void AAvaryoCharacter::StartCrouchInput()
 void AAvaryoCharacter::StopCrouchInput()
 {
 	UnCrouch();
+}
+
+void AAvaryoCharacter::ConsumeHeldItemCharge()
+{
+	if (!HasAuthority())
+	{
+		return;
+	}
+	if (APickupItem* Held = GetHeldItem())
+	{
+		ConsumeCharge(Held);
+	}
 }
 
 void AAvaryoCharacter::ConsumeCharge(APickupItem* Item)
