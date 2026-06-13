@@ -218,8 +218,15 @@ void UVitalsComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 	}
 }
 
+bool UVitalsComponent::IsVitalAuthority() const
+{
+	const AActor* OwnerActor = GetOwner();
+	return !OwnerActor || OwnerActor->HasAuthority();
+}
+
 void UVitalsComponent::AddSmell(float Amount)
 {
+	if (!IsVitalAuthority()) { return; }
 	Smell = FMath::Clamp(Smell + Amount, 0.f, 100.f);
 }
 
@@ -235,7 +242,7 @@ void UVitalsComponent::DebugSetVital(FName Which, float Value)
 
 void UVitalsComponent::ApplyDamage(float Amount)
 {
-	if (Amount <= 0.f)
+	if (!IsVitalAuthority() || Amount <= 0.f)
 	{
 		return;
 	}
@@ -253,7 +260,7 @@ void UVitalsComponent::ApplyDamage(float Amount)
 
 void UVitalsComponent::Heal(float Amount)
 {
-	if (Amount <= 0.f)
+	if (!IsVitalAuthority() || Amount <= 0.f)
 	{
 		return;
 	}
@@ -269,16 +276,19 @@ void UVitalsComponent::Heal(float Amount)
 
 void UVitalsComponent::AddPanic(float Amount)
 {
+	if (!IsVitalAuthority()) { return; }
 	Panic = FMath::Clamp(Panic + Amount, 0.f, 100.f);
 }
 
 void UVitalsComponent::RestoreStamina(float Amount)
 {
+	if (!IsVitalAuthority()) { return; }
 	Stamina = FMath::Clamp(Stamina + Amount, 0.f, 100.f);
 }
 
 void UVitalsComponent::ReducePanic(float Amount)
 {
+	if (!IsVitalAuthority()) { return; }
 	Panic = FMath::Clamp(Panic - Amount, 0.f, 100.f);
 }
 
@@ -290,15 +300,18 @@ void UVitalsComponent::SetSprinting(bool bNewSprinting)
 
 void UVitalsComponent::RelieveBladder()
 {
+	if (!IsVitalAuthority()) { return; }
 	Bladder = 0.f;
 }
 
 void UVitalsComponent::DrainBladder(float Amount)
 {
+	if (!IsVitalAuthority()) { return; }
 	Bladder = FMath::Max(0.f, Bladder - Amount);
 }
 
 void UVitalsComponent::StartSmoking()
 {
+	if (!IsVitalAuthority()) { return; }
 	SmokingRemaining = SmokingDuration;
 }

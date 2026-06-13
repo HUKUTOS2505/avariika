@@ -16,21 +16,25 @@ import unreal
 RAW = r'D:\unrealEngine\avariika\RawAssets'
 DEST = '/Game/Avariika/Meshes'
 
-# folder -> (actor label или None, target max-dim cm)
+# folder -> (target, target max-dim cm). target:
+#   'actor:<label>'  — назначить меш на актора уровня (+ масштаб под max-dim)
+#   'spawn:<label>'  — декор: найти/создать StaticMeshActor у ExitZone_Gazelle
+#   'bp:<path>'      — назначить меш в CDO компонента MeshComponent блюпринта-предмета
+#   None             — только импорт, без привязки
 MAPPING = {
-    'SM_Toilet':          ('Toilet', 75.0),
-    'SM_Breaker':         ('Repairable_Breaker', 160.0),
-    'SM_Tester':          ('Tester', 22.0),
-    'SM_GasPipe':         ('Repairable_GasPipe', 220.0),
-    'SM_Generator':       ('Repairable_Generator', 200.0),
-    'SM_Radio':           ('Radio', 20.0),
-    'SM_WeldingMachine':  (None, 60.0),
-    'SM_FireExtinguisher':(None, 60.0),
-    'SM_FirstAidKit':     (None, 30.0),
-    'SM_Battery':         (None, 20.0),
-    'SM_Cigarettes':      (None, 12.0),
-    'SM_Fuse':            (None, 10.0),
-    'SM_Gazelle':         (None, 500.0),
+    'SM_Toilet':          ('actor:Toilet', 75.0),
+    'SM_Breaker':         ('actor:Repairable_Breaker', 160.0),
+    'SM_Tester':          ('actor:Tester', 22.0),
+    'SM_GasPipe':         ('actor:Repairable_GasPipe', 220.0),
+    'SM_Generator':       ('actor:Repairable_Generator', 200.0),
+    'SM_Radio':           ('actor:Radio', 20.0),
+    'SM_Gazelle':         ('spawn:Gazelle_Mesh', 480.0),
+    'SM_WeldingMachine':  ('bp:/Game/Avariika/Items/BP_WeldingMachine', 0.0),
+    'SM_FireExtinguisher':('bp:/Game/Avariika/Items/BP_FireExtinguisher', 0.0),
+    'SM_FirstAidKit':     ('bp:/Game/Avariika/Items/BP_FirstAidKit', 0.0),
+    'SM_Battery':         ('bp:/Game/Avariika/Items/BP_Battery', 0.0),
+    'SM_Cigarettes':      ('bp:/Game/Avariika/Items/BP_Cigarettes', 0.0),
+    'SM_Fuse':            ('bp:/Game/Avariika/Items/BP_Fuse', 0.0),
 }
 
 out = []
@@ -75,7 +79,7 @@ def do_task(src, name):
     return unreal.load_asset(obj)
 
 
-def import_model(folder, actor_label, max_dim):
+def import_model(folder, target, max_dim):
     fdir = os.path.join(RAW, folder)
     if not os.path.isdir(fdir):
         return None
@@ -137,23 +141,45 @@ def import_model(folder, actor_label, max_dim):
 
     msg = 'OK %s: %.0fx%.0fx%.0f mat=%s orphans_killed=%d' % (folder, size[0], size[1], size[2], bool(mat), killed)
 
-    if actor_label:
-        actor = by_label.get(actor_label)
+    kind, _, key = (target or '').partition(':')
+    if kind == 'actor':
+        actor = by_label.get(key)
         if actor:
             actor.get_editor_property('MeshComponent').set_static_mesh(mesh)
-            m = max(size)
-            if m > 1.0:
-                s = max_dim / m
+            if max_dim > 0 and max(size) > 1.0:
+                s = max_dim / max(size)
                 actor.set_actor_scale3d(unreal.Vector(s, s, s))
-                msg += ' -> %s scale %.3f' % (actor_label, s)
+                msg += ' -> %s scale %.3f' % (key, s)
         else:
-            msg += ' (актор %s не найден)' % actor_label
+            msg += ' (актор %s не найден)' % key
+    elif kind == 'spawn':
+        actor = by_label.get(key)
+        if not actor:
+            zone = by_label.get('ExitZone_Gazelle')
+            loc = zone.get_actor_location() if zone else unreal.Vector(-250.0, 0.0, 300.0)
+            actor = eas.spawn_actor_from_class(unreal.StaticMeshActor, unreal.Vector(loc.x, loc.y, 210.0), unreal.Rotator(0.0, 90.0, 0.0))
+            actor.set_actor_label(key)
+            by_label[key] = actor
+        actor.static_mesh_component.set_editor_property('static_mesh', mesh)
+        if max_dim > 0 and max(size) > 1.0:
+            s = max_dim / max(size)
+            actor.set_actor_scale3d(unreal.Vector(s, s, s))
+        msg += ' -> декор %s' % key
+    elif kind == 'bp':
+        bp = unreal.EditorAssetLibrary.load_asset(key)
+        if bp:
+            cdo = unreal.get_default_object(bp.generated_class())
+            cdo.get_editor_property('MeshComponent').set_static_mesh(mesh)
+            unreal.EditorAssetLibrary.save_loaded_asset(bp)
+            msg += ' -> CDO %s' % key.split('/')[-1]
+        else:
+            msg += ' (BP %s не найден)' % key
     out.append(msg)
     return mesh
 
 
-for folder, (actor_label, max_dim) in MAPPING.items():
-    import_model(folder, actor_label, max_dim)
+for folder, (target, max_dim) in MAPPING.items():
+    import_model(folder, target, max_dim)
 
 les.save_current_level()
 unreal.EditorLoadingAndSavingUtils.save_dirty_packages(True, True)

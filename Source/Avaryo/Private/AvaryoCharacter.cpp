@@ -288,6 +288,10 @@ void AAvaryoCharacter::Tick(float DeltaSeconds)
 			MakeNoise(1.f, this, GetActorLocation());
 		}
 	}
+	else if (HasAuthority())
+	{
+		FootstepNoiseAccum = 0.f; // не бежим — следующий шаг отсчитываем с нуля (ровная каденция шума)
+	}
 }
 
 void AAvaryoCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -1492,6 +1496,8 @@ void AAvaryoCharacter::StopSpraying()
 {
 	bSprayingHeld = false;
 	SprayDrainAccum = 0.f;
+	SprayNoiseAccum = 0.f; // ровная каденция шума/пены при повторном распылении
+	SprayFoamAccum = 0.f;
 	for (int32 SlotIndex = 0; SlotIndex < NumSlots; ++SlotIndex)
 	{
 		APickupItem* Item = GetItemInSlot(SlotIndex);

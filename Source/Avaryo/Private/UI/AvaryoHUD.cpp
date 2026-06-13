@@ -111,9 +111,9 @@ void AAvaryoHUD::DrawHUD()
 			{
 				const float BarY = TileY + TileH + 6.f;
 				DrawRect(AvaryoHUDStyle::BarBG, TileX, BarY, TileW * 0.48f, 8.f);
-				DrawRect(FLinearColor(0.8f, 0.12f, 0.12f), TileX, BarY, TileW * 0.48f * CrewVitals->GetHealth() / 100.f, 8.f);
+				DrawRect(FLinearColor(0.8f, 0.12f, 0.12f), TileX, BarY, TileW * 0.48f * FMath::Clamp(CrewVitals->GetHealth(), 0.f, 100.f) / 100.f, 8.f);
 				DrawRect(AvaryoHUDStyle::BarBG, TileX + TileW * 0.52f, BarY, TileW * 0.48f, 8.f);
-				DrawRect(FLinearColor(0.25f, 0.7f, 0.85f), TileX + TileW * 0.52f, BarY, TileW * 0.48f * CrewVitals->GetPanic() / 100.f, 8.f);
+				DrawRect(FLinearColor(0.25f, 0.7f, 0.85f), TileX + TileW * 0.52f, BarY, TileW * 0.48f * FMath::Clamp(CrewVitals->GetPanic(), 0.f, 100.f) / 100.f, 8.f);
 			}
 
 			if (++Column % 2 == 0)
@@ -515,7 +515,7 @@ void AAvaryoHUD::DrawHUD()
 
 		// Верхняя полоска: сколько «содержимого» осталось
 		DrawRect(BarBG, BoxX, BoxY + 2.f, BarW, BarH);
-		DrawRect(FLinearColor(0.65f, 0.45f, 0.15f), BoxX, BoxY + 2.f, BarW * Vitals->GetBladder() / 100.f, BarH);
+		DrawRect(FLinearColor(0.65f, 0.45f, 0.15f), BoxX, BoxY + 2.f, BarW * FMath::Clamp(Vitals->GetBladder(), 0.f, 100.f) / 100.f, BarH);
 
 		// Нижняя полоска: мини-игра — красный фон, отдельные жёлтая и зелёная зоны, белый курсор
 		BoxY += BarH + 12.f;

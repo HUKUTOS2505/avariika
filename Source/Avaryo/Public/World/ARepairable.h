@@ -87,6 +87,10 @@ public:
 	void SuppressGas(float Duration);
 	bool IsGasSuppressed() const { return GasSuppressedTime > 0.f; }
 
+	/** Текущий (разросшийся) радиус газового облака, см. Для HUD и автотестов. */
+	UFUNCTION(BlueprintPure, Category="Repair|Gas")
+	float GetCurrentGasRadius() const { return CurrentGasRadius; }
+
 	// ---------- Мини-игры ----------
 
 	/** Какой мини-игрой чинится: None (держать E) / Cursor (щиток) / Valve (труба) / Starter (генератор). */

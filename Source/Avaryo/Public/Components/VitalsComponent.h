@@ -68,6 +68,10 @@ public:
 	/** Дев-режим: жёстко выставить шкалу по имени (health/panic/stamina/bladder/smell). Только сервер. */
 	void DebugSetVital(FName Which, float Value);
 
+	/** Вся динамика витала — серверная. Без овнера (юнит-тест) считаем авторитетным, иначе сверяем овнера.
+	 * Защищает реплицируемые шкалы от клиентских вызовов (кооп: рассинхрон/чит). */
+	bool IsVitalAuthority() const;
+
 	// -- Геттеры --
 
 	UFUNCTION(BlueprintPure, Category="Vitals") float GetHealth() const { return Health; }

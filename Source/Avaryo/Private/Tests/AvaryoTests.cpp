@@ -127,6 +127,17 @@ bool FAvaryoVitalsTest::RunTest(const FString&)
 	V->DebugSetVital(TEXT("stamina"), 10.f);
 	TestEqual(TEXT("DebugSetVital stamina=10"), V->GetStamina(), 10.f);
 
+	// Кофе/термос (EItemEffect::Drink): RestoreStamina с зажимом 0..100
+	V->RestoreStamina(30.f);
+	TestEqual(TEXT("RestoreStamina 10+30=40"), V->GetStamina(), 40.f);
+	V->RestoreStamina(200.f);
+	TestEqual(TEXT("RestoreStamina зажат сверху 100"), V->GetStamina(), 100.f);
+
+	// Паника не проваливается ниже нуля
+	V->DebugSetVital(TEXT("panic"), 10.f);
+	V->ReducePanic(40.f);
+	TestEqual(TEXT("ReducePanic пол 0"), V->GetPanic(), 0.f);
+
 	return true;
 }
 
@@ -215,6 +226,53 @@ bool FAvaryoDeployablesTest::RunTest(const FString&)
 		Rep->bAllowBotch = false;
 		TestFalse(TEXT("при bAllowBotch=false колхоз запрещён"), Rep->CanBotchBy(Char));
 	}
+
+	AvaryoDestroyTestWorld(World);
+	return true;
+}
+
+// Газовое облако растёт со временем и зажато по максимуму ×GasSpreadMaxScale.
+// Tick актора в ручном тест-мире сам не диспатчится — зовём Tick напрямую (детерминированно,
+// без рандома: взрыв требует курящего рядом, а тут персонажей нет).
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FAvaryoGasSpreadTest, "Avariika.GasSpread",
+	EAutomationTestFlags_ApplicationContextMask | EAutomationTestFlags::ProductFilter)
+bool FAvaryoGasSpreadTest::RunTest(const FString&)
+{
+	UWorld* World = AvaryoMakeTestWorld();
+	if (!TestNotNull(TEXT("тест-мир создан"), World))
+	{
+		return false;
+	}
+
+	FActorSpawnParameters Always;
+	Always.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+	ARepairable* Rep = World->SpawnActor<ARepairable>(ARepairable::StaticClass(), FVector::ZeroVector, FRotator::ZeroRotator, Always);
+	if (!TestNotNull(TEXT("труба заспавнена"), Rep))
+	{
+		AvaryoDestroyTestWorld(World);
+		return false;
+	}
+
+	Rep->bLeaksGasWhenBroken = true;
+	Rep->SetBroken(true);
+	TestTrue(TEXT("сломанная труба травит газ"), Rep->IsLeakingGas());
+
+	const float Base = Rep->GasRadius;
+	TestEqual(TEXT("старт: радиус = базовый"), Rep->GetCurrentGasRadius(), Base);
+
+	// +5%/с за 40 с дало бы ×3, но рост зажат ×2 (GasSpreadMaxScale=2.0)
+	for (int32 i = 0; i < 40; ++i)
+	{
+		Rep->Tick(1.0f);
+	}
+	TestEqual(TEXT("радиус облака зажат ×2"), Rep->GetCurrentGasRadius(), Base * 2.0f);
+
+	// Перекрыли (починили) — облако опадает к базовому радиусу
+	Rep->SetBroken(false);
+	Rep->Tick(0.1f);
+	TestFalse(TEXT("починенная труба не травит"), Rep->IsLeakingGas());
+	TestEqual(TEXT("после починки: радиус базовый"), Rep->GetCurrentGasRadius(), Base);
 
 	AvaryoDestroyTestWorld(World);
 	return true;
