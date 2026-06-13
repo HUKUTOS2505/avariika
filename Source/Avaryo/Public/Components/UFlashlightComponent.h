@@ -90,6 +90,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Flashlight", meta=(ClampMin="0.0", ClampMax="1.0"))
 	float CheapGlitchChancePerSecond;
 
+	/** Скачок паники, когда фонарь гаснет от полностью севшей батареи (внезапная темнота пугает). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Flashlight", meta=(ClampMin="0.0"))
+	float DeadBatteryFright;
+
 protected:
 	/** Дешёвый комплект: моргает даже при полном заряде (косяк оборудования, §18). Реплицируется для клиентского мерцания. */
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadOnly, Category="Flashlight")

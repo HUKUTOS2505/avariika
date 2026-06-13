@@ -1,6 +1,8 @@
 #include "Components/UFlashlightComponent.h"
 
+#include "AvaryoCharacter.h"
 #include "Components/LightComponent.h"
+#include "Components/VitalsComponent.h"
 #include "Engine/World.h"
 #include "GameFramework/Actor.h"
 #include "Net/UnrealNetwork.h"
@@ -17,6 +19,7 @@ UFlashlightComponent::UFlashlightComponent()
 	BlackoutChancePerSecond = 0.35f;
 	CheapGlitchChancePerSecond = 0.12f;
 	bCheapUnit = false;
+	DeadBatteryFright = 12.f;
 
 	DefaultIntensity = -1.f;
 	BeamIntensity = 14000.f; // пунш для хоррора; 0 = брать из BP
@@ -65,6 +68,13 @@ void UFlashlightComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 		{
 			OnBatteryEmpty.Broadcast();
 			TurnOff(); // батарея села — выключаемся принудительно
+
+			// Внезапная темнота пугает: скачок паники + испуганный вздох (выдаёт позицию)
+			if (AAvaryoCharacter* Char = Cast<AAvaryoCharacter>(GetOwner()))
+			{
+				if (Char->VitalsComponent) { Char->VitalsComponent->AddPanic(DeadBatteryFright); }
+				Char->MakeNoise(0.5f, Char, Char->GetActorLocation());
+			}
 		}
 	}
 
