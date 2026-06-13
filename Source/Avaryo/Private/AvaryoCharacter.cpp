@@ -1313,9 +1313,10 @@ void AAvaryoCharacter::ApplyItemEffect(APickupItem* Item)
 		}
 		break;
 	case EItemEffect::Drink:
-		// Кофе/термос: вернул выносливость и чуть успокоился
+		// Кофе/термос: бодрит и успокаивает — но это диуретик, шкала туалета подскочит (комедийный риск)
 		VitalsComponent->RestoreStamina(Item->EffectMagnitude > 0.f ? Item->EffectMagnitude : 60.f);
 		VitalsComponent->ReducePanic(5.f);
+		VitalsComponent->AddBladder(18.f);
 		ConsumeCharge(Item);
 		if (ARunState* Run = ARunState::Get(GetWorld()))
 		{

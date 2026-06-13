@@ -355,6 +355,12 @@ void UVitalsComponent::DrainBladder(float Amount)
 	Bladder = FMath::Max(0.f, Bladder - Amount);
 }
 
+void UVitalsComponent::AddBladder(float Amount)
+{
+	if (!IsVitalAuthority()) { return; }
+	Bladder = FMath::Clamp(Bladder + Amount, 0.f, 100.f);
+}
+
 void UVitalsComponent::StartSmoking()
 {
 	if (!IsVitalAuthority()) { return; }

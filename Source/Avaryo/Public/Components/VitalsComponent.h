@@ -54,6 +54,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Vitals")
 	void DrainBladder(float Amount);
 
+	/** Добавить к шкале туалета (диуретик: кофе/термос). Клампится в [0;100]. */
+	UFUNCTION(BlueprintCallable, Category="Vitals")
+	void AddBladder(float Amount);
+
 	/** Начать перекур: SmokingDuration секунд паника плавно снижается. */
 	UFUNCTION(BlueprintCallable, Category="Vitals")
 	void StartSmoking();
