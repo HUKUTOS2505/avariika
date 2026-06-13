@@ -187,10 +187,10 @@ public:
 
 ## 8. План реализации (по этапам)
 
-**Фаза 1 — персист + трата (фундамент):**
-1. `UAvariikaSaveGame` + `Load()/Save()` в `UCompanyLedgerSubsystem` (авторитет хоста).
-2. `UCompanyLedgerSubsystem::TrySpend(int32)` — серверное атомарное списание.
-3. Хранение `FEquipmentLevels` + `FConsumableStock` в леджере, репликация уровней через `ARunState`.
+**Фаза 1 — персист + трата (фундамент): ✅ ГОТОВО (2026-06-13, билд Succeeded)**
+1. ✅ `UAvariikaSaveGame` + `Load()/Save()` в `UCompanyLedgerSubsystem` (слот "AvariikaCompany", авторитет хоста). Прогресс больше не теряется при выходе.
+2. ✅ `TrySpend(int32)` / `AddBalance` / `ResetCompany`.
+3. ✅ `FEquipmentLevels` + `FConsumableStock` + `FCareerStats` в сейве; карьера копится из `FinishRun`. ⬜ Осталось: репликация `FEquipmentLevels` клиентам через `ARunState` (когда инструменты начнут читать уровни — Фаза 3).
 
 **Фаза 2 — магазин:**
 4. `AShopTerminal` (актор у Hilux) + фокус/взаимодействие.
