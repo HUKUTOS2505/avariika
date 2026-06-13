@@ -419,6 +419,10 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Avaryo|Panic")
 	float PanicSwayAmount;       // амплитуда дрожи прицела при панике
 
+	/** Камера-эффекты паники (шейк камеры + дрожь прицела). Сейчас ВЫКЛ для тестов; true — вернуть. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Panic")
+	bool bPanicCameraEffects;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Avaryo|Panic")
 	float AdrenalineHealthThreshold; // ниже этого HP включается адреналин
 

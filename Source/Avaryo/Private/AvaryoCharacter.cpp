@@ -106,6 +106,7 @@ AAvaryoCharacter::AAvaryoCharacter()
 	FoamFallChancePerSecond = 0.25f;
 
 	PanicSwayAmount = 9.f;
+	bPanicCameraEffects = false; // паник-камера-эффекты (шейк+дрожь) выключены — мешали тесту; true чтобы вернуть
 	AdrenalineHealthThreshold = 30.f;
 	AdrenalineSpeedMult = 1.15f;
 	AdrenalinePanicPerSecond = 3.f;
@@ -168,7 +169,7 @@ void AAvaryoCharacter::Tick(float DeltaSeconds)
 
 		// Паника трясёт камеру: бесконечный шейк включается при входе в панику
 		// и гасится при выходе (рестарты по таймеру давали рывки вбок)
-		const bool bPanicNow = VitalsComponent && VitalsComponent->IsPanicking();
+		const bool bPanicNow = bPanicCameraEffects && VitalsComponent && VitalsComponent->IsPanicking();
 		if (bPanicNow != bPanicShakeActive)
 		{
 			bPanicShakeActive = bPanicNow;
@@ -257,7 +258,7 @@ void AAvaryoCharacter::Tick(float DeltaSeconds)
 	}
 
 	// Дрожащие руки: лёгкая тряска прицела при панике (у владельца, Panic реплицируется)
-	if (IsLocallyControlled() && VitalsComponent && VitalsComponent->IsPanicking())
+	if (bPanicCameraEffects && IsLocallyControlled() && VitalsComponent && VitalsComponent->IsPanicking())
 	{
 		const float Sway = PanicSwayAmount * (VitalsComponent->GetPanic() / 100.f);
 		const float T = GetWorld()->GetTimeSeconds();
