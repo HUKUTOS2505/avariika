@@ -248,7 +248,7 @@ void ARepairable::Tick(float DeltaSeconds)
 		else if (bDoingPrereqMinigame)
 		{
 			// Prereq-мини-игра (заварка/починка руками): курсор бегает, попадания/откат — в TryHitBy
-			CursorPhase += DeltaSeconds * MinigameCursorSpeed * MinigameSpeedMult * (1.f + PanicHardenScale * RepairerPanic01());
+			CursorPhase += DeltaSeconds * MinigameCursorSpeed * MinigameSpeedMult * (1.f + PanicHardenScale * RepairerPanic01()) / FMath::Max(0.25f, RepairerToolQuality());
 			const float Saw = FMath::Fmod(CursorPhase, 2.f);
 			CursorPos = Saw <= 1.f ? Saw : 2.f - Saw;
 		}
@@ -285,7 +285,7 @@ void ARepairable::Tick(float DeltaSeconds)
 		else if (MinigameType == ERepairMinigameType::Cursor)
 		{
 			// Мини-игра: курсор бегает, прогресс растёт только попаданиями (TryHitBy)
-			CursorPhase += DeltaSeconds * MinigameCursorSpeed * MinigameSpeedMult * (1.f + PanicHardenScale * RepairerPanic01());
+			CursorPhase += DeltaSeconds * MinigameCursorSpeed * MinigameSpeedMult * (1.f + PanicHardenScale * RepairerPanic01()) / FMath::Max(0.25f, RepairerToolQuality());
 			const float Saw = FMath::Fmod(CursorPhase, 2.f);
 			CursorPos = Saw <= 1.f ? Saw : 2.f - Saw;
 		}
@@ -603,6 +603,18 @@ float ARepairable::RepairerPanic01() const
 	return 0.f;
 }
 
+float ARepairable::RepairerToolQuality() const
+{
+	if (Repairer)
+	{
+		if (const APickupItem* Held = Repairer->GetHeldItem())
+		{
+			return FMath::Clamp(Held->ToolQualityScale, 0.25f, 3.f);
+		}
+	}
+	return 1.f;
+}
+
 void ARepairable::TryHitBy(AAvaryoCharacter* Who)
 {
 	if (!HasAuthority() || Repairer != Who || !Who)
@@ -613,7 +625,7 @@ void ARepairable::TryHitBy(AAvaryoCharacter* Who)
 	// Prereq-мини-игра (заварка / починка руками): курсор в зелёной зоне = прогресс этапа, промах = откат
 	if (bDoingPrereqMinigame)
 	{
-		const float EffGreenHalf = FMath::Max(MinigameGreenHalfWidth * (1.f - 0.5f * PanicHardenScale * RepairerPanic01()), 0.02f);
+		const float EffGreenHalf = FMath::Max(MinigameGreenHalfWidth * (1.f - 0.5f * PanicHardenScale * RepairerPanic01()) * RepairerToolQuality(), 0.02f);
 		if (FMath::Abs(CursorPos - GreenCenter) <= EffGreenHalf)
 		{
 			PrereqProgress = FMath::Min(PrereqProgress + 1.f / FMath::Max(HitsToRepair, 1), 1.f);

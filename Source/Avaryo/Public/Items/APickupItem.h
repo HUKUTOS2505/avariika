@@ -78,6 +78,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Pickup|Use")
 	float EffectMagnitude;
 
+	/** Качество инструмента для мини-игр починки: >1 легче (шире зона, медленнее курсор),
+	 *  <1 тяжелее. 1 — нейтрально. Апгрейды магазина поднимают, дешёвый комплект — опускает. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Pickup|Use", meta=(ClampMin="0.25", ClampMax="3.0"))
+	float ToolQualityScale = 1.f;
+
 	/** Запас использований. -1 — бесконечно. При нуле предмет исчезает. */
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadOnly, Category="Pickup|Use")
 	int32 Charges;

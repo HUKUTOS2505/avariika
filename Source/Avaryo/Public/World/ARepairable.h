@@ -313,6 +313,9 @@ public:
 	/** Паника ремонтника 0..1 (трясущиеся руки усложняют мини-игру). */
 	float RepairerPanic01() const;
 
+	/** Качество инструмента в руках ремонтника (0.25..3, 1 — нейтрально). Хороший инструмент облегчает мини-игру. */
+	float RepairerToolQuality() const;
+
 protected:
 	/** Сломан ли. Выставляется в редакторе/скриптом; чинится игроками. */
 	UPROPERTY(EditAnywhere, ReplicatedUsing=OnRep_Broken, BlueprintReadOnly, Category="Repair")
