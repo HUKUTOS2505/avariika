@@ -136,6 +136,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Vitals|Panic")
 	float FearContagionPerSecond;
 
+	/** Минимальная яркость источника, чтобы он считался «успокаивающим светом» (отсекает тусклые/тревожные лампы). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Vitals|Panic")
+	float CalmLightMinIntensity;
+
 	/** Выносливость: расход при беге, %/сек. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Vitals|Stamina")
 	float StaminaDrainPerSecond;
@@ -215,7 +219,12 @@ public:
 	float CoughPanic;
 
 protected:
-	float CoughAccum = 0.f; // таймер кашля
+	/** Стоит ли монтёр в досягаемости достаточно яркого «успокаивающего» света (не тревожно-красного). */
+	bool IsLitByNearbyLight(const AActor* OwnerChar) const;
+
+	float CoughAccum = 0.f;     // таймер кашля
+	float LightScanAccum = 0.f; // троттл сканера успокаивающего света
+	bool bInLightCached = false; // последний результат сканера света
 	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadOnly, Category="Vitals")
 	float Health;
 

@@ -2,9 +2,10 @@
 
 #include "AvaryoCharacter.h"
 #include "Components/UFlashlightComponent.h"
-#include "World/AFloodlight.h"
+#include "Components/PointLightComponent.h"
 #include "EngineUtils.h"
 #include "Net/UnrealNetwork.h"
+#include "UObject/UObjectIterator.h"
 
 UVitalsComponent::UVitalsComponent()
 {
@@ -31,6 +32,7 @@ UVitalsComponent::UVitalsComponent()
 	PanicThreshold = 70.f;
 	FearContagionRadius = 400.f;
 	FearContagionPerSecond = 1.5f;
+	CalmLightMinIntensity = 1000.f;
 	CoughInterval = 4.f;
 	CoughPanic = 1.f;
 
@@ -91,15 +93,15 @@ void UVitalsComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 	bool bLit = Char->FlashlightComponent && Char->FlashlightComponent->IsOn();
 	if (!bLit)
 	{
-		// Свет выставленного прожектора тоже считается «в свете» (свет = безопасность)
-		for (TActorIterator<AFloodlight> It(GetWorld()); It; ++It)
+		// Любой достаточно яркий свет рядом (прожектор, лампы здания, чужой фонарь) тоже успокаивает.
+		// Сканируем не каждый кадр — дорого.
+		LightScanAccum += DeltaTime;
+		if (LightScanAccum >= 0.3f)
 		{
-			if (FVector::DistSquared(It->GetActorLocation(), Char->GetActorLocation()) <= FMath::Square(It->CalmRadius))
-			{
-				bLit = true;
-				break;
-			}
+			LightScanAccum = 0.f;
+			bInLightCached = IsLitByNearbyLight(Char);
 		}
+		bLit = bInLightCached;
 	}
 	PanicDelta += bLit ? -PanicFallInLightPerSecond : PanicRiseInDarkPerSecond;
 
@@ -235,6 +237,36 @@ bool UVitalsComponent::IsVitalAuthority() const
 {
 	const AActor* OwnerActor = GetOwner();
 	return !OwnerActor || OwnerActor->HasAuthority();
+}
+
+bool UVitalsComponent::IsLitByNearbyLight(const AActor* OwnerChar) const
+{
+	const UWorld* World = GetWorld();
+	if (!World || !OwnerChar)
+	{
+		return false;
+	}
+	const FVector P = OwnerChar->GetActorLocation();
+
+	// UPointLightComponent ловит и точечные, и прожекторные (USpotLightComponent — его подкласс).
+	for (TObjectIterator<UPointLightComponent> It; It; ++It)
+	{
+		const UPointLightComponent* L = *It;
+		if (!IsValid(L) || L->GetWorld() != World || !L->IsVisible() || L->Intensity < CalmLightMinIntensity)
+		{
+			continue;
+		}
+		const FLinearColor C = L->GetLightColor();
+		if (C.R > 1.5f * FMath::Max(C.G, C.B)) // тревожно-красная лампа (авария) не успокаивает
+		{
+			continue;
+		}
+		if (FVector::DistSquared(L->GetComponentLocation(), P) <= FMath::Square(L->AttenuationRadius))
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 void UVitalsComponent::AddSmell(float Amount)
