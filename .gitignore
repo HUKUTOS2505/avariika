@@ -7,6 +7,17 @@ Build/
 
 # Запечённый свет > 100 МБ (лимит GitHub) — регенерируется ребилдом освещения
 Content/AbandonedHospital/Levels/Showcase_BuiltData.uasset
+Content/Construction_Pit/Environment/Maps/Construction_Pit_Example_BuiltData.uasset
+
+# Импортированные паки: отдельные файлы > 100 МБ (лимит GitHub) — держим локально, в git не тащим.
+# Это либо ненужный природный мусор (сосны/скалы/снег — «не использовать» по каталогу), либо 8K-текстуры.
+Content/AmericanDrive/Meshes/SM_Entrepot_bois_02.uasset
+Content/AmericanDrive/Meshes/SM_PineTree_01a_PP.uasset
+Content/AmericanDrive/Meshes/SM_PineTree_02a_PP.uasset
+Content/AmericanDrive/Textures/T_Sofa01_N01.uasset
+Content/ResourcePack/Tileable_Materials/Landscape/RockWall/T_RockCliff_4K_Color.uasset
+Content/ResourcePack/Tileable_Materials/Landscape/RockWall/T_RockCliff_4K_Normal.uasset
+Content/ResourcePack/Tileable_Materials/Landscape/Snow/T_Snow_Normal.uasset
 
 # IDE
 .vs/
