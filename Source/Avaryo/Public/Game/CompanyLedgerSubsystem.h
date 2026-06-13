@@ -41,6 +41,12 @@ public:
 	/** Сбросить контору в ноль (новая карьера / провал квоты) + сейв. */
 	void ResetCompany();
 
+	/** Уровень апгрейда инструмента по имени категории (Flashlight/Tester/Welder/Extinguisher/Radio). 1 — базовый. */
+	int32 GetEquipmentLevel(FName Tool) const;
+
+	/** Купить +1 уровень инструмента: списывает цену (растёт с уровнем), поднимает уровень, сейв. false если не хватает/макс. */
+	bool BuyUpgrade(FName Tool);
+
 	// ---------- Квота диспетчера (game-over крючок). QuotaTarget==0 = выкл/песочница. ----------
 
 	/** Запустить квоту: сдать Target ₽ за WindowShifts смен (с текущей). + сейв. */

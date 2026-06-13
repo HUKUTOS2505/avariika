@@ -6,9 +6,11 @@
 #include "Components/TextRenderComponent.h"
 #include "Components/VitalsComponent.h"
 #include "Engine/DamageEvents.h"
+#include "Engine/GameInstance.h"
 #include "Engine/World.h"
 #include "EngineUtils.h"
 #include "Game/ARunState.h"
+#include "Game/CompanyLedgerSubsystem.h"
 #include "GameFramework/PlayerController.h"
 #include "Items/APickupItem.h"
 #include "Kismet/GameplayStatics.h"
@@ -609,17 +611,45 @@ float ARepairable::RepairerToolQuality() const
 	{
 		return 1.f;
 	}
-	// Этап «руками» (мини-игра без инструмента) — посторонний предмет в руках не должен влиять
+
 	FRepairStage Stage;
-	if (bDoingPrereqMinigame && GetCurrentStage(Stage) && Stage.ItemTag.IsNone())
+	const bool bHaveStage = GetCurrentStage(Stage);
+
+	// Этап «руками» (мини-игра без инструмента) — посторонний предмет в руках не влияет
+	if (bDoingPrereqMinigame && bHaveStage && Stage.ItemTag.IsNone())
 	{
 		return 1.f;
 	}
+
+	// База: качество держимого инструмента (дешёвый комплект / per-instance)
+	float Q = 1.f;
 	if (const APickupItem* Held = Repairer->GetHeldItem())
 	{
-		return FMath::Clamp(Held->ToolQualityScale, 0.25f, 3.f);
+		Q = FMath::Clamp(Held->ToolQualityScale, 0.25f, 3.f);
 	}
-	return 1.f;
+
+	// Апгрейд магазина для инструмента текущего этапа (по тегу этапа / типу мини-игры)
+	FName ToolCat = NAME_None;
+	if (bDoingPrereqMinigame && bHaveStage && !Stage.ItemTag.IsNone())
+	{
+		ToolCat = Stage.ItemTag; // напр. 'Welder'
+	}
+	else if (MinigameType == ERepairMinigameType::Cursor)
+	{
+		ToolCat = FName(TEXT("Tester")); // щиток настраивается тестером
+	}
+	if (!ToolCat.IsNone())
+	{
+		if (const UGameInstance* GI = GetWorld() ? GetWorld()->GetGameInstance() : nullptr)
+		{
+			if (const UCompanyLedgerSubsystem* Ledger = GI->GetSubsystem<UCompanyLedgerSubsystem>())
+			{
+				Q *= 1.f + 0.2f * FMath::Max(0, Ledger->GetEquipmentLevel(ToolCat) - 1);
+			}
+		}
+	}
+
+	return FMath::Clamp(Q, 0.25f, 3.f);
 }
 
 float ARepairable::GetEffectiveGreenHalf() const

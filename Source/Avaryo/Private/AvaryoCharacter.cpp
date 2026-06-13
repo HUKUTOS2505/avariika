@@ -9,12 +9,14 @@
 #include "Components/InputComponent.h"
 #include "Components/PrimitiveComponent.h"
 #include "Engine/DamageEvents.h"
+#include "Engine/GameInstance.h"
 #include "Engine/OverlapResult.h"
 #include "Engine/World.h"
 #include "EngineUtils.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "InputCoreTypes.h"
 #include "Game/ARunState.h"
+#include "Game/CompanyLedgerSubsystem.h"
 #include "Items/ABioPickup.h"
 #include "Items/APickupItem.h"
 #include "Net/UnrealNetwork.h"
@@ -857,6 +859,19 @@ void AAvaryoCharacter::AvQuota(int32 Target)
 	if (ARunState* Run = ARunState::Get(GetWorld())) { Run->DebugSetQuota(Target); }
 }
 void AAvaryoCharacter::ServerAvQuota_Implementation(int32 Target) { AvQuota(Target); }
+
+void AAvaryoCharacter::AvUpgrade(const FString& Tool)
+{
+	if (!HasAuthority()) { ServerAvUpgrade(Tool); return; }
+	if (UGameInstance* GI = GetGameInstance())
+	{
+		if (UCompanyLedgerSubsystem* Ledger = GI->GetSubsystem<UCompanyLedgerSubsystem>())
+		{
+			Ledger->BuyUpgrade(FName(*Tool));
+		}
+	}
+}
+void AAvaryoCharacter::ServerAvUpgrade_Implementation(const FString& Tool) { AvUpgrade(Tool); }
 
 // ---------- Оператор: нагрудные камеры ----------
 

@@ -141,3 +141,36 @@ void UCompanyLedgerSubsystem::StopQuota()
 	bQuotaFailed = false;
 	Save();
 }
+
+int32 UCompanyLedgerSubsystem::GetEquipmentLevel(FName Tool) const
+{
+	if (Tool == TEXT("Flashlight"))   { return Equipment.Flashlight; }
+	if (Tool == TEXT("Tester"))       { return Equipment.Tester; }
+	if (Tool == TEXT("Welder"))       { return Equipment.Welder; }
+	if (Tool == TEXT("Extinguisher")) { return Equipment.Extinguisher; }
+	if (Tool == TEXT("Radio"))        { return Equipment.Radio; }
+	return 1;
+}
+
+bool UCompanyLedgerSubsystem::BuyUpgrade(FName Tool)
+{
+	const int32 Cur = GetEquipmentLevel(Tool);
+	const int32 MaxLvl = (Tool == TEXT("Flashlight")) ? 4 : 3;
+	if (Cur >= MaxLvl)
+	{
+		return false; // уже максимум
+	}
+	const int32 Price = 3000 * Cur; // дороже с каждым уровнем
+	if (!TrySpend(Price))           // спишет и сохранит при успехе
+	{
+		return false; // не хватает денег
+	}
+	if      (Tool == TEXT("Flashlight"))   { Equipment.Flashlight   = Cur + 1; }
+	else if (Tool == TEXT("Tester"))       { Equipment.Tester       = Cur + 1; }
+	else if (Tool == TEXT("Welder"))       { Equipment.Welder       = Cur + 1; }
+	else if (Tool == TEXT("Extinguisher")) { Equipment.Extinguisher = Cur + 1; }
+	else if (Tool == TEXT("Radio"))        { Equipment.Radio        = Cur + 1; }
+	else { AddBalance(Price); return false; } // неизвестный инструмент — вернуть деньги
+	Save();
+	return true;
+}

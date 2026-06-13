@@ -610,6 +610,10 @@ protected:
 	UFUNCTION(Exec)
 	void AvQuota(int32 Target);
 
+	/** Купить апгрейд инструмента: `AvUpgrade Welder` (Flashlight/Tester/Welder/Extinguisher/Radio). */
+	UFUNCTION(Exec)
+	void AvUpgrade(const FString& Tool);
+
 	UFUNCTION(Server, Reliable)
 	void ServerAvVital(const FString& Which, float Value);
 
@@ -624,4 +628,7 @@ protected:
 
 	UFUNCTION(Server, Reliable)
 	void ServerAvQuota(int32 Target);
+
+	UFUNCTION(Server, Reliable)
+	void ServerAvUpgrade(const FString& Tool);
 };
