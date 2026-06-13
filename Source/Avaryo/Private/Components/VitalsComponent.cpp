@@ -2,6 +2,7 @@
 
 #include "AvaryoCharacter.h"
 #include "Components/UFlashlightComponent.h"
+#include "World/AFloodlight.h"
 #include "EngineUtils.h"
 #include "Net/UnrealNetwork.h"
 
@@ -87,7 +88,19 @@ void UVitalsComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 	// --- Паника ---
 	float PanicDelta = 0.f;
 
-	const bool bLit = Char->FlashlightComponent && Char->FlashlightComponent->IsOn();
+	bool bLit = Char->FlashlightComponent && Char->FlashlightComponent->IsOn();
+	if (!bLit)
+	{
+		// Свет выставленного прожектора тоже считается «в свете» (свет = безопасность)
+		for (TActorIterator<AFloodlight> It(GetWorld()); It; ++It)
+		{
+			if (FVector::DistSquared(It->GetActorLocation(), Char->GetActorLocation()) <= FMath::Square(It->CalmRadius))
+			{
+				bLit = true;
+				break;
+			}
+		}
+	}
 	PanicDelta += bLit ? -PanicFallInLightPerSecond : PanicRiseInDarkPerSecond;
 
 	bool bTeammateNear = false;

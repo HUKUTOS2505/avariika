@@ -19,6 +19,7 @@ UFlashlightComponent::UFlashlightComponent()
 	bCheapUnit = false;
 
 	DefaultIntensity = -1.f;
+	BeamIntensity = 14000.f; // пунш для хоррора; 0 = брать из BP
 	BlackoutTimeRemaining = 0.f;
 	bLowBatteryNotified = false;
 }
@@ -148,9 +149,9 @@ void UFlashlightComponent::ApplyLightState()
 
 	AttachedLight->SetVisibility(bIsOn);
 
-	if (bIsOn && DefaultIntensity >= 0.f)
+	if (bIsOn)
 	{
-		AttachedLight->SetIntensity(DefaultIntensity);
+		AttachedLight->SetIntensity(OnIntensity());
 	}
 }
 
@@ -170,7 +171,7 @@ void UFlashlightComponent::UpdateFlicker(float DeltaTime)
 			if (BlackoutTimeRemaining > 0.f)
 			{
 				BlackoutTimeRemaining -= DeltaTime;
-				AttachedLight->SetIntensity(BlackoutTimeRemaining > 0.f ? 0.f : DefaultIntensity);
+				AttachedLight->SetIntensity(BlackoutTimeRemaining > 0.f ? 0.f : OnIntensity());
 				return;
 			}
 			if (FMath::FRand() < CheapGlitchChancePerSecond * DeltaTime)
@@ -182,10 +183,7 @@ void UFlashlightComponent::UpdateFlicker(float DeltaTime)
 		}
 
 		// Иначе горим ровно
-		if (DefaultIntensity >= 0.f)
-		{
-			AttachedLight->SetIntensity(DefaultIntensity);
-		}
+		AttachedLight->SetIntensity(OnIntensity());
 		BlackoutTimeRemaining = 0.f;
 		return;
 	}
@@ -194,7 +192,7 @@ void UFlashlightComponent::UpdateFlicker(float DeltaTime)
 	if (BlackoutTimeRemaining > 0.f)
 	{
 		BlackoutTimeRemaining -= DeltaTime;
-		AttachedLight->SetIntensity(BlackoutTimeRemaining > 0.f ? 0.f : DefaultIntensity);
+		AttachedLight->SetIntensity(BlackoutTimeRemaining > 0.f ? 0.f : OnIntensity());
 		return;
 	}
 
@@ -209,5 +207,5 @@ void UFlashlightComponent::UpdateFlicker(float DeltaTime)
 	// Нервное дрожание интенсивности
 	const float Time = GetWorld() ? GetWorld()->GetTimeSeconds() : 0.f;
 	const float Flicker = 0.55f + 0.45f * FMath::Abs(FMath::Sin(Time * 25.f)) * FMath::FRandRange(0.6f, 1.f);
-	AttachedLight->SetIntensity(DefaultIntensity * Flicker);
+	AttachedLight->SetIntensity(OnIntensity() * Flicker);
 }

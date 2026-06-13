@@ -70,6 +70,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Flashlight")
 	TObjectPtr<ULightComponent> AttachedLight;
 
+	/** Яркость включённого луча (перекрывает интенсивность света из BP). 0 — брать значение из BP. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Flashlight", meta=(ClampMin="0.0"))
+	float BeamIntensity;
+
 	/** Скорость разряда, % в секунду. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Flashlight", meta=(ClampMin="0.0"))
 	float DrainPerSecond;
@@ -109,6 +113,9 @@ protected:
 	void UpdateFlicker(float DeltaTime);
 
 private:
+	/** Яркость включённого луча: BeamIntensity, если задана (>0), иначе из BP. */
+	float OnIntensity() const { return BeamIntensity > 0.f ? BeamIntensity : DefaultIntensity; }
+
 	float DefaultIntensity;       // интенсивность света по умолчанию (запоминается в BeginPlay)
 	float BlackoutTimeRemaining;  // сколько ещё длится случайное отключение
 	bool bLowBatteryNotified;     // чтобы OnBatteryLow сработал один раз на разряд
