@@ -39,6 +39,7 @@ APickupItem::APickupItem()
 	UseCastTime = 0.f;
 	CastSpeedMultiplier = 1.f;
 	HoldOffset = FVector(60.f, 30.f, -25.f);
+	HoldRotation = FRotator::ZeroRotator;
 	CarryOffset = FVector(45.f, -45.f, -40.f);
 	RotationSpeed = 45.f;
 	bSpraying = false;

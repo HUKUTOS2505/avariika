@@ -4,7 +4,7 @@
 #include "GameFramework/Actor.h"
 #include "AFloodlight.generated.h"
 
-class UPointLightComponent;
+class USpotLightComponent;
 class UStaticMeshComponent;
 
 /**
@@ -26,9 +26,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Floodlight")
 	TObjectPtr<UStaticMeshComponent> MeshComponent;
 
-	/** Источник света. */
+	/** Источник света — направленный конус (светит туда, куда смотрит прожектор). */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Floodlight")
-	TObjectPtr<UPointLightComponent> Light;
+	TObjectPtr<USpotLightComponent> Light;
 
 	/** Радиус, в котором прожектор гасит панику, см. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Floodlight")

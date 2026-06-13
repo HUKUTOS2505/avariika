@@ -1,7 +1,7 @@
 #include "World/AFloodlight.h"
 
 #include "AvaryoCharacter.h"
-#include "Components/PointLightComponent.h"
+#include "Components/SpotLightComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/VitalsComponent.h"
 #include "Engine/World.h"
@@ -25,13 +25,16 @@ AFloodlight::AFloodlight()
 	MeshComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	MeshComponent->SetCollisionResponseToAllChannels(ECR_Ignore);
 
-	Light = CreateDefaultSubobject<UPointLightComponent>(TEXT("Light"));
+	Light = CreateDefaultSubobject<USpotLightComponent>(TEXT("Light"));
 	Light->SetupAttachment(MeshComponent);
-	Light->SetRelativeLocation(FVector(0.f, 0.f, 90.f));
+	Light->SetRelativeLocation(FVector(12.f, 0.f, 105.f)); // у головы прожектора, чуть вперёд
+	Light->SetRelativeRotation(FRotator(-22.f, 0.f, 0.f)); // конус вперёд и чуть вниз — туда, куда «смотрит»
 	Light->SetUsingAbsoluteScale(true);
 	Light->SetLightColor(FColor(255, 240, 210)); // тёплый рабочий свет
-	Light->SetIntensity(12000.f);
-	Light->SetAttenuationRadius(1400.f);
+	Light->SetIntensity(40000.f);                // у spot-света нужно больше, чем у point
+	Light->SetAttenuationRadius(2200.f);
+	Light->SetInnerConeAngle(26.f);
+	Light->SetOuterConeAngle(46.f);
 	Light->SetCastShadows(true);
 
 	CalmRadius = 700.f;

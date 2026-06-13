@@ -94,6 +94,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Pickup")
 	FVector HoldOffset;
 
+	/** Доворот предмета в руках (некоторые модели смотрят не туда). По умолчанию 0. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Pickup")
+	FRotator HoldRotation;
+
 	/** Положение тяжёлого предмета, когда он "опущен" (активен лёгкий слот). */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Pickup")
 	FVector CarryOffset;

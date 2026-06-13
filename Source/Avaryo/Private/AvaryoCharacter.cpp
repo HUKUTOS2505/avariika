@@ -1960,7 +1960,7 @@ void AAvaryoCharacter::HoldItem(APickupItem* Item)
 		Item->SetActorEnableCollision(false);
 	}
 
-	Item->SetActorRelativeRotation(FRotator::ZeroRotator);
+	Item->SetActorRelativeRotation(Item->HoldRotation);
 	Item->SetActorHiddenInGame(false);
 }
 
