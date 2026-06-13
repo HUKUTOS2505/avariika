@@ -6,9 +6,11 @@
 #include "Engine/Canvas.h"
 #include "Engine/Engine.h"
 #include "Engine/Font.h"
+#include "Engine/GameInstance.h"
 #include "Engine/TextureRenderTarget2D.h"
 #include "EngineUtils.h"
 #include "Game/ARunState.h"
+#include "Game/CompanyLedgerSubsystem.h"
 #include "GameFramework/PlayerState.h"
 #include "Items/APickupItem.h"
 #include "World/AExitZone.h"
@@ -28,6 +30,73 @@ namespace AvaryoHUDStyle
 	const FLinearColor BarBG(0.f, 0.f, 0.f, 0.55f);
 }
 
+void AAvaryoHUD::DrawShop()
+{
+	using namespace AvaryoHUDStyle;
+	if (!Canvas)
+	{
+		return;
+	}
+	UFont* Font = GEngine ? GEngine->GetLargeFont() : nullptr;
+	if (!Font)
+	{
+		return;
+	}
+
+	const UCompanyLedgerSubsystem* Ledger = nullptr;
+	if (const UGameInstance* GI = GetGameInstance())
+	{
+		Ledger = GI->GetSubsystem<UCompanyLedgerSubsystem>();
+	}
+	const int32 Balance = Ledger ? Ledger->GetBalance() : 0;
+
+	const float SizeX = Canvas->SizeX;
+	const float SizeY = Canvas->SizeY;
+	const float W = FMath::Min(660.f, SizeX - 80.f);
+	const float H = 360.f;
+	const float PX = (SizeX - W) * 0.5f;
+	float TY = FMath::Max(40.f, (SizeY - H) * 0.5f);
+
+	DrawRect(PanelBG, PX, TY, W, H);
+	DrawRect(Accent, PX, TY, W, 4.f);
+	TY += 16.f;
+
+	DrawText(TEXT("СНАРЯЖЕНИЕ — склад бригады"), Accent, PX + 22.f, TY, Font, 1.3f);
+	TY += 36.f;
+	DrawText(FString::Printf(TEXT("Касса конторы: %d ₽"), Balance), TextMain, PX + 22.f, TY, Font, 1.0f);
+	TY += 32.f;
+
+	struct FShopRow { const TCHAR* Cat; const TCHAR* Name; int32 MaxLevel; };
+	static const FShopRow Rows[] = {
+		{ TEXT("Welder"),       TEXT("Сварочник"),    3 },
+		{ TEXT("Tester"),       TEXT("Тестер"),       3 },
+		{ TEXT("Flashlight"),   TEXT("Фонарь"),       4 },
+		{ TEXT("Extinguisher"), TEXT("Огнетушитель"), 3 },
+		{ TEXT("Radio"),        TEXT("Рация"),        3 },
+	};
+	for (const FShopRow& R : Rows)
+	{
+		const int32 Lvl = Ledger ? Ledger->GetEquipmentLevel(FName(R.Cat)) : 1;
+		FString Line;
+		FLinearColor Col;
+		if (Lvl >= R.MaxLevel)
+		{
+			Line = FString::Printf(TEXT("%s — ур. %d  (МАКС)"), R.Name, Lvl);
+			Col = TextDim;
+		}
+		else
+		{
+			const int32 Price = 3000 * Lvl;
+			Line = FString::Printf(TEXT("%s — ур. %d → %d:  %d ₽   [AvUpgrade %s]"), R.Name, Lvl, Lvl + 1, Price, R.Cat);
+			Col = (Balance >= Price) ? TextMain : FLinearColor(0.85f, 0.42f, 0.3f);
+		}
+		DrawText(Line, Col, PX + 26.f, TY, Font, 0.95f);
+		TY += 28.f;
+	}
+	TY += 12.f;
+	DrawText(TEXT("Покупка: AvUpgrade <англ. название>.   Закрыть: AvShop"), TextDim, PX + 22.f, TY, Font, 0.85f);
+}
+
 void AAvaryoHUD::DrawHUD()
 {
 	Super::DrawHUD();
@@ -37,6 +106,13 @@ void AAvaryoHUD::DrawHUD()
 	AAvaryoCharacter* Character = Cast<AAvaryoCharacter>(GetOwningPawn());
 	if (!Character || !Canvas)
 	{
+		return;
+	}
+
+	// Модальный экран магазина (AvShop) — рисуем его и больше ничего
+	if (bShopOpen)
+	{
+		DrawShop();
 		return;
 	}
 

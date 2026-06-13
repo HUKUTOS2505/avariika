@@ -614,6 +614,10 @@ protected:
 	UFUNCTION(Exec)
 	void AvUpgrade(const FString& Tool);
 
+	/** Открыть/закрыть экран магазина снаряжения (локально). */
+	UFUNCTION(Exec)
+	void AvShop();
+
 	UFUNCTION(Server, Reliable)
 	void ServerAvVital(const FString& Which, float Value);
 

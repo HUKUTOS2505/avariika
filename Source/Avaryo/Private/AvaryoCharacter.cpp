@@ -19,8 +19,10 @@
 #include "Game/CompanyLedgerSubsystem.h"
 #include "Items/ABioPickup.h"
 #include "Items/APickupItem.h"
+#include "GameFramework/PlayerController.h"
 #include "Net/UnrealNetwork.h"
 #include "UI/AvaryoCameraShakes.h"
+#include "UI/AvaryoHUD.h"
 #include "World/ABioProjectile.h"
 #include "World/AFloodlight.h"
 #include "World/AFoamPatch.h"
@@ -872,6 +874,18 @@ void AAvaryoCharacter::AvUpgrade(const FString& Tool)
 	}
 }
 void AAvaryoCharacter::ServerAvUpgrade_Implementation(const FString& Tool) { AvUpgrade(Tool); }
+
+void AAvaryoCharacter::AvShop()
+{
+	// Локальный экран — без сервера
+	if (APlayerController* PC = Cast<APlayerController>(GetController()))
+	{
+		if (AAvaryoHUD* HUD = Cast<AAvaryoHUD>(PC->GetHUD()))
+		{
+			HUD->ToggleShop();
+		}
+	}
+}
 
 // ---------- Оператор: нагрудные камеры ----------
 
