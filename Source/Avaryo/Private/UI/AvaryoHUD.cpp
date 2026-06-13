@@ -413,9 +413,26 @@ void AAvaryoHUD::DrawHUD()
 
 			// Репутация конторы — влияет на качество выдаваемого комплекта в следующих сменах
 			const FString RepLine = FString::Printf(TEXT("Репутация: %s"), *ARunState::ReputationTitle(Run->GetReputation()));
-			TY += DrawCentered(RepLine, TextDim, TY, 1.0f) + 10.f;
+			TY += DrawCentered(RepLine, TextDim, TY, 1.0f) + 8.f;
 
-			DrawCentered(TEXT("[R] Следующая смена"), TextDim, TY, 1.05f);
+			// Квота диспетчера (game-over крючок) — показываем только когда включена
+			if (Run->IsQuotaFailed())
+			{
+				TY += DrawCentered(TEXT("КВОТА ПРОВАЛЕНА — контора закрыта"), NegC, TY, 1.15f) + 4.f;
+				DrawCentered(TEXT("[R] Начать карьеру заново"), TextDim, TY, 1.05f);
+			}
+			else if (Run->IsQuotaActive())
+			{
+				const FString QLine = FString::Printf(TEXT("Квота: %d / %d ₽   срок — смена №%d"),
+					Run->GetQuotaPaid(), Run->GetQuotaTarget(), Run->GetQuotaDeadlineShift());
+				const bool bMet = Run->GetQuotaPaid() >= Run->GetQuotaTarget();
+				TY += DrawCentered(QLine, bMet ? PosC : TextMain, TY, 1.05f) + 8.f;
+				DrawCentered(TEXT("[R] Следующая смена"), TextDim, TY, 1.05f);
+			}
+			else
+			{
+				DrawCentered(TEXT("[R] Следующая смена"), TextDim, TY, 1.05f);
+			}
 		}
 		else if (Run->AreAllObjectivesComplete() && Run->GetTotalObjectives() > 0)
 		{

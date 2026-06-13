@@ -606,6 +606,10 @@ protected:
 	UFUNCTION(Exec)
 	void AvFinish(const FString& Outcome);
 
+	/** Квота диспетчера: `AvQuota 8000` включить, `AvQuota 0` выключить (песочница). */
+	UFUNCTION(Exec)
+	void AvQuota(int32 Target);
+
 	UFUNCTION(Server, Reliable)
 	void ServerAvVital(const FString& Which, float Value);
 
@@ -617,4 +621,7 @@ protected:
 
 	UFUNCTION(Server, Reliable)
 	void ServerAvFinish(const FString& Outcome);
+
+	UFUNCTION(Server, Reliable)
+	void ServerAvQuota(int32 Target);
 };

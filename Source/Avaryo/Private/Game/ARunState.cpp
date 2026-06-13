@@ -252,6 +252,10 @@ void ARunState::BeginPlay()
 			ShiftNumber = Ledger->GetShiftNumber();
 			CompanyBalanceStart = Ledger->GetBalance();
 			Reputation = Ledger->GetReputation();
+			QuotaTarget = Ledger->GetQuotaTarget();
+			QuotaPaid = Ledger->GetQuotaPaidSoFar();
+			QuotaDeadlineShift = Ledger->GetQuotaDeadlineShift();
+			bQuotaFailed = Ledger->IsQuotaFailed();
 		}
 	}
 
@@ -279,6 +283,10 @@ void ARunState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetim
 	DOREPLIFETIME(ARunState, CompanyBalanceStart);
 	DOREPLIFETIME(ARunState, Reputation);
 	DOREPLIFETIME(ARunState, ShiftNet);
+	DOREPLIFETIME(ARunState, QuotaTarget);
+	DOREPLIFETIME(ARunState, QuotaPaid);
+	DOREPLIFETIME(ARunState, QuotaDeadlineShift);
+	DOREPLIFETIME(ARunState, bQuotaFailed);
 }
 
 ARunState* ARunState::Get(UWorld* World)
@@ -665,6 +673,18 @@ void ARunState::RequestRestart()
 	{
 		return; // рестарт только с финального экрана
 	}
+	// Квота провалена — контора закрыта: [R] начинает новую карьеру (сброс леджера)
+	if (UGameInstance* GI = GetWorld()->GetGameInstance())
+	{
+		if (UCompanyLedgerSubsystem* Ledger = GI->GetSubsystem<UCompanyLedgerSubsystem>())
+		{
+			if (Ledger->IsQuotaFailed())
+			{
+				Ledger->ResetCompany();
+			}
+		}
+	}
+
 	if (AGameModeBase* GameMode = GetWorld()->GetAuthGameMode())
 	{
 		GameMode->ProcessServerTravel(TEXT("?restart")); // новая смена, новые поломки
@@ -700,6 +720,11 @@ void ARunState::FinishRun(ERunPhase NewPhase)
 			Career.TotalIncidents  += SumIncidents;
 			Career.BuildingsBlownUp += SumExplosions;
 			Ledger->CommitShift(ShiftNet, bWon); // сохранит и карьеру на диск
+			// Обновить копии квоты для «Акта» (CommitShift мог продвинуть/провалить её)
+			QuotaTarget = Ledger->GetQuotaTarget();
+			QuotaPaid = Ledger->GetQuotaPaidSoFar();
+			QuotaDeadlineShift = Ledger->GetQuotaDeadlineShift();
+			bQuotaFailed = Ledger->IsQuotaFailed();
 		}
 	}
 
@@ -840,6 +865,25 @@ void ARunState::DebugFinishRun(bool bWon)
 	if (HasAuthority() && Phase == ERunPhase::InProgress)
 	{
 		FinishRun(bWon ? ERunPhase::Won : ERunPhase::Lost);
+	}
+}
+
+void ARunState::DebugSetQuota(int32 Target)
+{
+	if (!HasAuthority())
+	{
+		return;
+	}
+	if (UGameInstance* GI = GetWorld()->GetGameInstance())
+	{
+		if (UCompanyLedgerSubsystem* Ledger = GI->GetSubsystem<UCompanyLedgerSubsystem>())
+		{
+			if (Target > 0) { Ledger->StartQuota(Target); } else { Ledger->StopQuota(); }
+			QuotaTarget = Ledger->GetQuotaTarget();
+			QuotaPaid = Ledger->GetQuotaPaidSoFar();
+			QuotaDeadlineShift = Ledger->GetQuotaDeadlineShift();
+			bQuotaFailed = Ledger->IsQuotaFailed();
+		}
 	}
 }
 

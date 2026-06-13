@@ -199,6 +199,9 @@ public:
 	/** Дев-режим: завершить забег (показать «Акт») победой/поражением. Только сервер. */
 	void DebugFinishRun(bool bWon);
 
+	/** Дев-режим: включить квоту на Target ₽ (0 = выключить). Только сервер. */
+	void DebugSetQuota(int32 Target);
+
 	// ---------- Бухгалтерия конторы (§19, переживает смены через UCompanyLedgerSubsystem) ----------
 
 	/** Премии/штрафы одного монтёра за смену — единая формула для сервера и HUD. */
@@ -208,6 +211,13 @@ public:
 	UFUNCTION(BlueprintPure, Category="Run") int32 GetCompanyBalanceStart() const { return CompanyBalanceStart; }
 	UFUNCTION(BlueprintPure, Category="Run") int32 GetShiftNet() const { return ShiftNet; }
 	UFUNCTION(BlueprintPure, Category="Run") int32 GetReputation() const { return Reputation; }
+
+	// Квота диспетчера (реплицируется для «Акта»; 0 = выключена/песочница)
+	UFUNCTION(BlueprintPure, Category="Run") int32 GetQuotaTarget() const { return QuotaTarget; }
+	UFUNCTION(BlueprintPure, Category="Run") int32 GetQuotaPaid() const { return QuotaPaid; }
+	UFUNCTION(BlueprintPure, Category="Run") int32 GetQuotaDeadlineShift() const { return QuotaDeadlineShift; }
+	UFUNCTION(BlueprintPure, Category="Run") bool IsQuotaActive() const { return QuotaTarget > 0; }
+	UFUNCTION(BlueprintPure, Category="Run") bool IsQuotaFailed() const { return bQuotaFailed; }
 
 	/** Название репутационного статуса конторы по очкам. */
 	static FString ReputationTitle(int32 Points);
@@ -261,6 +271,19 @@ protected:
 	/** Итог смены (сумма по бригаде), считается на финише. Реплицируется для «Акта». */
 	UPROPERTY(Replicated)
 	int32 ShiftNet;
+
+	/** Квота диспетчера — копии из леджера для «Акта» (0 = выключена). */
+	UPROPERTY(Replicated)
+	int32 QuotaTarget = 0;
+
+	UPROPERTY(Replicated)
+	int32 QuotaPaid = 0;
+
+	UPROPERTY(Replicated)
+	int32 QuotaDeadlineShift = 0;
+
+	UPROPERTY(Replicated)
+	bool bQuotaFailed = false;
 
 	/** Сервер: когда в эфир в следующий раз прорвётся чужой голос (только пока включена рация). */
 	float NextRadioGhostTime;

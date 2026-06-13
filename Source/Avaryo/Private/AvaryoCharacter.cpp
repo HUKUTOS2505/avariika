@@ -851,6 +851,13 @@ void AAvaryoCharacter::AvFinish(const FString& Outcome)
 }
 void AAvaryoCharacter::ServerAvFinish_Implementation(const FString& Outcome) { AvFinish(Outcome); }
 
+void AAvaryoCharacter::AvQuota(int32 Target)
+{
+	if (!HasAuthority()) { ServerAvQuota(Target); return; }
+	if (ARunState* Run = ARunState::Get(GetWorld())) { Run->DebugSetQuota(Target); }
+}
+void AAvaryoCharacter::ServerAvQuota_Implementation(int32 Target) { AvQuota(Target); }
+
 // ---------- Оператор: нагрудные камеры ----------
 
 bool AAvaryoCharacter::CanUseMonitor() const
