@@ -899,6 +899,62 @@ void AAvaryoCharacter::AvGod()
 }
 void AAvaryoCharacter::ServerAvGod_Implementation() { AvGod(); }
 
+void AAvaryoCharacter::AvGive(const FString& What)
+{
+	if (!HasAuthority()) { ServerAvGive(What); return; }
+
+	const FString w = What.ToLower();
+	if (w.Contains(TEXT("bio"))) { AvGiveBio(); return; }
+
+	EItemEffect Eff = EItemEffect::None;
+	if (w.Contains(TEXT("coffee")) || w.Contains(TEXT("кофе")) || w.Contains(TEXT("drink")) || w.Contains(TEXT("термос"))) Eff = EItemEffect::Drink;
+	else if (w.Contains(TEXT("heal")) || w.Contains(TEXT("аптеч")))    Eff = EItemEffect::Heal;
+	else if (w.Contains(TEXT("calm")) || w.Contains(TEXT("сигар")) || w.Contains(TEXT("cig"))) Eff = EItemEffect::Calm;
+	else if (w.Contains(TEXT("ext"))  || w.Contains(TEXT("огнетуш")))  Eff = EItemEffect::Extinguish;
+	else if (w.Contains(TEXT("radio")) || w.Contains(TEXT("рация")))   Eff = EItemEffect::Radio;
+	else if (w.Contains(TEXT("recharge")) || w.Contains(TEXT("батар")) || w.Contains(TEXT("batt"))) Eff = EItemEffect::Recharge;
+	else if (w.Contains(TEXT("trap")) || w.Contains(TEXT("растяж")))   Eff = EItemEffect::DeployTrap;
+	else if (w.Contains(TEXT("light")) || w.Contains(TEXT("прожект"))) Eff = EItemEffect::DeployLight;
+
+	// Образец на уровне для клонирования (по эффекту; иначе по имени актора)
+	UClass* CloneClass = nullptr;
+	for (TActorIterator<APickupItem> It(GetWorld()); It; ++It)
+	{
+		const bool bByEffect = (Eff != EItemEffect::None && It->ItemEffect == Eff);
+		const bool bByName = (Eff == EItemEffect::None && It->GetName().ToLower().Contains(w));
+		if (bByEffect || bByName) { CloneClass = It->GetClass(); break; }
+	}
+
+	const FVector Loc = GetActorLocation() + GetActorForwardVector() * 90.f + FVector(0.f, 0.f, 20.f);
+	FActorSpawnParameters P;
+	P.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+
+	APickupItem* NewItem = nullptr;
+	if (CloneClass)
+	{
+		NewItem = GetWorld()->SpawnActor<APickupItem>(CloneClass, Loc, FRotator::ZeroRotator, P);
+	}
+	else if (Eff != EItemEffect::None)
+	{
+		// Нет образца на карте — базовый предмет с нужным эффектом (для теста эффекта)
+		NewItem = GetWorld()->SpawnActor<APickupItem>(APickupItem::StaticClass(), Loc, FRotator::ZeroRotator, P);
+		if (NewItem)
+		{
+			NewItem->ItemEffect = Eff;
+			NewItem->ItemSize = EItemSize::Light;
+			NewItem->Charges = 5;
+			NewItem->EffectMagnitude = 60.f;
+			NewItem->DisplayName = FText::FromString(What);
+		}
+	}
+
+	if (NewItem)
+	{
+		PickupItem(NewItem); // сразу в свободный слот
+	}
+}
+void AAvaryoCharacter::ServerAvGive_Implementation(const FString& What) { AvGive(What); }
+
 // ---------- Оператор: нагрудные камеры ----------
 
 bool AAvaryoCharacter::CanUseMonitor() const

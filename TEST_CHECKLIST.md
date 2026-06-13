@@ -6,6 +6,7 @@
 | Команда | Что делает |
 |---|---|
 | `AvGod` | вкл/выкл бессмертие (урон не проходит) — чтобы НЕ УМЕРЕТЬ во время тестов; доливает HP |
+| `AvGive coffee` | выдать предмет в слот (coffee/heal/calm/ext/radio/recharge/trap/light/bio). Кофе с зарядами → пей дважды для «Кофеман» |
 | `AvVital panic 100` | выставить шкалу (panic/health/stamina/bladder/smell, 0..100) |
 | `AvIncident` | мгновенный санитарный инцидент |
 | `AvGiveBio` | дать биоснаряд в руки |

@@ -622,6 +622,10 @@ protected:
 	UFUNCTION(Exec)
 	void AvGod();
 
+	/** Дев: выдать предмет в свободный слот для теста: `AvGive coffee` (heal/calm/ext/radio/recharge/trap/light/bio). */
+	UFUNCTION(Exec)
+	void AvGive(const FString& What);
+
 	UFUNCTION(Server, Reliable)
 	void ServerAvVital(const FString& Which, float Value);
 
@@ -642,4 +646,7 @@ protected:
 
 	UFUNCTION(Server, Reliable)
 	void ServerAvGod();
+
+	UFUNCTION(Server, Reliable)
+	void ServerAvGive(const FString& What);
 };
