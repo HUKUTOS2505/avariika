@@ -334,30 +334,6 @@ protected:
 	UPROPERTY(EditAnywhere, Category="Run|Ambient")
 	float CreakIntervalMax;
 
-	/** Страх темноты: пока питание вырублено (щиток сломан) и игрок без света — паника растёт. */
-	UPROPERTY(EditAnywhere, Category="Run|Darkness")
-	bool bDarknessFear;
-
-	/** Сколько паники/сек набегает в темноте без света. */
-	UPROPERTY(EditAnywhere, Category="Run|Darkness")
-	float DarknessPanicPerSecond;
-
-	/** Радиус «у прожектора не страшно», см (хранится в квадрате — см. .cpp). */
-	UPROPERTY(EditAnywhere, Category="Run|Darkness")
-	float DarknessSafeRadius;
-
-	/** Паника заразна: рядом с паникующим спокойные тоже начинают нервничать. */
-	UPROPERTY(EditAnywhere, Category="Run|Panic")
-	bool bPanicContagion;
-
-	/** Радиус заражения паникой, см. */
-	UPROPERTY(EditAnywhere, Category="Run|Panic")
-	float PanicContagionRadius;
-
-	/** Сколько паники/сек набегает рядом с паникующим товарищем. */
-	UPROPERTY(EditAnywhere, Category="Run|Panic")
-	float PanicContagionPerSecond;
-
 	/** Сервер: выдать монтёру дешёвый фонарь, если на забег выпал дешёвый комплект (один раз). */
 	void ApplyCheapGear(AAvaryoCharacter* Who);
 
