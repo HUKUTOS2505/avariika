@@ -26,6 +26,20 @@ namespace DispatcherLines
 		TEXT("Диспетчерская — бригаде: по заявке «обычная поломка минут на пять». По факту — {X}. Удачи."),
 		TEXT("Принята заявка №47: объектов {X}. Жильцы уже звонят. Не позорьте контору."),
 	};
+	// «Диспетчер помнит» — реплики на основе карьеры конторы (переживает выход из игры)
+	const TArray<FString> MemoryBlewUp = {
+		TEXT("О, опять вы. На вашем счету уже {X} спалённых объектов. Сегодня — хотя бы без пожара?"),
+		TEXT("Бригада-поджигатели снова в деле. {X} зданий на вашей совести. Зажигалки оставьте дома."),
+		TEXT("Напоминаю: вы взрывали объекты {X} раз. Страховая нас уже по имени знает."),
+	};
+	const TArray<FString> MemoryLoser = {
+		TEXT("Честно? После ваших прошлых смен я заявку давал с неохотой. Докажите, что зря."),
+		TEXT("Контора на грани. Ещё один провал — и пишем заявления. Без давления, работайте."),
+	};
+	const TArray<FString> MemoryVeteran = {
+		TEXT("А, ветераны. Заявки вы закрываете — за это держим. Не зазнавайтесь."),
+		TEXT("Опытная бригада на смене. Жильцы попросили именно вас. Не подведите."),
+	};
 	const TArray<FString> RepairDone = {
 		TEXT("«{X}» — принято. Неужели сами справились."),
 		TEXT("Отметил: «{X}» готов. Продолжаем не ломать остальное."),
@@ -770,6 +784,28 @@ void ARunState::SendGreeting()
 	if (bCheapGear)
 	{
 		DispatcherSay(DispatcherLines::CheapGearGreeting, FString(), /*bImportant=*/true);
+	}
+
+	// «Диспетчер помнит»: реплика по карьере конторы (переживает выход из игры)
+	if (const UGameInstance* GI = GetWorld()->GetGameInstance())
+	{
+		if (const UCompanyLedgerSubsystem* Ledger = GI->GetSubsystem<UCompanyLedgerSubsystem>())
+		{
+			const FCareerStats& C = Ledger->GetCareer();
+			const int32 Played = C.ShiftsWon + C.ShiftsLost;
+			if (C.BuildingsBlownUp > 0)
+			{
+				DispatcherSay(DispatcherLines::MemoryBlewUp, FString::FromInt(C.BuildingsBlownUp), /*bImportant=*/true);
+			}
+			else if (Played >= 2 && C.ShiftsLost > C.ShiftsWon)
+			{
+				DispatcherSay(DispatcherLines::MemoryLoser, FString(), /*bImportant=*/true);
+			}
+			else if (C.ShiftsWon >= 3)
+			{
+				DispatcherSay(DispatcherLines::MemoryVeteran, FString(), /*bImportant=*/true);
+			}
+		}
 	}
 }
 
