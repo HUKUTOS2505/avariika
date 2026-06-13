@@ -1758,6 +1758,23 @@ void AAvaryoCharacter::UpdateTrip(float DeltaSeconds)
 		}
 	}
 
+	// Споткнуться о брошенный на полу хлам (своя же выроненная канистра/ключ) прямо по курсу
+	for (TActorIterator<APickupItem> It(GetWorld()); It; ++It)
+	{
+		UPrimitiveComponent* Prim = Cast<UPrimitiveComponent>(It->GetRootComponent());
+		if (!Prim || !Prim->IsSimulatingPhysics()) // лежит на полу (не в руках/не закреплён)
+		{
+			continue;
+		}
+		const FVector To = It->GetActorLocation() - Loc;
+		if (To.Z < 30.f && To.SizeSquared() <= FMath::Square(100.f)
+			&& FVector::DotProduct(To.GetSafeNormal(), Fwd) > 0.25f)
+		{
+			TriggerStumble(); // насорил — сам и влетел
+			return;
+		}
+	}
+
 	float Mult = 1.f;
 	if (FlashlightComponent && !FlashlightComponent->IsOn())
 	{
