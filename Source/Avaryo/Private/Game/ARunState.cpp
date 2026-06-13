@@ -15,6 +15,7 @@
 #include "Net/UnrealNetwork.h"
 #include "TimerManager.h"
 #include "World/AExitZone.h"
+#include "World/AFloodlight.h"
 #include "World/ARepairable.h"
 
 // Реплики диспетчера: сухой сарказм уставшего начальника смены. «{X}» — имя/название/число.
@@ -192,6 +193,9 @@ ARunState::ARunState()
 	NextCreakTime = 0.f;
 	CreakIntervalMin = 22.f;
 	CreakIntervalMax = 50.f;
+	bDarknessFear = true;
+	DarknessPanicPerSecond = 2.5f; // ~25 c в полной темноте до паники
+	DarknessSafeRadius = 900.f;    // 9 м от прожектора — спокойно
 	ShiftNumber = 1;
 	CompanyBalanceStart = 0;
 	Reputation = 0;
@@ -322,6 +326,29 @@ void ARunState::Tick(float DeltaSeconds)
 		return;
 	}
 
+	// Страх темноты: питание вырублено, если сломан щиток (объект с курсорной мини-игрой)
+	bool bPowerOut = false;
+	TArray<FVector> FloodlightLocs;
+	if (bDarknessFear)
+	{
+		for (const TObjectPtr<ARepairable>& Obj : Objectives)
+		{
+			if (Obj && Obj->GetMinigameType() == ERepairMinigameType::Cursor && Obj->IsBroken())
+			{
+				bPowerOut = true;
+				break;
+			}
+		}
+		if (bPowerOut)
+		{
+			for (TActorIterator<AFloodlight> Fl(GetWorld()); Fl; ++Fl)
+			{
+				FloodlightLocs.Add(Fl->GetActorLocation());
+			}
+		}
+	}
+	const float DarkRadiusSq = DarknessSafeRadius * DarknessSafeRadius;
+
 	// Статистика + поражение (вся бригада ранена — поднимать некому)
 	const float Now = GetWorld()->GetTimeSeconds();
 	int32 NumPlayers = 0;
@@ -383,6 +410,29 @@ void ARunState::Tick(float DeltaSeconds)
 		if (It->IsSlipping())
 		{
 			Stats.SlipSeconds += DeltaSeconds; // катается по пене
+		}
+
+		// Страх темноты: вырублен свет + фонарь выключен + не у прожектора → паника крадётся вверх
+		if (bPowerOut && !Vitals->IsWounded())
+		{
+			const bool bLightOn = It->FlashlightComponent && It->FlashlightComponent->IsOn();
+			bool bSafeLit = bLightOn;
+			if (!bSafeLit)
+			{
+				const FVector P = It->GetActorLocation();
+				for (const FVector& FL : FloodlightLocs)
+				{
+					if (FVector::DistSquared(P, FL) < DarkRadiusSq)
+					{
+						bSafeLit = true;
+						break;
+					}
+				}
+			}
+			if (!bSafeLit)
+			{
+				Vitals->AddPanic(DarknessPanicPerSecond * DeltaSeconds);
+			}
 		}
 	}
 
