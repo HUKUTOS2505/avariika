@@ -31,22 +31,22 @@ Breaker, GasPipe, Generator, Battery — работают, но если хоч�
 
 ## ПРИОРИТЕТ A — нужны модели (заглушки на карте)
 
-### SM_Thermos — термос/кофе (восстанавливает выносливость), ~22 см
+### SM_Thermos — термос/кофе (восстанавливает выносливость), ~25 см
 ```
 Modern present-day stainless steel travel thermos flask, slim cylinder about 22cm tall, matte powder-coated dark teal painted body with a black screw-on cup lid that doubles as a drinking mug, satin brushed steel base ring and screw threads with high roughness and no mirror reflection, subtle silicone grip band, light-to-medium wear with fine scuffs, dust, fingerprints, a faded peeling label and a few small scratches, brand-neutral realistic used municipal worker gear, realistic proportions, low-poly game prop, PBR, game-ready, single object, centered, no ground plane, no scene
 ```
 
-### SM_TrapKit — носимая растяжка-шумелка, ~15 см
+### SM_TrapKit — носимая растяжка-шумелка, ~18 см
 ```
 A modern compact tripwire noise-maker trap kit roughly 15 cm, a small handheld can-sized device: a matte black ABS plastic case with a safety-yellow hi-vis front panel and rounded rubber bumper pads on the corners, a coiled spool of thin steel tripwire mounted on one side with a tiny tension hook, a recessed trigger pin and a small spring-loaded clacker mechanism, a faded warning sticker and printed icons on the casing, slightly worn matte painted plastic with light scuffs, dust, fingerprints and a few faint scratches, brushed non-reflective dark metal hardware, graphite and dirty-white accents, realistic everyday proportions, contemporary present-day worn work gear, high roughness matte surfaces, low-poly game prop, PBR, game-ready, single object, centered, no ground plane, no scene
 ```
 
-### SM_LightKit — переносной складной LED-прожектор (носимый), ~25 см
+### SM_LightKit — переносной складной LED-прожектор (носимый), ~28 см
 ```
 A modern compact folding LED work light kit, about 25 cm folded for carrying, rectangular housing of matte safety-yellow painted ABS plastic with graphite-black accents, a brushed dark-grey metal carry handle on top, folded-up adjustable tripod legs clipped against the body, a wide rectangular non-reflective frosted LED lens panel with a textured matte bezel, rubberized grip pads, a small recessed power switch and a coiled cable tucked along one side, light realistic wear with dust, fingerprints, faint scuffs and a couple of faded warning stickers, satin painted surfaces and powder-coated metal at high roughness, realistic proportions, low-poly game prop, PBR, game-ready, single object, centered, no ground plane, no scene
 ```
 
-### SM_MotionSensor — датчик движения, ~18 см
+### SM_MotionSensor — датчик движения, ~16 см
 ```
 Modern present-day PIR motion detector, roughly 18 cm tall, a rounded off-white and light-grey molded ABS plastic housing with a smooth matte semi-translucent white plastic lens dome on the front, a tiny recessed LED indicator dot below the dome, mounted on a short slim grey plastic neck rising from a small flat circular magnetic base plate, satin matte painted plastic surfaces with high roughness, neutral dirty-white and graphite-grey color scheme, light wear with faint dust, fingerprints and a small faded warning sticker, no scuffs heavier than light scratches, realistic proportions, clean contemporary contractor security device, low-poly game prop, PBR, game-ready, single object, centered, no ground plane, no scene
 ```

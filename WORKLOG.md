@@ -39,6 +39,12 @@
 
 **ИТОГ по моделям — заглушки остались только у 4 размещённых:** Thermos, TrapKit, LightKit, MotionSensor (+ рантайм-спавн: BioBlob, Floodlight, Trap; FoamPatch — делать декалью). Промты для них в `MESHY_PROMPTS.md`. Остальные 12 + Hilux — с мешами.
 
+### Вечер 2 (доп.): дневной свет + стекло Hilux + размеры
+- **Стартовый мир СВЕТЛЫЙ (день):** DirectionalLight 0.6→9 (белое солнце, use_temperature off, pitch −58), SkyLight 0.15→2 (recapture), PPV_Night → дневная histogram-авто-экспозиция (bias 0.5). **Откат в ночь:** DirLight 0.6 / SkyLight 0.15 / убрать override экспозиции. Скрипты `brighten_and_glass.py`, `daylight_tune.py`.
+- **Стёкла Hilux:** окна (слоты 38/46/54 `glass/glass_001/glass_002`) были непрозрачны снаружи (односторонний). Сделал `M_HiluxGlass` (Translucent, **two_sided**, opacity 0.18, rough 0.06) — видно сквозь кабину с обеих сторон. Фары/поворотники не трогал.
+- **Реальные размеры заглушек (= целевые для импорта):** Thermos 25, TrapKit 18, LightKit 28, MotionSensor 16 см (`restore_and_sizes.py`).
+- ⚠️ Грабли: `StaticMeshComponent.get_static_mesh()` нет в 5.7 Python → `get_editor_property('static_mesh')`.
+
 ## СЕССИЯ 2026-06-13 (день, автономно, доступ дал пользователь) — аудит + импорт 4 моделей + PIE
 
 Пользователь уехал, попросил прогнать механики, импортировать добавленные модели, проверить в PIE. Сделано (всё в `main`):
