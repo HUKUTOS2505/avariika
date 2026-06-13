@@ -644,6 +644,20 @@ void ARunState::OnObjectiveRepaired(ARepairable* Repairable, AAvaryoCharacter* F
 		}
 	}
 
+	// Командное «уф, починили!» — живая бригада рядом чуть выдыхает (гасит панику в пиковый момент)
+	{
+		const float ReliefRadiusSq = FMath::Square(1500.f);
+		const FVector Where = Repairable ? Repairable->GetActorLocation() : FVector::ZeroVector;
+		for (TActorIterator<AAvaryoCharacter> It(GetWorld()); It; ++It)
+		{
+			if (It->VitalsComponent && !It->VitalsComponent->IsWounded()
+				&& (!Repairable || FVector::DistSquared(It->GetActorLocation(), Where) < ReliefRadiusSq))
+			{
+				It->VitalsComponent->ReducePanic(8.f);
+			}
+		}
+	}
+
 	// Без зоны выхода на карте побеждаем сразу после последней починки
 	if (AreAllObjectivesComplete() && !bHasExitZone)
 	{

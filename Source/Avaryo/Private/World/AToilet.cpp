@@ -183,6 +183,7 @@ void AToilet::FinishSession(AAvaryoCharacter* Who)
 	Occupant = nullptr;
 	Who->SetInteractionLocked(false);
 	Who->VitalsComponent->RelieveBladder();
+	Who->VitalsComponent->ReducePanic(12.f); // облегчение: короткий «ааа», сброс паники
 	if (ARunState* Run = ARunState::Get(GetWorld()))
 	{
 		Run->AddToiletVisit(Who); // дисциплина — в «Акт»

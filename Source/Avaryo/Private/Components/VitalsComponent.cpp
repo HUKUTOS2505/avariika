@@ -103,7 +103,15 @@ void UVitalsComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 		}
 		bLit = bInLightCached;
 	}
-	PanicDelta += bLit ? -PanicFallInLightPerSecond : PanicRiseInDarkPerSecond;
+	// Свет успокаивает всех; страх темноты не вешаем на раненого — ему и так идёт +PanicRiseWounded
+	if (bLit)
+	{
+		PanicDelta += -PanicFallInLightPerSecond;
+	}
+	else if (!bWounded)
+	{
+		PanicDelta += PanicRiseInDarkPerSecond;
+	}
 
 	bool bTeammateNear = false;
 	for (TActorIterator<AAvaryoCharacter> It(GetWorld()); It; ++It)
