@@ -25,9 +25,11 @@ enum class ERepairMinigameType : uint8
 UENUM(BlueprintType)
 enum class ERepairStageKind : uint8
 {
-	HoldHand,   // держать E руками (починить корпус, и т.п.)
-	HoldTool,   // держать E с инструментом ItemTag в руках (заварить сваркой)
-	InsertItem  // нажать E с предметом ItemTag в руках — предмет тратится (кабель, канистра, предохранитель)
+	HoldHand,    // держать E руками (починить корпус, и т.п.)
+	HoldTool,    // держать E с инструментом ItemTag в руках (заварить сваркой)
+	InsertItem,  // нажать E с предметом ItemTag в руках — предмет тратится мгновенно (предохранитель, бензин)
+	AutoFill,    // нажать E с предметом ItemTag — полоска установки заполняется САМА (кабель); предмет тратится
+	Minigame     // мини-игра курсором (заварка/починка руками): попадание — прогресс, промах — откат
 };
 
 /** Один подготовительный этап ремонта. */
@@ -285,8 +287,21 @@ public:
 	/** Текущий этап (если не все пройдены). Возвращает false, если этапов больше нет. */
 	bool GetCurrentStage(FRepairStage& OutStage) const;
 
-	/** Нужно ли сейчас вставлять предмет (текущий этап = InsertItem). */
+	/** Нужно ли сейчас вставлять предмет (текущий этап = InsertItem — мгновенно). */
 	UFUNCTION(BlueprintPure, Category="Repair|Stages") bool NeedsInsertNow() const;
+
+	/** Текущий этап = AutoFill (нажал E — полоска заполняется сама). */
+	UFUNCTION(BlueprintPure, Category="Repair|Stages") bool IsAutoFillStageNow() const;
+
+	/** Текущий этап = Minigame (курсор с откатом). */
+	UFUNCTION(BlueprintPure, Category="Repair|Stages") bool IsMinigameStageNow() const;
+
+	/** Идёт ли прямо сейчас prereq-мини-игра (курсор этапа активен). */
+	UFUNCTION(BlueprintPure, Category="Repair|Stages") bool IsDoingPrereqMinigame() const { return bDoingPrereqMinigame; }
+	/** Идёт ли prereq Hold-этап (держать E). */
+	UFUNCTION(BlueprintPure, Category="Repair|Stages") bool IsDoingPrereqHold() const { return bDoingPrereqHold; }
+	/** Идёт ли AutoFill-этап (полоска заполняется сама). */
+	UFUNCTION(BlueprintPure, Category="Repair|Stages") bool IsAutoFilling() const { return bPrereqAutoFilling; }
 
 	/** Нажатие E с предметом для этапа InsertItem: тратит предмет, продвигает этап. Только сервер. */
 	bool TryInsertBy(AAvaryoCharacter* Who);
@@ -377,6 +392,14 @@ protected:
 	/** Идёт ли сейчас Hold-этап (держим E на подготовке, а не на основной починке). */
 	UPROPERTY(Replicated)
 	bool bDoingPrereqHold;
+
+	/** AutoFill-этап запущен: полоска заполняется сама (E держать не нужно). */
+	UPROPERTY(Replicated)
+	bool bPrereqAutoFilling;
+
+	/** Идёт prereq-мини-игра (курсор этапа): E — попадание/промах. */
+	UPROPERTY(Replicated)
+	bool bDoingPrereqMinigame;
 
 	/** Докрутка вентиля одним тыком: попал в ритм или сорвал резьбу. Только сервер. */
 	void HandleValveTurn(AAvaryoCharacter* Who);

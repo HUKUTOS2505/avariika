@@ -688,6 +688,13 @@ void AAvaryoCharacter::InteractPressedAuth()
 		return;
 	}
 
+	// Активна prereq-мини-игра (заварка/починка руками) — E это удар по курсору
+	if (CurrentRepairable && CurrentRepairable->IsDoingPrereqMinigame())
+	{
+		CurrentRepairable->TryHitBy(this);
+		return;
+	}
+
 	// Этап «вставить расходник»: смотрим на объект, в руках нужный предмет (кабель/канистра/предохранитель) — E вставляет
 	if (ARepairable* RInsert = FindFocusedRepairable())
 	{
@@ -748,20 +755,33 @@ void AAvaryoCharacter::InteractPressedAuth()
 
 void AAvaryoCharacter::InteractReleasedAuth()
 {
-	// Мини-игры НЕ завершаются отпусканием E (выход по G), но стартеру важен момент отпускания.
-	// Колхоз — обычное удержание E, отпускание его завершает (ниже).
-	if (CurrentRepairable && CurrentRepairable->IsMinigameRepair() && !CurrentRepairable->IsBotching())
+	if (!CurrentRepairable)
 	{
-		CurrentRepairable->TryReleaseBy(this);
+		return;
+	}
+	ARepairable* R = CurrentRepairable;
+
+	// На подготовительных этапах: Hold завершается отпусканием E; AutoFill и prereq-мини-игра — НЕ завершаются
+	if (!R->ArePrereqsDone())
+	{
+		if (R->IsDoingPrereqHold())
+		{
+			R->EndRepairBy(this);
+			CurrentRepairable = nullptr;
+		}
+		return;
+	}
+
+	// Основная мини-игра НЕ завершается отпусканием E (выход по отходу), но стартеру важен момент отпускания
+	if (R->IsMinigameRepair() && !R->IsBotching())
+	{
+		R->TryReleaseBy(this);
 		return;
 	}
 
 	// Обычная починка (удержание E) — завершается
-	if (CurrentRepairable)
-	{
-		CurrentRepairable->EndRepairBy(this);
-		CurrentRepairable = nullptr;
-	}
+	R->EndRepairBy(this);
+	CurrentRepairable = nullptr;
 }
 
 void AAvaryoCharacter::TryRestartRun()

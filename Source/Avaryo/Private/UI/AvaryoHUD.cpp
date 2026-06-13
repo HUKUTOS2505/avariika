@@ -608,14 +608,42 @@ void AAvaryoHUD::DrawHUD()
 			DrawText(TEXT("[E] — жми в зелёной! Промах бьёт током, 3 промаха — замыкание.  [G] — отойти"), TextDim, BoxX, BoxY + BarH + 8.f, Font, 0.9f);
 		}
 	}
-	// ---------- Подготовительный этап удержанием E (заварить / починить корпус) ----------
+	// ---------- Подготовительная мини-игра (заварка / починка руками — курсор с откатом) ----------
+	else if (Character->IsRepairing() && Character->GetCurrentRepairable()
+		&& Character->GetCurrentRepairable()->IsDoingPrereqMinigame())
+	{
+		ARepairable* R = Character->GetCurrentRepairable();
+		FRepairStage St;
+		R->GetCurrentStage(St);
+		const FString Label = FString::Printf(TEXT("%s  %d%%"),
+			St.Label.IsEmpty() ? TEXT("Этап") : *St.Label.ToString(), FMath::RoundToInt(R->GetPrereqProgress() * 100.f));
+		const float BarW = 340.f, BarH = 18.f;
+		const float BoxX = (SizeX - BarW) * 0.5f;
+		float BoxY = SizeY * 0.42f;
+		float LW = 0.f, LH = 0.f;
+		GetTextSize(Label, LW, LH, Font, 1.1f);
+		DrawRect(BoxBG, BoxX - 12.f, BoxY - LH - 10.f, BarW + 24.f, LH + BarH * 2.f + 56.f);
+		DrawText(Label, TextMain, BoxX, BoxY - LH - 4.f, Font, 1.1f);
+		DrawRect(BarBG, BoxX, BoxY + 2.f, BarW, BarH);
+		DrawRect(Accent, BoxX, BoxY + 2.f, BarW * R->GetPrereqProgress(), BarH);
+		BoxY += BarH + 12.f;
+		DrawRect(FLinearColor(0.55f, 0.12f, 0.1f), BoxX, BoxY + 2.f, BarW, BarH);
+		const float Green = R->GetGreenCenter();
+		const float GreenL = FMath::Clamp(Green - R->MinigameGreenHalfWidth, 0.f, 1.f);
+		const float GreenR = FMath::Clamp(Green + R->MinigameGreenHalfWidth, 0.f, 1.f);
+		DrawRect(FLinearColor(0.25f, 0.8f, 0.25f), BoxX + GreenL * BarW, BoxY + 2.f, (GreenR - GreenL) * BarW, BarH);
+		DrawRect(TextMain, BoxX + R->GetCursorPos() * BarW - 2.f, BoxY - 2.f, 4.f, BarH + 8.f);
+		DrawText(TEXT("[E] — жми в зелёной! Промах — откат прогресса."), TextDim, BoxX, BoxY + BarH + 8.f, Font, 0.9f);
+	}
+	// ---------- Подготовительный этап: держать E (починка руками) или AutoFill (установка кабеля) ----------
 	else if (Character->IsRepairing() && Character->GetCurrentRepairable()
 		&& !Character->GetCurrentRepairable()->ArePrereqsDone())
 	{
 		ARepairable* Rep = Character->GetCurrentRepairable();
 		FRepairStage St;
 		const FString StepName = (Rep->GetCurrentStage(St) && !St.Label.IsEmpty()) ? St.Label.ToString() : TEXT("Подготовка");
-		DrawCastBar(StepName, Rep->GetPrereqProgress(), Accent);
+		DrawCastBar(Rep->IsAutoFilling() ? FString::Printf(TEXT("%s (установка...)"), *StepName) : StepName,
+			Rep->GetPrereqProgress(), Accent);
 	}
 	// ---------- Основная починка (держит E у объекта) ----------
 	else if (Character->IsRepairing() && Character->GetCurrentRepairable())
@@ -646,19 +674,26 @@ void AAvaryoHUD::DrawHUD()
 			FocusedRep->GetCurrentStage(St);
 			const FString Step = St.Label.IsEmpty() ? TEXT("Подготовка") : St.Label.ToString();
 			const APickupItem* Held = Character->GetHeldItem();
-			const bool bNeedItem = (St.Kind == ERepairStageKind::HoldTool || St.Kind == ERepairStageKind::InsertItem);
+			const bool bNeedItem = (St.Kind == ERepairStageKind::HoldTool
+				|| St.Kind == ERepairStageKind::InsertItem
+				|| St.Kind == ERepairStageKind::AutoFill
+				|| (St.Kind == ERepairStageKind::Minigame && !St.ItemTag.IsNone()));
 			const bool bHasItem = Held && Held->ToolTag == St.ItemTag;
 			if (bNeedItem && !bHasItem)
 			{
 				Prompt = FString::Printf(TEXT("%s — нужен в руках: %s"), *Step, *St.ItemTag.ToString());
 			}
-			else if (St.Kind == ERepairStageKind::InsertItem)
+			else if (St.Kind == ERepairStageKind::Minigame)
 			{
-				Prompt = FString::Printf(TEXT("[E] %s"), *Step);
+				Prompt = FString::Printf(TEXT("[E] %s (мини-игра)"), *Step);
+			}
+			else if (St.Kind == ERepairStageKind::HoldHand || St.Kind == ERepairStageKind::HoldTool)
+			{
+				Prompt = FString::Printf(TEXT("[E] %s (держать)"), *Step);
 			}
 			else
 			{
-				Prompt = FString::Printf(TEXT("[E] %s (держать)"), *Step);
+				Prompt = FString::Printf(TEXT("[E] %s"), *Step); // InsertItem / AutoFill
 			}
 		}
 		else if (FocusedRep->CanBeRepairedBy(Character))

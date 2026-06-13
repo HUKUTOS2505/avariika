@@ -101,6 +101,8 @@ ARepairable::ARepairable()
 	PrereqIndex = 0;
 	PrereqProgress = 0.f;
 	bDoingPrereqHold = false;
+	bPrereqAutoFilling = false;
+	bDoingPrereqMinigame = false;
 }
 
 void ARepairable::BeginPlay()
@@ -127,6 +129,8 @@ void ARepairable::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifet
 	DOREPLIFETIME(ARepairable, PrereqIndex);
 	DOREPLIFETIME(ARepairable, PrereqProgress);
 	DOREPLIFETIME(ARepairable, bDoingPrereqHold);
+	DOREPLIFETIME(ARepairable, bPrereqAutoFilling);
+	DOREPLIFETIME(ARepairable, bDoingPrereqMinigame);
 }
 
 bool ARepairable::GetCurrentStage(FRepairStage& OutStage) const
@@ -143,6 +147,18 @@ bool ARepairable::NeedsInsertNow() const
 {
 	FRepairStage S;
 	return bBroken && GetCurrentStage(S) && S.Kind == ERepairStageKind::InsertItem;
+}
+
+bool ARepairable::IsAutoFillStageNow() const
+{
+	FRepairStage S;
+	return bBroken && GetCurrentStage(S) && S.Kind == ERepairStageKind::AutoFill;
+}
+
+bool ARepairable::IsMinigameStageNow() const
+{
+	FRepairStage S;
+	return bBroken && GetCurrentStage(S) && S.Kind == ERepairStageKind::Minigame;
 }
 
 bool ARepairable::TryInsertBy(AAvaryoCharacter* Who)
@@ -191,11 +207,11 @@ void ARepairable::Tick(float DeltaSeconds)
 		{
 			EndRepairBy(Repairer);
 		}
-		else if (bDoingPrereqHold)
+		else if (bDoingPrereqHold || bPrereqAutoFilling)
 		{
-			// Подготовительный Hold-этап: держим E, прогресс этапа растёт; по завершении — следующий этап
+			// Hold-этап (держать E) ИЛИ AutoFill (полоска сама ползёт после нажатия E)
 			FRepairStage S;
-			if (GetCurrentStage(S) && (S.Kind == ERepairStageKind::HoldHand || S.Kind == ERepairStageKind::HoldTool))
+			if (GetCurrentStage(S))
 			{
 				PrereqProgress = FMath::Min(PrereqProgress + DeltaSeconds / FMath::Max(S.Duration, 0.1f), 1.f);
 				NoiseAccum += DeltaSeconds;
@@ -206,9 +222,14 @@ void ARepairable::Tick(float DeltaSeconds)
 				}
 				if (PrereqProgress >= 1.f)
 				{
+					if (bPrereqAutoFilling && Repairer)
+					{
+						Repairer->ConsumeHeldItemCharge(); // кабель/расходник потрачен после установки
+					}
 					PrereqIndex++;
 					PrereqProgress = 0.f;
 					bDoingPrereqHold = false;
+					bPrereqAutoFilling = false;
 					if (Repairer)
 					{
 						Repairer->SetInteractionLocked(false);
@@ -220,8 +241,16 @@ void ARepairable::Tick(float DeltaSeconds)
 			else
 			{
 				bDoingPrereqHold = false;
+				bPrereqAutoFilling = false;
 				EndRepairBy(Repairer);
 			}
+		}
+		else if (bDoingPrereqMinigame)
+		{
+			// Prereq-мини-игра (заварка/починка руками): курсор бегает, попадания/откат — в TryHitBy
+			CursorPhase += DeltaSeconds * MinigameCursorSpeed * MinigameSpeedMult * (1.f + PanicHardenScale * RepairerPanic01());
+			const float Saw = FMath::Fmod(CursorPhase, 2.f);
+			CursorPos = Saw <= 1.f ? Saw : 2.f - Saw;
 		}
 		else if (bBotching)
 		{
@@ -407,7 +436,7 @@ bool ARepairable::CanBotchBy(const AAvaryoCharacter* Who) const
 bool ARepairable::CanContinueRepair() const
 {
 	const bool bInRange = FVector::DistSquared(Repairer->GetActorLocation(), GetActorLocation()) <= FMath::Square(RepairRange);
-	if (bDoingPrereqHold)
+	if (bDoingPrereqHold || bPrereqAutoFilling || bDoingPrereqMinigame)
 	{
 		if (!bInRange)
 		{
@@ -422,7 +451,11 @@ bool ARepairable::CanContinueRepair() const
 		{
 			return false;
 		}
-		if (S.Kind == ERepairStageKind::HoldTool)
+		// если этап требует предмета — он должен оставаться в руках
+		const bool bNeedsItem = (S.Kind == ERepairStageKind::HoldTool
+			|| S.Kind == ERepairStageKind::AutoFill
+			|| (S.Kind == ERepairStageKind::Minigame && !S.ItemTag.IsNone()));
+		if (bNeedsItem)
 		{
 			const APickupItem* Held = Repairer->GetHeldItem();
 			if (!Held || Held->ToolTag != S.ItemTag)
@@ -457,7 +490,7 @@ bool ARepairable::BeginRepairBy(AAvaryoCharacter* Who)
 		GetCurrentStage(S);
 		if (S.Kind == ERepairStageKind::InsertItem)
 		{
-			return false; // вставка расходника — отдельным нажатием E (TryInsertBy)
+			return false; // мгновенная вставка — отдельным нажатием E (TryInsertBy)
 		}
 		if (LockoutRemaining > 0.f || (Repairer && Repairer != Who))
 		{
@@ -467,24 +500,40 @@ bool ARepairable::BeginRepairBy(AAvaryoCharacter* Who)
 		{
 			return false;
 		}
-		if (S.Kind == ERepairStageKind::HoldTool)
+		// нужен предмет в руках: инструмент (HoldTool / Minigame с ItemTag) или расходник (AutoFill)
+		const bool bNeedsItem = (S.Kind == ERepairStageKind::HoldTool
+			|| S.Kind == ERepairStageKind::AutoFill
+			|| (S.Kind == ERepairStageKind::Minigame && !S.ItemTag.IsNone()));
+		if (bNeedsItem)
 		{
 			const APickupItem* Held = Who->GetHeldItem();
 			if (!Held || Held->ToolTag != S.ItemTag)
 			{
-				return false; // нужен инструмент этапа в руках (напр. сварочник)
+				return false; // нужен предмет этапа в руках (сварочник / кабель / ...)
 			}
 		}
 		Repairer = Who;
 		NoiseAccum = 0.f;
 		bBotching = false;
-		bDoingPrereqHold = true;
+		bDoingPrereqHold = (S.Kind == ERepairStageKind::HoldHand || S.Kind == ERepairStageKind::HoldTool);
+		bPrereqAutoFilling = (S.Kind == ERepairStageKind::AutoFill);
+		bDoingPrereqMinigame = (S.Kind == ERepairStageKind::Minigame);
+		if (bDoingPrereqMinigame)
+		{
+			CursorPhase = 0.f;
+			CursorPos = 0.f;
+			MissCount = 0;
+			MinigameSpeedMult = 1.f;
+			GreenCenter = FMath::FRandRange(0.1f, 0.9f);
+		}
 		Who->SetInteractionLocked(true);
 		return true;
 	}
 
 	// Нет нужного инструмента, но можно колхозить — крудовый ремонт удержанием E (без мини-игры)
 	bDoingPrereqHold = false;
+	bPrereqAutoFilling = false;
+	bDoingPrereqMinigame = false;
 	const bool bProper = CanBeRepairedBy(Who);
 	if (!bProper)
 	{
@@ -523,7 +572,7 @@ void ARepairable::EndRepairBy(AAvaryoCharacter* Who)
 {
 	if (HasAuthority() && Repairer == Who)
 	{
-		if (Who && (bDoingPrereqHold || (IsMinigameRepair() && !bBotching)))
+		if (Who && (bDoingPrereqHold || bPrereqAutoFilling || bDoingPrereqMinigame || (IsMinigameRepair() && !bBotching)))
 		{
 			Who->SetInteractionLocked(false);
 		}
@@ -531,6 +580,8 @@ void ARepairable::EndRepairBy(AAvaryoCharacter* Who)
 		StarterTension = 0.f;
 		bBotching = false;
 		bDoingPrereqHold = false;
+		bPrereqAutoFilling = false;
+		bDoingPrereqMinigame = false;
 		Repairer = nullptr; // прогресс сохраняется — можно дочинить позже (этапы тоже)
 	}
 }
@@ -556,6 +607,38 @@ void ARepairable::TryHitBy(AAvaryoCharacter* Who)
 {
 	if (!HasAuthority() || Repairer != Who || !Who)
 	{
+		return;
+	}
+
+	// Prereq-мини-игра (заварка / починка руками): курсор в зелёной зоне = прогресс этапа, промах = откат
+	if (bDoingPrereqMinigame)
+	{
+		const float EffGreenHalf = FMath::Max(MinigameGreenHalfWidth * (1.f - 0.5f * PanicHardenScale * RepairerPanic01()), 0.02f);
+		if (FMath::Abs(CursorPos - GreenCenter) <= EffGreenHalf)
+		{
+			PrereqProgress = FMath::Min(PrereqProgress + 1.f / FMath::Max(HitsToRepair, 1), 1.f);
+			GreenCenter = FMath::FRandRange(0.1f, 0.9f);
+			MakeNoise(0.5f, Who, GetActorLocation());
+			if (PrereqProgress >= 1.f)
+			{
+				PrereqIndex++;
+				PrereqProgress = 0.f;
+				bDoingPrereqMinigame = false;
+				if (Repairer)
+				{
+					Repairer->SetInteractionLocked(false);
+				}
+				Repairer = nullptr; // этап пройден — игрок жмёт E для следующего
+				RefreshStatusVisual();
+			}
+		}
+		else
+		{
+			// Промах — «поломка»: часть прогресса этапа сгорает
+			PrereqProgress = FMath::Max(PrereqProgress - ValveSlipPenalty, 0.f);
+			MissCount++;
+			MakeNoise(0.8f, Who, GetActorLocation());
+		}
 		return;
 	}
 
@@ -752,6 +835,8 @@ void ARepairable::SetBroken(bool bNewBroken)
 	Repairer = nullptr;
 	bBotching = false;
 	bDoingPrereqHold = false;
+	bPrereqAutoFilling = false;
+	bDoingPrereqMinigame = false;
 	if (bNewBroken)
 	{
 		PrereqIndex = 0;       // сломали заново — этапы с нуля
