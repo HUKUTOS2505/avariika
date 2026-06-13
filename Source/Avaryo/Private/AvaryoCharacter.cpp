@@ -681,7 +681,8 @@ void AAvaryoCharacter::InteractPressedAuth()
 
 	// Чиним в мини-игре — E по типу: щиток — удар по курсору, вентиль — докрутка, стартер — потянуть шнур.
 	// Колхоз (без инструмента) — это удержание E, а не мини-игра.
-	if (CurrentRepairable && CurrentRepairable->IsMinigameRepair() && !CurrentRepairable->IsBotching())
+	if (CurrentRepairable && CurrentRepairable->IsMinigameRepair() && CurrentRepairable->ArePrereqsDone()
+		&& !CurrentRepairable->IsBotching())
 	{
 		CurrentRepairable->TryHitBy(this);
 		return;

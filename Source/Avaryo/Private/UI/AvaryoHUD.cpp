@@ -532,9 +532,10 @@ void AAvaryoHUD::DrawHUD()
 
 		DrawText(TEXT("[E] — жми в зелёной (или жёлтой) зоне!  [G] — встать"), TextDim, BoxX, BoxY + BarH + 8.f, Font, 0.9f);
 	}
-	// ---------- Мини-игры починки (щиток/вентиль/стартер) ----------
+	// ---------- Мини-игры починки (щиток/вентиль/стартер) — только когда все подготовительные этапы пройдены ----------
 	else if (Character->IsRepairing() && Character->GetCurrentRepairable()
-		&& Character->GetCurrentRepairable()->IsMinigameRepair() && !Character->GetCurrentRepairable()->IsBotching())
+		&& Character->GetCurrentRepairable()->IsMinigameRepair() && Character->GetCurrentRepairable()->ArePrereqsDone()
+		&& !Character->GetCurrentRepairable()->IsBotching())
 	{
 		ARepairable* R = Character->GetCurrentRepairable();
 		const float BarW = 340.f, BarH = 18.f;
@@ -607,15 +608,22 @@ void AAvaryoHUD::DrawHUD()
 			DrawText(TEXT("[E] — жми в зелёной! Промах бьёт током, 3 промаха — замыкание.  [G] — отойти"), TextDim, BoxX, BoxY + BarH + 8.f, Font, 0.9f);
 		}
 	}
-	// ---------- Починка (держит E у объекта) ----------
+	// ---------- Подготовительный этап удержанием E (заварить / починить корпус) ----------
+	else if (Character->IsRepairing() && Character->GetCurrentRepairable()
+		&& !Character->GetCurrentRepairable()->ArePrereqsDone())
+	{
+		ARepairable* Rep = Character->GetCurrentRepairable();
+		FRepairStage St;
+		const FString StepName = (Rep->GetCurrentStage(St) && !St.Label.IsEmpty()) ? St.Label.ToString() : TEXT("Подготовка");
+		DrawCastBar(StepName, Rep->GetPrereqProgress(), Accent);
+	}
+	// ---------- Основная починка (держит E у объекта) ----------
 	else if (Character->IsRepairing() && Character->GetCurrentRepairable())
 	{
 		ARepairable* Repairing = Character->GetCurrentRepairable();
 		const int32 Percent = FMath::RoundToInt(Repairing->GetRepairProgress() * 100.f);
-		const FString RepairLabel = Repairing->IsBotching()
-			? FString::Printf(TEXT("Колхоз: %s  %d%% (без инструмента)"), *Repairing->DisplayName.ToString(), Percent)
-			: FString::Printf(TEXT("Ремонт: %s  %d%%"), *Repairing->DisplayName.ToString(), Percent);
-		DrawCastBar(RepairLabel, Repairing->GetRepairProgress(), Accent);
+		DrawCastBar(FString::Printf(TEXT("Ремонт: %s  %d%%"), *Repairing->DisplayName.ToString(), Percent),
+			Repairing->GetRepairProgress(), Accent);
 	}
 	// ---------- Подсказка подбора (плашка как в референсе) ----------
 	else if (APickupItem* Focused = Character->GetFocusedItem())
@@ -630,6 +638,28 @@ void AAvaryoHUD::DrawHUD()
 		{
 			Prompt = FString::Printf(TEXT("%s замкнуло — подождите %d с"),
 				*FocusedRep->DisplayName.ToString(), FMath::CeilToInt(FocusedRep->GetLockoutRemaining()));
+		}
+		else if (!FocusedRep->ArePrereqsDone())
+		{
+			// Подготовительный этап: подсказываем, что делать (заварить / подключить кабель / вставить...)
+			FRepairStage St;
+			FocusedRep->GetCurrentStage(St);
+			const FString Step = St.Label.IsEmpty() ? TEXT("Подготовка") : St.Label.ToString();
+			const APickupItem* Held = Character->GetHeldItem();
+			const bool bNeedItem = (St.Kind == ERepairStageKind::HoldTool || St.Kind == ERepairStageKind::InsertItem);
+			const bool bHasItem = Held && Held->ToolTag == St.ItemTag;
+			if (bNeedItem && !bHasItem)
+			{
+				Prompt = FString::Printf(TEXT("%s — нужен в руках: %s"), *Step, *St.ItemTag.ToString());
+			}
+			else if (St.Kind == ERepairStageKind::InsertItem)
+			{
+				Prompt = FString::Printf(TEXT("[E] %s"), *Step);
+			}
+			else
+			{
+				Prompt = FString::Printf(TEXT("[E] %s (держать)"), *Step);
+			}
 		}
 		else if (FocusedRep->CanBeRepairedBy(Character))
 		{
@@ -656,11 +686,6 @@ void AAvaryoHUD::DrawHUD()
 		else if (FocusedRep->IsBeingRepaired())
 		{
 			Prompt = FString::Printf(TEXT("%s уже чинят"), *FocusedRep->DisplayName.ToString());
-		}
-		else if (FocusedRep->CanBotchBy(Character))
-		{
-			Prompt = FString::Printf(TEXT("[E] Чинить «%s» на коленке (без инструмента — рискованно)"),
-				*FocusedRep->DisplayName.ToString());
 		}
 		else
 		{
