@@ -17,6 +17,18 @@
 - Перед «релизом» вернуть Health=100, Panic=0 в `VitalsComponent.cpp` (сейчас 50/50 для тестов).
 - 3D-модели делает пользователь в **meshy.ai** по промптам Claude; анимации делает пользователь. Импорт моделей — `Scripts/` + `asset.import` или `set_static_mesh` по метке актора.
 
+## СЕССИЯ 2026-06-13 (вечер, продолжение) — реалистичные модели предметов + фикс материалов
+
+Пользователь: «грузим модели, ставим реалистичные модели». Сделано (всё в `main`):
+
+**1. Импорт 4 новых предметов** (`import_items_realistic.py`, редактор открыт, Claudius :8080):
+`SM_Radio`, `SM_Battery`, `SM_FireExtinguisher`, `SM_FirstAidKit` — legacy FBX (без Interchange-битой нормали), полный PBR из meshy-карт. Размеры: Radio 20см, Battery 18см, огнетушитель 55см, аптечка 28см. Привязка: Radio → актор `Radio`; остальные → CDO BP + **per-instance override на ВСЕ размещённые инстансы** (Battery×3, FireExt×1, FirstAid×2). Подбор аттачит тот же актор → в руках меш тот же.
+**2. ⚠️ Фикс materials без metallic:** meshy-карты `_metallic.png` ЗАВЫШЕНЫ — крашеный металл/пластик становился белым зеркалом (красный огнетушитель рендерился белым). Пересобрал `M_SM_*` как base color + normal + roughness, **metallic=0** (`rebuild_item_mats.py`). Проверено в PIE: огнетушитель красный, рация тёмная, батарея светлая. → правило в [[ue-python-scripting-gotchas]].
+**3. Скан мешей (`scan_item_meshes.py`) нашёл откат:** `Repairable_GasPipe/Generator/Breaker` и `Tester` снова стали кубами (CDO-меш не сериализовался; вероятно revert газели ee8ea7d откатил и их override в external-акторах). Переназначил per-instance (`assign_repairables.py`) — теперь в OFPA-пакетах, устойчиво.
+**4. Тряска паники ВЫКЛ** (флаг `bPanicCameraEffects=false` в AvaryoCharacter, по просьбе на время тестов; true — вернуть).
+
+**Остались ЗАГЛУШКИ (нужны модели от пользователя):** Cigarettes (Cube), Fuse (Cylinder), Thermos (Cylinder), TrapKit (Cube), LightKit (Cube), MotionSensor (Cone). Газель — всё ещё серая (см. ниже).
+
 ## СЕССИЯ 2026-06-13 (день, автономно, доступ дал пользователь) — аудит + импорт 4 моделей + PIE
 
 Пользователь уехал, попросил прогнать механики, импортировать добавленные модели, проверить в PIE. Сделано (всё в `main`):
