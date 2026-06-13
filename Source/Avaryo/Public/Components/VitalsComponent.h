@@ -58,6 +58,11 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Vitals")
 	void AddBladder(float Amount);
 
+	/** Дев-режим: неуязвимость (урон не проходит) — чтобы не умереть во время тестов. */
+	UFUNCTION(BlueprintCallable, Category="Vitals")
+	void SetInvulnerable(bool bNew) { bInvulnerable = bNew; }
+	bool IsInvulnerable() const { return bInvulnerable; }
+
 	/** Начать перекур: SmokingDuration секунд паника плавно снижается. */
 	UFUNCTION(BlueprintCallable, Category="Vitals")
 	void StartSmoking();
@@ -238,6 +243,7 @@ protected:
 	/** Стоит ли монтёр в досягаемости достаточно яркого «успокаивающего» света (не тревожно-красного). */
 	bool IsLitByNearbyLight(const AActor* OwnerChar) const;
 
+	bool bInvulnerable = false; // дев-режим неуязвимости (AvGod)
 	float CoughAccum = 0.f;     // таймер кашля
 	float HiccupAccum = 0.f;    // таймер икоты при полном пузыре
 	float WindedRemaining = 0.f; // секунды отдышки после спринта-в-ноль

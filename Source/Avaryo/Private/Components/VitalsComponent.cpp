@@ -328,7 +328,7 @@ void UVitalsComponent::DebugSetVital(FName Which, float Value)
 
 void UVitalsComponent::ApplyDamage(float Amount)
 {
-	if (!IsVitalAuthority() || Amount <= 0.f)
+	if (!IsVitalAuthority() || Amount <= 0.f || bInvulnerable)
 	{
 		return;
 	}

@@ -887,6 +887,18 @@ void AAvaryoCharacter::AvShop()
 	}
 }
 
+void AAvaryoCharacter::AvGod()
+{
+	if (!HasAuthority()) { ServerAvGod(); return; }
+	if (VitalsComponent)
+	{
+		const bool bNew = !VitalsComponent->IsInvulnerable();
+		VitalsComponent->SetInvulnerable(bNew);
+		if (bNew) { VitalsComponent->DebugSetVital(TEXT("health"), 100.f); } // долить HP при включении
+	}
+}
+void AAvaryoCharacter::ServerAvGod_Implementation() { AvGod(); }
+
 // ---------- Оператор: нагрудные камеры ----------
 
 bool AAvaryoCharacter::CanUseMonitor() const

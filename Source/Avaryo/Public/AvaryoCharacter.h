@@ -618,6 +618,10 @@ protected:
 	UFUNCTION(Exec)
 	void AvShop();
 
+	/** Дев-режим: вкл/выкл неуязвимость (для тестов — не умереть). Доливает здоровье при включении. */
+	UFUNCTION(Exec)
+	void AvGod();
+
 	UFUNCTION(Server, Reliable)
 	void ServerAvVital(const FString& Which, float Value);
 
@@ -635,4 +639,7 @@ protected:
 
 	UFUNCTION(Server, Reliable)
 	void ServerAvUpgrade(const FString& Tool);
+
+	UFUNCTION(Server, Reliable)
+	void ServerAvGod();
 };
