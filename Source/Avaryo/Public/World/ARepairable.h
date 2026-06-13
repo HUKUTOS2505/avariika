@@ -316,6 +316,14 @@ public:
 	/** Качество инструмента в руках ремонтника (0.25..3, 1 — нейтрально). Хороший инструмент облегчает мини-игру. */
 	float RepairerToolQuality() const;
 
+	/** Эффективная полуширина зелёной зоны (паника + качество инструмента) — ЕДИНЫЙ источник для сервера и HUD. */
+	UFUNCTION(BlueprintPure, Category="Repair|Minigame")
+	float GetEffectiveGreenHalf() const;
+
+	/** Эффективное окно рывка стартера [Start;End] (паника + качество) — единый источник для сервера и HUD. */
+	UFUNCTION(BlueprintPure, Category="Repair|Starter")
+	void GetEffectiveStarterWindow(float& OutStart, float& OutEnd) const;
+
 protected:
 	/** Сломан ли. Выставляется в редакторе/скриптом; чинится игроками. */
 	UPROPERTY(EditAnywhere, ReplicatedUsing=OnRep_Broken, BlueprintReadOnly, Category="Repair")

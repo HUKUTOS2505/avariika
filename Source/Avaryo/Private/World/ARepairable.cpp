@@ -605,14 +605,35 @@ float ARepairable::RepairerPanic01() const
 
 float ARepairable::RepairerToolQuality() const
 {
-	if (Repairer)
+	if (!Repairer)
 	{
-		if (const APickupItem* Held = Repairer->GetHeldItem())
-		{
-			return FMath::Clamp(Held->ToolQualityScale, 0.25f, 3.f);
-		}
+		return 1.f;
+	}
+	// Этап «руками» (мини-игра без инструмента) — посторонний предмет в руках не должен влиять
+	FRepairStage Stage;
+	if (bDoingPrereqMinigame && GetCurrentStage(Stage) && Stage.ItemTag.IsNone())
+	{
+		return 1.f;
+	}
+	if (const APickupItem* Held = Repairer->GetHeldItem())
+	{
+		return FMath::Clamp(Held->ToolQualityScale, 0.25f, 3.f);
 	}
 	return 1.f;
+}
+
+float ARepairable::GetEffectiveGreenHalf() const
+{
+	return FMath::Max(MinigameGreenHalfWidth * (1.f - 0.5f * PanicHardenScale * RepairerPanic01()) * RepairerToolQuality(), 0.02f);
+}
+
+void ARepairable::GetEffectiveStarterWindow(float& OutStart, float& OutEnd) const
+{
+	const float Center = (StarterWindowStart + StarterWindowEnd) * 0.5f;
+	const float Half = (StarterWindowEnd - StarterWindowStart) * 0.5f
+		* (1.f - 0.5f * PanicHardenScale * RepairerPanic01()) * RepairerToolQuality();
+	OutStart = Center - Half;
+	OutEnd = Center + Half;
 }
 
 void ARepairable::TryHitBy(AAvaryoCharacter* Who)
@@ -625,7 +646,7 @@ void ARepairable::TryHitBy(AAvaryoCharacter* Who)
 	// Prereq-мини-игра (заварка / починка руками): курсор в зелёной зоне = прогресс этапа, промах = откат
 	if (bDoingPrereqMinigame)
 	{
-		const float EffGreenHalf = FMath::Max(MinigameGreenHalfWidth * (1.f - 0.5f * PanicHardenScale * RepairerPanic01()) * RepairerToolQuality(), 0.02f);
+		const float EffGreenHalf = GetEffectiveGreenHalf();
 		if (FMath::Abs(CursorPos - GreenCenter) <= EffGreenHalf)
 		{
 			PrereqProgress = FMath::Min(PrereqProgress + 1.f / FMath::Max(HitsToRepair, 1), 1.f);
@@ -676,7 +697,7 @@ void ARepairable::TryHitBy(AAvaryoCharacter* Who)
 		return;
 	}
 
-	const float EffGreenHalf = FMath::Max(MinigameGreenHalfWidth * (1.f - 0.5f * PanicHardenScale * RepairerPanic01()), 0.02f);
+	const float EffGreenHalf = GetEffectiveGreenHalf();
 	if (FMath::Abs(CursorPos - GreenCenter) <= EffGreenHalf)
 	{
 		// Попадание: ещё один контакт прозвонен
@@ -729,10 +750,10 @@ void ARepairable::TryReleaseBy(AAvaryoCharacter* Who)
 		return; // едва взялся и отпустил — просто перехват, без наказания
 	}
 
-	// Паника сужает окно рывка к центру (трясущиеся руки)
-	const float WinCenter = (StarterWindowStart + StarterWindowEnd) * 0.5f;
-	const float WinHalf = (StarterWindowEnd - StarterWindowStart) * 0.5f * (1.f - 0.5f * PanicHardenScale * RepairerPanic01()) * RepairerToolQuality();
-	if (Tension >= WinCenter - WinHalf && Tension <= WinCenter + WinHalf)
+	// Паника сужает окно рывка к центру (трясущиеся руки), хороший инструмент — расширяет
+	float WinStart, WinEnd;
+	GetEffectiveStarterWindow(WinStart, WinEnd);
+	if (Tension >= WinStart && Tension <= WinEnd)
 	{
 		// Рывок удался: движок чихнул и провернулся
 		RepairProgress = FMath::Min(RepairProgress + 1.f / FMath::Max(StarterPullsToFix, 1), 1.f);

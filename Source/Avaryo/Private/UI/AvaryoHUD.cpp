@@ -611,8 +611,10 @@ void AAvaryoHUD::DrawHUD()
 		{
 			// Натяжение шнура: зелёное окно, белая полоса растёт пока держишь E
 			DrawRect(BarBG, BoxX, BoxY + 2.f, BarW, BarH);
-			const float WinL = FMath::Clamp(R->StarterWindowStart, 0.f, 1.f);
-			const float WinR = FMath::Clamp(R->StarterWindowEnd, 0.f, 1.f);
+			float WStart, WEnd;
+			R->GetEffectiveStarterWindow(WStart, WEnd); // окно как у сервера (паника+инструмент)
+			const float WinL = FMath::Clamp(WStart, 0.f, 1.f);
+			const float WinR = FMath::Clamp(WEnd, 0.f, 1.f);
 			DrawRect(FLinearColor(0.25f, 0.8f, 0.25f), BoxX + WinL * BarW, BoxY + 2.f, (WinR - WinL) * BarW, BarH);
 			const float Tension = R->GetStarterTension();
 			DrawRect(FLinearColor(0.9f, 0.9f, 0.9f), BoxX, BoxY + 4.f, BarW * Tension, BarH - 4.f);
@@ -627,8 +629,9 @@ void AAvaryoHUD::DrawHUD()
 			// Щиток: красный фон, хаотичная зелёная зона, белый курсор
 			DrawRect(FLinearColor(0.55f, 0.12f, 0.1f), BoxX, BoxY + 2.f, BarW, BarH);
 			const float Green = R->GetGreenCenter();
-			const float GreenL = FMath::Clamp(Green - R->MinigameGreenHalfWidth, 0.f, 1.f);
-			const float GreenR = FMath::Clamp(Green + R->MinigameGreenHalfWidth, 0.f, 1.f);
+			const float HalfW = R->GetEffectiveGreenHalf(); // та же зона, что принимает сервер (паника+инструмент)
+			const float GreenL = FMath::Clamp(Green - HalfW, 0.f, 1.f);
+			const float GreenR = FMath::Clamp(Green + HalfW, 0.f, 1.f);
 			DrawRect(FLinearColor(0.25f, 0.8f, 0.25f), BoxX + GreenL * BarW, BoxY + 2.f, (GreenR - GreenL) * BarW, BarH);
 			DrawRect(TextMain, BoxX + R->GetCursorPos() * BarW - 2.f, BoxY - 2.f, 4.f, BarH + 8.f);
 			DrawText(TEXT("[E] — жми в зелёной! Промах бьёт током, 3 промаха — замыкание.  [G] — отойти"), TextDim, BoxX, BoxY + BarH + 8.f, Font, 0.9f);
@@ -655,8 +658,9 @@ void AAvaryoHUD::DrawHUD()
 		BoxY += BarH + 12.f;
 		DrawRect(FLinearColor(0.55f, 0.12f, 0.1f), BoxX, BoxY + 2.f, BarW, BarH);
 		const float Green = R->GetGreenCenter();
-		const float GreenL = FMath::Clamp(Green - R->MinigameGreenHalfWidth, 0.f, 1.f);
-		const float GreenR = FMath::Clamp(Green + R->MinigameGreenHalfWidth, 0.f, 1.f);
+		const float HalfW = R->GetEffectiveGreenHalf(); // совпадает с серверной зоной (паника+инструмент)
+		const float GreenL = FMath::Clamp(Green - HalfW, 0.f, 1.f);
+		const float GreenR = FMath::Clamp(Green + HalfW, 0.f, 1.f);
 		DrawRect(FLinearColor(0.25f, 0.8f, 0.25f), BoxX + GreenL * BarW, BoxY + 2.f, (GreenR - GreenL) * BarW, BarH);
 		DrawRect(TextMain, BoxX + R->GetCursorPos() * BarW - 2.f, BoxY - 2.f, 4.f, BarH + 8.f);
 		DrawText(TEXT("[E] — жми в зелёной! Промах — откат прогресса."), TextDim, BoxX, BoxY + BarH + 8.f, Font, 0.9f);
