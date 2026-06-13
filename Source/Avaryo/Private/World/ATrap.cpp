@@ -21,12 +21,12 @@ ATrap::ATrap()
 
 	MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 	SetRootComponent(MeshComponent);
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> CubeMesh(TEXT("/Engine/BasicShapes/Cube.Cube"));
-	if (CubeMesh.Succeeded())
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> TrapMesh(TEXT("/Game/Avariika/Meshes/SM_Trap/SM_Trap.SM_Trap"));
+	if (TrapMesh.Succeeded())
 	{
-		MeshComponent->SetStaticMesh(CubeMesh.Object); // видимая «банка» на полу
+		MeshComponent->SetStaticMesh(TrapMesh.Object); // реальная развёрнутая растяжка (~20 см)
 	}
-	MeshComponent->SetRelativeScale3D(FVector(0.2f, 0.2f, 0.15f));
+	MeshComponent->SetRelativeScale3D(FVector(0.565f));
 	MeshComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	MeshComponent->SetCollisionResponseToAllChannels(ECR_Ignore);
 

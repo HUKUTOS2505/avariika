@@ -13,11 +13,11 @@ ABioPickup::ABioPickup()
 
 	if (MeshComponent)
 	{
-		static ConstructorHelpers::FObjectFinder<UStaticMesh> SphereMesh(TEXT("/Engine/BasicShapes/Sphere.Sphere"));
-		if (SphereMesh.Succeeded())
+		static ConstructorHelpers::FObjectFinder<UStaticMesh> BioMesh(TEXT("/Game/Avariika/Meshes/SM_BioBlob/SM_BioBlob.SM_BioBlob"));
+		if (BioMesh.Succeeded())
 		{
-			MeshComponent->SetStaticMesh(SphereMesh.Object);
+			MeshComponent->SetStaticMesh(BioMesh.Object); // реальный био-комок (~15 см)
 		}
-		MeshComponent->SetRelativeScale3D(FVector(0.18f));
+		MeshComponent->SetRelativeScale3D(FVector(0.8f));
 	}
 }

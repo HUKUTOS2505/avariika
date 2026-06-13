@@ -16,12 +16,12 @@ AFloodlight::AFloodlight()
 
 	MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 	SetRootComponent(MeshComponent);
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> CylinderMesh(TEXT("/Engine/BasicShapes/Cylinder.Cylinder"));
-	if (CylinderMesh.Succeeded())
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> FloodMesh(TEXT("/Game/Avariika/Meshes/SM_Floodlight/SM_Floodlight.SM_Floodlight"));
+	if (FloodMesh.Succeeded())
 	{
-		MeshComponent->SetStaticMesh(CylinderMesh.Object); // видимая стойка-тренога
+		MeshComponent->SetStaticMesh(FloodMesh.Object); // реальная модель прожектора на треноге (~130 см)
 	}
-	MeshComponent->SetRelativeScale3D(FVector(0.25f, 0.25f, 0.9f));
+	MeshComponent->SetRelativeScale3D(FVector(1.0f));
 	MeshComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	MeshComponent->SetCollisionResponseToAllChannels(ECR_Ignore);
 
