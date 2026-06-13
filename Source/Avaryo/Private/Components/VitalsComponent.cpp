@@ -36,6 +36,10 @@ UVitalsComponent::UVitalsComponent()
 	CoughInterval = 4.f;
 	CoughPanic = 1.f;
 
+	HiccupBladderThreshold = 70.f;
+	HiccupInterval = 3.5f;
+	WindedDuration = 3.5f;
+
 	StaminaDrainPerSecond = 12.f;
 	StaminaHeavyMultiplier = 1.6f;
 	StaminaRegenPerSecond = 10.f;
@@ -163,11 +167,24 @@ void UVitalsComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 		{
 			Stamina = 0.f;
 			bSprinting = false; // выдохся
+			WindedRemaining = WindedDuration; // отдышка пошла
 		}
 	}
 	else
 	{
 		Stamina = FMath::Min(100.f, Stamina + StaminaRegenPerSecond * DeltaTime);
+	}
+
+	// Отдышка: выдохшись в ноль, монтёр пару секунд шумно дышит — тактически выдаёт позицию
+	if (WindedRemaining > 0.f)
+	{
+		WindedRemaining = FMath::Max(0.f, WindedRemaining - DeltaTime);
+		WindedNoiseAccum += DeltaTime;
+		if (WindedNoiseAccum >= 0.6f)
+		{
+			WindedNoiseAccum = 0.f;
+			Char->MakeNoise(0.7f, Char, Char->GetActorLocation());
+		}
 	}
 
 	// --- Туалет ---
@@ -224,6 +241,22 @@ void UVitalsComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 	else
 	{
 		CoughAccum = 0.f;
+	}
+
+	// Нервная икота при переполненном пузыре: «пора в туалет»-звоночек, тихий шум + крошечная паника
+	if (Bladder > HiccupBladderThreshold && !bWounded)
+	{
+		HiccupAccum += DeltaTime;
+		if (HiccupAccum >= HiccupInterval)
+		{
+			HiccupAccum = 0.f;
+			Char->MakeNoise(0.3f, Char, Char->GetActorLocation());
+			AddPanic(0.5f);
+		}
+	}
+	else
+	{
+		HiccupAccum = 0.f;
 	}
 
 	// Групповая паника (§18): паникёр заражает страхом соседей. Спокойный тиммейт рядом

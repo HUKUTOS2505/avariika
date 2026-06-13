@@ -222,11 +222,26 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Vitals|Smell")
 	float CoughPanic;
 
+	/** Порог пузыря, выше которого начинается нервная икота. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Vitals|Bladder")
+	float HiccupBladderThreshold;
+
+	/** Как часто икать при переполненном пузыре, сек. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Vitals|Bladder")
+	float HiccupInterval;
+
+	/** Сколько секунд шумно отдуваешься, выдохнувшись в ноль стамины. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Vitals|Stamina")
+	float WindedDuration;
+
 protected:
 	/** Стоит ли монтёр в досягаемости достаточно яркого «успокаивающего» света (не тревожно-красного). */
 	bool IsLitByNearbyLight(const AActor* OwnerChar) const;
 
 	float CoughAccum = 0.f;     // таймер кашля
+	float HiccupAccum = 0.f;    // таймер икоты при полном пузыре
+	float WindedRemaining = 0.f; // секунды отдышки после спринта-в-ноль
+	float WindedNoiseAccum = 0.f; // таймер шумного выдоха
 	float LightScanAccum = 0.f; // троттл сканера успокаивающего света
 	bool bInLightCached = false; // последний результат сканера света
 	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadOnly, Category="Vitals")
