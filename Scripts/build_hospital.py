@@ -230,7 +230,7 @@ box('B_Workbench', 200, 3950, BZ, 1200, 4080, BZ + 100)                 # вер
 # ---------- дневной свет для осмотра (атмосфера — Этап 5) ----------
 try:
     sun = eas.spawn_actor_from_class(unreal.DirectionalLight, unreal.Vector(2800, 2000, 2500))
-    sun.set_actor_rotation(unreal.Rotator(-45.0, 35.0, 0.0), False)
+    sun.set_actor_rotation(unreal.Rotator(pitch=-50.0, yaw=-45.0, roll=0.0), False)  # солнце высоко
     sunc = sun.get_component_by_class(unreal.DirectionalLightComponent)
     sunc.set_mobility(unreal.ComponentMobility.MOVABLE)
     sunc.set_intensity(100000.0)
@@ -258,10 +258,11 @@ try:
     ppv = eas.spawn_actor_from_class(unreal.PostProcessVolume, unreal.Vector(2800, 2000, 200))
     ppv.set_editor_property('unbound', True)
     pset = ppv.get_editor_property('settings')
-    pset.set_editor_property('b_override_auto_exposure_min_brightness', True)
-    pset.set_editor_property('auto_exposure_min_brightness', 1.0)
-    pset.set_editor_property('b_override_auto_exposure_max_brightness', True)
-    pset.set_editor_property('auto_exposure_max_brightness', 1.0)
+    # Авто-экспозиция (гистограмма) сама сбалансирует освещённую сцену; нейтральный bias.
+    pset.set_editor_property('override_auto_exposure_method', True)
+    pset.set_editor_property('auto_exposure_method', unreal.AutoExposureMethod.AEM_HISTOGRAM)
+    pset.set_editor_property('override_auto_exposure_bias', True)
+    pset.set_editor_property('auto_exposure_bias', 0.0)
     ppv.set_editor_property('settings', pset)
     ppv.set_actor_label('Hosp_PPV'); tag(ppv)
     out.append('ppv ok')
@@ -271,7 +272,7 @@ except Exception as e:
 # ---------- PlayerStart (под портиком, лицом в атриум, +Y) ----------
 try:
     ps = eas.spawn_actor_from_class(unreal.PlayerStart, unreal.Vector(2800, -250, F1 + 100))
-    ps.set_actor_rotation(unreal.Rotator(0.0, 90.0, 0.0), False)
+    ps.set_actor_rotation(unreal.Rotator(pitch=0.0, yaw=90.0, roll=0.0), False)  # лицом на север (+Y) в атриум
     ps.set_actor_label('PlayerStart'); tag(ps)
     out.append('playerstart ok')
 except Exception as e:
@@ -284,7 +285,7 @@ try:
         g = eas.spawn_actor_from_class(unreal.StaticMeshActor, unreal.Vector(2800, -550, F1))
         g.static_mesh_component.set_static_mesh(gz)
         g.set_actor_scale3d(unreal.Vector(90.8, 90.8, 90.8))
-        g.set_actor_rotation(unreal.Rotator(0.0, 90.0, 0.0), False)
+        g.set_actor_rotation(unreal.Rotator(pitch=0.0, yaw=90.0, roll=0.0), False)  # плоско, носом на север
         g.set_actor_label('Gazelle_Mesh'); tag(g)
     ExitZoneCls = unreal.load_class(None, '/Script/Avaryo.ExitZone')
     if ExitZoneCls:
