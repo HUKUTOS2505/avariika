@@ -681,16 +681,25 @@ void ARunState::FinishRun(ERunPhase NewPhase)
 
 	// Бухгалтерия (§19): сумма по бригаде → итог смены, фиксируем в леджере на следующую смену
 	ShiftNet = 0;
+	int32 SumRepairs = 0, SumIncidents = 0, SumExplosions = 0;
 	for (const FPlayerRunStats& S : PlayerStats)
 	{
 		ShiftNet += ComputePlayerBalance(S);
+		SumRepairs += S.Repairs;
+		SumIncidents += S.Incidents;
+		SumExplosions += S.ExplosionsCaused;
 	}
 	const bool bWon = NewPhase == ERunPhase::Won;
 	if (UGameInstance* GI = GetWorld()->GetGameInstance())
 	{
 		if (UCompanyLedgerSubsystem* Ledger = GI->GetSubsystem<UCompanyLedgerSubsystem>())
 		{
-			Ledger->CommitShift(ShiftNet, bWon);
+			// Накопить карьеру (переживёт выход — под «диспетчер помнит» / экран карьеры)
+			FCareerStats& Career = Ledger->GetCareerMutable();
+			Career.TotalRepairs    += SumRepairs;
+			Career.TotalIncidents  += SumIncidents;
+			Career.BuildingsBlownUp += SumExplosions;
+			Ledger->CommitShift(ShiftNet, bWon); // сохранит и карьеру на диск
 		}
 	}
 
