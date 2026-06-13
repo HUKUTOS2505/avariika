@@ -26,6 +26,8 @@ void UCompanyLedgerSubsystem::Load()
 		QuotaTarget        = S->QuotaTarget;
 		QuotaDeadlineShift = S->QuotaDeadlineShift;
 		QuotaPaidSoFar     = S->QuotaPaidSoFar;
+		QuotaWindowShifts  = S->QuotaWindowShifts;
+		bQuotaFailed       = S->bQuotaFailed;
 	}
 }
 
@@ -46,11 +48,15 @@ void UCompanyLedgerSubsystem::Save() const
 	S->QuotaTarget        = QuotaTarget;
 	S->QuotaDeadlineShift = QuotaDeadlineShift;
 	S->QuotaPaidSoFar     = QuotaPaidSoFar;
+	S->QuotaWindowShifts  = QuotaWindowShifts;
+	S->bQuotaFailed       = bQuotaFailed;
 	UGameplayStatics::SaveGameToSlot(S, SlotName(), 0);
 }
 
 void UCompanyLedgerSubsystem::CommitShift(int32 ShiftNet, bool bWon)
 {
+	const int32 PlayedShift = ShiftNumber; // смена, которая только что закончилась
+
 	CompanyBalance += ShiftNet;
 
 	// Сдал объект — репутация чуть вверх; провалил — заметно вниз; ушёл в минус — ещё штраф
@@ -61,9 +67,28 @@ void UCompanyLedgerSubsystem::CommitShift(int32 ShiftNet, bool bWon)
 	}
 	ReputationPoints = FMath::Clamp(ReputationPoints, -10, 10);
 
-	++ShiftNumber;
-
 	if (bWon) { ++Career.ShiftsWon; } else { ++Career.ShiftsLost; }
+
+	// Квота диспетчера: копим сданное, на дедлайне — проверка (выполнил → новая выше; нет → крах)
+	if (QuotaTarget > 0 && !bQuotaFailed)
+	{
+		QuotaPaidSoFar += FMath::Max(0, ShiftNet);
+		if (PlayedShift >= QuotaDeadlineShift)
+		{
+			if (QuotaPaidSoFar >= QuotaTarget)
+			{
+				QuotaTarget = FMath::RoundToInt(QuotaTarget * 1.6f); // следующая квота жёстче
+				QuotaDeadlineShift = (PlayedShift + 1) + QuotaWindowShifts - 1;
+				QuotaPaidSoFar = 0;
+			}
+			else
+			{
+				bQuotaFailed = true; // контора закрыта — ARunState предложит новую карьеру
+			}
+		}
+	}
+
+	++ShiftNumber;
 
 	Save();
 }
@@ -96,5 +121,23 @@ void UCompanyLedgerSubsystem::ResetCompany()
 	QuotaTarget = 0;
 	QuotaDeadlineShift = 0;
 	QuotaPaidSoFar = 0;
+	bQuotaFailed = false;
+	Save();
+}
+
+void UCompanyLedgerSubsystem::StartQuota(int32 Target, int32 WindowShifts)
+{
+	QuotaTarget = FMath::Max(0, Target);
+	QuotaWindowShifts = FMath::Max(1, WindowShifts);
+	QuotaDeadlineShift = ShiftNumber + QuotaWindowShifts - 1;
+	QuotaPaidSoFar = 0;
+	bQuotaFailed = false;
+	Save();
+}
+
+void UCompanyLedgerSubsystem::StopQuota()
+{
+	QuotaTarget = 0;
+	bQuotaFailed = false;
 	Save();
 }

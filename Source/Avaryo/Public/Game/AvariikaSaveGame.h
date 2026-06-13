@@ -68,8 +68,10 @@ public:
 	UPROPERTY() FEquipmentLevels Equipment;
 	UPROPERTY() FConsumableStock Stock;
 	UPROPERTY() FCareerStats     Career;
-	// Квота: сколько ₽ сдать и до какой смены (0 = квоты нет).
+	// Квота: сколько ₽ сдать и до какой смены (0 = квоты нет / песочница).
 	UPROPERTY() int32 QuotaTarget        = 0;
 	UPROPERTY() int32 QuotaDeadlineShift = 0;
 	UPROPERTY() int32 QuotaPaidSoFar     = 0;
+	UPROPERTY() int32 QuotaWindowShifts  = 3;     // на сколько смён даётся очередная квота
+	UPROPERTY() bool  bQuotaFailed       = false; // квота провалена → контора закрыта
 };

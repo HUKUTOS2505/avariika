@@ -41,6 +41,20 @@ public:
 	/** Сбросить контору в ноль (новая карьера / провал квоты) + сейв. */
 	void ResetCompany();
 
+	// ---------- Квота диспетчера (game-over крючок). QuotaTarget==0 = выкл/песочница. ----------
+
+	/** Запустить квоту: сдать Target ₽ за WindowShifts смен (с текущей). + сейв. */
+	void StartQuota(int32 Target, int32 WindowShifts = 3);
+
+	/** Выключить квоту (режим песочницы). + сейв. */
+	void StopQuota();
+
+	int32 GetQuotaTarget() const { return QuotaTarget; }
+	int32 GetQuotaPaidSoFar() const { return QuotaPaidSoFar; }
+	int32 GetQuotaDeadlineShift() const { return QuotaDeadlineShift; }
+	bool  IsQuotaActive() const { return QuotaTarget > 0; }
+	bool  IsQuotaFailed() const { return bQuotaFailed; }
+
 	/** Сохранить состояние на диск немедленно. */
 	void Save() const;
 
@@ -66,4 +80,6 @@ protected:
 	int32 QuotaTarget = 0;
 	int32 QuotaDeadlineShift = 0;
 	int32 QuotaPaidSoFar = 0;
+	int32 QuotaWindowShifts = 3;
+	bool  bQuotaFailed = false;
 };
