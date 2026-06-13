@@ -98,5 +98,51 @@ A modern compact 18 cm rechargeable headlamp battery pack, rectangular molded AB
 
 ---
 
+## v2 — ЧИСТЫЕ промты (перегенерация шумных моделей)
+
+Диагностика 2026-06-13: текстуры привязаны верно, НО meshy сделал их шумными/пятнистыми из-за перегруза описанием износа (scuffs/dust/stickers/scratches/grime). **Новое правило: МИНИМУМ износа, упор на чистые сплошные цвета, гладкие читаемые поверхности, «studio product render».** Хвост прежний.
+
+### SM_Cigarettes — ПРОСТАЯ пачка (а не пачка+20 сигарет)
+```
+A modern brand-neutral cigarette soft pack, single small object about 9 cm tall, closed crisp rectangular paper-and-foil pack standing upright with one tan filter cigarette poking out of the top, clean matte off-white and dark graphite packaging with a simple generic warning band, smooth readable surfaces, solid clean colors, minimal wear, studio product render, low-poly game prop, PBR, game-ready, single object, centered, no ground plane, no scene
+```
+
+### SM_Radio
+```
+A modern handheld walkie-talkie radio, single clean object about 22 cm tall, matte black body with a few solid safety-orange accent panels, a short stubby antenna, a round speaker grille, two control knobs on top and a side push-to-talk button, smooth clean readable surfaces with solid colors and crisp details, minimal wear, studio product render quality, matte plastic, low-poly game prop, PBR, game-ready, single object, centered, no ground plane, no scene
+```
+
+### SM_WeldingMachine
+```
+A modern portable inverter welding machine, single clean object about 45 cm wide, a rectangular matte blue steel case with a carry handle on top, a clean front control panel with two round dials and an amperage display, two cable sockets, a coiled welding cable with electrode holder, solid clean colors and smooth readable surfaces, minimal wear, studio product render, matte painted metal, low-poly game prop, PBR, game-ready, single object, centered, no ground plane, no scene
+```
+
+### SM_MotionSensor
+```
+A modern PIR motion sensor, single clean object about 16 cm tall, smooth matte white ABS plastic housing with a clean semi-translucent white lens dome on the front and one small LED indicator, mounted on a short neck and a small round base, solid clean white-grey colors, smooth surfaces, minimal wear, studio product render, low-poly game prop, PBR, game-ready, single object, centered, no ground plane, no scene
+```
+
+### SM_FirstAidKit
+```
+A modern first aid kit, single clean object about 28 cm wide, a smooth matte white hard plastic case with a bold solid red cross on the lid, two clasp latches and a carry handle, clean crisp solid colors and smooth readable surfaces, minimal wear, studio product render, low-poly game prop, PBR, game-ready, single object, centered, no ground plane, no scene
+```
+
+### SM_TrapKit
+```
+A modern compact tripwire alarm device, single clean object about 18 cm, a smooth matte black and safety-yellow ABS plastic case with a small coiled tripwire spool on one side, a clean trigger button and a tiny LED, solid clean colors, smooth readable surfaces, minimal wear, studio product render, low-poly game prop, PBR, game-ready, single object, centered, no ground plane, no scene
+```
+
+### SM_Thermos
+```
+A modern stainless steel travel thermos, single clean object about 25 cm tall, a smooth slim cylinder with a matte dark-teal powder-coated body and a black screw-on cup lid, a brushed steel base, clean solid colors and smooth surfaces, minimal wear, studio product render, low-poly game prop, PBR, game-ready, single object, centered, no ground plane, no scene
+```
+
+### SM_Fuse
+```
+A modern blade cartridge fuse, single clean object about 6 cm, a smooth matte colored translucent plastic body with a clear amperage number printed on it and two flat metal blade contacts, clean solid colors, smooth readable surfaces, minimal wear, studio product render, low-poly game prop, PBR, game-ready, single object, centered, no ground plane, no scene
+```
+
+**Совет по meshy:** генерируй в максимальном качестве, на шаге текстур выбирай вариант с чистой читаемой картой (не «камуфляжный»). Не добавляй в промт «weathered/grimy/heavily worn» — именно это даёт шумные пятна.
+
 ## Как присылать модели
 Экспортируй из meshy FBX с текстурами, положи в `RawAssets/SM_<Имя>/` (точное имя из заголовков выше, напр. `SM_Thermos`). Скажи «импортируй» — прогоню скрипт (без metallic-карты), назначу на актор/предмет и его инстансы, отмасштабирую.
