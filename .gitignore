@@ -45,3 +45,7 @@ Scripts/_*.py
 # Прочее
 *.tmp
 *.log
+
+# UE content packs dumped into RawAssets (use the copy under Content/ instead)
+RawAssets/**/*.uasset
+RawAssets/**/*.umap
