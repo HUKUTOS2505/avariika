@@ -23,15 +23,8 @@ Claudius/claudius_response.json
 # Секреты — НЕ коммитить
 .meshy_key
 
-# Исходники моделей meshy (тяжёлые, регенерируются) — в git не держим
-RawAssets/**/*.fbx
-RawAssets/**/*.png
-RawAssets/**/*.zip
-RawAssets/**/*.glb
-RawAssets/**/*.obj
-RawAssets/**/*.jpg
-RawAssets/**/*.jpeg
-RawAssets/**/*.fbm/
+# Исходники моделей/паков (тяжёлые, локальные) — в git не держим вообще
+RawAssets/
 
 # Python-кэш
 Scripts/__pycache__/
@@ -45,7 +38,3 @@ Scripts/_*.py
 # Прочее
 *.tmp
 *.log
-
-# UE content packs dumped into RawAssets (use the copy under Content/ instead)
-RawAssets/**/*.uasset
-RawAssets/**/*.umap
