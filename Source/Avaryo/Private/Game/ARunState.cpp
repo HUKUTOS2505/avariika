@@ -507,6 +507,7 @@ void ARunState::NotifyGasExplosion(AAvaryoCharacter* Culprit)
 {
 	if (HasAuthority())
 	{
+		if (Culprit) { ++FindOrAddStats(Culprit).ExplosionsCaused; }
 		DispatcherSay(DispatcherLines::GasExplosion, CrewName(Culprit), /*bImportant=*/true);
 	}
 }
@@ -515,6 +516,7 @@ void ARunState::NotifyShortCircuit(AAvaryoCharacter* Culprit)
 {
 	if (HasAuthority())
 	{
+		if (Culprit) { ++FindOrAddStats(Culprit).ShortsCaused; }
 		DispatcherSay(DispatcherLines::ShortCircuit, CrewName(Culprit), /*bImportant=*/true);
 	}
 }
@@ -571,6 +573,7 @@ void ARunState::NotifyThrow(AAvaryoCharacter* Who)
 {
 	if (HasAuthority())
 	{
+		if (Who) { ++FindOrAddStats(Who).Throws; }
 		DispatcherSay(DispatcherLines::ThrowJab, CrewName(Who), /*bImportant=*/false);
 	}
 }
@@ -579,6 +582,7 @@ void ARunState::NotifyCoffee(AAvaryoCharacter* Who)
 {
 	if (HasAuthority())
 	{
+		if (Who) { ++FindOrAddStats(Who).Coffees; }
 		DispatcherSay(DispatcherLines::CoffeeBreak, CrewName(Who), /*bImportant=*/false);
 	}
 }

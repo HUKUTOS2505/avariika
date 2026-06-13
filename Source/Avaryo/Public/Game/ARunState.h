@@ -53,6 +53,18 @@ struct FPlayerRunStats
 	UPROPERTY(BlueprintReadOnly, Category="Run")
 	float SlipSeconds = 0.f;    // времени катался по пене (§18)
 
+	UPROPERTY(BlueprintReadOnly, Category="Run")
+	int32 ExplosionsCaused = 0; // устроил взрыв газа на объекте
+
+	UPROPERTY(BlueprintReadOnly, Category="Run")
+	int32 ShortsCaused = 0;     // замкнул щиток серией промахов
+
+	UPROPERTY(BlueprintReadOnly, Category="Run")
+	int32 Throws = 0;           // метал предметы (§18)
+
+	UPROPERTY(BlueprintReadOnly, Category="Run")
+	int32 Coffees = 0;          // хлебал кофе из термоса
+
 	// Для детекции переходов на серверном тике (реплицируются заодно — безвредно)
 	UPROPERTY()
 	bool bWasWounded = false;

@@ -306,6 +306,7 @@ void AAvaryoHUD::DrawHUD()
 			// Максимумы для раздачи званий
 			int32 MaxRepairs = 0, MaxWounded = 0, MaxRevives = 0, MaxDrags = 0, MaxBotched = 0;
 			int32 MaxShoved = 0, MaxTripped = 0;
+			int32 MaxExplosions = 0, MaxShorts = 0, MaxThrows = 0, MaxCoffees = 0;
 			float MaxPanic = 0.f, MaxSmell = 0.f;
 			for (const FPlayerRunStats& S : AllStats)
 			{
@@ -316,6 +317,10 @@ void AAvaryoHUD::DrawHUD()
 				MaxBotched = FMath::Max(MaxBotched, S.BotchedRepairs);
 				MaxShoved  = FMath::Max(MaxShoved,  S.ShovedOthers);
 				MaxTripped = FMath::Max(MaxTripped, S.TimesTripped);
+				MaxExplosions = FMath::Max(MaxExplosions, S.ExplosionsCaused);
+				MaxShorts  = FMath::Max(MaxShorts,  S.ShortsCaused);
+				MaxThrows  = FMath::Max(MaxThrows,  S.Throws);
+				MaxCoffees = FMath::Max(MaxCoffees, S.Coffees);
 				MaxPanic   = FMath::Max(MaxPanic,   S.PanicSeconds);
 				MaxSmell   = FMath::Max(MaxSmell,   S.SmellSeconds);
 			}
@@ -350,6 +355,8 @@ void AAvaryoHUD::DrawHUD()
 				// Звание: инциденты вне конкуренции, дальше — по лучшему показателю
 				FString Title;
 				if (S.Incidents > 0)                                   Title = TEXT("Биологическая угроза");
+				else if (S.ExplosionsCaused > 0 && S.ExplosionsCaused == MaxExplosions) Title = TEXT("Пожарный наоборот");
+				else if (S.ShortsCaused > 0 && S.ShortsCaused == MaxShorts) Title = TEXT("Электрик Эдисон");
 				else if (S.BotchedRepairs > 0 && S.BotchedRepairs == MaxBotched) Title = TEXT("Народный умелец");
 				else if (S.SmellSeconds > 5.f && S.SmellSeconds >= MaxSmell) Title = TEXT("Амбре смены");
 				else if (S.ToiletVisits >= 2)                          Title = TEXT("Дисциплинированный мочевой пузырь");
@@ -357,9 +364,11 @@ void AAvaryoHUD::DrawHUD()
 				else if (S.Revives > 0 && S.Revives == MaxRevives)     Title = TEXT("Полевой медик");
 				else if (S.Drags > 0 && S.Drags == MaxDrags)           Title = TEXT("Эвакуатор");
 				else if (S.ShovedOthers > 0 && S.ShovedOthers == MaxShoved) Title = TEXT("Гроза коллектива");
+				else if (S.Throws > 1 && S.Throws == MaxThrows)        Title = TEXT("Метатель снарядов");
 				else if (S.TimesTripped > 1 && S.TimesTripped == MaxTripped) Title = TEXT("Спотыкач смены");
 				else if (S.TimesWounded > 0 && S.TimesWounded == MaxWounded) Title = TEXT("Главный пострадавший");
 				else if (S.PanicSeconds > 1.f && S.PanicSeconds >= MaxPanic) Title = TEXT("Паникёр смены");
+				else if (S.Coffees >= 2 && S.Coffees == MaxCoffees)    Title = TEXT("Кофеман смены");
 				else                                                   Title = TEXT("Просто присутствовал");
 
 				// Бухгалтерия: премии и штрафы (единая формула с сервером)
