@@ -731,7 +731,7 @@ void ARepairable::TryReleaseBy(AAvaryoCharacter* Who)
 
 	// Паника сужает окно рывка к центру (трясущиеся руки)
 	const float WinCenter = (StarterWindowStart + StarterWindowEnd) * 0.5f;
-	const float WinHalf = (StarterWindowEnd - StarterWindowStart) * 0.5f * (1.f - 0.5f * PanicHardenScale * RepairerPanic01());
+	const float WinHalf = (StarterWindowEnd - StarterWindowStart) * 0.5f * (1.f - 0.5f * PanicHardenScale * RepairerPanic01()) * RepairerToolQuality();
 	if (Tension >= WinCenter - WinHalf && Tension <= WinCenter + WinHalf)
 	{
 		// Рывок удался: движок чихнул и провернулся
@@ -766,7 +766,7 @@ void ARepairable::HandleValveTurn(AAvaryoCharacter* Who)
 			return;
 		}
 	}
-	ValveCooldown = ValveMinInterval; // ритм отсчитывается от любого тыка, даже сорванного
+	ValveCooldown = ValveMinInterval / FMath::Max(0.25f, RepairerToolQuality()); // хороший ключ — мягче ритм
 }
 
 void ARepairable::StarterKickback(AAvaryoCharacter* Who)
