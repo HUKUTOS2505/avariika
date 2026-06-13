@@ -489,7 +489,19 @@ void AAvaryoHUD::DrawHUD()
 
 			// Репутация конторы — влияет на качество выдаваемого комплекта в следующих сменах
 			const FString RepLine = FString::Printf(TEXT("Репутация: %s"), *ARunState::ReputationTitle(Run->GetReputation()));
-			TY += DrawCentered(RepLine, TextDim, TY, 1.0f) + 8.f;
+			TY += DrawCentered(RepLine, TextDim, TY, 1.0f) + 6.f;
+
+			// Карьера конторы за всё время (копится в сейве, переживает выход)
+			if (const UGameInstance* GI = GetGameInstance())
+			{
+				if (const UCompanyLedgerSubsystem* Ledger = GI->GetSubsystem<UCompanyLedgerSubsystem>())
+				{
+					const FCareerStats& C = Ledger->GetCareer();
+					const FString CareerLine = FString::Printf(TEXT("Карьера: починок всего %d · домов спалили %d · инцидентов %d"),
+						C.TotalRepairs, C.BuildingsBlownUp, C.TotalIncidents);
+					TY += DrawCentered(CareerLine, TextDim, TY, 0.85f) + 8.f;
+				}
+			}
 
 			// Квота диспетчера (game-over крючок) — показываем только когда включена
 			if (Run->IsQuotaFailed())
