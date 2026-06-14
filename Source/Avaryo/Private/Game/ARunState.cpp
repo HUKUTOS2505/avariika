@@ -12,8 +12,11 @@
 #include "GameFramework/PlayerState.h"
 #include "Items/ABioPickup.h"
 #include "Items/APickupItem.h"
+#include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
+#include "Sound/SoundBase.h"
 #include "TimerManager.h"
+#include "UObject/ConstructorHelpers.h"
 #include "World/AExitZone.h"
 #include "World/ARepairable.h"
 
@@ -210,11 +213,23 @@ ARunState::ARunState()
 	CompanyBalanceStart = 0;
 	Reputation = 0;
 	ShiftNet = 0;
+
+	// Звуки по умолчанию (переопределяемы в Blueprint)
+	static ConstructorHelpers::FObjectFinder<USoundBase> RadioSnd(TEXT("/Game/Audio/SFX/RadioBlip.RadioBlip"));
+	if (RadioSnd.Succeeded()) { RadioBlipSound = RadioSnd.Object; }
+	static ConstructorHelpers::FObjectFinder<USoundBase> AmbSnd(TEXT("/Game/Audio/SFX/Ambient_Boiler.Ambient_Boiler"));
+	if (AmbSnd.Succeeded()) { AmbientLoopSound = AmbSnd.Object; }
 }
 
 void ARunState::BeginPlay()
 {
 	Super::BeginPlay();
+
+	// Фоновый эмбиент — локально на каждой машине (ARunState есть у всех клиентов)
+	if (AmbientLoopSound && !AmbientAudio)
+	{
+		AmbientAudio = UGameplayStatics::SpawnSound2D(this, AmbientLoopSound, 0.6f);
+	}
 
 	if (!HasAuthority())
 	{
@@ -1006,6 +1021,12 @@ void ARunState::MulticastDispatcherSay_Implementation(const FString& Speaker, co
 	while (DispatcherLines.Num() > 3) // на экране держим максимум три плашки
 	{
 		DispatcherLines.RemoveAt(0);
+	}
+
+	// Короткий шум рации в момент появления реплики (играется на всех — это мультикаст)
+	if (RadioBlipSound)
+	{
+		UGameplayStatics::PlaySound2D(this, RadioBlipSound, 0.5f);
 	}
 }
 

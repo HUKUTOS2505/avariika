@@ -1,8 +1,11 @@
 #include "AvaryoCharacter.h"
 
 #include "Camera/CameraComponent.h"
+#include "Components/AudioComponent.h"
 #include "Components/SceneCaptureComponent2D.h"
 #include "Components/UFlashlightComponent.h"
+#include "Sound/SoundBase.h"
+#include "UObject/ConstructorHelpers.h"
 #include "Engine/TextureRenderTarget2D.h"
 #include "World/AExitZone.h"
 #include "Components/VitalsComponent.h"
@@ -122,6 +125,19 @@ AAvaryoCharacter::AAvaryoCharacter()
 	// Приседание (Ctrl/C) — пригодится против монстра-слухача
 	GetCharacterMovement()->GetNavAgentPropertiesRef().bCanCrouch = true;
 	GetCharacterMovement()->MaxWalkSpeedCrouched = 250.f;
+
+	// Сердцебиение паники: личный звук (2D), стартует выключенным, гонится в Tick
+	HeartbeatAudio = CreateDefaultSubobject<UAudioComponent>(TEXT("HeartbeatAudio"));
+	HeartbeatAudio->SetupAttachment(RootComponent);
+	HeartbeatAudio->bAutoActivate = false;
+	HeartbeatAudio->bAllowSpatialization = false; // личное, без 3D-затухания
+	HeartbeatAudio->SetVolumeMultiplier(0.f);
+	static ConstructorHelpers::FObjectFinder<USoundBase> HeartSnd(TEXT("/Game/Audio/SFX/Heartbeat.Heartbeat"));
+	if (HeartSnd.Succeeded())
+	{
+		HeartbeatSound = HeartSnd.Object;
+		HeartbeatAudio->SetSound(HeartSnd.Object);
+	}
 }
 
 void AAvaryoCharacter::BeginPlay()
@@ -188,6 +204,26 @@ void AAvaryoCharacter::Tick(float DeltaSeconds)
 				{
 					PC->ClientStopCameraShake(UPanicCameraShake::StaticClass(), false);
 				}
+			}
+		}
+
+		// Сердцебиение при панике — только локальный игрок слышит своё (громче/быстрее с паникой)
+		if (HeartbeatAudio)
+		{
+			const bool bPanic = VitalsComponent && VitalsComponent->IsPanicking();
+			if (bPanic)
+			{
+				const float P = FMath::Clamp(VitalsComponent->GetPanic() / 100.f, 0.f, 1.f);
+				if (!HeartbeatAudio->IsPlaying())
+				{
+					HeartbeatAudio->Play();
+				}
+				HeartbeatAudio->SetVolumeMultiplier(0.4f + 0.6f * P);
+				HeartbeatAudio->SetPitchMultiplier(0.9f + 0.5f * P);
+			}
+			else if (HeartbeatAudio->IsPlaying())
+			{
+				HeartbeatAudio->Stop();
 			}
 		}
 

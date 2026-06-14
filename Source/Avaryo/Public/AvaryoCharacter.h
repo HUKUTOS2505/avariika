@@ -9,6 +9,8 @@ class ARepairable;
 class AToilet;
 class UCameraComponent;
 class UFlashlightComponent;
+class UAudioComponent;
+class USoundBase;
 class USceneCaptureComponent2D;
 class UTextureRenderTarget2D;
 class UVitalsComponent;
@@ -231,6 +233,14 @@ public:
 	/** Налобный фонарик. Источник света (SpotLight) добавляется в Blueprint. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Avaryo")
 	TObjectPtr<UFlashlightComponent> FlashlightComponent;
+
+	/** Личное сердцебиение при панике — слышит только локальный игрок (2D, без spatialization). */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Avaryo|Audio")
+	TObjectPtr<UAudioComponent> HeartbeatAudio;
+
+	/** Звук сердцебиения (зацикленный). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Audio")
+	TObjectPtr<USoundBase> HeartbeatSound;
 
 	/** Шкалы: HP, паника, выносливость, туалет. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Avaryo")

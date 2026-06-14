@@ -7,6 +7,7 @@
 class AAvaryoCharacter;
 class UPointLightComponent;
 class UStaticMeshComponent;
+class USoundBase;
 class UTextRenderComponent;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnRepairFinished, ARepairable*, Repairable, AAvaryoCharacter*, FinishedBy);
@@ -430,6 +431,14 @@ protected:
 	/** Тряска камеры от взрыва у всех машин (затухает с расстоянием). */
 	UFUNCTION(NetMulticast, Unreliable)
 	void MulticastExplosionShake();
+
+	/** Звук взрыва газа (играется у всех через мультикаст). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Repairable|Audio")
+	TObjectPtr<USoundBase> ExplosionSound;
+
+	/** Звук успешной починки объекта. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Repairable|Audio")
+	TObjectPtr<USoundBase> RepairDoneSound;
 
 	/** Последний показанный на табличке процент — чтобы не перерисовывать текст каждый кадр. */
 	int32 LastShownPercent;

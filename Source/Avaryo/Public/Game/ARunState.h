@@ -7,6 +7,8 @@
 
 class AAvaryoCharacter;
 class ARepairable;
+class USoundBase;
+class UAudioComponent;
 
 /** Статистика монтёра за забег — кормит «Акт выполненных работ». */
 USTRUCT(BlueprintType)
@@ -361,6 +363,18 @@ protected:
 
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastDispatcherSay(const FString& Speaker, const FString& Line);
+
+	/** Короткий «бип/шум рации», когда приходит реплика диспетчера. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Run|Audio")
+	TObjectPtr<USoundBase> RadioBlipSound;
+
+	/** Фоновый эмбиент уровня (зацикленный, играется у всех). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Run|Audio")
+	TObjectPtr<USoundBase> AmbientLoopSound;
+
+	/** Хэндл играющего эмбиента (чтобы не собрался GC). */
+	UPROPERTY(Transient)
+	TObjectPtr<UAudioComponent> AmbientAudio;
 
 	/** Приветственная реплика по таймеру после старта смены. */
 	void SendGreeting();

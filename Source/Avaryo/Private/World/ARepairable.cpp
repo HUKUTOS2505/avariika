@@ -15,7 +15,9 @@
 #include "Items/APickupItem.h"
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
+#include "Sound/SoundBase.h"
 #include "UI/AvaryoCameraShakes.h"
+#include "UObject/ConstructorHelpers.h"
 
 ARepairable::ARepairable()
 {
@@ -60,6 +62,12 @@ ARepairable::ARepairable()
 	GasSpreadMaxScale = 2.0f;
 	CurrentGasRadius = GasRadius;
 	LastShownPercent = -1;
+
+	// Звуки по умолчанию (можно переопределить в Blueprint)
+	static ConstructorHelpers::FObjectFinder<USoundBase> ExplosionSnd(TEXT("/Game/Audio/SFX/Explosion.Explosion"));
+	if (ExplosionSnd.Succeeded()) { ExplosionSound = ExplosionSnd.Object; }
+	static ConstructorHelpers::FObjectFinder<USoundBase> RepairSnd(TEXT("/Game/Audio/SFX/RepairDone.RepairDone"));
+	if (RepairSnd.Succeeded()) { RepairDoneSound = RepairSnd.Object; }
 
 	MinigameType = ERepairMinigameType::None;
 	HitsToRepair = 4;
@@ -859,6 +867,12 @@ void ARepairable::FinishRepair(AAvaryoCharacter* Who)
 		}
 	}
 
+	// Звук «починили» (на листен-сервере слышит хост; для клиентов — позже через мультикаст)
+	if (RepairDoneSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, RepairDoneSound, GetActorLocation());
+	}
+
 	OnRepairFinished.Broadcast(this, Who);
 }
 
@@ -944,6 +958,11 @@ void ARepairable::MulticastExplosionShake_Implementation()
 {
 	UGameplayStatics::PlayWorldCameraShake(this, UExplosionCameraShake::StaticClass(),
 		GetActorLocation(), GasRadius * 0.5f, GasRadius * 2.5f);
+
+	if (ExplosionSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, ExplosionSound, GetActorLocation());
+	}
 }
 
 void ARepairable::OnRep_Broken()
