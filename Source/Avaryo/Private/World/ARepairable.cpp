@@ -73,7 +73,7 @@ ARepairable::ARepairable()
 	if (ExplosionSnd.Succeeded()) { ExplosionSound = ExplosionSnd.Object; }
 	static ConstructorHelpers::FObjectFinder<USoundBase> RepairSnd(TEXT("/Game/Audio/SFX/RepairDone.RepairDone"));
 	if (RepairSnd.Succeeded()) { RepairDoneSound = RepairSnd.Object; }
-	static ConstructorHelpers::FObjectFinder<USoundBase> HitSnd(TEXT("/Game/Survival_SFX/Craft/Anvil_hit_1.Anvil_hit_1"));
+	static ConstructorHelpers::FObjectFinder<USoundBase> HitSnd(TEXT("/Game/Audio/SFX/Cues/SC_MinigameHit.SC_MinigameHit")); // случайный из 5
 	if (HitSnd.Succeeded()) { MinigameHitSound = HitSnd.Object; }
 
 	// VFX по умолчанию (из бесплатных паков; переопределяемы в Blueprint)
@@ -105,7 +105,7 @@ ARepairable::ARepairable()
 	GasHissComp->AttenuationOverrides.FalloffDistance = 2500.f; // дальше плавно гаснет до тишины (~26 м)
 
 	// Установка расходника — металлический клик «вставлено» (Nut Driver), а не «уронил»
-	static ConstructorHelpers::FObjectFinder<USoundBase> InsSnd(TEXT("/Game/Audio/SFX/Repair/Repair_Insert_1.Repair_Insert_1"));
+	static ConstructorHelpers::FObjectFinder<USoundBase> InsSnd(TEXT("/Game/Audio/SFX/Repair/SC_Insert.SC_Insert")); // случайный из 2
 	if (InsSnd.Succeeded()) { InsertSound = InsSnd.Object; }
 	static ConstructorHelpers::FObjectFinder<USoundBase> FillSnd(TEXT("/Game/Survival_SFX/Craft/Crafting_wood_item_1.Crafting_wood_item_1"));
 	if (FillSnd.Succeeded()) { FillLoopSound = FillSnd.Object; }
@@ -115,10 +115,10 @@ ARepairable::ARepairable()
 	if (EngSnd.Succeeded()) { EngineStartSound = EngSnd.Object; }
 	static ConstructorHelpers::FObjectFinder<USoundBase> ShortSnd(TEXT("/Game/Audio/SFX/ElectricZap.ElectricZap"));
 	if (ShortSnd.Succeeded()) { ShortCircuitSound = ShortSnd.Object; }
-	// Вентиль: трещотка ключа на тык + срыв резьбы (Garage Impact Wrench / Tire Pressure)
-	static ConstructorHelpers::FObjectFinder<USoundBase> ValveSnd(TEXT("/Game/Audio/SFX/Repair/Repair_ValveRatchet_1.Repair_ValveRatchet_1"));
+	// Вентиль: трещотка ключа на тык + срыв резьбы (случайный вариант, чтобы не «долбило одно»)
+	static ConstructorHelpers::FObjectFinder<USoundBase> ValveSnd(TEXT("/Game/Audio/SFX/Repair/SC_ValveRatchet.SC_ValveRatchet")); // случайный из 3
 	if (ValveSnd.Succeeded()) { ValveTurnSound = ValveSnd.Object; }
-	static ConstructorHelpers::FObjectFinder<USoundBase> SlipSnd(TEXT("/Game/Audio/SFX/Repair/Repair_ValveStrip_1.Repair_ValveStrip_1"));
+	static ConstructorHelpers::FObjectFinder<USoundBase> SlipSnd(TEXT("/Game/Audio/SFX/Repair/SC_ValveStrip.SC_ValveStrip")); // случайный из 2
 	if (SlipSnd.Succeeded()) { ValveSlipSound = SlipSnd.Object; }
 	// Стартер: натяжение шнура (луп) + холостой ход двигателя после запуска (луп)
 	static ConstructorHelpers::FObjectFinder<USoundBase> PullSnd(TEXT("/Game/Audio/SFX/Repair/Repair_GenPull_Loop.Repair_GenPull_Loop"));

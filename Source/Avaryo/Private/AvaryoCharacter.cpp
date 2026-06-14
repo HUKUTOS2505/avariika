@@ -149,7 +149,7 @@ AAvaryoCharacter::AAvaryoCharacter()
 	if (SmokeSnd.Succeeded()) { SmokeSound = SmokeSnd.Object; }
 	static ConstructorHelpers::FObjectFinder<USoundBase> DrinkSnd(TEXT("/Game/Audio/SFX/DrinkGlug.DrinkGlug"));
 	if (DrinkSnd.Succeeded()) { DrinkSound = DrinkSnd.Object; }
-	static ConstructorHelpers::FObjectFinder<USoundBase> ShoveSnd(TEXT("/Game/Survival_SFX/Survival/Punch_1.Punch_1"));
+	static ConstructorHelpers::FObjectFinder<USoundBase> ShoveSnd(TEXT("/Game/Audio/SFX/Cues/SC_Shove.SC_Shove")); // случайный из 5
 	if (ShoveSnd.Succeeded()) { ShoveSound = ShoveSnd.Object; }
 	static ConstructorHelpers::FObjectFinder<USoundBase> RadioSnd(TEXT("/Game/Audio/SFX/RadioComm.RadioComm"));
 	if (RadioSnd.Succeeded()) { RadioToggleSound = RadioSnd.Object; }
@@ -170,8 +170,8 @@ AAvaryoCharacter::AAvaryoCharacter()
 
 	static ConstructorHelpers::FObjectFinder<USoundBase> JumpSnd(TEXT("/Game/Survival_SFX/Movement/Jump_stone.Jump_stone"));
 	if (JumpSnd.Succeeded()) { JumpSound = JumpSnd.Object; }
-	// Падение тела (споткнулся/поскользнулся) — глухой удар о бетон
-	static ConstructorHelpers::FObjectFinder<USoundBase> FallSnd(TEXT("/Game/Audio/SFX/Foley/Foley_BodyFall_1.Foley_BodyFall_1"));
+	// Падение тела (споткнулся/поскользнулся) — глухой удар о бетон (случайный из 2)
+	static ConstructorHelpers::FObjectFinder<USoundBase> FallSnd(TEXT("/Game/Audio/SFX/Foley/SC_BodyFall.SC_BodyFall"));
 	if (FallSnd.Succeeded()) { FallSound = FallSnd.Object; }
 	// Уронил предмет — металлический удар о пол
 	static ConstructorHelpers::FObjectFinder<USoundBase> DropSnd(TEXT("/Game/Survival_SFX/User_Interface/Metal_item_drop.Metal_item_drop"));
