@@ -184,6 +184,7 @@ void UVitalsComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 		{
 			WindedNoiseAccum = 0.f;
 			Char->MakeNoise(0.7f, Char, Char->GetActorLocation());
+			Char->RegisterSelfNoise(0.7f);
 		}
 	}
 
@@ -199,6 +200,7 @@ void UVitalsComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 		Panic = FMath::Min(100.f, Panic + IncidentPanicSpike);
 		Smell = FMath::Min(100.f, Smell + SmellIncidentJump); // и амбре теперь надолго
 		Char->MakeNoise(1.f, Char, Char->GetActorLocation()); // очень громко и стыдно
+		Char->RegisterSelfNoise(1.f);
 		OnSanitaryIncident.Broadcast();
 	}
 
@@ -235,6 +237,7 @@ void UVitalsComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 		{
 			CoughAccum = 0.f;
 			Char->MakeNoise(0.5f, Char, Char->GetActorLocation());
+			Char->RegisterSelfNoise(0.5f);
 			AddPanic(CoughPanic);
 		}
 	}
@@ -251,6 +254,7 @@ void UVitalsComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 		{
 			HiccupAccum = 0.f;
 			Char->MakeNoise(0.3f, Char, Char->GetActorLocation());
+			Char->RegisterSelfNoise(0.3f);
 			AddPanic(0.5f);
 		}
 	}

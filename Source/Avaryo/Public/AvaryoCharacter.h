@@ -63,6 +63,11 @@ public:
 	/** Прогресс зарядки броска 0..1 (для HUD-полоски). */
 	UFUNCTION(BlueprintPure, Category="Avaryo|Inventory") float GetThrowChargeAlpha() const;
 
+	/** Зарегистрировать «свой шум» (для шумомера HUD): громкость 0..1, затухает за ~0.8с. */
+	UFUNCTION(BlueprintCallable, Category="Avaryo|Noise") void RegisterSelfNoise(float Loudness);
+	/** Текущий уровень своего шума 0..1 (с затуханием) — для HUD-шумомера. */
+	UFUNCTION(BlueprintPure, Category="Avaryo|Noise") float GetSelfNoise01() const;
+
 	/** Переключить активный слот (клавиши 1-5). 0 — тяжёлый, 1-4 — лёгкие. */
 	UFUNCTION(BlueprintCallable, Category="Avaryo|Inventory")
 	void EquipSlot(int32 SlotIndex);
@@ -541,6 +546,9 @@ protected:
 
 	bool bChargingThrow = false; // локально: зажата ли G для зарядки броска
 	float ThrowPressTime = 0.f;  // локально: момент нажатия G
+
+	float SelfNoiseLevel = 0.f;  // последний пик «своего шума» 0..1 (для шумомера)
+	float SelfNoiseTime = 0.f;   // когда был пик (для затухания)
 	void CarryHeavyLowered(APickupItem* Item);
 	void StashItem(APickupItem* Item);
 

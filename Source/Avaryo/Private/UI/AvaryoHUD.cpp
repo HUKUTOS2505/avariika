@@ -275,7 +275,8 @@ void AAvaryoHUD::DrawHUD()
 		DrawBar(TEXT("Туалет"),       Vitals->GetBladder(), FLinearColor(0.8f, 0.6f, 0.12f),  Y); Y += 22.f;
 		DrawBar(TEXT("Амбре"),        Vitals->GetSmell(),   FLinearColor(0.5f, 0.45f, 0.12f), Y); Y += 22.f;
 
-		// Шум: насколько ты сейчас слышен (бег/распыление громко, присед тихо) — задел под монстра-слухача
+		// Шум: насколько ты сейчас слышен — задел под монстра-слухача.
+		// Движение (бег/присед) + события MakeNoise (кашель, икота, отдышка, бросок, починка…).
 		float Noise01 = FMath::Clamp(Character->GetVelocity().Size2D() / 750.f, 0.f, 1.f);
 		if (Character->bIsCrouched)
 		{
@@ -288,6 +289,7 @@ void AAvaryoHUD::DrawHUD()
 				Noise01 = 1.f;
 			}
 		}
+		Noise01 = FMath::Max(Noise01, Character->GetSelfNoise01()); // всплески от событий шума
 		DrawBar(TEXT("Шум"), Noise01 * 100.f, FLinearColor(1.f, 0.55f, 0.2f), Y);
 
 		// Батарея налобного фонаря: ярко-жёлтая когда включён, тусклая когда выключен

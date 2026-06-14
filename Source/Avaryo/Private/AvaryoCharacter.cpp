@@ -1266,6 +1266,24 @@ float AAvaryoCharacter::GetThrowChargeAlpha() const
 	return FMath::Clamp((Held - ThrowChargeMinTime) / FMath::Max(0.01f, ThrowChargeMaxTime - ThrowChargeMinTime), 0.f, 1.f);
 }
 
+void AAvaryoCharacter::RegisterSelfNoise(float Loudness)
+{
+	const float Now = GetWorld() ? GetWorld()->GetTimeSeconds() : 0.f;
+	SelfNoiseLevel = FMath::Max(GetSelfNoise01(), FMath::Clamp(Loudness, 0.f, 1.f));
+	SelfNoiseTime = Now;
+}
+
+float AAvaryoCharacter::GetSelfNoise01() const
+{
+	if (!GetWorld() || SelfNoiseLevel <= 0.f)
+	{
+		return 0.f;
+	}
+	const float Age = GetWorld()->GetTimeSeconds() - SelfNoiseTime;
+	const float Decay = FMath::Clamp(1.f - Age / 0.8f, 0.f, 1.f); // затухает за ~0.8с
+	return SelfNoiseLevel * Decay;
+}
+
 void AAvaryoCharacter::ServerThrowCharged_Implementation(float ChargeAlpha)
 {
 	if (CurrentToilet || (CurrentRepairable && CurrentRepairable->IsMinigameRepair()))
@@ -1344,7 +1362,9 @@ void AAvaryoCharacter::ReleaseHeldItem(bool bThrown, float ChargeAlpha)
 	}
 
 	// Бросок и падение слышно; тяжёлый — громче
-	MakeNoise(bThrown ? 0.8f : (bHeavy ? 1.f : 0.6f), this, DropLocation);
+	const float ReleaseNoise = bThrown ? 0.8f : (bHeavy ? 1.f : 0.6f);
+	MakeNoise(ReleaseNoise, this, DropLocation);
+	RegisterSelfNoise(ReleaseNoise);
 
 	if (bThrown)
 	{
@@ -1962,6 +1982,7 @@ void AAvaryoCharacter::TriggerStumble()
 	bStumbling = true;
 	StumbleUntil = GetWorld()->GetTimeSeconds() + TripRecoverTime;
 	MakeNoise(0.7f, this, GetActorLocation()); // грохнулся — слышно
+	RegisterSelfNoise(0.7f);
 	if (ARunState* Run = ARunState::Get(GetWorld()))
 	{
 		Run->NotifyTripped(this);
