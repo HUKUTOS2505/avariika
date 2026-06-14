@@ -177,6 +177,33 @@ crouch-шаги (можно из Walk питчем), «мокрый» squelch с
 
 ---
 
+## ✅ Импортировано курировано (2026-06-14) — готово к развеске
+
+23 SoundWave в `Content/Audio/` (по семейству на событие, не целые папки — лицензии+диск). Гиганты Sonomar и большие лупы обрезаны до 12–25 c. Лупы (★) уже `looping=True`.
+
+| Ассет (`/Game/Audio/...`) | Событие (куда вешать) | Источник |
+|---|---|---|
+| `SFX/Repair/Repair_ValveRatchet_1..3` | Труба: докрутка вентиля (на тык, 3 варианта) | Garage Impact Wrench Screw |
+| `SFX/Repair/Repair_ValveStrip_1..2` | Труба: срыв резьбы + шипение | Garage Tire Pressure Deflate |
+| `SFX/Repair/Repair_GenPull_Loop` ★ | Генератор: натяг шнура (пока тянешь) | Garage Winch Spin |
+| `SFX/Repair/Repair_Insert_1..2` | Вставка расходника (метал. клик) | Garage Nut Driver Clatter |
+| `SFX/Repair/Repair_EngineIdle_Loop` ★ | Генератор: холостой ход (весь забег) — **времянка** | Garage Flue Gas Installation Running |
+| `SFX/Repair/Repair_JuryRig_Loop` ★ | Колхоз-сборка: возня | Garage Tire Changing Machine |
+| `SFX/Repair/Repair_FuelFill_Loop` ★ | Заправка топлива: налив | Magic Water Bubble Fill Glug |
+| `SFX/Hazard/Hazard_FireLoop` ★ | Пожар после взрыва / газ-горелка | Magic Fire Gas Flame Burn Loop |
+| `SFX/Hazard/Hazard_LampHum_Loop` ★ | Гул лампы (прожектор) / восстановление света | Magic Lightning Fluorescent Lamp |
+| `SFX/Hazard/Hazard_Overload_1` | Перегруз/дефект генератора (электро) | Magic Lightning Defect Generator |
+| `SFX/Hazard/Hazard_ExplosionGas_1` | Взрыв газа (вариант, лучше плейсхолдера) | Explosives Explosion Gas Debris |
+| `SFX/Item/Item_ExtinguisherSpray_Loop` ★ | Огнетушитель: спрей под давлением | Air Burst Pneumatic Pump |
+| `SFX/Foley/Foley_BodyFall_1..2` | Приземление / падение тела | Ultimate Fighting Body Fall Concrete |
+| `Ambient/Amb_Hall_Loop` ★ | Эмбиент: большой зал/палата | Sonomar Large Hall |
+| `Ambient/Amb_Corridor_Loop` ★ | Эмбиент: коридор | Sonomar Long Corridor |
+| `Ambient/Amb_WaterDrips_Loop` ★ | Эмбиент: капель/подвал | Sonomar Basement Water Drips |
+| `Ambient/Amb_Rain_Loop` ★ | Эмбиент: дождь (если погода) | Medieval Weather Medium Rain |
+| `Ambient/Amb_RainThunder_1` | Раскат грома (1×) | Medieval Weather Rain Thunder |
+
+> Развеска (репоинт `FObjectFinder` + новые лупы idle/огнетушитель/эмбиент в коде) — в окно сборки. Скрипты импорта: `Scripts/import_audio_batch.py` + `Scripts/set_audio_looping.py`.
+
 ## 📦 Импортировать в проект (приоритет)
 
 Конвенция: разовые SFX → `Content/Audio/SFX/<Группа>/`, эмбиенты → `Content/Audio/Ambient/<Группа>/`. Импорт = robocopy дерева пака в целевую папку (см. memory: asset import method), либо headless `UnrealEditor-Cmd`.
