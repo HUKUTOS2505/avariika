@@ -105,6 +105,12 @@ ARepairable::ARepairable()
 	if (InsSnd.Succeeded()) { InsertSound = InsSnd.Object; }
 	static ConstructorHelpers::FObjectFinder<USoundBase> FillSnd(TEXT("/Game/Survival_SFX/Craft/Crafting_wood_item_1.Crafting_wood_item_1"));
 	if (FillSnd.Succeeded()) { FillLoopSound = FillSnd.Object; }
+	static ConstructorHelpers::FObjectFinder<USoundBase> WeldSnd(TEXT("/Game/Audio/SFX/WeldBuzz.WeldBuzz"));
+	if (WeldSnd.Succeeded()) { WeldLoopSound = WeldSnd.Object; }
+	static ConstructorHelpers::FObjectFinder<USoundBase> EngSnd(TEXT("/Game/Audio/SFX/EngineStart.EngineStart"));
+	if (EngSnd.Succeeded()) { EngineStartSound = EngSnd.Object; }
+	static ConstructorHelpers::FObjectFinder<USoundBase> ShortSnd(TEXT("/Game/Audio/SFX/ElectricZap.ElectricZap"));
+	if (ShortSnd.Succeeded()) { ShortCircuitSound = ShortSnd.Object; }
 
 	// Луп заливки/прокладки — компонент, гоняется в Tick по bPrereqAutoFilling
 	FillAudioComp = CreateDefaultSubobject<UAudioComponent>(TEXT("FillAudio"));
@@ -251,12 +257,21 @@ void ARepairable::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	// Луп заливки/прокладки (на всех машинах — bPrereqAutoFilling реплицируется)
+	// Луп заливки/прокладки (AutoFill) или сварки (удержание с инструментом) — на всех машинах
 	if (FillAudioComp)
 	{
-		const bool bPlaying = FillAudioComp->IsPlaying();
-		if (bPrereqAutoFilling && !bPlaying) { FillAudioComp->Play(); }
-		else if (!bPrereqAutoFilling && bPlaying) { FillAudioComp->Stop(); }
+		USoundBase* WantLoop = nullptr;
+		if (bPrereqAutoFilling) { WantLoop = FillLoopSound; }
+		else if (bDoingPrereqHold && !bBotching) { WantLoop = WeldLoopSound; } // сварка (колхоз руками — без дуги)
+		if (WantLoop)
+		{
+			if (FillAudioComp->Sound != WantLoop) { FillAudioComp->SetSound(WantLoop); FillAudioComp->Play(); }
+			else if (!FillAudioComp->IsPlaying()) { FillAudioComp->Play(); }
+		}
+		else if (FillAudioComp->IsPlaying())
+		{
+			FillAudioComp->Stop();
+		}
 	}
 
 	// Сервер: блокировка после замыкания тает
@@ -929,9 +944,12 @@ void ARepairable::FinishRepair(AAvaryoCharacter* Who)
 		}
 	}
 
-	if (RepairDoneSound) // «починили» — у всех
+	// Генератор (стартер) → «завёлся» (двигатель); остальные → общий «починили». У всех.
+	USoundBase* DoneSnd = (MinigameType == ERepairMinigameType::Starter && EngineStartSound)
+		? EngineStartSound : RepairDoneSound;
+	if (DoneSnd)
 	{
-		MulticastSound(RepairDoneSound, GetActorLocation(), 1.f);
+		MulticastSound(DoneSnd, GetActorLocation(), 1.f);
 	}
 
 	OnRepairFinished.Broadcast(this, Who);
@@ -955,6 +973,10 @@ void ARepairable::ShortCircuit(AAvaryoCharacter* Culprit)
 	if (SparkFX) // мелкие искры дуги — у всех
 	{
 		MulticastSparkFX(GetActorLocation() + FVector(0, 0, 60.f));
+	}
+	if (ShortCircuitSound) // электро-разряд — у всех
+	{
+		MulticastSound(ShortCircuitSound, GetActorLocation() + FVector(0, 0, 60.f), 1.f);
 	}
 
 	LockoutRemaining = LockoutDuration;

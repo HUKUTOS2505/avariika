@@ -258,6 +258,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Audio")
 	TObjectPtr<USoundBase> SmokeSound;
 
+	/** Звук глотка (кофе/термос — эффект Drink). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Audio")
+	TObjectPtr<USoundBase> DrinkSound;
+
 	/** Звук толчка (Q) — глухой удар. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Audio")
 	TObjectPtr<USoundBase> ShoveSound;

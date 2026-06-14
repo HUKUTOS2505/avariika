@@ -147,6 +147,8 @@ AAvaryoCharacter::AAvaryoCharacter()
 	if (HealSnd.Succeeded()) { HealSound = HealSnd.Object; }
 	static ConstructorHelpers::FObjectFinder<USoundBase> SmokeSnd(TEXT("/Game/Survival_SFX/Survival/Lighter_1.Lighter_1"));
 	if (SmokeSnd.Succeeded()) { SmokeSound = SmokeSnd.Object; }
+	static ConstructorHelpers::FObjectFinder<USoundBase> DrinkSnd(TEXT("/Game/Audio/SFX/DrinkGlug.DrinkGlug"));
+	if (DrinkSnd.Succeeded()) { DrinkSound = DrinkSnd.Object; }
 	static ConstructorHelpers::FObjectFinder<USoundBase> ShoveSnd(TEXT("/Game/Survival_SFX/Survival/Punch_1.Punch_1"));
 	if (ShoveSnd.Succeeded()) { ShoveSound = ShoveSnd.Object; }
 	static ConstructorHelpers::FObjectFinder<USoundBase> RadioSnd(TEXT("/Game/Audio/SFX/RadioComm.RadioComm"));
@@ -2168,6 +2170,7 @@ USoundBase* AAvaryoCharacter::ItemUseSoundFor(const APickupItem* Item) const
 	{
 		if (Item->ItemEffect == EItemEffect::Heal && HealSound) { return HealSound; }
 		if (Item->ItemEffect == EItemEffect::Calm && SmokeSound) { return SmokeSound; }
+		if (Item->ItemEffect == EItemEffect::Drink && DrinkSound) { return DrinkSound; }
 	}
 	return UseSound;
 }

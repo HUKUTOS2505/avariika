@@ -463,6 +463,18 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Repairable|Audio")
 	TObjectPtr<USoundBase> FillLoopSound;
 
+	/** Зацикленный звук сварки (этап удержания с инструментом) — электро-дуга. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Repairable|Audio")
+	TObjectPtr<USoundBase> WeldLoopSound;
+
+	/** Звук «генератор завёлся» (для объекта со стартером — вместо общего «починили»). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Repairable|Audio")
+	TObjectPtr<USoundBase> EngineStartSound;
+
+	/** Звук электро-разряда при замыкании щитка. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Repairable|Audio")
+	TObjectPtr<USoundBase> ShortCircuitSound;
+
 	/** Хэндл лупа заливки. */
 	UPROPERTY(Transient)
 	TObjectPtr<UAudioComponent> FillAudioComp;
