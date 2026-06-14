@@ -979,6 +979,26 @@ void AAvaryoCharacter::AvMoney(int32 Amount)
 }
 void AAvaryoCharacter::ServerAvMoney_Implementation(int32 Amount) { AvMoney(Amount); }
 
+void AAvaryoCharacter::AvSetGear(const FString& Tool, int32 Level)
+{
+	if (!HasAuthority()) { ServerAvSetGear(Tool, Level); return; }
+	if (UGameInstance* GI = GetGameInstance())
+	{
+		if (UCompanyLedgerSubsystem* Ledger = GI->GetSubsystem<UCompanyLedgerSubsystem>())
+		{
+			Ledger->SetEquipmentLevel(FName(*Tool), Level);
+		}
+	}
+}
+void AAvaryoCharacter::ServerAvSetGear_Implementation(const FString& Tool, int32 Level) { AvSetGear(Tool, Level); }
+
+void AAvaryoCharacter::AvBattery(float Pct)
+{
+	if (!HasAuthority()) { ServerAvBattery(Pct); return; }
+	if (FlashlightComponent) { FlashlightComponent->DebugSetBattery(Pct); }
+}
+void AAvaryoCharacter::ServerAvBattery_Implementation(float Pct) { AvBattery(Pct); }
+
 // ---------- Оператор: нагрудные камеры ----------
 
 bool AAvaryoCharacter::CanUseMonitor() const

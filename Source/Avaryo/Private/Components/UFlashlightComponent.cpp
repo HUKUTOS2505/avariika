@@ -27,6 +27,12 @@ UFlashlightComponent::UFlashlightComponent()
 	bLowBatteryNotified = false;
 }
 
+void UFlashlightComponent::DebugSetBattery(float Pct)
+{
+	BatteryLevel = FMath::Clamp(Pct, 0.f, 100.f);
+	if (BatteryLevel >= LowBatteryThreshold) { bLowBatteryNotified = false; }
+}
+
 void UFlashlightComponent::BeginPlay()
 {
 	Super::BeginPlay();

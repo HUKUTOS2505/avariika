@@ -54,6 +54,10 @@ public:
 	UFUNCTION(BlueprintPure, Category="Flashlight")
 	float GetBatteryLevel() const { return BatteryLevel; }
 
+	/** Дев: задать заряд 0..100 (для теста разряда/испуга при севшей батарее). */
+	UFUNCTION(BlueprintCallable, Category="Flashlight")
+	void DebugSetBattery(float Pct);
+
 	/** Срабатывает при включении/выключении (на сервере сразу, на клиентах через OnRep). */
 	UPROPERTY(BlueprintAssignable, Category="Flashlight")
 	FOnFlashlightToggled OnFlashlightToggled;

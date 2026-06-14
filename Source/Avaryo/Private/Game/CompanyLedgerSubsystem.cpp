@@ -142,6 +142,19 @@ void UCompanyLedgerSubsystem::StopQuota()
 	Save();
 }
 
+void UCompanyLedgerSubsystem::SetEquipmentLevel(FName Tool, int32 Level)
+{
+	const int32 MaxLvl = (Tool == TEXT("Flashlight")) ? 4 : 3;
+	const int32 L = FMath::Clamp(Level, (Tool == TEXT("Cameras")) ? 0 : 1, MaxLvl);
+	if      (Tool == TEXT("Flashlight"))   { Equipment.Flashlight   = L; }
+	else if (Tool == TEXT("Tester"))       { Equipment.Tester       = L; }
+	else if (Tool == TEXT("Welder"))       { Equipment.Welder       = L; }
+	else if (Tool == TEXT("Extinguisher")) { Equipment.Extinguisher = L; }
+	else if (Tool == TEXT("Radio"))        { Equipment.Radio        = L; }
+	else { return; }
+	Save();
+}
+
 int32 UCompanyLedgerSubsystem::GetEquipmentLevel(FName Tool) const
 {
 	if (Tool == TEXT("Flashlight"))   { return Equipment.Flashlight; }

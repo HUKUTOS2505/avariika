@@ -665,6 +665,14 @@ protected:
 	UFUNCTION(Exec)
 	void AvMoney(int32 Amount);
 
+	/** Дев: задать уровень апгрейда напрямую (сравнить до/после, без денег): `AvSetGear Welder 1` / `AvSetGear Welder 3`. */
+	UFUNCTION(Exec)
+	void AvSetGear(const FString& Tool, int32 Level);
+
+	/** Дев: задать заряд фонаря 0..100: `AvBattery 2` → быстро сядет (тест испуга при севшей батарее). */
+	UFUNCTION(Exec)
+	void AvBattery(float Pct);
+
 	UFUNCTION(Server, Reliable)
 	void ServerAvVital(const FString& Which, float Value);
 
@@ -694,4 +702,10 @@ protected:
 
 	UFUNCTION(Server, Reliable)
 	void ServerAvMoney(int32 Amount);
+
+	UFUNCTION(Server, Reliable)
+	void ServerAvSetGear(const FString& Tool, int32 Level);
+
+	UFUNCTION(Server, Reliable)
+	void ServerAvBattery(float Pct);
 };
