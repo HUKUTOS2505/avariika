@@ -489,6 +489,14 @@ Greybox `L_Hospital` (каркас+комнаты+квест-акторы) по�
 
 ⚠️ **Git:** Hospital (3 ГБ, BuiltData 558 МБ >100 МБ) и PostApocalypticHouse (4.8 ГБ) → gitignore'нуты (локальные). Plugins/ уже был в gitignore. Коммитятся только `.uproject`/`.ini`/`.gitignore`/доки.
 
+### ГЛАВНОЕ МЕНЮ — своё, в нашем стиле (2026-06-14, по решению пользователя «путь 1»)
+OG Main Menu забраковали как фронт (целый чужой фреймворк, headless-перекраска CommonUI капризная — нет смысла). Сделал **своё лёгкое меню на C++/Canvas** (как `AvaryoHUD`, без UMG/BP-возни), завязанное на нашу готовую кооп-подсистему:
+- **`AMenuHUD`** (`UI/MenuHUD.h/.cpp`): рисует на Canvas тёмный фон + оранжевый акцент, заголовок «АВАРИЙКА», кнопки. Кнопки — нативные хитбоксы AHUD (`AddHitBox`/`NotifyHitBoxClick` + hover через `NotifyHitBoxBeginCursorOver`). Экраны Main/Browse. «Создать игру»→`HostGame()`, «Найти игру»→`FindGames()`+список найденных→`JoinGameByIndex`, «Настройки»→грузит `WBP_EasyOptionsMenuMain` (Easy Options) в вьюпорт, «Выход»→QuitGame.
+- **`AMenuGameMode` + `AMenuPlayerController`** (`Game/MenuGameMode.h/.cpp`): контроллер включает курсор + `bEnableClickEvents`/`bEnableMouseOverEvents` + GameAndUI; гейммод без пешки (HUDClass=AMenuHUD).
+- **Карта `/Game/Avariika/Maps/L_MainMenu`** (`Scripts/make_menu_level.py`): пустой уровень, WorldSettings GameMode=MenuGameMode, PlayerStart. `DefaultEngine.ini` GameDefaultMap→L_MainMenu (EditorStartupMap оставил Lvl_FirstPerson — редактор открывается на рабочем уровне). `HostGame` уезжает на Lvl_FirstPerson (там BP_AvaryoGameMode по GlobalDefaultGameMode).
+- **+UMG** в `Avaryo.Build.cs` (для CreateWidget настроек). Собрано закрытым Build.bat (новые UCLASS), редактор перезапущен, **проверено PIE-скрином — меню рисуется, оранжевое, без фиолетового** (скрин отправлен).
+- ⚠️ Тест пользователю: открыть L_MainMenu → Play → клик по кнопкам (Создать игру должно увезти в игру; Найти — поиск LAN; Настройки — открыть Easy Options). OG Main Menu пак остаётся как склад шрифтов/иконок/звуков.
+
 ### Продолжение (автономка, редактор открыт, Live Coding)
 - **Кооп-харднинг добит закрытой сборкой** (`b4a80bc`): репликация новых зеркальных полей `ARunState` (касса/уровни апгрейдов/карьера хосту→клиенту) ЗАРЕГИСТРИРОВАНА чистым Build.bat (Live Coding репликацию не регистрирует), редактор перезапущен. `RepairerToolQuality`/`DrawShop`/«Акт» читают из `ARunState`, а не из host-only леджера. `APickupItem::ToolQualityScale` теперь Replicated.
 - **Шумомер: пик-холд** (`6b37f6f`): `GetSelfNoise01` раньше затухал линейно за 0.8 с → одиночный блип (икота 0.3, севшая батарея 0.5) мелькал <1 с, юзер не ловил (#8/#9/#12 «не работало»). Теперь пик держится `SelfNoiseHoldTime`=0.45 с, потом спад `SelfNoiseDecayTime`=1.4 с (оба EditAnywhere). `DebugSetBattery(0)` теперь сам триггерит испуг (паника+шум) → `AvBattery 0` показывает мгновенно (фонарь должен быть ВКЛ). Логика испуга вынесена в `TriggerDeadBatteryFright` (общая для разряда и дев-команды).

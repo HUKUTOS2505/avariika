@@ -16,7 +16,8 @@ public class Avaryo : ModuleRules
 			"NetCore",       // репликация
 			"EngineCameras", // PerlinNoiseCameraShakePattern для тряски камеры
 			"OnlineSubsystem",      // кооп-сессии (NULL/LAN сейчас, EOS/Steam через конфиг)
-			"OnlineSubsystemUtils"  // хелперы сессий
+			"OnlineSubsystemUtils",  // хелперы сессий
+			"UMG"                    // CreateWidget для экрана настроек (Easy Options) из меню
 		});
 	}
 }
