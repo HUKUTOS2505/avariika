@@ -181,7 +181,7 @@ crouch-шаги (можно из Walk питчем), «мокрый» squelch с
 
 23 SoundWave в `Content/Audio/` (по семейству на событие, не целые папки — лицензии+диск). Гиганты Sonomar и большие лупы обрезаны до 12–25 c. Лупы (★) уже `looping=True`.
 
-**Статус врезки (`2f3930f`):** 🔌 ВЖАТО в код — Repair_ValveRatchet/ValveStrip, Repair_GenPull_Loop, Repair_Insert, Repair_EngineIdle_Loop, Repair_FuelFill_Loop, Hazard_ExplosionGas, Item_ExtinguisherSpray_Loop, Foley_BodyFall. ⏳ ИМПОРТировано, ждёт механики/окна сборки — Hazard_FireLoop (нет персистентного огня), Hazard_LampHum_Loop (нет прожектора в коде), Hazard_Overload_1 (есть ElectricZap), Repair_JuryRig_Loop (колхоз уже на Weld/Craft), Amb_* (ставить 3D AmbientSound по уровню — левел-дизайн, не код).
+**Статус врезки (`2f3930f` + `5160a47`):** 🔌 ВЖАТО в код — Repair_ValveRatchet/ValveStrip, Repair_GenPull_Loop, Repair_Insert, Repair_EngineIdle_Loop, Repair_FuelFill_Loop, Repair_JuryRig_Loop (колхоз), Hazard_ExplosionGas, Hazard_Rumble_1 (рокот-хвост взрыва), Hazard_LampHum_Loop (гул прожектора AFloodlight), Item_ExtinguisherSpray_Loop, Foley_BodyFall; + из Survival: Metal_item_drop (бросок), Button_hover (смена слота). ⏳ Импортировано, ждёт механики/левел-дизайна — Hazard_FireLoop (нет персистентного огня), Hazard_Overload_1 (есть ElectricZap), Amb_* (ставить 3D AmbientSound в реальных уровнях — не в тест-боксе). Rope creak (хоррор-эмбиент) — нужна система случайных скрипов.
 
 | Ассет (`/Game/Audio/...`) | Событие (куда вешать) | Источник |
 |---|---|---|
