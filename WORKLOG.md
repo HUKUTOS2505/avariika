@@ -530,6 +530,13 @@ OG Main Menu забраковали как фронт (целый чужой ф�
 - **Звук на нормальные Survival-сэмплы:** фонарь → `Button_press_1` (чистый клик вместо sci-fi), подбор → `Metal_item_pick_up` (тот самый идеальный), **+ тычок мини-игры → `Anvil_hit_1`** (металл-клац на каждый E в починке, vol 0.5). Диспетчер оставил «эфир рации» (RadioComm). Собрано, перезапущено, FObjectFinder-ошибок нет.
 - Очередь звука дальше: гудёж газа (луп на трубе), шаги, кашель/икота/отдышка, джампскейр (под монстра).
 
+### Уборка 2: удаление Foggy/Decal/OGMainMenu + чистка Hyper (2026-06-14)
+Юзер: удалить FoggyStreet, Decal_Forge, OGMainMenu; в Hyper вычистить мусор.
+- **Удалены целиком:** FoggyStreet (3.6G), Decal_Forge (2.8G), OGMainMenu (462M — своё меню есть). (Туман/декали возьмём из Hyper-погоды / VFX юзера.)
+- **Hyper обрезан 6.1 ГБ → 106 МБ** через **dependency-closure** (`Scripts/cleanup_packs.py`): keep-roots = погодные NiagaraSystem (`/Effects/Weather`) + небо (SkySphere/M_SkySphere/T_Moon/T_Stars/MI_SimpleVolumetricClouds) + Icons/Weather_States + Post_Process + SpaceSkyboxes; closure по `/Game/Hyper`; удалены папки без keep-ассета (Environments 3.1G, Tileable_Materials 2.3G, Locomotion, Core/WeatherSystem/TimeManager/UI фреймворк). Проверено — погодные VFX + небо целы, битых ссылок НЕТ.
+- ⚠️ Грабли: `EditorAssetLibrary.delete_directory` по тысячам ассетов МЕДЛЕННО (редактор не отвечает на ping, пока грызёт) + Claudius-таймаут 300с вернулся раньше конца. OGMainMenu реестром не дочистился — добил `rm` на диске (закрыл редактор). Пустые папки Hyper — `find -empty`.
+- **Content: ~29 → 15 ГБ** (за обе уборки суммарно −~47 ГБ). Удалённые паки были untracked/gitignore — git rm не нужен; почистил stale-строки в `.gitignore`.
+
 ### Продолжение (автономка, редактор открыт, Live Coding)
 - **Кооп-харднинг добит закрытой сборкой** (`b4a80bc`): репликация новых зеркальных полей `ARunState` (касса/уровни апгрейдов/карьера хосту→клиенту) ЗАРЕГИСТРИРОВАНА чистым Build.bat (Live Coding репликацию не регистрирует), редактор перезапущен. `RepairerToolQuality`/`DrawShop`/«Акт» читают из `ARunState`, а не из host-only леджера. `APickupItem::ToolQualityScale` теперь Replicated.
 - **Шумомер: пик-холд** (`6b37f6f`): `GetSelfNoise01` раньше затухал линейно за 0.8 с → одиночный блип (икота 0.3, севшая батарея 0.5) мелькал <1 с, юзер не ловил (#8/#9/#12 «не работало»). Теперь пик держится `SelfNoiseHoldTime`=0.45 с, потом спад `SelfNoiseDecayTime`=1.4 с (оба EditAnywhere). `DebugSetBattery(0)` теперь сам триггерит испуг (паника+шум) → `AvBattery 0` показывает мгновенно (фонарь должен быть ВКЛ). Логика испуга вынесена в `TriggerDeadBatteryFright` (общая для разряда и дев-команды).

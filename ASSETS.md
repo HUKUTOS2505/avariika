@@ -45,9 +45,7 @@
 
 | Пак | Папка | Размер | git | Исп. | Что это |
 |---|---|---|---|---|---|
-| **Hyper Dynamic Weather & Sky** | `Hyper` | 6.1G | локально | 📦 | cherry-pick: ночное небо + грозовые NS_* (фреймворк не берём, ~6G мусора вычистить — см. ASSET_ASSESSMENT) |
-| **Foggy Street** | `FoggyStreet` | 3.6G | локально | 📦 | туман/пар/дождь VFX (оставлен ради них) |
-| **Decal Forge** | `Decal_Forge` | 2.8G | локально | 📦 | декали (грязь/кровь/потёки — хоррор) |
+| **Hyper Dynamic Weather & Sky** (обрезан) | `Hyper` | **106M** | локально | 📦 | оставлены ТОЛЬКО погодные Niagara (NS_Rain/ThunderStorm/Blizzard/…) + ночное небо (SkySphere/Moon/Stars/Clouds) + их зависимости. ~6 ГБ природного балласта вычищено (Environments/Tileable/Locomotion/фреймворк). |
 | **NiagaraExamples** | `NiagaraExamples` | 1.2G | локально | 🔧 | движковые примеры VFX (бесплатно, вернётся одной кнопкой) |
 | **Fire_EXP Vol.01 (Free)** | `Fire_EXP_Vol01_Free` | 47M | локально | 📦 | огонь-VFX (бесплатный) |
 
@@ -58,7 +56,6 @@
 | Пак | Папка | Размер | git | Исп. | Что это |
 |---|---|---|---|---|---|
 | **Easy Options Menu** | `EasyOptionsMenu` | 40M | git | ✅ | экран настроек (нужен плагин JsonBlueprintUtilities) |
-| **OG Main Menu System** | `OGMainMenu` | 462M | локально | 🔧 | как фронт НЕ используем (своё меню сделали) — склад шрифтов/иконок/звуков |
 | **Footstep System** | `FootstepSystem` | 8.6M | git | 📦 | система шагов по поверхностям |
 | **Resource Pack** | `ResourcePack` | 1.5G | git | 📦 | тайловые материалы/текстуры (общий ресурс) |
 
@@ -83,8 +80,8 @@
 
 ---
 
-### Итого (≈29 ГБ Content)
+### Итого (≈15 ГБ Content — было ~50)
 - **В git** (клонируется): наш код+контент, HospitalCombo, Construction_VOL2, EasyOptionsMenu, FootstepSystem, ResourcePack, Content/Audio/SFX.
-- **Локально** (тяжёлое, не в git): Hospital, PostApocalypticHouse, Hyper, FoggyStreet, Decal_Forge, Construction_Pit, NiagaraExamples, OGMainMenu, oldBenchPack, Fire_EXP, Survival_SFX + Plugins + RawAssets.
-- **Удалено в уборку** (−~34 ГБ): AmericanDrive, LightHouse, Madrid_Street, Shoothouse, Backrooms_TheLobby, YI_Luggage, FencesVOL2, Adventure_Pack(Sarah), Citizens_Pack, 3 лишних больницы (Leartes/Horror/Abandoned), плагин EOSCore (платный).
-- **Лицензий к докупке** (паки в билде): ~по одному на категорию — больница(City+Combo), дом, стройка, Hyper, Decal_Forge, FoggyStreet, ResourcePack, EasyOptions, AudioToolkitPro + звук-библиотеки (Ghosthack, Asylum, Survival). Бесплатные: Fire_EXP, NiagaraExamples, EOS (движок).
+- **Локально** (тяжёлое, не в git): Hospital, PostApocalypticHouse, Hyper (обрезан до 106М), Construction_Pit, NiagaraExamples, oldBenchPack, Fire_EXP, Survival_SFX + Plugins + RawAssets.
+- **Удалено в уборку** (−~47 ГБ суммарно): AmericanDrive, LightHouse, Madrid_Street, Shoothouse, Backrooms_TheLobby, YI_Luggage, FencesVOL2, Adventure_Pack(Sarah), Citizens_Pack, 3 лишних больницы (Leartes/Horror/Abandoned), **FoggyStreet, Decal_Forge, OGMainMenu**, плагин EOSCore (платный), + ~6 ГБ балласта внутри Hyper.
+- **Лицензий к докупке** (паки в билде): ~по одному на категорию — больница(City+Combo), дом, стройка, Hyper, ResourcePack, EasyOptions, AudioToolkitPro + звук-библиотеки (Ghosthack, Asylum, Survival). Бесплатные: Fire_EXP, NiagaraExamples, EOS (движок). _Туман/декали — теперь из Hyper-погоды / твоих VFX._

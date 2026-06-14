@@ -47,19 +47,15 @@ Content/**/*.fbx
 # Python-кэш
 Scripts/__pycache__/
 
-# Локальные плагины-инструменты (Claudius/meshy/EOSCore/AudioToolkitPro) — тяжёлые
-# (EOSCore ~2 ГБ + EOS SDK). Включены в .uproject, лежат локально. См. WORKLOG.
+# Локальные плагины-инструменты (Claudius/meshy/AudioToolkitPro) — тяжёлые,
+# лежат локально. См. WORKLOG.
 Plugins/
 
-# Крупные ассет-паки из RawAssets/новое (есть файлы >100 МБ — лимит GitHub;
-# git-стратегия не решена). Импортированы в Content/, в git не держим.
+# Крупные ассет-паки (тяжёлые/файлы >100 МБ — лимит GitHub; git-стратегия не решена).
+# Импортированы в Content/, в git не держим.
 Content/Hospital/
 Content/PostApocalypticHouse/
 Content/__ExternalActors__/PostApocalypticHouse/
-Content/OGMainMenu/
-Content/__ExternalActors__/OGMainMenu/
-Content/__ExternalObjects__/OGMainMenu/
-Content/Citizens_Pack/
 Content/Hyper/
 Content/Survival_SFX/
 
