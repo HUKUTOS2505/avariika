@@ -139,8 +139,8 @@ AAvaryoCharacter::AAvaryoCharacter()
 		HeartbeatSound = HeartSnd.Object;
 		HeartbeatAudio->SetSound(HeartSnd.Object);
 	}
-	// Звук подбора: ждёт Survival SFX (Metal_item_pick_up) — пак запаролен; пока без звука
-	// (код проигрывания no-op при null). Назначить, когда будет пароль/чистый foley.
+	static ConstructorHelpers::FObjectFinder<USoundBase> PickSnd(TEXT("/Game/Survival_SFX/User_Interface/Metal_item_pick_up.Metal_item_pick_up"));
+	if (PickSnd.Succeeded()) { PickupSound = PickSnd.Object; }
 }
 
 void AAvaryoCharacter::BeginPlay()

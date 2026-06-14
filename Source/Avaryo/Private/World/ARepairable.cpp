@@ -68,6 +68,8 @@ ARepairable::ARepairable()
 	if (ExplosionSnd.Succeeded()) { ExplosionSound = ExplosionSnd.Object; }
 	static ConstructorHelpers::FObjectFinder<USoundBase> RepairSnd(TEXT("/Game/Audio/SFX/RepairDone.RepairDone"));
 	if (RepairSnd.Succeeded()) { RepairDoneSound = RepairSnd.Object; }
+	static ConstructorHelpers::FObjectFinder<USoundBase> HitSnd(TEXT("/Game/Survival_SFX/Craft/Anvil_hit_1.Anvil_hit_1"));
+	if (HitSnd.Succeeded()) { MinigameHitSound = HitSnd.Object; }
 
 	MinigameType = ERepairMinigameType::None;
 	HitsToRepair = 4;
@@ -680,6 +682,12 @@ void ARepairable::TryHitBy(AAvaryoCharacter* Who)
 	if (!HasAuthority() || Repairer != Who || !Who)
 	{
 		return;
+	}
+
+	// Тактильный «тык» мини-игры (на листен-сервере слышит хост; клиентам — позже мультикастом)
+	if (MinigameHitSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, MinigameHitSound, GetActorLocation(), 0.5f);
 	}
 
 	// Prereq-мини-игра (заварка / починка руками): курсор в зелёной зоне = прогресс этапа, промах = откат

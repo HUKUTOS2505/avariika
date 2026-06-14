@@ -29,7 +29,7 @@ UFlashlightComponent::UFlashlightComponent()
 	BlackoutTimeRemaining = 0.f;
 	bLowBatteryNotified = false;
 
-	static ConstructorHelpers::FObjectFinder<USoundBase> ClickSnd(TEXT("/Game/Audio/SFX/FlashClick.FlashClick"));
+	static ConstructorHelpers::FObjectFinder<USoundBase> ClickSnd(TEXT("/Game/Survival_SFX/User_Interface/Button_press_1.Button_press_1"));
 	if (ClickSnd.Succeeded()) { ClickSound = ClickSnd.Object; }
 }
 
