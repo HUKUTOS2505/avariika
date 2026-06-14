@@ -537,6 +537,16 @@ OG Main Menu забраковали как фронт (целый чужой ф�
 - ⚠️ Грабли: `EditorAssetLibrary.delete_directory` по тысячам ассетов МЕДЛЕННО (редактор не отвечает на ping, пока грызёт) + Claudius-таймаут 300с вернулся раньше конца. OGMainMenu реестром не дочистился — добил `rm` на диске (закрыл редактор). Пустые папки Hyper — `find -empty`.
 - **Content: ~29 → 15 ГБ** (за обе уборки суммарно −~47 ГБ). Удалённые паки были untracked/gitignore — git rm не нужен; почистил stale-строки в `.gitignore`.
 
+### VFX — подключены из бесплатных (2026-06-14)
+Вердикт: бесплатных VFX ХВАТАЕТ (NiagaraExamples + Fire_EXP + Hyper-погода). Докупать к релизу опц.: Niagara Realistic Starter VFX **2**, опц. All Explosion Pack, Blood (если гор). НЕ брать: Sci-Fi/Rocket/Plane/Water/Cascade-версии. (Подробно в ASSETS.md.)
+- Модуль **Niagara** в `Avaryo.Build.cs`. Подключил 3 хука в `ARepairable` (FObjectFinder, EditAnywhere — переопределяемо в BP):
+  - **Взрыв газа** → `NS_Explosion` (NiagaraExamples) в `MulticastExplosionShake` — у всех.
+  - **Замыкание щитка** → `NS_Spark_Burst` (NiagaraExamples) в `ShortCircuit` — на сервере/хосте (клиентам мультикастом позже).
+  - **Утечка газа** → зацикленный `NS_Smoke_Plume` (NiagaraExamples), `SpawnSystemAttached` на трубу, лайфсайкл в `RefreshStatusVisual` (broken+leaks → spawn, fixed → deactivate+destroy). Работает на всех машинах (через OnRep_Broken).
+- Foam огнетушителя — отдельный пак не нужен (подделать белой частицей позже).
+- Собрано (Niagara dep → закрытый Build.bat), перезапущено, FObjectFinder-ошибок нет.
+- Очередь VFX дальше: огонь на горящей трубе/генераторе (Fire_EXP циклы), обломки при взрыве (Fire_EXP debris), foam-струя.
+
 ### Продолжение (автономка, редактор открыт, Live Coding)
 - **Кооп-харднинг добит закрытой сборкой** (`b4a80bc`): репликация новых зеркальных полей `ARunState` (касса/уровни апгрейдов/карьера хосту→клиенту) ЗАРЕГИСТРИРОВАНА чистым Build.bat (Live Coding репликацию не регистрирует), редактор перезапущен. `RepairerToolQuality`/`DrawShop`/«Акт» читают из `ARunState`, а не из host-only леджера. `APickupItem::ToolQualityScale` теперь Replicated.
 - **Шумомер: пик-холд** (`6b37f6f`): `GetSelfNoise01` раньше затухал линейно за 0.8 с → одиночный блип (икота 0.3, севшая батарея 0.5) мелькал <1 с, юзер не ловил (#8/#9/#12 «не работало»). Теперь пик держится `SelfNoiseHoldTime`=0.45 с, потом спад `SelfNoiseDecayTime`=1.4 с (оба EditAnywhere). `DebugSetBattery(0)` теперь сам триггерит испуг (паника+шум) → `AvBattery 0` показывает мгновенно (фонарь должен быть ВКЛ). Логика испуга вынесена в `TriggerDeadBatteryFright` (общая для разряда и дев-команды).

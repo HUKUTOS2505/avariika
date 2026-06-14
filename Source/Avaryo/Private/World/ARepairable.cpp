@@ -14,6 +14,9 @@
 #include "GameFramework/PlayerController.h"
 #include "Items/APickupItem.h"
 #include "Kismet/GameplayStatics.h"
+#include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
+#include "NiagaraSystem.h"
 #include "Net/UnrealNetwork.h"
 #include "Sound/SoundBase.h"
 #include "UI/AvaryoCameraShakes.h"
@@ -70,6 +73,14 @@ ARepairable::ARepairable()
 	if (RepairSnd.Succeeded()) { RepairDoneSound = RepairSnd.Object; }
 	static ConstructorHelpers::FObjectFinder<USoundBase> HitSnd(TEXT("/Game/Survival_SFX/Craft/Anvil_hit_1.Anvil_hit_1"));
 	if (HitSnd.Succeeded()) { MinigameHitSound = HitSnd.Object; }
+
+	// VFX по умолчанию (из бесплатных паков; переопределяемы в Blueprint)
+	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> ExpFX(TEXT("/Game/NiagaraExamples/FX_Explosions/NS_Explosion.NS_Explosion"));
+	if (ExpFX.Succeeded()) { ExplosionFX = ExpFX.Object; }
+	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> SpkFX(TEXT("/Game/NiagaraExamples/FX_Sparks/NS_Spark_Burst.NS_Spark_Burst"));
+	if (SpkFX.Succeeded()) { SparkFX = SpkFX.Object; }
+	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> GasFX(TEXT("/Game/NiagaraExamples/FX_Smoke/NS_Smoke_Plume.NS_Smoke_Plume"));
+	if (GasFX.Succeeded()) { GasLeakFX = GasFX.Object; }
 
 	MinigameType = ERepairMinigameType::None;
 	HitsToRepair = 4;
@@ -899,6 +910,10 @@ void ARepairable::ShortCircuit(AAvaryoCharacter* Culprit)
 		}
 	}
 	MakeNoise(1.5f, Culprit, GetActorLocation());
+	if (SparkFX) // искры дуги (на листен-сервере видит хост; клиентам — позже мультикастом)
+	{
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, SparkFX, GetActorLocation() + FVector(0, 0, 60.f), GetActorRotation());
+	}
 
 	LockoutRemaining = LockoutDuration;
 	EndRepairBy(Culprit); // выкидывает из мини-игры и снимает блокировку ввода
@@ -971,6 +986,10 @@ void ARepairable::MulticastExplosionShake_Implementation()
 	{
 		UGameplayStatics::PlaySoundAtLocation(this, ExplosionSound, GetActorLocation());
 	}
+	if (ExplosionFX)
+	{
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ExplosionFX, GetActorLocation(), GetActorRotation());
+	}
 }
 
 void ARepairable::OnRep_Broken()
@@ -980,6 +999,20 @@ void ARepairable::OnRep_Broken()
 
 void ARepairable::RefreshStatusVisual()
 {
+	// Газовое облако: висит на трубе пока сломана+травит, гаснет при починке (на всех машинах).
+	const bool bLeakingNow = bBroken && bLeaksGasWhenBroken;
+	if (bLeakingNow && GasLeakFX && !GasFXComp)
+	{
+		GasFXComp = UNiagaraFunctionLibrary::SpawnSystemAttached(GasLeakFX, MeshComponent, NAME_None,
+			FVector(0.f, 0.f, 60.f), FRotator::ZeroRotator, EAttachLocation::KeepRelativeOffset, false);
+	}
+	else if (!bLeakingNow && GasFXComp)
+	{
+		GasFXComp->Deactivate();
+		GasFXComp->DestroyComponent();
+		GasFXComp = nullptr;
+	}
+
 	if (!StatusText)
 	{
 		return;

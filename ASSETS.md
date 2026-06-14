@@ -46,8 +46,13 @@
 | Пак | Папка | Размер | git | Исп. | Что это |
 |---|---|---|---|---|---|
 | **Hyper Dynamic Weather & Sky** (обрезан) | `Hyper` | **106M** | локально | 📦 | оставлены ТОЛЬКО погодные Niagara (NS_Rain/ThunderStorm/Blizzard/…) + ночное небо (SkySphere/Moon/Stars/Clouds) + их зависимости. ~6 ГБ природного балласта вычищено (Environments/Tileable/Locomotion/фреймворк). |
-| **NiagaraExamples** | `NiagaraExamples` | 1.2G | локально | 🔧 | движковые примеры VFX (бесплатно, вернётся одной кнопкой) |
-| **Fire_EXP Vol.01 (Free)** | `Fire_EXP_Vol01_Free` | 47M | локально | 📦 | огонь-VFX (бесплатный) |
+| **NiagaraExamples** | `NiagaraExamples` | 1.2G | локально | 📦 | движковые примеры VFX (бесплатно): взрывы (FX_Explosions), огонь, дым, искры, туман |
+| **Fire_EXP Vol.01 (Free)** | `Fire_EXP_Vol01_Free` | 47M | локально | 📦 | огонь (циклы)/взрыв/искры/обломки (бесплатный) |
+
+**VFX-покрытие (вывод 2026-06-14): на разработку/прототип бесплатных ХВАТАЕТ.**
+- взрыв газа → NiagaraExamples FX_Explosions / Fire_EXP NS_Sub_EXP_* · огонь → Fire_EXP циклы · дым/облако → NiagaraExamples · искры/замыкание → NiagaraExamples+Fire_EXP · обломки → Fire_EXP · дождь/гроза → Hyper. Foam огнетушителя — белой частицей.
+- **Докупить ПОТОМ (опц., для лоска):** 1) Niagara Realistic Starter VFX Pack **2** (огонь/дым/искры/взрыв, Niagara) — лучший один пак; 2) All Explosion Pack (1 том) — кинематографичный бабах, если захочется; 3) Blood Starter VFX — только если решим видимую кровь.
+- **НЕ покупать:** Niagara Sci-Fi, Rocket, Plane Crash, Water Starter; Realistic Starter v1/v2 на **Cascade** (брать Niagara-версию).
 
 ---
 

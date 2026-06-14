@@ -17,7 +17,8 @@ public class Avaryo : ModuleRules
 			"EngineCameras", // PerlinNoiseCameraShakePattern для тряски камеры
 			"OnlineSubsystem",      // кооп-сессии (NULL/LAN сейчас, EOS/Steam через конфиг)
 			"OnlineSubsystemUtils",  // хелперы сессий
-			"UMG"                    // CreateWidget для экрана настроек (Easy Options) из меню
+			"UMG",                   // CreateWidget для экрана настроек (Easy Options) из меню
+			"Niagara"                // VFX: взрыв/искры/газовое облако
 		});
 	}
 }

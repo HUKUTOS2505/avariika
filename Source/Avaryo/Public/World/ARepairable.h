@@ -8,6 +8,8 @@ class AAvaryoCharacter;
 class UPointLightComponent;
 class UStaticMeshComponent;
 class USoundBase;
+class UNiagaraSystem;
+class UNiagaraComponent;
 class UTextRenderComponent;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnRepairFinished, ARepairable*, Repairable, AAvaryoCharacter*, FinishedBy);
@@ -443,6 +445,22 @@ protected:
 	/** Звук тычка в мини-игре (удар по курсору / докрутка вентиля / рывок стартера). */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Repairable|Audio")
 	TObjectPtr<USoundBase> MinigameHitSound;
+
+	/** VFX взрыва газа (одноразовый, у всех через мультикаст). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Repairable|VFX")
+	TObjectPtr<UNiagaraSystem> ExplosionFX;
+
+	/** VFX искр при замыкании щитка. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Repairable|VFX")
+	TObjectPtr<UNiagaraSystem> SparkFX;
+
+	/** VFX утечки газа (зацикленный, висит на трубе пока сломана). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Repairable|VFX")
+	TObjectPtr<UNiagaraSystem> GasLeakFX;
+
+	/** Хэндл играющего газового облака. */
+	UPROPERTY(Transient)
+	TObjectPtr<UNiagaraComponent> GasFXComp;
 
 	/** Последний показанный на табличке процент — чтобы не перерисовывать текст каждый кадр. */
 	int32 LastShownPercent;
