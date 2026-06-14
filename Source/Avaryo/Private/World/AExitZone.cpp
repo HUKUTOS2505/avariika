@@ -6,6 +6,7 @@
 #include "Engine/World.h"
 #include "EngineUtils.h"
 #include "Game/ARunState.h"
+#include "Net/UnrealNetwork.h"
 
 AExitZone::AExitZone()
 {
@@ -28,6 +29,12 @@ AExitZone::AExitZone()
 	Label->SetTextRenderColor(FColor(255, 140, 0)); // оранжевый акцент проекта
 
 	bTeamInside = false;
+}
+
+void AExitZone::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(AExitZone, bTeamInside);
 }
 
 void AExitZone::Tick(float DeltaSeconds)

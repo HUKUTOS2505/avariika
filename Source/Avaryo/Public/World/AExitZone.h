@@ -20,6 +20,7 @@ public:
 	AExitZone();
 
 	virtual void Tick(float DeltaSeconds) override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	/** Объём зоны. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="ExitZone")
@@ -34,6 +35,7 @@ public:
 	bool IsTeamInside() const { return bTeamInside; }
 
 protected:
-	/** Кэш последней проверки (сервер считает, не реплицируется — HUD сервера хватает). */
+	/** Вся ли команда в зоне. Сервер считает в Tick, реплицируется → клиентский HUD тоже видит. */
+	UPROPERTY(Replicated)
 	bool bTeamInside;
 };
