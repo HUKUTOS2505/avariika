@@ -478,6 +478,11 @@ Greybox `L_Hospital` (каркас+комнаты+квест-акторы) по�
 - **OG Main Menu System** (проект YJW57 в zip) → `Content/OGMainMenu` (611 ассетов, `/Game/OGMainMenu/`) + `Content/Movies` (6.7М, фоны) + `Content/Localization` + только свои external-actors/objects (`OGMainMenu`). Карты: **MainMenu, LobbyMap**, Dungeon/Prison/Temple (демо), TransitionMap. Виджеты: **AWBP_CreateMatch / AWBP_GameMode / AWBP_GameKeys** и т.д. — меню заточено под мультиплеер-сессии, ляжет на EOSCore. ⚠️ ещё НЕ wired в игровой флоу (нужно решить: делать ли MainMenu стартовой картой + связать CreateMatch с нашими сессиями).
 - **Citizens_Pack** → `Content/Citizens_Pack` (115 ассетов, `/Game/Citizens_Pack/`, карта Citizens_Pack_Map) — NPC-горожане под пациентов/персонал больницы.
 
+**Доимпорт 2 (по просьбе):**
+- **HyperDynamicWeatherSky 5.6** (проект, `/Game/Hyper/`) → `Content/Hyper` (1240 ассетов, 6.3 ГБ — целиком: weather-пресеты DA_Blizzard/Clear/Cloudy/Foggy ссылаются на ResourcePack/Locomotion, 78+11 рефов, cherry-pick сломал бы рефы). ⚠️ Система **компонентная на GameState/PlayerController** (`AC_Biome_WeatherManager_Abstract`, `AC_PlayerController_WeatherManager_Abstract`) — НЕ drop-in, требует врезки в наш фреймворк или их демо-карту. Локальный (gitignore).
+
+**⚠️ ВАЖНОЕ ОТКРЫТИЕ — «меню» это целый фреймворк.** OG Main Menu — НЕ просто экран, а полный мульти-плеер game-framework (свои `BP_GameInstance`, `GM_Base/Game/Lobby/MainMenu`, `GS_*`, `HUD_*`, `BP_PlayerController`, CommonUI-стек `UI/CoreUI`, кастомизация/чат/квесты). Конфликтует с нашим (`BP_AvaryoGameMode`, `AAvaryoCharacter`, `ARunState`, `AvaryoHUD`). Цвета централизованы НЕ в одном дата-ассете, а в CommonUI-стилях (`CTS_*_Color` текст, `Button_Main`, `Border_BlackWithColorOutline`). Headless-перекраска через Python хрупкая (generated_class() у этих BP отдаёт None). **Вывод:** мерж двух фреймворков вслепую — высокий риск; направление выбирает пользователь (см. варианты в чате 2026-06-14). НЕ начинал wiring/перекраску до решения.
+
 **Осталось в `новое`:** только `pos_fbx` (POS-терминал, FBX) — импорт в фазе звуков/магазина (пользователь отложил). Остальное из `новое` можно удалять.
 
 **НЕ в `новое`, ждём от пользователя:** Hospital COMBO Prop Pack VOL 1-6, Modern Hospital Environment (229 — уже есть Leartes), Hyper Dynamic Weather & Sky.

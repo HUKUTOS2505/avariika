@@ -60,6 +60,7 @@ Content/OGMainMenu/
 Content/__ExternalActors__/OGMainMenu/
 Content/__ExternalObjects__/OGMainMenu/
 Content/Citizens_Pack/
+Content/Hyper/
 
 # Временные отладочные скрипты (префикс _)
 Scripts/_*.py
