@@ -246,6 +246,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Audio")
 	TObjectPtr<USoundBase> PickupSound;
 
+	/** Звук применения предмета (аптечка/кофе/сигарета/прожектор и т.п.). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Audio")
+	TObjectPtr<USoundBase> UseSound;
+
 	/** Шкалы: HP, паника, выносливость, туалет. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Avaryo")
 	TObjectPtr<UVitalsComponent> VitalsComponent;

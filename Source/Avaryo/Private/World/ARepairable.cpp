@@ -1,6 +1,7 @@
 #include "World/ARepairable.h"
 
 #include "AvaryoCharacter.h"
+#include "Components/AudioComponent.h"
 #include "Components/PointLightComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/TextRenderComponent.h"
@@ -81,6 +82,18 @@ ARepairable::ARepairable()
 	if (SpkFX.Succeeded()) { SparkFX = SpkFX.Object; }
 	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> GasFX(TEXT("/Game/NiagaraExamples/FX_Smoke/NS_Smoke_Plume.NS_Smoke_Plume"));
 	if (GasFX.Succeeded()) { GasLeakFX = GasFX.Object; }
+
+	// Звуки установки/заливки
+	static ConstructorHelpers::FObjectFinder<USoundBase> InsSnd(TEXT("/Game/Survival_SFX/Craft/Building_item_remove_1.Building_item_remove_1"));
+	if (InsSnd.Succeeded()) { InsertSound = InsSnd.Object; }
+	static ConstructorHelpers::FObjectFinder<USoundBase> FillSnd(TEXT("/Game/Survival_SFX/Craft/Crafting_wood_item_1.Crafting_wood_item_1"));
+	if (FillSnd.Succeeded()) { FillLoopSound = FillSnd.Object; }
+
+	// Луп заливки/прокладки — компонент, гоняется в Tick по bPrereqAutoFilling
+	FillAudioComp = CreateDefaultSubobject<UAudioComponent>(TEXT("FillAudio"));
+	FillAudioComp->SetupAttachment(MeshComponent);
+	FillAudioComp->bAutoActivate = false;
+	if (FillLoopSound) { FillAudioComp->SetSound(FillLoopSound); }
 
 	MinigameType = ERepairMinigameType::None;
 	HitsToRepair = 4;
@@ -209,6 +222,10 @@ bool ARepairable::TryInsertBy(AAvaryoCharacter* Who)
 	PrereqIndex++;
 	PrereqProgress = 0.f;
 	MakeNoise(0.6f, Who, GetActorLocation());
+	if (InsertSound) // звук установки (на листен-сервере слышит хост)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, InsertSound, GetActorLocation());
+	}
 	RefreshStatusVisual();
 	return true;
 }
@@ -216,6 +233,14 @@ bool ARepairable::TryInsertBy(AAvaryoCharacter* Who)
 void ARepairable::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
+
+	// Луп заливки/прокладки (на всех машинах — bPrereqAutoFilling реплицируется)
+	if (FillAudioComp)
+	{
+		const bool bPlaying = FillAudioComp->IsPlaying();
+		if (bPrereqAutoFilling && !bPlaying) { FillAudioComp->Play(); }
+		else if (!bPrereqAutoFilling && bPlaying) { FillAudioComp->Stop(); }
+	}
 
 	// Сервер: блокировка после замыкания тает
 	if (HasAuthority() && LockoutRemaining > 0.f)
@@ -910,9 +935,10 @@ void ARepairable::ShortCircuit(AAvaryoCharacter* Culprit)
 		}
 	}
 	MakeNoise(1.5f, Culprit, GetActorLocation());
-	if (SparkFX) // искры дуги (на листен-сервере видит хост; клиентам — позже мультикастом)
+	if (SparkFX) // мелкие искры дуги (на листен-сервере видит хост; клиентам — позже мультикастом)
 	{
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, SparkFX, GetActorLocation() + FVector(0, 0, 60.f), GetActorRotation());
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, SparkFX, GetActorLocation() + FVector(0, 0, 60.f),
+			GetActorRotation(), FVector(SparkScale));
 	}
 
 	LockoutRemaining = LockoutDuration;
@@ -1004,7 +1030,8 @@ void ARepairable::RefreshStatusVisual()
 	if (bLeakingNow && GasLeakFX && !GasFXComp)
 	{
 		GasFXComp = UNiagaraFunctionLibrary::SpawnSystemAttached(GasLeakFX, MeshComponent, NAME_None,
-			FVector(0.f, 0.f, 60.f), FRotator::ZeroRotator, EAttachLocation::KeepRelativeOffset, false);
+			GasFXOffset, FRotator::ZeroRotator, EAttachLocation::KeepRelativeOffset, false);
+		if (GasFXComp) { GasFXComp->SetRelativeScale3D(FVector(GasFXScale)); }
 	}
 	else if (!bLeakingNow && GasFXComp)
 	{

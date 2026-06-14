@@ -141,6 +141,8 @@ AAvaryoCharacter::AAvaryoCharacter()
 	}
 	static ConstructorHelpers::FObjectFinder<USoundBase> PickSnd(TEXT("/Game/Survival_SFX/User_Interface/Metal_item_pick_up.Metal_item_pick_up"));
 	if (PickSnd.Succeeded()) { PickupSound = PickSnd.Object; }
+	static ConstructorHelpers::FObjectFinder<USoundBase> UseSnd(TEXT("/Game/Survival_SFX/Craft/Crafting_cloth_item_1.Crafting_cloth_item_1"));
+	if (UseSnd.Succeeded()) { UseSound = UseSnd.Object; }
 }
 
 void AAvaryoCharacter::BeginPlay()
@@ -1542,6 +1544,12 @@ void AAvaryoCharacter::ApplyItemEffect(APickupItem* Item)
 	if (!HasAuthority() || !Item || !VitalsComponent)
 	{
 		return;
+	}
+
+	// Звук применения предмета (на листен-сервере слышит хост)
+	if (UseSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, UseSound, GetActorLocation());
 	}
 
 	switch (Item->ItemEffect)

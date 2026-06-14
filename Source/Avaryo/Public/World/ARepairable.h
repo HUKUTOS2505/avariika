@@ -10,6 +10,7 @@ class UStaticMeshComponent;
 class USoundBase;
 class UNiagaraSystem;
 class UNiagaraComponent;
+class UAudioComponent;
 class UTextRenderComponent;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnRepairFinished, ARepairable*, Repairable, AAvaryoCharacter*, FinishedBy);
@@ -446,6 +447,18 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Repairable|Audio")
 	TObjectPtr<USoundBase> MinigameHitSound;
 
+	/** Звук установки расходника (кабель/канистра/предохранитель вставлен). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Repairable|Audio")
+	TObjectPtr<USoundBase> InsertSound;
+
+	/** Зацикленный звук этапа AutoFill (прокладка кабеля / заливка) — играет, пока полоска ползёт. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Repairable|Audio")
+	TObjectPtr<USoundBase> FillLoopSound;
+
+	/** Хэндл лупа заливки. */
+	UPROPERTY(Transient)
+	TObjectPtr<UAudioComponent> FillAudioComp;
+
 	/** VFX взрыва газа (одноразовый, у всех через мультикаст). */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Repairable|VFX")
 	TObjectPtr<UNiagaraSystem> ExplosionFX;
@@ -457,6 +470,18 @@ protected:
 	/** VFX утечки газа (зацикленный, висит на трубе пока сломана). */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Repairable|VFX")
 	TObjectPtr<UNiagaraSystem> GasLeakFX;
+
+	/** Смещение газового облака от меша (опускаем, чтобы не висело высоко). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Repairable|VFX")
+	FVector GasFXOffset = FVector(0.f, 0.f, 10.f);
+
+	/** Масштаб газового облака (меньше = ниже/дешевле). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Repairable|VFX", meta=(ClampMin="0.05"))
+	float GasFXScale = 0.35f;
+
+	/** Масштаб искр замыкания (мелкие). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Repairable|VFX", meta=(ClampMin="0.05"))
+	float SparkScale = 0.6f;
 
 	/** Хэндл играющего газового облака. */
 	UPROPERTY(Transient)
