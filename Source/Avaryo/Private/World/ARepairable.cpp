@@ -69,7 +69,7 @@ ARepairable::ARepairable()
 	LastShownPercent = -1;
 
 	// Звуки по умолчанию (можно переопределить в Blueprint)
-	static ConstructorHelpers::FObjectFinder<USoundBase> ExplosionSnd(TEXT("/Game/Audio/SFX/Explosion.Explosion"));
+	static ConstructorHelpers::FObjectFinder<USoundBase> ExplosionSnd(TEXT("/Game/Audio/SFX/Hazard/Hazard_ExplosionGas_1.Hazard_ExplosionGas_1"));
 	if (ExplosionSnd.Succeeded()) { ExplosionSound = ExplosionSnd.Object; }
 	static ConstructorHelpers::FObjectFinder<USoundBase> RepairSnd(TEXT("/Game/Audio/SFX/RepairDone.RepairDone"));
 	if (RepairSnd.Succeeded()) { RepairDoneSound = RepairSnd.Object; }
@@ -87,8 +87,8 @@ ARepairable::ARepairable()
 	// Звук утечки газа ВЫКЛ по просьбе (нынешний — «свист-свист»); вернём с нормальным газ-эффектом
 	// static ConstructorHelpers::FObjectFinder<USoundBase> HissSnd(TEXT("/Game/Audio/SFX/GasHiss.GasHiss"));
 	// if (HissSnd.Succeeded()) { GasHissSound = HissSnd.Object; }
-	// Бульканье (Magic Water) — на ЗАЛИВ БЕНЗИНА (генератор), а не на кофе
-	static ConstructorHelpers::FObjectFinder<USoundBase> FuelSnd(TEXT("/Game/Audio/SFX/DrinkGlug.DrinkGlug"));
+	// Залив бензина (генератор) — настоящий бульк-луп (Magic Water glug)
+	static ConstructorHelpers::FObjectFinder<USoundBase> FuelSnd(TEXT("/Game/Audio/SFX/Repair/Repair_FuelFill_Loop.Repair_FuelFill_Loop"));
 	if (FuelSnd.Succeeded()) { FuelFillSound = FuelSnd.Object; }
 
 	GasHissComp = CreateDefaultSubobject<UAudioComponent>(TEXT("GasHissAudio"));
@@ -104,8 +104,8 @@ ARepairable::ARepairable()
 	GasHissComp->AttenuationOverrides.AttenuationShapeExtents = FVector(150.f, 0.f, 0.f); // радиус полной громкости ~1.5 м
 	GasHissComp->AttenuationOverrides.FalloffDistance = 2500.f; // дальше плавно гаснет до тишины (~26 м)
 
-	// Звуки установки/заливки (установка = металлический клик «вставлено», а не «уронил»)
-	static ConstructorHelpers::FObjectFinder<USoundBase> InsSnd(TEXT("/Game/Survival_SFX/User_Interface/Metal_item_pick_up.Metal_item_pick_up"));
+	// Установка расходника — металлический клик «вставлено» (Nut Driver), а не «уронил»
+	static ConstructorHelpers::FObjectFinder<USoundBase> InsSnd(TEXT("/Game/Audio/SFX/Repair/Repair_Insert_1.Repair_Insert_1"));
 	if (InsSnd.Succeeded()) { InsertSound = InsSnd.Object; }
 	static ConstructorHelpers::FObjectFinder<USoundBase> FillSnd(TEXT("/Game/Survival_SFX/Craft/Crafting_wood_item_1.Crafting_wood_item_1"));
 	if (FillSnd.Succeeded()) { FillLoopSound = FillSnd.Object; }
@@ -115,12 +115,35 @@ ARepairable::ARepairable()
 	if (EngSnd.Succeeded()) { EngineStartSound = EngSnd.Object; }
 	static ConstructorHelpers::FObjectFinder<USoundBase> ShortSnd(TEXT("/Game/Audio/SFX/ElectricZap.ElectricZap"));
 	if (ShortSnd.Succeeded()) { ShortCircuitSound = ShortSnd.Object; }
+	// Вентиль: трещотка ключа на тык + срыв резьбы (Garage Impact Wrench / Tire Pressure)
+	static ConstructorHelpers::FObjectFinder<USoundBase> ValveSnd(TEXT("/Game/Audio/SFX/Repair/Repair_ValveRatchet_1.Repair_ValveRatchet_1"));
+	if (ValveSnd.Succeeded()) { ValveTurnSound = ValveSnd.Object; }
+	static ConstructorHelpers::FObjectFinder<USoundBase> SlipSnd(TEXT("/Game/Audio/SFX/Repair/Repair_ValveStrip_1.Repair_ValveStrip_1"));
+	if (SlipSnd.Succeeded()) { ValveSlipSound = SlipSnd.Object; }
+	// Стартер: натяжение шнура (луп) + холостой ход двигателя после запуска (луп)
+	static ConstructorHelpers::FObjectFinder<USoundBase> PullSnd(TEXT("/Game/Audio/SFX/Repair/Repair_GenPull_Loop.Repair_GenPull_Loop"));
+	if (PullSnd.Succeeded()) { StarterPullLoopSound = PullSnd.Object; }
+	static ConstructorHelpers::FObjectFinder<USoundBase> IdleSnd(TEXT("/Game/Audio/SFX/Repair/Repair_EngineIdle_Loop.Repair_EngineIdle_Loop"));
+	if (IdleSnd.Succeeded()) { EngineIdleSound = IdleSnd.Object; }
 
-	// Луп заливки/прокладки — компонент, гоняется в Tick по bPrereqAutoFilling
+	// Луп заливки/прокладки/натяга — компонент, гоняется в Tick по состоянию
 	FillAudioComp = CreateDefaultSubobject<UAudioComponent>(TEXT("FillAudio"));
 	FillAudioComp->SetupAttachment(MeshComponent);
 	FillAudioComp->bAutoActivate = false;
 	if (FillLoopSound) { FillAudioComp->SetSound(FillLoopSound); }
+
+	// Холостой ход генератора: отдельный луп, играет пока объект-стартер починен (3D-затухание).
+	EngineIdleComp = CreateDefaultSubobject<UAudioComponent>(TEXT("EngineIdleAudio"));
+	EngineIdleComp->SetupAttachment(MeshComponent);
+	EngineIdleComp->bAutoActivate = false;
+	EngineIdleComp->SetVolumeMultiplier(0.5f);
+	if (EngineIdleSound) { EngineIdleComp->SetSound(EngineIdleSound); }
+	EngineIdleComp->bOverrideAttenuation = true;
+	EngineIdleComp->AttenuationOverrides.bAttenuate = true;
+	EngineIdleComp->AttenuationOverrides.bSpatialize = true;
+	EngineIdleComp->AttenuationOverrides.AttenuationShape = EAttenuationShape::Sphere;
+	EngineIdleComp->AttenuationOverrides.AttenuationShapeExtents = FVector(300.f, 0.f, 0.f); // полный объём ~3 м
+	EngineIdleComp->AttenuationOverrides.FalloffDistance = 3000.f;                            // дальше гаснет
 
 	MinigameType = ERepairMinigameType::None;
 	HitsToRepair = 4;
@@ -271,6 +294,7 @@ void ARepairable::Tick(float DeltaSeconds)
 			WantLoop = (MinigameType == ERepairMinigameType::Starter && FuelFillSound) ? FuelFillSound : FillLoopSound;
 		}
 		else if (bDoingPrereqHold && !bBotching) { WantLoop = WeldLoopSound; } // сварка (колхоз руками — без дуги)
+		else if (bStarterPulling && StarterPullLoopSound) { WantLoop = StarterPullLoopSound; } // натяг шнура стартера
 		if (WantLoop)
 		{
 			if (FillAudioComp->Sound != WantLoop) { FillAudioComp->SetSound(WantLoop); FillAudioComp->Play(); }
@@ -280,6 +304,14 @@ void ARepairable::Tick(float DeltaSeconds)
 		{
 			FillAudioComp->Stop();
 		}
+	}
+
+	// Холостой ход генератора: на всех машинах по реплицируемому bBroken — гудит, пока стартер-объект починен.
+	if (EngineIdleComp && EngineIdleSound)
+	{
+		const bool bWantIdle = (MinigameType == ERepairMinigameType::Starter) && !bBroken;
+		if (bWantIdle && !EngineIdleComp->IsPlaying()) { EngineIdleComp->Play(); }
+		else if (!bWantIdle && EngineIdleComp->IsPlaying()) { EngineIdleComp->Stop(); }
 	}
 
 	// Сервер: блокировка после замыкания тает
@@ -760,9 +792,11 @@ void ARepairable::TryHitBy(AAvaryoCharacter* Who)
 		return;
 	}
 
-	// Тактильный «тык» мини-игры — у всех. Для стартера НЕ играем (там тык в начале не к месту;
-	// нужен звук «завёлся» в зелёной зоне — ждёт индустриального пака).
-	if (MinigameHitSound && MinigameType != ERepairMinigameType::Starter)
+	// Тактильный «тык» мини-игры — у всех. Стартер: тык в начале не к месту (звук натяга — луп).
+	// Вентиль: свой звук трещотки/срыва играем в HandleValveTurn (по исходу), а не общий «тык».
+	if (MinigameHitSound
+		&& MinigameType != ERepairMinigameType::Starter
+		&& MinigameType != ERepairMinigameType::Valve)
 	{
 		MulticastSound(MinigameHitSound, GetActorLocation(), 0.5f);
 	}
@@ -900,11 +934,13 @@ void ARepairable::HandleValveTurn(AAvaryoCharacter* Who)
 		// Засуетился — резьба сорвалась, вентиль провернулся назад с громким шипением
 		RepairProgress = FMath::Max(RepairProgress - ValveSlipPenalty, 0.f);
 		MakeNoise(1.f, Who, GetActorLocation());
+		if (ValveSlipSound) { MulticastSound(ValveSlipSound, GetActorLocation(), 1.f); } // срыв резьбы — у всех
 	}
 	else
 	{
 		RepairProgress = FMath::Min(RepairProgress + ValveTurnAmount, 1.f);
 		MakeNoise(0.4f, Who, GetActorLocation());
+		if (ValveTurnSound) { MulticastSound(ValveTurnSound, GetActorLocation(), 0.8f); } // трещотка — у всех
 		if (RepairProgress >= 1.f)
 		{
 			FinishRepair(Who);

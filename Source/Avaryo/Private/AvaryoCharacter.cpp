@@ -170,6 +170,20 @@ AAvaryoCharacter::AAvaryoCharacter()
 
 	static ConstructorHelpers::FObjectFinder<USoundBase> JumpSnd(TEXT("/Game/Survival_SFX/Movement/Jump_stone.Jump_stone"));
 	if (JumpSnd.Succeeded()) { JumpSound = JumpSnd.Object; }
+	// Падение тела (споткнулся/поскользнулся) — глухой удар о бетон
+	static ConstructorHelpers::FObjectFinder<USoundBase> FallSnd(TEXT("/Game/Audio/SFX/Foley/Foley_BodyFall_1.Foley_BodyFall_1"));
+	if (FallSnd.Succeeded()) { FallSound = FallSnd.Object; }
+
+	// Струя огнетушителя — луп, гоняется в Tick по IsSpraying() (реплицируется → у всех)
+	ExtinguisherAudio = CreateDefaultSubobject<UAudioComponent>(TEXT("ExtinguisherAudio"));
+	ExtinguisherAudio->SetupAttachment(RootComponent);
+	ExtinguisherAudio->bAutoActivate = false;
+	static ConstructorHelpers::FObjectFinder<USoundBase> SpraySnd(TEXT("/Game/Audio/SFX/Item/Item_ExtinguisherSpray_Loop.Item_ExtinguisherSpray_Loop"));
+	if (SpraySnd.Succeeded())
+	{
+		ExtinguisherSprayLoopSound = SpraySnd.Object;
+		ExtinguisherAudio->SetSound(SpraySnd.Object);
+	}
 }
 
 void AAvaryoCharacter::BeginPlay()
@@ -240,6 +254,15 @@ void AAvaryoCharacter::Tick(float DeltaSeconds)
 			UseCastAudio->Stop();
 			UseCastAudio->SetSound(nullptr);
 		}
+	}
+
+	// Струя огнетушителя: луп, пока удерживаемый баллон распыляет (bSpraying реплицируется → у всех).
+	if (ExtinguisherAudio && ExtinguisherSprayLoopSound)
+	{
+		const APickupItem* Held = GetHeldItem();
+		const bool bSpray = Held && Held->IsSpraying();
+		if (bSpray && !ExtinguisherAudio->IsPlaying()) { ExtinguisherAudio->Play(); }
+		else if (!bSpray && ExtinguisherAudio->IsPlaying()) { ExtinguisherAudio->Stop(); }
 	}
 
 	// Подсказки "[E] Подобрать" / "[E] Чинить" нужны только локальному игроку
@@ -2161,6 +2184,7 @@ void AAvaryoCharacter::TriggerStumble()
 	StumbleUntil = GetWorld()->GetTimeSeconds() + TripRecoverTime;
 	MakeNoise(0.7f, this, GetActorLocation()); // грохнулся — слышно
 	RegisterSelfNoise(0.7f);
+	if (FallSound) { MulticastSound(FallSound, GetActorLocation(), 0.9f); } // удар тела о пол — у всех
 	if (ARunState* Run = ARunState::Get(GetWorld()))
 	{
 		Run->NotifyTripped(this);

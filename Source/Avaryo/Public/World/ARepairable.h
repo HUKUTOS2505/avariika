@@ -479,9 +479,29 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Repairable|Audio")
 	TObjectPtr<USoundBase> ShortCircuitSound;
 
+	/** Звук докрутки вентиля на один тык (трещотка ключа). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Repairable|Audio")
+	TObjectPtr<USoundBase> ValveTurnSound;
+
+	/** Звук срыва резьбы вентиля (засуетился, тыкнул раньше времени). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Repairable|Audio")
+	TObjectPtr<USoundBase> ValveSlipSound;
+
+	/** Зацикленный звук натяжения шнура стартера (пока тянешь E). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Repairable|Audio")
+	TObjectPtr<USoundBase> StarterPullLoopSound;
+
+	/** Зацикленный холостой ход двигателя — играет, пока генератор починен (весь забег). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Repairable|Audio")
+	TObjectPtr<USoundBase> EngineIdleSound;
+
 	/** Хэндл лупа заливки. */
 	UPROPERTY(Transient)
 	TObjectPtr<UAudioComponent> FillAudioComp;
+
+	/** Хэндл холостого хода двигателя (генератор гудит после запуска). */
+	UPROPERTY(Transient)
+	TObjectPtr<UAudioComponent> EngineIdleComp;
 
 	/** VFX взрыва газа (одноразовый, у всех через мультикаст). */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Repairable|VFX")

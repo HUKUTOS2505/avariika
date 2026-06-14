@@ -290,6 +290,18 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Audio")
 	TObjectPtr<USoundBase> RadioToggleSound;
 
+	/** Звук падения тела (споткнулся/поскользнулся — удар о пол). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Audio")
+	TObjectPtr<USoundBase> FallSound;
+
+	/** Зацикленный звук струи огнетушителя (пока распыляешь). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Audio")
+	TObjectPtr<USoundBase> ExtinguisherSprayLoopSound;
+
+	/** Компонент струи огнетушителя — гонится в Tick по IsSpraying() удерживаемого баллона. */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Avaryo|Audio")
+	TObjectPtr<UAudioComponent> ExtinguisherAudio;
+
 	/** Проиграть звук у ВСЕХ игроков (кооп): сервер зовёт — слышат все. */
 	UFUNCTION(NetMulticast, Unreliable)
 	void MulticastSound(USoundBase* Sound, FVector Loc, float Vol);
