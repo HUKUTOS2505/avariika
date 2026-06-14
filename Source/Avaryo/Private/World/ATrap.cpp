@@ -10,6 +10,7 @@
 #include "Game/ARunState.h"
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
+#include "Sound/SoundBase.h"
 #include "UI/AvaryoCameraShakes.h"
 #include "UObject/ConstructorHelpers.h"
 
@@ -53,6 +54,11 @@ ATrap::ATrap()
 	bArmed = false;
 	bTriggered = false;
 	ArmedAtTime = 0.f;
+
+	static ConstructorHelpers::FObjectFinder<USoundBase> PlaceSnd(TEXT("/Game/Survival_SFX/Survival/Trap_place_1.Trap_place_1"));
+	if (PlaceSnd.Succeeded()) { PlaceSound = PlaceSnd.Object; }
+	static ConstructorHelpers::FObjectFinder<USoundBase> SnapSnd(TEXT("/Game/Survival_SFX/Survival/Trap_snap_1.Trap_snap_1"));
+	if (SnapSnd.Succeeded()) { SnapSound = SnapSnd.Object; }
 }
 
 void ATrap::BeginPlay()
@@ -62,6 +68,12 @@ void ATrap::BeginPlay()
 	if (TriggerSphere)
 	{
 		TriggerSphere->SetSphereRadius(TriggerRadius);
+	}
+
+	// Звук установки — на всех машинах (актор реплицируется, BeginPlay у каждого)
+	if (PlaceSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, PlaceSound, GetActorLocation());
 	}
 
 	if (HasAuthority())
@@ -163,4 +175,9 @@ void ATrap::MulticastFlash_Implementation()
 	}
 	UGameplayStatics::PlayWorldCameraShake(this, UExplosionCameraShake::StaticClass(),
 		GetActorLocation(), TriggerRadius * 0.5f, TriggerRadius * 3.f);
+
+	if (SnapSound) // срабатывание — у всех (мультикаст)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, SnapSound, GetActorLocation());
+	}
 }

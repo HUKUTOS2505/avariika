@@ -8,6 +8,7 @@ class AAvaryoCharacter;
 class UPointLightComponent;
 class USphereComponent;
 class UStaticMeshComponent;
+class USoundBase;
 
 /**
  * Растяжка-шумелка (§18 «предметы-ловушки»): монтёр ставит её из быстрого слота.
@@ -60,6 +61,14 @@ public:
 	float PlacerGraceTime;
 
 	UFUNCTION(BlueprintPure, Category="Trap") bool IsArmed() const { return bArmed; }
+
+	/** Звук установки растяжки. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Trap|Audio")
+	TObjectPtr<USoundBase> PlaceSound;
+
+	/** Звук срабатывания растяжки. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Trap|Audio")
+	TObjectPtr<USoundBase> SnapSound;
 
 protected:
 	/** Взведена (реплицируется для мигания индикатора). */
