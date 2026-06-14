@@ -16,6 +16,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "InputCoreTypes.h"
 #include "Game/ARunState.h"
+#include "Game/AvariikaOnlineSubsystem.h"
 #include "Game/CompanyLedgerSubsystem.h"
 #include "Items/ABioPickup.h"
 #include "Items/APickupItem.h"
@@ -998,6 +999,15 @@ void AAvaryoCharacter::AvBattery(float Pct)
 	if (FlashlightComponent) { FlashlightComponent->DebugSetBattery(Pct); }
 }
 void AAvaryoCharacter::ServerAvBattery_Implementation(float Pct) { AvBattery(Pct); }
+
+static UAvariikaOnlineSubsystem* GetOnline(AActor* A)
+{
+	return (A && A->GetGameInstance()) ? A->GetGameInstance()->GetSubsystem<UAvariikaOnlineSubsystem>() : nullptr;
+}
+void AAvaryoCharacter::AvHost()  { if (UAvariikaOnlineSubsystem* O = GetOnline(this)) { O->HostGame(); } }
+void AAvaryoCharacter::AvFind()  { if (UAvariikaOnlineSubsystem* O = GetOnline(this)) { O->FindGames(); } }
+void AAvaryoCharacter::AvJoin(int32 Index) { if (UAvariikaOnlineSubsystem* O = GetOnline(this)) { O->JoinGameByIndex(Index); } }
+void AAvaryoCharacter::AvLeave() { if (UAvariikaOnlineSubsystem* O = GetOnline(this)) { O->LeaveGame(); } }
 
 // ---------- Оператор: нагрудные камеры ----------
 

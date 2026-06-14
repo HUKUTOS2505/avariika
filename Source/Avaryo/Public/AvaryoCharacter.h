@@ -677,6 +677,16 @@ protected:
 	UFUNCTION(Exec)
 	void AvBattery(float Pct);
 
+	// ---------- Кооп-сессии (тест через 2 инстанса / PIE-2) ----------
+	/** Создать сессию и уехать на карту листен-сервером. */
+	UFUNCTION(Exec) void AvHost();
+	/** Найти открытые сессии (см. лог: «найдено: N»). */
+	UFUNCTION(Exec) void AvFind();
+	/** Подключиться к найденной сессии по индексу: `AvJoin 0`. */
+	UFUNCTION(Exec) void AvJoin(int32 Index);
+	/** Выйти/закрыть сессию. */
+	UFUNCTION(Exec) void AvLeave();
+
 	UFUNCTION(Server, Reliable)
 	void ServerAvVital(const FString& Which, float Value);
 

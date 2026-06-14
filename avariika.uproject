@@ -29,6 +29,14 @@
 		{
 			"Name": "meshy",
 			"Enabled": true
+		},
+		{
+			"Name": "OnlineSubsystem",
+			"Enabled": true
+		},
+		{
+			"Name": "OnlineSubsystemNull",
+			"Enabled": true
 		}
 	]
 }
