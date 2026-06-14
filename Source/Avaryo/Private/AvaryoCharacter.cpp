@@ -155,6 +155,11 @@ AAvaryoCharacter::AAvaryoCharacter()
 	if (WalkSnd.Succeeded()) { FootstepWalkSound = WalkSnd.Object; }
 	static ConstructorHelpers::FObjectFinder<USoundBase> RunSnd(TEXT("/Game/Survival_SFX/Movement/Jog_stone.Jog_stone"));
 	if (RunSnd.Succeeded()) { FootstepRunSound = RunSnd.Object; }
+
+	// Шаги — зацикленный цикл (клипы многошаговые), играем непрерывно во время движения
+	FootstepAudio = CreateDefaultSubobject<UAudioComponent>(TEXT("FootstepAudio"));
+	FootstepAudio->SetupAttachment(RootComponent);
+	FootstepAudio->bAutoActivate = false;
 }
 
 void AAvaryoCharacter::BeginPlay()
@@ -183,25 +188,31 @@ void AAvaryoCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	// Шаги — косметика: на всех машинах для каждого персонажа по его скорости.
-	if (FootstepWalkSound && GetCharacterMovement() && GetCharacterMovement()->IsMovingOnGround()
-		&& (!VitalsComponent || !VitalsComponent->IsWounded()))
+	// Шаги — зацикленный цикл (звуки многошаговые): играем непрерывно во время движения,
+	// переключая ходьба/бег; стоим — стоп. На всех машинах по скорости каждого персонажа.
+	if (FootstepAudio)
 	{
-		if (GetVelocity().Size2D() > 10.f)
+		const bool bMoving = GetCharacterMovement() && GetCharacterMovement()->IsMovingOnGround()
+			&& GetVelocity().Size2D() > 10.f && (!VitalsComponent || !VitalsComponent->IsWounded());
+		if (bMoving)
 		{
 			const bool bRun = VitalsComponent && VitalsComponent->IsSprinting();
-			FootstepAccum += DeltaSeconds;
-			if (FootstepAccum >= (bRun ? 0.28f : 0.48f))
+			USoundBase* Want = (bRun && FootstepRunSound) ? FootstepRunSound : FootstepWalkSound;
+			if (FootstepAudio->Sound != Want)
 			{
-				FootstepAccum = 0.f;
-				USoundBase* Step = (bRun && FootstepRunSound) ? FootstepRunSound : FootstepWalkSound;
-				const float Vol = bIsCrouched ? 0.3f : (bRun ? 0.55f : 0.45f);
-				UGameplayStatics::PlaySoundAtLocation(this, Step, GetActorLocation(), Vol);
+				FootstepAudio->SetSound(Want);
+				FootstepAudio->Play();
 			}
+			else if (!FootstepAudio->IsPlaying())
+			{
+				FootstepAudio->Play();
+			}
+			FootstepAudio->SetVolumeMultiplier(bIsCrouched ? 0.3f : (bRun ? 0.7f : 0.5f));
 		}
-		else
+		else if (FootstepAudio->Sound != nullptr)
 		{
-			FootstepAccum = 1.f; // стоим — следующий шаг сразу при начале движения
+			FootstepAudio->Stop();
+			FootstepAudio->SetSound(nullptr);
 		}
 	}
 

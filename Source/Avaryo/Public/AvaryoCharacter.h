@@ -269,6 +269,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Audio")
 	TObjectPtr<USoundBase> FootstepRunSound;
 
+	/** Зацикленный цикл шагов (звуки — многошаговые лупы, играем непрерывно, не по одному). */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Avaryo|Audio")
+	TObjectPtr<UAudioComponent> FootstepAudio;
+
 	/** Звук тумблера рации (вкл/выкл). */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Audio")
 	TObjectPtr<USoundBase> RadioToggleSound;
@@ -601,7 +605,6 @@ protected:
 
 	float SelfNoiseLevel = 0.f;  // последний пик «своего шума» 0..1 (для шумомера)
 	float SelfNoiseTime = 0.f;   // когда был пик (для затухания)
-	float FootstepAccum = 1.f;   // накопитель каденции шагов (косметический звук)
 
 	/** Сколько секунд пик шума держится на полную, прежде чем затухать (чтобы короткий блип — икота,
 	 *  севшая батарея — был читаем на шумомере, а не мелькал на доли секунды). */

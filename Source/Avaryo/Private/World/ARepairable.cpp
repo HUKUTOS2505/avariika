@@ -19,6 +19,7 @@
 #include "NiagaraFunctionLibrary.h"
 #include "NiagaraSystem.h"
 #include "Net/UnrealNetwork.h"
+#include "Sound/SoundAttenuation.h"
 #include "Sound/SoundBase.h"
 #include "UI/AvaryoCameraShakes.h"
 #include "UObject/ConstructorHelpers.h"
@@ -89,8 +90,15 @@ ARepairable::ARepairable()
 	GasHissComp = CreateDefaultSubobject<UAudioComponent>(TEXT("GasHissAudio"));
 	GasHissComp->SetupAttachment(MeshComponent);
 	GasHissComp->bAutoActivate = false;
-	GasHissComp->SetVolumeMultiplier(0.6f);
+	GasHissComp->SetVolumeMultiplier(0.55f);
 	if (GasHissSound) { GasHissComp->SetSound(GasHissSound); }
+	// Затухание по расстоянию: вблизи слышно, вдали — еле-еле шипение
+	GasHissComp->bOverrideAttenuation = true;
+	GasHissComp->AttenuationOverrides.bAttenuate = true;
+	GasHissComp->AttenuationOverrides.bSpatialize = true;
+	GasHissComp->AttenuationOverrides.AttenuationShape = EAttenuationShape::Sphere;
+	GasHissComp->AttenuationOverrides.AttenuationShapeExtents = FVector(150.f, 0.f, 0.f); // радиус полной громкости ~1.5 м
+	GasHissComp->AttenuationOverrides.FalloffDistance = 2500.f; // дальше плавно гаснет до тишины (~26 м)
 
 	// Звуки установки/заливки (установка = металлический клик «вставлено», а не «уронил»)
 	static ConstructorHelpers::FObjectFinder<USoundBase> InsSnd(TEXT("/Game/Survival_SFX/User_Interface/Metal_item_pick_up.Metal_item_pick_up"));
