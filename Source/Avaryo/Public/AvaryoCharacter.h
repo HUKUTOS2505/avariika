@@ -246,9 +246,28 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Audio")
 	TObjectPtr<USoundBase> PickupSound;
 
-	/** Звук применения предмета (аптечка/кофе/сигарета/прожектор и т.п.). */
+	/** Звук применения предмета (общий — кофе/прожектор и т.п.). */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Audio")
 	TObjectPtr<USoundBase> UseSound;
+
+	/** Звук аптечки (перевязка). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Audio")
+	TObjectPtr<USoundBase> HealSound;
+
+	/** Звук зажигалки (закурить — эффект Calm). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Audio")
+	TObjectPtr<USoundBase> SmokeSound;
+
+	/** Звук толчка (Q) — глухой удар. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Audio")
+	TObjectPtr<USoundBase> ShoveSound;
+
+	/** Шаги: шаг и бег (по камню — больница). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Audio")
+	TObjectPtr<USoundBase> FootstepWalkSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Audio")
+	TObjectPtr<USoundBase> FootstepRunSound;
 
 	/** Шкалы: HP, паника, выносливость, туалет. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Avaryo")
@@ -571,6 +590,7 @@ protected:
 
 	float SelfNoiseLevel = 0.f;  // последний пик «своего шума» 0..1 (для шумомера)
 	float SelfNoiseTime = 0.f;   // когда был пик (для затухания)
+	float FootstepAccum = 1.f;   // накопитель каденции шагов (косметический звук)
 
 	/** Сколько секунд пик шума держится на полную, прежде чем затухать (чтобы короткий блип — икота,
 	 *  севшая батарея — был читаем на шумомере, а не мелькал на доли секунды). */

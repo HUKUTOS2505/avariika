@@ -143,6 +143,16 @@ AAvaryoCharacter::AAvaryoCharacter()
 	if (PickSnd.Succeeded()) { PickupSound = PickSnd.Object; }
 	static ConstructorHelpers::FObjectFinder<USoundBase> UseSnd(TEXT("/Game/Survival_SFX/Craft/Crafting_cloth_item_1.Crafting_cloth_item_1"));
 	if (UseSnd.Succeeded()) { UseSound = UseSnd.Object; }
+	static ConstructorHelpers::FObjectFinder<USoundBase> HealSnd(TEXT("/Game/Survival_SFX/Survival/First_aid_1.First_aid_1"));
+	if (HealSnd.Succeeded()) { HealSound = HealSnd.Object; }
+	static ConstructorHelpers::FObjectFinder<USoundBase> SmokeSnd(TEXT("/Game/Survival_SFX/Survival/Lighter_1.Lighter_1"));
+	if (SmokeSnd.Succeeded()) { SmokeSound = SmokeSnd.Object; }
+	static ConstructorHelpers::FObjectFinder<USoundBase> ShoveSnd(TEXT("/Game/Survival_SFX/Survival/Punch_1.Punch_1"));
+	if (ShoveSnd.Succeeded()) { ShoveSound = ShoveSnd.Object; }
+	static ConstructorHelpers::FObjectFinder<USoundBase> WalkSnd(TEXT("/Game/Survival_SFX/Movement/Walk_stone.Walk_stone"));
+	if (WalkSnd.Succeeded()) { FootstepWalkSound = WalkSnd.Object; }
+	static ConstructorHelpers::FObjectFinder<USoundBase> RunSnd(TEXT("/Game/Survival_SFX/Movement/Run_stone.Run_stone"));
+	if (RunSnd.Succeeded()) { FootstepRunSound = RunSnd.Object; }
 }
 
 void AAvaryoCharacter::BeginPlay()
@@ -170,6 +180,28 @@ void AAvaryoCharacter::BeginPlay()
 void AAvaryoCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
+
+	// Шаги — косметика: на всех машинах для каждого персонажа по его скорости.
+	if (FootstepWalkSound && GetCharacterMovement() && GetCharacterMovement()->IsMovingOnGround()
+		&& (!VitalsComponent || !VitalsComponent->IsWounded()))
+	{
+		if (GetVelocity().Size2D() > 10.f)
+		{
+			const bool bRun = VitalsComponent && VitalsComponent->IsSprinting();
+			FootstepAccum += DeltaSeconds;
+			if (FootstepAccum >= (bRun ? 0.28f : 0.48f))
+			{
+				FootstepAccum = 0.f;
+				USoundBase* Step = (bRun && FootstepRunSound) ? FootstepRunSound : FootstepWalkSound;
+				const float Vol = bIsCrouched ? 0.35f : (bRun ? 0.9f : 0.6f);
+				UGameplayStatics::PlaySoundAtLocation(this, Step, GetActorLocation(), Vol);
+			}
+		}
+		else
+		{
+			FootstepAccum = 1.f; // стоим — следующий шаг сразу при начале движения
+		}
+	}
 
 	// Подсказки "[E] Подобрать" / "[E] Чинить" нужны только локальному игроку
 	if (IsLocallyControlled())
@@ -1546,10 +1578,13 @@ void AAvaryoCharacter::ApplyItemEffect(APickupItem* Item)
 		return;
 	}
 
-	// Звук применения предмета (на листен-сервере слышит хост)
-	if (UseSound)
+	// Звук применения предмета по типу (на листен-сервере слышит хост)
+	USoundBase* EffSnd = UseSound;
+	if (Item->ItemEffect == EItemEffect::Heal && HealSound) { EffSnd = HealSound; }
+	else if (Item->ItemEffect == EItemEffect::Calm && SmokeSound) { EffSnd = SmokeSound; }
+	if (EffSnd)
 	{
-		UGameplayStatics::PlaySoundAtLocation(this, UseSound, GetActorLocation());
+		UGameplayStatics::PlaySoundAtLocation(this, EffSnd, GetActorLocation());
 	}
 
 	switch (Item->ItemEffect)
@@ -2110,6 +2145,11 @@ void AAvaryoCharacter::ServerShove_Implementation()
 		return; // перезарядка
 	}
 	ShoveReadyTime = Now + ShoveCooldownTime;
+
+	if (ShoveSound) // глухой удар толчка (на листен-сервере слышит хост)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, ShoveSound, GetActorLocation());
+	}
 
 	FVector ViewLoc;
 	FRotator ViewRot;
