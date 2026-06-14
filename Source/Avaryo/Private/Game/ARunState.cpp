@@ -215,7 +215,8 @@ ARunState::ARunState()
 	ShiftNet = 0;
 
 	// Звуки по умолчанию (переопределяемы в Blueprint)
-	static ConstructorHelpers::FObjectFinder<USoundBase> RadioSnd(TEXT("/Game/Audio/SFX/RadioBlip.RadioBlip"));
+	// Диспетчер: «эфир рации» вместо прежнего глитч-стэтика (тот не подошёл)
+	static ConstructorHelpers::FObjectFinder<USoundBase> RadioSnd(TEXT("/Game/Audio/SFX/RadioComm.RadioComm"));
 	if (RadioSnd.Succeeded()) { RadioBlipSound = RadioSnd.Object; }
 	static ConstructorHelpers::FObjectFinder<USoundBase> AmbSnd(TEXT("/Game/Audio/SFX/Ambient_Boiler.Ambient_Boiler"));
 	if (AmbSnd.Succeeded()) { AmbientLoopSound = AmbSnd.Object; }

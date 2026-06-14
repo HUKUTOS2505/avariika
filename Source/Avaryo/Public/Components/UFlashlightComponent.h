@@ -5,6 +5,7 @@
 #include "UFlashlightComponent.generated.h"
 
 class ULightComponent;
+class USoundBase;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnFlashlightToggled, bool, bNewState);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnBatteryLow);
@@ -98,6 +99,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Flashlight", meta=(ClampMin="0.0"))
 	float DeadBatteryFright;
 
+	/** Щелчок тумблера фонаря (вкл/выкл). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Flashlight|Audio")
+	TObjectPtr<USoundBase> ClickSound;
+
 protected:
 	/** Дешёвый комплект: моргает даже при полном заряде (косяк оборудования, §18). Реплицируется для клиентского мерцания. */
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadOnly, Category="Flashlight")
@@ -130,4 +135,5 @@ private:
 	float DefaultIntensity;       // интенсивность света по умолчанию (запоминается в BeginPlay)
 	float BlackoutTimeRemaining;  // сколько ещё длится случайное отключение
 	bool bLowBatteryNotified;     // чтобы OnBatteryLow сработал один раз на разряд
+	bool bClickReady = false;     // первый ApplyLightState (BeginPlay) щелчок не играет
 };

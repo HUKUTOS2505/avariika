@@ -4,6 +4,7 @@
 #include "Components/AudioComponent.h"
 #include "Components/SceneCaptureComponent2D.h"
 #include "Components/UFlashlightComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "Sound/SoundBase.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Engine/TextureRenderTarget2D.h"
@@ -138,6 +139,8 @@ AAvaryoCharacter::AAvaryoCharacter()
 		HeartbeatSound = HeartSnd.Object;
 		HeartbeatAudio->SetSound(HeartSnd.Object);
 	}
+	// Звук подбора: ждёт Survival SFX (Metal_item_pick_up) — пак запаролен; пока без звука
+	// (код проигрывания no-op при null). Назначить, когда будет пароль/чистый foley.
 }
 
 void AAvaryoCharacter::BeginPlay()
@@ -1201,6 +1204,12 @@ void AAvaryoCharacter::PickupItem(APickupItem* Item)
 	if (!HasAuthority() || !CanPickupItem(Item))
 	{
 		return;
+	}
+
+	// Звук подбора (на листен-сервере слышит хост; клиентам — позже мультикастом)
+	if (PickupSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, PickupSound, GetActorLocation());
 	}
 
 	// Передача из рук в руки: забираем предмет у того, кто его протянул

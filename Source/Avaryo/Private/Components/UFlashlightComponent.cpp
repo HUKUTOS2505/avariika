@@ -5,7 +5,10 @@
 #include "Components/VitalsComponent.h"
 #include "Engine/World.h"
 #include "GameFramework/Actor.h"
+#include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
+#include "Sound/SoundBase.h"
+#include "UObject/ConstructorHelpers.h"
 
 UFlashlightComponent::UFlashlightComponent()
 {
@@ -25,6 +28,9 @@ UFlashlightComponent::UFlashlightComponent()
 	BeamIntensity = 14000.f; // пунш для хоррора; 0 = брать из BP
 	BlackoutTimeRemaining = 0.f;
 	bLowBatteryNotified = false;
+
+	static ConstructorHelpers::FObjectFinder<USoundBase> ClickSnd(TEXT("/Game/Audio/SFX/FlashClick.FlashClick"));
+	if (ClickSnd.Succeeded()) { ClickSound = ClickSnd.Object; }
 }
 
 void UFlashlightComponent::DebugSetBattery(float Pct)
@@ -173,6 +179,16 @@ void UFlashlightComponent::OnRep_IsOn()
 
 void UFlashlightComponent::ApplyLightState()
 {
+	// Щелчок тумблера на каждом переключении (первый вызов из BeginPlay пропускаем)
+	if (bClickReady && ClickSound)
+	{
+		if (const AActor* Owner = GetOwner())
+		{
+			UGameplayStatics::PlaySoundAtLocation(this, ClickSound, Owner->GetActorLocation());
+		}
+	}
+	bClickReady = true;
+
 	if (!AttachedLight)
 	{
 		return;
