@@ -508,6 +508,14 @@ OG Main Menu забраковали как фронт (целый чужой ф�
 - Собрано закрытым Build.bat (новые UPROPERTY/компонент), редактор перезапущен, FObjectFinder-ошибок нет — все 5 подхватились. Слушать пользователю в PIE.
 - Очередь звука дальше (точечно по событию): шаги (есть FootstepSystem/звук), гудёж газа (луп на трубе), щёлк фонаря, мини-игры (тык/срыв), джампскейр (под монстра).
 
+### УБОРКА АССЕТОВ + EOSCore→бесплатный EOS (2026-06-14)
+Пользователь: освободить диск + минимизировать будущие лицензии. Закрыл редактор, удалил (все локальные/untracked, перекачиваемы):
+- Не наш сеттинг: AmericanDrive (8.4G), LightHouse (3.3G), Madrid_Street (2.3G), Shoothouse (2.1G), Backrooms_TheLobby (1.0G), YI_Luggage (0.33G), FencesVOL2 (0.15G).
+- По решению юзера: Adventure_Pack/Sarah (3.0G — генерим своих операторов в meshy), Citizens_Pack (0.77G).
+- **EOSCore (платный eelDev, 3.0G) УБРАН** — юзер: использовать бесплатный встроенный EOS. Удалил `Plugins/EOSCore`, убрал из `.uproject`, почистил `[EOSSDK]` из DefaultEngine.ini. Онлайн-кооп позже через движковые `OnlineSubsystemEOS`+`EOSShared` (бесплатные, есть в движке) — включить + креды Epic Dev Portal при интернет-коопе. Сейчас Null/LAN. Мой код на `IOnlineSubsystem` — менять не пришлось. **Сборка зелёная** после удаления.
+- **Итого освобождено ~28 ГБ.** Оставлены: Hospital(City Modular)+HospitalCombo, PostApocalypticHouse, Hyper (обрезать мусор внутри), Decal_Forge, **FoggyStreet** (ради тумана/пара под VFX), Fire_EXP, EasyOptionsMenu, AudioToolkitPro, Survival_SFX, Construction_Pit (мультилокация), ResourcePack, oldBench, OGMainMenu, NiagaraExamples.
+- ⏳ **Ждёт решения юзера:** 3 лишних больничных кита (Leartes/Horror/Abandoned, ~6.7G) — рекомендую оставить ОДИН City Modular. Вопрос локаций: больница-только vs мультилокация (больница+дом+стройка). Я склоняюсь к **мультилокации** (диспетчер шлёт бригаду на разные объекты = реиграбельность) → Construction оставлен; «Abandoned Factory» от автора City Hospital — в бэклог.
+
 ### Продолжение (автономка, редактор открыт, Live Coding)
 - **Кооп-харднинг добит закрытой сборкой** (`b4a80bc`): репликация новых зеркальных полей `ARunState` (касса/уровни апгрейдов/карьера хосту→клиенту) ЗАРЕГИСТРИРОВАНА чистым Build.bat (Live Coding репликацию не регистрирует), редактор перезапущен. `RepairerToolQuality`/`DrawShop`/«Акт» читают из `ARunState`, а не из host-only леджера. `APickupItem::ToolQualityScale` теперь Replicated.
 - **Шумомер: пик-холд** (`6b37f6f`): `GetSelfNoise01` раньше затухал линейно за 0.8 с → одиночный блип (икота 0.3, севшая батарея 0.5) мелькал <1 с, юзер не ловил (#8/#9/#12 «не работало»). Теперь пик держится `SelfNoiseHoldTime`=0.45 с, потом спад `SelfNoiseDecayTime`=1.4 с (оба EditAnywhere). `DebugSetBattery(0)` теперь сам триггерит испуг (паника+шум) → `AvBattery 0` показывает мгновенно (фонарь должен быть ВКЛ). Логика испуга вынесена в `TriggerDeadBatteryFright` (общая для разряда и дев-команды).
