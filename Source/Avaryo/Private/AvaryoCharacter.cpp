@@ -173,6 +173,12 @@ AAvaryoCharacter::AAvaryoCharacter()
 	// Падение тела (споткнулся/поскользнулся) — глухой удар о бетон
 	static ConstructorHelpers::FObjectFinder<USoundBase> FallSnd(TEXT("/Game/Audio/SFX/Foley/Foley_BodyFall_1.Foley_BodyFall_1"));
 	if (FallSnd.Succeeded()) { FallSound = FallSnd.Object; }
+	// Уронил предмет — металлический удар о пол
+	static ConstructorHelpers::FObjectFinder<USoundBase> DropSnd(TEXT("/Game/Survival_SFX/User_Interface/Metal_item_drop.Metal_item_drop"));
+	if (DropSnd.Succeeded()) { DropSound = DropSnd.Object; }
+	// Переключение слота — тихий тик (личный 2D)
+	static ConstructorHelpers::FObjectFinder<USoundBase> SlotSnd(TEXT("/Game/Survival_SFX/User_Interface/Button_hover.Button_hover"));
+	if (SlotSnd.Succeeded()) { SlotSwitchSound = SlotSnd.Object; }
 
 	// Струя огнетушителя — луп, гоняется в Tick по IsSpraying() (реплицируется → у всех)
 	ExtinguisherAudio = CreateDefaultSubobject<UAudioComponent>(TEXT("ExtinguisherAudio"));
@@ -1550,6 +1556,10 @@ void AAvaryoCharacter::ReleaseHeldItem(bool bThrown, float ChargeAlpha)
 	const float ReleaseNoise = bThrown ? 0.8f : (bHeavy ? 1.f : 0.6f);
 	MakeNoise(ReleaseNoise, this, DropLocation);
 	RegisterSelfNoise(ReleaseNoise);
+	if (!bThrown && DropSound) // уронил — стук о пол у всех (бросок-импакт ждёт whoosh-пака)
+	{
+		MulticastSound(DropSound, DropLocation, bHeavy ? 1.f : 0.7f);
+	}
 
 	if (bThrown)
 	{
@@ -1572,6 +1582,12 @@ void AAvaryoCharacter::EquipSlot(int32 SlotIndex)
 	if (SlotIndex < 0 || SlotIndex >= NumSlots)
 	{
 		return;
+	}
+
+	// Тик переключения — личный, только тому, кто нажал (2D, без мультикаста)
+	if (IsLocallyControlled() && SlotSwitchSound && SlotIndex != ActiveSlot)
+	{
+		UGameplayStatics::PlaySound2D(this, SlotSwitchSound, 0.5f);
 	}
 
 	if (!HasAuthority())

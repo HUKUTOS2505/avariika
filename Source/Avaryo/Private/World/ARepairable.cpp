@@ -125,6 +125,12 @@ ARepairable::ARepairable()
 	if (PullSnd.Succeeded()) { StarterPullLoopSound = PullSnd.Object; }
 	static ConstructorHelpers::FObjectFinder<USoundBase> IdleSnd(TEXT("/Game/Audio/SFX/Repair/Repair_EngineIdle_Loop.Repair_EngineIdle_Loop"));
 	if (IdleSnd.Succeeded()) { EngineIdleSound = IdleSnd.Object; }
+	// Колхоз: возня подручным (Tire Changing Machine) — луп через FillAudioComp
+	static ConstructorHelpers::FObjectFinder<USoundBase> BotchSnd(TEXT("/Game/Audio/SFX/Repair/Repair_JuryRig_Loop.Repair_JuryRig_Loop"));
+	if (BotchSnd.Succeeded()) { BotchLoopSound = BotchSnd.Object; }
+	// Низкий рокот-хвост взрыва (earthquake LFE) — слой под бабах
+	static ConstructorHelpers::FObjectFinder<USoundBase> RumbleSnd(TEXT("/Game/Audio/SFX/Hazard/Hazard_Rumble_1.Hazard_Rumble_1"));
+	if (RumbleSnd.Succeeded()) { ExplosionRumbleSound = RumbleSnd.Object; }
 
 	// Луп заливки/прокладки/натяга — компонент, гоняется в Tick по состоянию
 	FillAudioComp = CreateDefaultSubobject<UAudioComponent>(TEXT("FillAudio"));
@@ -295,6 +301,7 @@ void ARepairable::Tick(float DeltaSeconds)
 		}
 		else if (bDoingPrereqHold && !bBotching) { WantLoop = WeldLoopSound; } // сварка (колхоз руками — без дуги)
 		else if (bStarterPulling && StarterPullLoopSound) { WantLoop = StarterPullLoopSound; } // натяг шнура стартера
+		else if (bBotching && BotchLoopSound) { WantLoop = BotchLoopSound; } // колхоз: возня подручным
 		if (WantLoop)
 		{
 			if (FillAudioComp->Sound != WantLoop) { FillAudioComp->SetSound(WantLoop); FillAudioComp->Play(); }
@@ -1093,6 +1100,10 @@ void ARepairable::MulticastExplosionShake_Implementation()
 	if (ExplosionSound)
 	{
 		UGameplayStatics::PlaySoundAtLocation(this, ExplosionSound, GetActorLocation());
+	}
+	if (ExplosionRumbleSound) // низкий рокот-хвост поверх бабаха
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, ExplosionRumbleSound, GetActorLocation(), 0.9f);
 	}
 	if (ExplosionFX)
 	{

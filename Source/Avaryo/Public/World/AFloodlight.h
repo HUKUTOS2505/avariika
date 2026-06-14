@@ -6,6 +6,8 @@
 
 class USpotLightComponent;
 class UStaticMeshComponent;
+class UAudioComponent;
+class USoundBase;
 
 /**
  * Переносной прожектор (§18 «предметы-ловушки»): монтёр ставит его из слота.
@@ -29,6 +31,14 @@ public:
 	/** Источник света — направленный конус (светит туда, куда смотрит прожектор). */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Floodlight")
 	TObjectPtr<USpotLightComponent> Light;
+
+	/** Зацикленный гул лампы (3D, играет пока прожектор стоит). */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Floodlight")
+	TObjectPtr<UAudioComponent> HumAudio;
+
+	/** Звук гудения лампы. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Floodlight")
+	TObjectPtr<USoundBase> HumSound;
 
 	/** Радиус, в котором прожектор гасит панику, см. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Floodlight")

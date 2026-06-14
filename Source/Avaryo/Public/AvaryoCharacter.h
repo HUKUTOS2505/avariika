@@ -294,6 +294,14 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Audio")
 	TObjectPtr<USoundBase> FallSound;
 
+	/** Звук падения предмета о пол (уронил). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Audio")
+	TObjectPtr<USoundBase> DropSound;
+
+	/** Тихий тик переключения слота инвентаря (личный). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Audio")
+	TObjectPtr<USoundBase> SlotSwitchSound;
+
 	/** Зацикленный звук струи огнетушителя (пока распыляешь). */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Audio")
 	TObjectPtr<USoundBase> ExtinguisherSprayLoopSound;

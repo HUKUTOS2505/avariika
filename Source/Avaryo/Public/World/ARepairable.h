@@ -495,6 +495,14 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Repairable|Audio")
 	TObjectPtr<USoundBase> EngineIdleSound;
 
+	/** Зацикленная возня колхозного ремонта (без инструмента, на коленке). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Repairable|Audio")
+	TObjectPtr<USoundBase> BotchLoopSound;
+
+	/** Низкий рокот-хвост взрыва (слой под основной бабах). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Repairable|Audio")
+	TObjectPtr<USoundBase> ExplosionRumbleSound;
+
 	/** Хэндл лупа заливки. */
 	UPROPERTY(Transient)
 	TObjectPtr<UAudioComponent> FillAudioComp;
