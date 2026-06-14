@@ -5,7 +5,8 @@
 > 🗑 **УБОРКА 2026-06-14** (освободить место + минимизировать лицензии). Удалено (не наш сеттинг / лишнее / делаем своё):
 > AmericanDrive, LightHouse, Madrid_Street, Shoothouse, Backrooms_TheLobby, YI_Luggage, FencesVOL2, **Adventure_Pack (Sarah)**, **Citizens_Pack** — ~25 ГБ. Все локальные, перекачиваемы при надобности.
 > **EOSCore (платный) УБРАН** → онлайн-кооп пойдёт через БЕСПЛАТНЫЙ движковый `OnlineSubsystemEOS` (включим при интернет-коопе). −3 ГБ, −1 лицензия.
-> **Оставлены под вопросом** (ждут решения): 3 лишних больничных кита (Leartes / Horror_Hospital / AbandonedHospital) — берём ОДИН флагман City Modular. Foggy Street оставлен ради тумана/пара (VFX). Construction оставлен (мультилокация).
+> **Больницы → 1 флагман:** удалены Leartes / Horror_Hospital / AbandonedHospital (−6.7 ГБ, −3 лицензии). Остался **City Modular Hospital + Combo**. Foggy Street оставлен ради тумана/пара. Construction оставлен (мультилокация). «Abandoned Factory» (автор City Hospital) — в бэклог.
+> **Звук:** `Survival_SFX` импортирован (распакованная копия; локально/gitignore). Источники-библиотеки звука: Ghosthack, Abandoned Asylum (Sonomar), Survival.
 
 > Что из этого брать/как встраивать (особенно динамическая погода) — см. [ASSET_ASSESSMENT.md](ASSET_ASSESSMENT.md).
 
