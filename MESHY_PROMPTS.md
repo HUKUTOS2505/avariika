@@ -144,5 +144,35 @@ A modern blade cartridge fuse, single clean object about 6 cm, a smooth matte co
 
 **Совет по meshy:** генерируй в максимальном качестве, на шаге текстур выбирай вариант с чистой читаемой картой (не «камуфляжный»). Не добавляй в промт «weathered/grimy/heavily worn» — именно это даёт шумные пятна.
 
+## Персонажи: операторы (бригада) + монстры
+
+**Общий хвост для персонажей** (вместо «single object…»): `full body humanoid character in a relaxed T-pose, arms out to the sides, symmetrical, game-ready character, clean topology, PBR textures, single character, centered, plain background, no ground plane, no scene`.
+**Совет:** если в meshy есть авто-риг (Humanoid) — включай, сэкономит риггинг; иначе экспортируй в T-позе под ручной риг на UE5 Mannequin. «gore/blood/decay» — только для монстров, не для операторов.
+
+### SK_Operator_01 — монтёр аварийной бригады (база)
+```
+A modern emergency utility repair worker, adult man, wearing a clean orange high-visibility coverall with reflective grey stripes, a white hard hat with a small headlamp on the front, sturdy work gloves, a tool belt with pouches, black work boots, a simple respirator mask hanging around the neck, clean solid readable colors, matte fabric, minimal wear, realistic proportions, full body humanoid character in a relaxed T-pose, arms out to the sides, symmetrical, game-ready character, clean topology, PBR textures, single character, centered, plain background, no ground plane, no scene
+```
+
+### SK_Operator_02 — монтёр (вариант, для разнообразия бригады)
+```
+A modern maintenance technician, adult man, wearing a dark navy-blue work coverall with a hi-vis yellow vest over it, a grey beanie instead of a helmet, a headlamp strap on the forehead, fingerless gloves, knee pads, heavy boots, a coiled cable over one shoulder, clean solid readable colors, matte fabric, slightly stocky build, realistic proportions, full body humanoid character in a relaxed T-pose, arms out to the sides, symmetrical, game-ready character, clean topology, PBR textures, single character, centered, plain background, no ground plane, no scene
+```
+
+### SK_Operator_03 — монтёр-женщина (вариант)
+```
+A modern emergency repair technician, adult woman, wearing a grey-and-teal work coverall with reflective stripes, sleeves rolled up, a hard hat with headlamp over a tied-back ponytail, work gloves, a tool belt, sturdy boots, clean solid readable colors, matte fabric, athletic realistic proportions, full body humanoid character in a relaxed T-pose, arms out to the sides, symmetrical, game-ready character, clean topology, PBR textures, single character, centered, plain background, no ground plane, no scene
+```
+
+### SK_Monster_Listener — монстр-слухач (охотится на звук; в геймплее ОТЛОЖЕН, модель делать можно)
+```
+A tall gaunt humanoid horror creature that hunts by sound, completely eyeless smooth face, enormous oversized human-like ears and exposed sensory flaps on the sides of the head, long thin limbs, hunched posture, pale grey veined skin stretched over the ribs, sharp slender fingers, no clothing, unsettling but not gory, dark muted colors, matte skin, realistic creature anatomy, full body humanoid character in a relaxed T-pose, arms out to the sides, symmetrical, game-ready character, clean topology, PBR textures, single character, centered, plain background, no ground plane, no scene
+```
+
+### SK_Monster_Patient — монстр-«пациент» (медицинский хоррор, вариант)
+```
+A disturbing humanoid horror creature themed as a former hospital patient, emaciated body in a tattered dirty hospital gown, head wrapped in stained bandages with no visible eyes, elongated jaw, twisted long limbs, pale sickly mottled skin, an IV tube still attached to one arm, unsettling but restrained without heavy gore, dark muted desaturated colors, matte surfaces, realistic creature anatomy, full body humanoid character in a relaxed T-pose, arms out to the sides, symmetrical, game-ready character, clean topology, PBR textures, single character, centered, plain background, no ground plane, no scene
+```
+
 ## Как присылать модели
-Экспортируй из meshy FBX с текстурами, положи в `RawAssets/SM_<Имя>/` (точное имя из заголовков выше, напр. `SM_Thermos`). Скажи «импортируй» — прогоню скрипт (без metallic-карты), назначу на актор/предмет и его инстансы, отмасштабирую.
+Экспортируй из meshy FBX с текстурами, положи в `RawAssets/SM_<Имя>/` (пропсы) или `RawAssets/SK_<Имя>/` (персонажи/монстры). Скажи «импортируй» — прогоню скрипт (без metallic-карты), назначу/отмасштабирую. Для персонажей риг под UE5 Mannequin делаешь ты (или meshy auto-rig), потом подключим AnimBP.
