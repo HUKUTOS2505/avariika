@@ -181,6 +181,8 @@ crouch-шаги (можно из Walk питчем), «мокрый» squelch с
 
 23 SoundWave в `Content/Audio/` (по семейству на событие, не целые папки — лицензии+диск). Гиганты Sonomar и большие лупы обрезаны до 12–25 c. Лупы (★) уже `looping=True`.
 
+**Статус врезки (`2f3930f`):** 🔌 ВЖАТО в код — Repair_ValveRatchet/ValveStrip, Repair_GenPull_Loop, Repair_Insert, Repair_EngineIdle_Loop, Repair_FuelFill_Loop, Hazard_ExplosionGas, Item_ExtinguisherSpray_Loop, Foley_BodyFall. ⏳ ИМПОРТировано, ждёт механики/окна сборки — Hazard_FireLoop (нет персистентного огня), Hazard_LampHum_Loop (нет прожектора в коде), Hazard_Overload_1 (есть ElectricZap), Repair_JuryRig_Loop (колхоз уже на Weld/Craft), Amb_* (ставить 3D AmbientSound по уровню — левел-дизайн, не код).
+
 | Ассет (`/Game/Audio/...`) | Событие (куда вешать) | Источник |
 |---|---|---|
 | `SFX/Repair/Repair_ValveRatchet_1..3` | Труба: докрутка вентиля (на тык, 3 варианта) | Garage Impact Wrench Screw |
