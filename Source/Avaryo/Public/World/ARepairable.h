@@ -491,9 +491,17 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Repairable|VFX", meta=(ClampMin="0.05"))
 	float SparkScale = 0.6f;
 
+	/** Зацикленное шипение утечки газа. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Repairable|Audio")
+	TObjectPtr<USoundBase> GasHissSound;
+
 	/** Хэндл играющего газового облака. */
 	UPROPERTY(Transient)
 	TObjectPtr<UNiagaraComponent> GasFXComp;
+
+	/** Хэндл шипения газа. */
+	UPROPERTY(Transient)
+	TObjectPtr<UAudioComponent> GasHissComp;
 
 	/** Последний показанный на табличке процент — чтобы не перерисовывать текст каждый кадр. */
 	int32 LastShownPercent;

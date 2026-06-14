@@ -149,9 +149,11 @@ AAvaryoCharacter::AAvaryoCharacter()
 	if (SmokeSnd.Succeeded()) { SmokeSound = SmokeSnd.Object; }
 	static ConstructorHelpers::FObjectFinder<USoundBase> ShoveSnd(TEXT("/Game/Survival_SFX/Survival/Punch_1.Punch_1"));
 	if (ShoveSnd.Succeeded()) { ShoveSound = ShoveSnd.Object; }
+	static ConstructorHelpers::FObjectFinder<USoundBase> RadioSnd(TEXT("/Game/Audio/SFX/RadioComm.RadioComm"));
+	if (RadioSnd.Succeeded()) { RadioToggleSound = RadioSnd.Object; }
 	static ConstructorHelpers::FObjectFinder<USoundBase> WalkSnd(TEXT("/Game/Survival_SFX/Movement/Walk_stone.Walk_stone"));
 	if (WalkSnd.Succeeded()) { FootstepWalkSound = WalkSnd.Object; }
-	static ConstructorHelpers::FObjectFinder<USoundBase> RunSnd(TEXT("/Game/Survival_SFX/Movement/Run_stone.Run_stone"));
+	static ConstructorHelpers::FObjectFinder<USoundBase> RunSnd(TEXT("/Game/Survival_SFX/Movement/Jog_stone.Jog_stone"));
 	if (RunSnd.Succeeded()) { FootstepRunSound = RunSnd.Object; }
 }
 
@@ -193,7 +195,7 @@ void AAvaryoCharacter::Tick(float DeltaSeconds)
 			{
 				FootstepAccum = 0.f;
 				USoundBase* Step = (bRun && FootstepRunSound) ? FootstepRunSound : FootstepWalkSound;
-				const float Vol = bIsCrouched ? 0.35f : (bRun ? 0.9f : 0.6f);
+				const float Vol = bIsCrouched ? 0.3f : (bRun ? 0.55f : 0.45f);
 				UGameplayStatics::PlaySoundAtLocation(this, Step, GetActorLocation(), Vol);
 			}
 		}
@@ -1578,13 +1580,13 @@ void AAvaryoCharacter::ApplyItemEffect(APickupItem* Item)
 		return;
 	}
 
-	// Звук применения предмета по типу (на листен-сервере слышит хост)
-	USoundBase* EffSnd = UseSound;
-	if (Item->ItemEffect == EItemEffect::Heal && HealSound) { EffSnd = HealSound; }
-	else if (Item->ItemEffect == EItemEffect::Calm && SmokeSound) { EffSnd = SmokeSound; }
-	if (EffSnd)
+	// Звук — только для МГНОВЕННЫХ предметов (у кастовых уже сыграл в начале каста, синхронно)
+	if (Item->UseCastTime <= 0.f)
 	{
-		MulticastSound(EffSnd, GetActorLocation(), 1.f);
+		if (USoundBase* S = ItemUseSoundFor(Item))
+		{
+			MulticastSound(S, GetActorLocation(), 1.f);
+		}
 	}
 
 	switch (Item->ItemEffect)
@@ -1716,6 +1718,10 @@ void AAvaryoCharacter::BeginUseHeldItem()
 	if (Item->ItemEffect == EItemEffect::Radio)
 	{
 		Item->SetToggledOn(!Item->IsToggledOn()); // тумблер: щёлк
+		if (RadioToggleSound)
+		{
+			MulticastSound(RadioToggleSound, GetActorLocation(), 0.7f);
+		}
 		return;
 	}
 
@@ -1742,6 +1748,11 @@ void AAvaryoCharacter::BeginUseHeldItem()
 			const float CastTime = Item->UseCastTime * (1.f + Panic01 * ItemUsePanicScale);
 			UseCastRemaining = CastTime;
 			UseCastDuration = CastTime;
+			// Звук — В НАЧАЛЕ действия (синхронно с перевязкой/применением), у всех
+			if (USoundBase* S = ItemUseSoundFor(Item))
+			{
+				MulticastSound(S, GetActorLocation(), 1.f);
+			}
 		}
 		else
 		{
@@ -2138,6 +2149,16 @@ void AAvaryoCharacter::MulticastSound_Implementation(USoundBase* Sound, FVector 
 	{
 		UGameplayStatics::PlaySoundAtLocation(this, Sound, Loc, Vol);
 	}
+}
+
+USoundBase* AAvaryoCharacter::ItemUseSoundFor(const APickupItem* Item) const
+{
+	if (Item)
+	{
+		if (Item->ItemEffect == EItemEffect::Heal && HealSound) { return HealSound; }
+		if (Item->ItemEffect == EItemEffect::Calm && SmokeSound) { return SmokeSound; }
+	}
+	return UseSound;
 }
 
 void AAvaryoCharacter::ServerShove_Implementation()

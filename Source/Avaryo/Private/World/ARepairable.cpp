@@ -80,11 +80,20 @@ ARepairable::ARepairable()
 	if (ExpFX.Succeeded()) { ExplosionFX = ExpFX.Object; }
 	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> SpkFX(TEXT("/Game/NiagaraExamples/FX_Sparks/NS_Spark_Burst.NS_Spark_Burst"));
 	if (SpkFX.Succeeded()) { SparkFX = SpkFX.Object; }
-	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> GasFX(TEXT("/Game/NiagaraExamples/FX_Smoke/NS_Smoke_Plume.NS_Smoke_Plume"));
+	// Утечка газа = лёгкая струйка пара + шипение (НЕ густой дым «как горит»)
+	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> GasFX(TEXT("/Game/NiagaraExamples/Utilities/SpriteGeneration/SmokePuffLight/NS_SmokePuffLight.NS_SmokePuffLight"));
 	if (GasFX.Succeeded()) { GasLeakFX = GasFX.Object; }
+	static ConstructorHelpers::FObjectFinder<USoundBase> HissSnd(TEXT("/Game/Audio/SFX/GasHiss.GasHiss"));
+	if (HissSnd.Succeeded()) { GasHissSound = HissSnd.Object; }
 
-	// Звуки установки/заливки
-	static ConstructorHelpers::FObjectFinder<USoundBase> InsSnd(TEXT("/Game/Survival_SFX/Craft/Building_item_remove_1.Building_item_remove_1"));
+	GasHissComp = CreateDefaultSubobject<UAudioComponent>(TEXT("GasHissAudio"));
+	GasHissComp->SetupAttachment(MeshComponent);
+	GasHissComp->bAutoActivate = false;
+	GasHissComp->SetVolumeMultiplier(0.6f);
+	if (GasHissSound) { GasHissComp->SetSound(GasHissSound); }
+
+	// Звуки установки/заливки (установка = металлический клик «вставлено», а не «уронил»)
+	static ConstructorHelpers::FObjectFinder<USoundBase> InsSnd(TEXT("/Game/Survival_SFX/User_Interface/Metal_item_pick_up.Metal_item_pick_up"));
 	if (InsSnd.Succeeded()) { InsertSound = InsSnd.Object; }
 	static ConstructorHelpers::FObjectFinder<USoundBase> FillSnd(TEXT("/Game/Survival_SFX/Craft/Crafting_wood_item_1.Crafting_wood_item_1"));
 	if (FillSnd.Succeeded()) { FillLoopSound = FillSnd.Object; }
@@ -720,8 +729,9 @@ void ARepairable::TryHitBy(AAvaryoCharacter* Who)
 		return;
 	}
 
-	// Тактильный «тык» мини-игры — у всех
-	if (MinigameHitSound)
+	// Тактильный «тык» мини-игры — у всех. Для стартера НЕ играем (там тык в начале не к месту;
+	// нужен звук «завёлся» в зелёной зоне — ждёт индустриального пака).
+	if (MinigameHitSound && MinigameType != ERepairMinigameType::Starter)
 	{
 		MulticastSound(MinigameHitSound, GetActorLocation(), 0.5f);
 	}
@@ -1052,6 +1062,12 @@ void ARepairable::RefreshStatusVisual()
 		GasFXComp->Deactivate();
 		GasFXComp->DestroyComponent();
 		GasFXComp = nullptr;
+	}
+	// Шипение газа — синхронно с облаком
+	if (GasHissComp)
+	{
+		if (bLeakingNow && !GasHissComp->IsPlaying()) { GasHissComp->Play(); }
+		else if (!bLeakingNow && GasHissComp->IsPlaying()) { GasHissComp->Stop(); }
 	}
 
 	if (!StatusText)

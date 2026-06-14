@@ -1024,11 +1024,7 @@ void ARunState::MulticastDispatcherSay_Implementation(const FString& Speaker, co
 		DispatcherLines.RemoveAt(0);
 	}
 
-	// Короткий шум рации в момент появления реплики (играется на всех — это мультикаст)
-	if (RadioBlipSound)
-	{
-		UGameplayStatics::PlaySound2D(this, RadioBlipSound, 0.5f);
-	}
+	// (звук реплики диспетчера убран — раздражал; при желании вернём тихий короткий бип)
 }
 
 FString ARunState::CrewName(const AAvaryoCharacter* Who)

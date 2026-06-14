@@ -269,9 +269,16 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Audio")
 	TObjectPtr<USoundBase> FootstepRunSound;
 
+	/** Звук тумблера рации (вкл/выкл). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Audio")
+	TObjectPtr<USoundBase> RadioToggleSound;
+
 	/** Проиграть звук у ВСЕХ игроков (кооп): сервер зовёт — слышат все. */
 	UFUNCTION(NetMulticast, Unreliable)
 	void MulticastSound(USoundBase* Sound, FVector Loc, float Vol);
+
+	/** Выбрать звук применения по эффекту предмета (аптечка/сигарета/общий). */
+	USoundBase* ItemUseSoundFor(const APickupItem* Item) const;
 
 	/** Шкалы: HP, паника, выносливость, туалет. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Avaryo")
