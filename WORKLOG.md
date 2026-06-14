@@ -472,7 +472,15 @@ Greybox `L_Hospital` (каркас+комнаты+квест-акторы) по�
 - `avariika.uproject`: включены EOSCore (+ MarketplaceURL, чтоб не нудел «project requires update»), AudioToolkitPro (TargetAllowList Editor), OnlineSubsystemUtils.
 - `DefaultEngine.ini`: `[EOSSDK] bHasProjectBinary=true` (снял варн EOSShared). DefaultPlatformService **оставлен Null** (LAN/PIE-кооп работает). Онлайн за NAT — когда пользователь заведёт продукт в Epic Dev Portal и даст ProductId/SandboxId/DeploymentId/ClientId/Secret → переключить на EOS/EOSCore + вписать креды.
 
-**Уже было / пропущено:** `Easy Options Menu` — уже в `Content/EasyOptionsMenu` (не реимпортил). **Ждёт обработки (после отмашки/по очереди):** OG Main Menu System (`новое/OG Main Menu System 5.7.zip` — проект YJW57, вытащить Content), Citizens_Pack (`/Game/Citizens_Pack/`, NPC для больницы), POS (`новое/pos_fbx` — FBX, импорт в редакторе под магазин-терминал в ГАЗели). НЕ в `новое`, ждём от пользователя: Hospital COMBO Prop Pack VOL 1-6, Modern Hospital Environment (229 — уже есть Leartes), Hyper Dynamic Weather & Sky.
+**Уже было / пропущено:** `Easy Options Menu` — уже в `Content/EasyOptionsMenu` (не реимпортил).
+
+**Доимпорт (тот же день, по отмашке «давай делаем»):**
+- **OG Main Menu System** (проект YJW57 в zip) → `Content/OGMainMenu` (611 ассетов, `/Game/OGMainMenu/`) + `Content/Movies` (6.7М, фоны) + `Content/Localization` + только свои external-actors/objects (`OGMainMenu`). Карты: **MainMenu, LobbyMap**, Dungeon/Prison/Temple (демо), TransitionMap. Виджеты: **AWBP_CreateMatch / AWBP_GameMode / AWBP_GameKeys** и т.д. — меню заточено под мультиплеер-сессии, ляжет на EOSCore. ⚠️ ещё НЕ wired в игровой флоу (нужно решить: делать ли MainMenu стартовой картой + связать CreateMatch с нашими сессиями).
+- **Citizens_Pack** → `Content/Citizens_Pack` (115 ассетов, `/Game/Citizens_Pack/`, карта Citizens_Pack_Map) — NPC-горожане под пациентов/персонал больницы.
+
+**Осталось в `новое`:** только `pos_fbx` (POS-терминал, FBX) — импорт в фазе звуков/магазина (пользователь отложил). Остальное из `новое` можно удалять.
+
+**НЕ в `новое`, ждём от пользователя:** Hospital COMBO Prop Pack VOL 1-6, Modern Hospital Environment (229 — уже есть Leartes), Hyper Dynamic Weather & Sky.
 
 ⚠️ **Git:** Hospital (3 ГБ, BuiltData 558 МБ >100 МБ) и PostApocalypticHouse (4.8 ГБ) → gitignore'нуты (локальные). Plugins/ уже был в gitignore. Коммитятся только `.uproject`/`.ini`/`.gitignore`/доки.
 
