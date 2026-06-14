@@ -457,6 +457,25 @@ Greybox `L_Hospital` (каркас+комнаты+квест-акторы) по�
 
 **Ещё НЕ хватает (нужны ассеты юзера):** звук (полигра!), VFX-паки (взрыв/огонь/искры/пена — хуки готовы), плагин EOS/Steam (для онлайн-коопа поверх готовой сабсистемы); + решение git-стратегии и сборка слайса (Modern Hospital + Sarah).
 
+### СЕССИЯ 2026-06-14 — импорт паков из `RawAssets/новое` + плагины (EOSCore, AudioToolkit)
+Пользователь догрузил папку `RawAssets/новое` и список «что брать». Разобрал и интегрировал (собрано Build.bat при закрытом редакторе, `Result: Succeeded`, редактор перезапущен, реестр просканирован):
+
+**Контент-паки (импорт robocopy дерева, FBX исключены `/XF *.fbx`):**
+- **City MODULAR HOSPITAL v.2** (`новое/ModularHospital` — это целый проект): `Content/Hospital` → наш `Content/Hospital`, **1387 ассетов**, `/Game/Hospital/`. Карты: Demonstration, Demonstration_2, Overview. Флагман-окружение больницы (стены/лестницы/мебель/мусор).
+- **Modular Haunted House** (`новое/Modular Haunted House (...)`): `PostApocalypticHouse` → `Content/PostApocalypticHouse`, **667 ассетов**, `/Game/PostApocalypticHouse/`. Карты: **LV_Horror_Light, LV_House, LV_Main**, LV_Cinematic, LV_Sunset_Light, L_Asset_Overview. Под прототип 0.1. ⚠️ Копировал только `__ExternalActors__/PostApocalypticHouse` — НЕ трогал FirstPerson/ThirdPerson/AncientRuins (иначе затёр бы OFPA нашего `Lvl_FirstPerson`).
+
+**Код-плагины (в `Plugins/`, собраны UBT, gitignore'нуты):**
+- **EOSCore v1.9.8.2 (5.7)** (eelDev) — фундамент коопа. Распакован из `новое/EOSCore/EOSCore v1.9.8.2 5.7.rar`, ~2 ГБ (со своим EOS SDK + precompiled Binaries). Модули: EOSCore, **OnlineSubsystemEOSCore** (своя реализация OnlineSubsystem!), EOSCoreWeb, EOSCoreShared. Скомпилился чисто, смонтировался (`Using EOSCore Version: 1.9.8.2`).
+- **Audio Toolkit Pro 1.2 (5.7)** (UMonster) — редактор-инструмент обработки звука. ⚠️ **НЕ компилился** (VS2026 + unity-сборка: в нескольких .cpp одноимённые функции в anonymous namespace `ColorFromHex/PrimaryText/...` → при unity-слиянии C2572/C2084 + каскад Slate-ошибок). **ФИКС:** `bUseUnity = false;` в `Plugins/AudioToolkitPro/Source/AudioToolkitPro/AudioToolkitPro.Build.cs` → собралось. ⚠️ Фикс живёт ТОЛЬКО локально (Plugins/ в gitignore) — при переносе проекта повторить.
+
+**Конфиг:**
+- `avariika.uproject`: включены EOSCore (+ MarketplaceURL, чтоб не нудел «project requires update»), AudioToolkitPro (TargetAllowList Editor), OnlineSubsystemUtils.
+- `DefaultEngine.ini`: `[EOSSDK] bHasProjectBinary=true` (снял варн EOSShared). DefaultPlatformService **оставлен Null** (LAN/PIE-кооп работает). Онлайн за NAT — когда пользователь заведёт продукт в Epic Dev Portal и даст ProductId/SandboxId/DeploymentId/ClientId/Secret → переключить на EOS/EOSCore + вписать креды.
+
+**Уже было / пропущено:** `Easy Options Menu` — уже в `Content/EasyOptionsMenu` (не реимпортил). **Ждёт обработки (после отмашки/по очереди):** OG Main Menu System (`новое/OG Main Menu System 5.7.zip` — проект YJW57, вытащить Content), Citizens_Pack (`/Game/Citizens_Pack/`, NPC для больницы), POS (`новое/pos_fbx` — FBX, импорт в редакторе под магазин-терминал в ГАЗели). НЕ в `новое`, ждём от пользователя: Hospital COMBO Prop Pack VOL 1-6, Modern Hospital Environment (229 — уже есть Leartes), Hyper Dynamic Weather & Sky.
+
+⚠️ **Git:** Hospital (3 ГБ, BuiltData 558 МБ >100 МБ) и PostApocalypticHouse (4.8 ГБ) → gitignore'нуты (локальные). Plugins/ уже был в gitignore. Коммитятся только `.uproject`/`.ini`/`.gitignore`/доки.
+
 ### Продолжение (автономка, редактор открыт, Live Coding)
 - **Кооп-харднинг добит закрытой сборкой** (`b4a80bc`): репликация новых зеркальных полей `ARunState` (касса/уровни апгрейдов/карьера хосту→клиенту) ЗАРЕГИСТРИРОВАНА чистым Build.bat (Live Coding репликацию не регистрирует), редактор перезапущен. `RepairerToolQuality`/`DrawShop`/«Акт» читают из `ARunState`, а не из host-only леджера. `APickupItem::ToolQualityScale` теперь Replicated.
 - **Шумомер: пик-холд** (`6b37f6f`): `GetSelfNoise01` раньше затухал линейно за 0.8 с → одиночный блип (икота 0.3, севшая батарея 0.5) мелькал <1 с, юзер не ловил (#8/#9/#12 «не работало»). Теперь пик держится `SelfNoiseHoldTime`=0.45 с, потом спад `SelfNoiseDecayTime`=1.4 с (оба EditAnywhere). `DebugSetBattery(0)` теперь сам триггерит испуг (паника+шум) → `AvBattery 0` показывает мгновенно (фонарь должен быть ВКЛ). Логика испуга вынесена в `TriggerDeadBatteryFright` (общая для разряда и дев-команды).
