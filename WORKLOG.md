@@ -606,6 +606,14 @@ OG Main Menu забраковали как фронт (целый чужой ф�
 - **Доки:** `AUDIO_INVENTORY.md` (статус врезки), `TEST_CHECKLIST.md` (полный гайд «что слушать» по всем добавленным звукам).
 - **Дальше:** rope-скрипы в систему случайного хоррор-эмбиента; эмбиенты палат/коридора — 3D в реальные уровни; на слух проверить idle/огнетушитель/cue; озвучка на anim-notify когда придёт модель оператора. Сварка/стартер-анимация и «вентиль→заварить» — в бэклоге. ❌-дыры (мужской вокал, газ-хисс, касса/бипы/радио-статик) — докупка.
 
+### Оператор: импорт модели + 34 анимаций + тест на карте (2026-06-14, автономно)
+Юзер дал `RawAssets/персонаж` (Meshy: модель 44 МБ + 35 FBX-анимаций `_biped_..._withSkin` + 145 png) — «импортируй, тестовую модель на карту, оптимизация обязательна».
+- **Импорт (headless commandlet, GUI завис на модалке восстановления после моих kill'ов):** `SK_Operator` + скелет из Idle-withSkin; затем 34 анимации как AnimSequence на этот скелет. `Content/Characters/Operator` ~46 МБ, ничего >90 МБ → закоммичено (`2acc09f`). Тестовый `TestOperator` (Idle) на `Lvl_FirstPerson` @ (300,0,-13) (`376ad2b`).
+- **Оптимизация:** 4 авто-LOD на меш (`EditorSkeletalMeshLibrary.regenerate_lod`), текстура → max 2K + TEXTUREGROUP_CHARACTER.
+- **2 жёсткие гочи (в память [[ue-python-scripting-gotchas]]):** (1) Interchange падает на Slate-ассерте в `-unattended` commandlet → отключать cvar `Interchange.FeatureFlags.Import.FBX false` (легаси-импортёр). (2) Легаси аним-импорт «withSkin» FBX молча тянет SkeletalMesh вместо AnimSequence → `FbxImportUI.automated_import_should_detect_type=False` + `mesh_type=FBXIT_ANIMATION`. Сначала так наимпортил 34 МЕША (удалил), потом починил.
+- **Скрипты:** `import_character.py` (меш+опт), `reimport_anims.py` (корректные анимации), `place_operator.py`, `delete_wrong_anims.py`.
+- **⚠️ Качество/дальше:** материал только basecolor (biped-материал ссылается лишь на albedo) — normal/roughness/metallic надо доимпортить + врезать; `texture_0` исходник 4K (26.9 МБ, рантайм-кап 2K) — ужать исходник; анимации на anim-notify + AnimBP (locomotion BlendSpace, idle/walk/run/crouch + one-shot реакции) когда юзер посмотрит и одобрит; озвучка шагов/усилий на anim-notify. GUI-редактор после kill'ов капризничал — чистить автосейвы при зависании старта.
+
 ## Очередь модулей (дальше)
 
 1. **Фиксы по фидбеку пользователя** из PIE-теста модулей (всё перечисленное ниже + прожектор).
