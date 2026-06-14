@@ -80,6 +80,7 @@ void UFlashlightComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 			{
 				if (Char->VitalsComponent) { Char->VitalsComponent->AddPanic(DeadBatteryFright); }
 				Char->MakeNoise(0.5f, Char, Char->GetActorLocation());
+				Char->RegisterSelfNoise(0.5f);
 			}
 		}
 	}
