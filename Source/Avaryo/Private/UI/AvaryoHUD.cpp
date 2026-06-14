@@ -146,6 +146,18 @@ void AAvaryoHUD::DrawHUD()
 		}
 	}
 
+	// ---------- Зарядка броска (удержание G): полоска силы у центра ----------
+	if (Character->IsChargingThrow())
+	{
+		const float A = Character->GetThrowChargeAlpha();
+		const float BW = 200.f, BH = 12.f;
+		const float BX = (SizeX - BW) * 0.5f, BY = SizeY * 0.60f;
+		DrawRect(BarBG, BX, BY, BW, BH);
+		DrawRect(A >= 1.f ? FLinearColor(0.95f, 0.85f, 0.2f) : Accent, BX, BY, BW * A, BH);
+		DrawText(A >= 1.f ? TEXT("БРОСОК заряжен — отпусти G") : TEXT("Зарядка броска... (отпусти G)"),
+			TextMain, BX, BY - 18.f, Font, 0.85f);
+	}
+
 	// ---------- Монитор оператора (Tab в зоне ГАЗели) ----------
 	if (Character->IsMonitorOpen())
 	{

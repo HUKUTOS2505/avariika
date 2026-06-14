@@ -50,9 +50,18 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Avaryo|Inventory")
 	void DropItem();
 
-	/** Метнуть предмет из рук по прицелу (клавиша T): передать через провал / запулить. */
+	/** Метнуть предмет из рук по прицелу (передать через провал / запулить). */
 	UFUNCTION(BlueprintCallable, Category="Avaryo|Inventory")
 	void ThrowItem();
+
+	/** G нажата: в мини-игре/туалете — выйти; иначе начать «зарядку» броска. */
+	void OnThrowKeyPressed();
+	/** G отпущена: метнуть с силой по времени удержания (короткий тап — слабо, удержание — сильно). */
+	void OnThrowKeyReleased();
+
+	UFUNCTION(BlueprintPure, Category="Avaryo|Inventory") bool IsChargingThrow() const { return bChargingThrow; }
+	/** Прогресс зарядки броска 0..1 (для HUD-полоски). */
+	UFUNCTION(BlueprintPure, Category="Avaryo|Inventory") float GetThrowChargeAlpha() const;
 
 	/** Переключить активный слот (клавиши 1-5). 0 — тяжёлый, 1-4 — лёгкие. */
 	UFUNCTION(BlueprintCallable, Category="Avaryo|Inventory")
@@ -510,17 +519,28 @@ protected:
 	void RefreshHeldItem();
 	void HoldItem(APickupItem* Item);
 
-	/** Выложить активный предмет в мир: bThrown=false — уронить/поставить, true — метнуть по прицелу. */
-	void ReleaseHeldItem(bool bThrown);
+	/** Выложить активный предмет в мир: bThrown=false — уронить/поставить, true — метнуть. ChargeAlpha 0..1 множит силу. */
+	void ReleaseHeldItem(bool bThrown, float ChargeAlpha = 0.f);
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Avaryo|Inventory")
-	float ThrowImpulseLight;  // сила броска лёгкого предмета
+	float ThrowImpulseLight;  // сила броска лёгкого предмета (база, тап без зарядки)
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Avaryo|Inventory")
 	float ThrowImpulseHeavy;  // сила броска тяжёлого (летит слабее)
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Avaryo|Inventory")
 	float ThrowMaxSpreadDeg;  // макс. разброс броска при полной панике, градусы
+
+	/** Зарядка броска: удержание дольше Min начинает копить силу, к Max — полная (×ThrowChargeMaxMult). */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Avaryo|Inventory")
+	float ThrowChargeMinTime = 0.3f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Avaryo|Inventory")
+	float ThrowChargeMaxTime = 1.5f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Avaryo|Inventory")
+	float ThrowChargeMaxMult = 3.f; // во столько раз сильнее при полной зарядке
+
+	bool bChargingThrow = false; // локально: зажата ли G для зарядки броска
+	float ThrowPressTime = 0.f;  // локально: момент нажатия G
 	void CarryHeavyLowered(APickupItem* Item);
 	void StashItem(APickupItem* Item);
 
@@ -550,6 +570,9 @@ protected:
 
 	UFUNCTION(Server, Reliable)
 	void ServerThrowItem();
+
+	UFUNCTION(Server, Reliable)
+	void ServerThrowCharged(float ChargeAlpha);
 
 	UFUNCTION(Server, Reliable)
 	void ServerEquipSlot(int32 SlotIndex);

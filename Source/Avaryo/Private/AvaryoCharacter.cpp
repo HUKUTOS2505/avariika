@@ -307,9 +307,10 @@ void AAvaryoCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	PlayerInputComponent->BindKey(EKeys::F, IE_Pressed, this, &AAvaryoCharacter::ToggleFlashlight);
 	PlayerInputComponent->BindKey(EKeys::E, IE_Pressed, this, &AAvaryoCharacter::OnInteractPressed);
 	PlayerInputComponent->BindKey(EKeys::E, IE_Released, this, &AAvaryoCharacter::OnInteractReleased);
-	PlayerInputComponent->BindKey(EKeys::G, IE_Pressed, this, &AAvaryoCharacter::DropItem);
+	// G — единая кнопка: тап = слабый бросок, удержание = зарядка силы; в мини-игре = «встать/выйти»
+	PlayerInputComponent->BindKey(EKeys::G, IE_Pressed, this, &AAvaryoCharacter::OnThrowKeyPressed);
+	PlayerInputComponent->BindKey(EKeys::G, IE_Released, this, &AAvaryoCharacter::OnThrowKeyReleased);
 	PlayerInputComponent->BindKey(EKeys::Q, IE_Pressed, this, &AAvaryoCharacter::Shove);
-	PlayerInputComponent->BindKey(EKeys::T, IE_Pressed, this, &AAvaryoCharacter::ThrowItem);
 	// Использование: ЛКМ или R (нажал — эффект/распыление, отпустил — конец распыления)
 	PlayerInputComponent->BindKey(EKeys::LeftMouseButton, IE_Pressed, this, &AAvaryoCharacter::BeginUseHeldItem);
 	PlayerInputComponent->BindKey(EKeys::LeftMouseButton, IE_Released, this, &AAvaryoCharacter::EndUseHeldItem);
@@ -1228,7 +1229,53 @@ void AAvaryoCharacter::ServerThrowItem_Implementation()
 	ThrowItem();
 }
 
-void AAvaryoCharacter::ReleaseHeldItem(bool bThrown)
+void AAvaryoCharacter::OnThrowKeyPressed()
+{
+	// В мини-игре/туалете G = выйти/встать (как раньше)
+	if (CurrentToilet || (CurrentRepairable && CurrentRepairable->IsMinigameRepair()))
+	{
+		DropItem();
+		return;
+	}
+	if (!GetHeldItem())
+	{
+		return; // нечего метать
+	}
+	bChargingThrow = true;
+	ThrowPressTime = GetWorld() ? GetWorld()->GetTimeSeconds() : 0.f;
+}
+
+void AAvaryoCharacter::OnThrowKeyReleased()
+{
+	if (!bChargingThrow)
+	{
+		return;
+	}
+	const float Alpha = GetThrowChargeAlpha();
+	bChargingThrow = false;
+	ServerThrowCharged(Alpha);
+}
+
+float AAvaryoCharacter::GetThrowChargeAlpha() const
+{
+	if (!bChargingThrow || !GetWorld())
+	{
+		return 0.f;
+	}
+	const float Held = GetWorld()->GetTimeSeconds() - ThrowPressTime;
+	return FMath::Clamp((Held - ThrowChargeMinTime) / FMath::Max(0.01f, ThrowChargeMaxTime - ThrowChargeMinTime), 0.f, 1.f);
+}
+
+void AAvaryoCharacter::ServerThrowCharged_Implementation(float ChargeAlpha)
+{
+	if (CurrentToilet || (CurrentRepairable && CurrentRepairable->IsMinigameRepair()))
+	{
+		return;
+	}
+	ReleaseHeldItem(/*bThrown=*/true, FMath::Clamp(ChargeAlpha, 0.f, 1.f));
+}
+
+void AAvaryoCharacter::ReleaseHeldItem(bool bThrown, float ChargeAlpha)
 {
 	APickupItem* Item = GetHeldItem();
 	if (!Item)
@@ -1284,9 +1331,10 @@ void AAvaryoCharacter::ReleaseHeldItem(bool bThrown)
 		Prim->SetSimulatePhysics(true);
 		if (bThrown)
 		{
-			// Бросок: запуляем по прицелу (тяжёлый летит слабее), с подбросом
-			const float Power = bHeavy ? ThrowImpulseHeavy : ThrowImpulseLight;
-			Prim->AddImpulse(AimDir * Power + FVector(0.f, 0.f, 150.f), NAME_None, true);
+			// Бросок: сила базовая (тап) → ×ThrowChargeMaxMult при полной зарядке удержанием
+			const float ChargeMult = 1.f + (ThrowChargeMaxMult - 1.f) * FMath::Clamp(ChargeAlpha, 0.f, 1.f);
+			const float Power = (bHeavy ? ThrowImpulseHeavy : ThrowImpulseLight) * ChargeMult;
+			Prim->AddImpulse(AimDir * Power + FVector(0.f, 0.f, 150.f + 150.f * ChargeAlpha), NAME_None, true);
 		}
 		else if (!bHeavy)
 		{
