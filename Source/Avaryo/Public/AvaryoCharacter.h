@@ -626,6 +626,14 @@ protected:
 	UFUNCTION(Exec)
 	void AvGive(const FString& What);
 
+	/** Дев: качество предмета В РУКАХ (0.25..3): `AvToolQ 3` легче чинить, `AvToolQ 0.3` тяжелее. */
+	UFUNCTION(Exec)
+	void AvToolQ(float Scale);
+
+	/** Дев: выдать ₽ в кассу конторы: `AvMoney 50000` (для теста магазина/апгрейдов/квоты). */
+	UFUNCTION(Exec)
+	void AvMoney(int32 Amount);
+
 	UFUNCTION(Server, Reliable)
 	void ServerAvVital(const FString& Which, float Value);
 
@@ -649,4 +657,10 @@ protected:
 
 	UFUNCTION(Server, Reliable)
 	void ServerAvGive(const FString& What);
+
+	UFUNCTION(Server, Reliable)
+	void ServerAvToolQ(float Scale);
+
+	UFUNCTION(Server, Reliable)
+	void ServerAvMoney(int32 Amount);
 };

@@ -955,6 +955,29 @@ void AAvaryoCharacter::AvGive(const FString& What)
 }
 void AAvaryoCharacter::ServerAvGive_Implementation(const FString& What) { AvGive(What); }
 
+void AAvaryoCharacter::AvToolQ(float Scale)
+{
+	if (!HasAuthority()) { ServerAvToolQ(Scale); return; }
+	if (APickupItem* Held = GetHeldItem())
+	{
+		Held->ToolQualityScale = FMath::Clamp(Scale, 0.25f, 3.f);
+	}
+}
+void AAvaryoCharacter::ServerAvToolQ_Implementation(float Scale) { AvToolQ(Scale); }
+
+void AAvaryoCharacter::AvMoney(int32 Amount)
+{
+	if (!HasAuthority()) { ServerAvMoney(Amount); return; }
+	if (UGameInstance* GI = GetGameInstance())
+	{
+		if (UCompanyLedgerSubsystem* Ledger = GI->GetSubsystem<UCompanyLedgerSubsystem>())
+		{
+			Ledger->AddBalance(Amount);
+		}
+	}
+}
+void AAvaryoCharacter::ServerAvMoney_Implementation(int32 Amount) { AvMoney(Amount); }
+
 // ---------- Оператор: нагрудные камеры ----------
 
 bool AAvaryoCharacter::CanUseMonitor() const
