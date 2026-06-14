@@ -272,6 +272,7 @@ void ARunState::BeginPlay()
 			bQuotaFailed = Ledger->IsQuotaFailed();
 		}
 	}
+	RefreshCompanyMirror(); // живой баланс/уровни/карьера → клиентам
 
 	// Косяки оборудования (§18): шанс дешёвого комплекта зависит от репутации
 	// (хорошая контора реже получает рыночный хлам, плохая — чаще).
@@ -301,6 +302,49 @@ void ARunState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetim
 	DOREPLIFETIME(ARunState, QuotaPaid);
 	DOREPLIFETIME(ARunState, QuotaDeadlineShift);
 	DOREPLIFETIME(ARunState, bQuotaFailed);
+	DOREPLIFETIME(ARunState, CompanyBalanceLive);
+	DOREPLIFETIME(ARunState, EquipWelder);
+	DOREPLIFETIME(ARunState, EquipTester);
+	DOREPLIFETIME(ARunState, EquipFlashlight);
+	DOREPLIFETIME(ARunState, EquipExtinguisher);
+	DOREPLIFETIME(ARunState, EquipRadio);
+	DOREPLIFETIME(ARunState, CareerRepairs);
+	DOREPLIFETIME(ARunState, CareerBlownUp);
+	DOREPLIFETIME(ARunState, CareerIncidents);
+}
+
+void ARunState::RefreshCompanyMirror()
+{
+	if (!HasAuthority())
+	{
+		return;
+	}
+	const UGameInstance* GI = GetWorld() ? GetWorld()->GetGameInstance() : nullptr;
+	const UCompanyLedgerSubsystem* Ledger = GI ? GI->GetSubsystem<UCompanyLedgerSubsystem>() : nullptr;
+	if (!Ledger)
+	{
+		return;
+	}
+	CompanyBalanceLive = Ledger->GetBalance();
+	EquipWelder       = Ledger->GetEquipmentLevel(FName(TEXT("Welder")));
+	EquipTester       = Ledger->GetEquipmentLevel(FName(TEXT("Tester")));
+	EquipFlashlight   = Ledger->GetEquipmentLevel(FName(TEXT("Flashlight")));
+	EquipExtinguisher = Ledger->GetEquipmentLevel(FName(TEXT("Extinguisher")));
+	EquipRadio        = Ledger->GetEquipmentLevel(FName(TEXT("Radio")));
+	const FCareerStats& C = Ledger->GetCareer();
+	CareerRepairs   = C.TotalRepairs;
+	CareerBlownUp   = C.BuildingsBlownUp;
+	CareerIncidents = C.TotalIncidents;
+}
+
+int32 ARunState::GetEquipmentLevelRep(FName Tool) const
+{
+	if (Tool == FName(TEXT("Welder")))       { return EquipWelder; }
+	if (Tool == FName(TEXT("Tester")))       { return EquipTester; }
+	if (Tool == FName(TEXT("Flashlight")))   { return EquipFlashlight; }
+	if (Tool == FName(TEXT("Extinguisher"))) { return EquipExtinguisher; }
+	if (Tool == FName(TEXT("Radio")))        { return EquipRadio; }
+	return 1;
 }
 
 ARunState* ARunState::Get(UWorld* World)
@@ -335,6 +379,8 @@ void ARunState::Tick(float DeltaSeconds)
 	{
 		return;
 	}
+
+	RefreshCompanyMirror(); // живой баланс/уровни (магазин/мини-игра у клиента) — дёшево
 
 	// Статистика + поражение (вся бригада ранена — поднимать некому)
 	const float Now = GetWorld()->GetTimeSeconds();
@@ -755,6 +801,7 @@ void ARunState::FinishRun(ERunPhase NewPhase)
 			bQuotaFailed = Ledger->IsQuotaFailed();
 		}
 	}
+	RefreshCompanyMirror(); // карьера/баланс/уровни для «Акта» у клиента
 
 	DispatcherSay(bWon ? DispatcherLines::Victory : DispatcherLines::Defeat,
 		FString(), /*bImportant=*/true);

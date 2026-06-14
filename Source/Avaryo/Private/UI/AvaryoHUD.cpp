@@ -43,12 +43,9 @@ void AAvaryoHUD::DrawShop()
 		return;
 	}
 
-	const UCompanyLedgerSubsystem* Ledger = nullptr;
-	if (const UGameInstance* GI = GetGameInstance())
-	{
-		Ledger = GI->GetSubsystem<UCompanyLedgerSubsystem>();
-	}
-	const int32 Balance = Ledger ? Ledger->GetBalance() : 0;
+	// Читаем из ARunState (реплицируется), а не из host-only леджера — иначе у клиента баланс/уровни 0
+	const ARunState* Run = ARunState::Get(GetWorld());
+	const int32 Balance = Run ? Run->GetCompanyBalanceLive() : 0;
 
 	const float SizeX = Canvas->SizeX;
 	const float SizeY = Canvas->SizeY;
@@ -76,7 +73,7 @@ void AAvaryoHUD::DrawShop()
 	};
 	for (const FShopRow& R : Rows)
 	{
-		const int32 Lvl = Ledger ? Ledger->GetEquipmentLevel(FName(R.Cat)) : 1;
+		const int32 Lvl = Run ? Run->GetEquipmentLevelRep(FName(R.Cat)) : 1;
 		FString Line;
 		FLinearColor Col;
 		if (Lvl >= R.MaxLevel)
@@ -505,17 +502,10 @@ void AAvaryoHUD::DrawHUD()
 			const FString RepLine = FString::Printf(TEXT("Репутация: %s"), *ARunState::ReputationTitle(Run->GetReputation()));
 			TY += DrawCentered(RepLine, TextDim, TY, 1.0f) + 6.f;
 
-			// Карьера конторы за всё время (копится в сейве, переживает выход)
-			if (const UGameInstance* GI = GetGameInstance())
-			{
-				if (const UCompanyLedgerSubsystem* Ledger = GI->GetSubsystem<UCompanyLedgerSubsystem>())
-				{
-					const FCareerStats& C = Ledger->GetCareer();
-					const FString CareerLine = FString::Printf(TEXT("Карьера: починок всего %d · домов спалили %d · инцидентов %d"),
-						C.TotalRepairs, C.BuildingsBlownUp, C.TotalIncidents);
-					TY += DrawCentered(CareerLine, TextDim, TY, 0.85f) + 8.f;
-				}
-			}
+			// Карьера конторы за всё время (реплицируется из ARunState — у клиента тоже верно)
+			const FString CareerLine = FString::Printf(TEXT("Карьера: починок всего %d · домов спалили %d · инцидентов %d"),
+				Run->GetCareerRepairs(), Run->GetCareerBlownUp(), Run->GetCareerIncidents());
+			TY += DrawCentered(CareerLine, TextDim, TY, 0.85f) + 8.f;
 
 			// Квота диспетчера (game-over крючок) — показываем только когда включена
 			if (Run->IsQuotaFailed())

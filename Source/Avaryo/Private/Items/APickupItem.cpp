@@ -77,6 +77,7 @@ void APickupItem::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifet
 	DOREPLIFETIME(APickupItem, Charges);
 	DOREPLIFETIME(APickupItem, bSpraying);
 	DOREPLIFETIME(APickupItem, bToggledOn);
+	DOREPLIFETIME(APickupItem, ToolQualityScale);
 }
 
 void APickupItem::Tick(float DeltaSeconds)

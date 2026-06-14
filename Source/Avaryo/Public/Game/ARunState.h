@@ -219,6 +219,14 @@ public:
 	UFUNCTION(BlueprintPure, Category="Run") bool IsQuotaActive() const { return QuotaTarget > 0; }
 	UFUNCTION(BlueprintPure, Category="Run") bool IsQuotaFailed() const { return bQuotaFailed; }
 
+	// Живые данные конторы — реплицируются с сервера (леджер host-only), чтобы у клиента
+	// совпадали зона мини-игры (по уровню инструмента), магазин и карьера на «Акте».
+	UFUNCTION(BlueprintPure, Category="Run") int32 GetCompanyBalanceLive() const { return CompanyBalanceLive; }
+	UFUNCTION(BlueprintPure, Category="Run") int32 GetEquipmentLevelRep(FName Tool) const;
+	UFUNCTION(BlueprintPure, Category="Run") int32 GetCareerRepairs() const { return CareerRepairs; }
+	UFUNCTION(BlueprintPure, Category="Run") int32 GetCareerBlownUp() const { return CareerBlownUp; }
+	UFUNCTION(BlueprintPure, Category="Run") int32 GetCareerIncidents() const { return CareerIncidents; }
+
 	/** Название репутационного статуса конторы по очкам. */
 	static FString ReputationTitle(int32 Points);
 
@@ -284,6 +292,20 @@ protected:
 
 	UPROPERTY(Replicated)
 	bool bQuotaFailed = false;
+
+	/** Живые данные конторы из леджера, обновляются на сервере в Tick и реплицируются. */
+	UPROPERTY(Replicated) int32 CompanyBalanceLive = 0;
+	UPROPERTY(Replicated) int32 EquipWelder = 1;
+	UPROPERTY(Replicated) int32 EquipTester = 1;
+	UPROPERTY(Replicated) int32 EquipFlashlight = 1;
+	UPROPERTY(Replicated) int32 EquipExtinguisher = 1;
+	UPROPERTY(Replicated) int32 EquipRadio = 1;
+	UPROPERTY(Replicated) int32 CareerRepairs = 0;
+	UPROPERTY(Replicated) int32 CareerBlownUp = 0;
+	UPROPERTY(Replicated) int32 CareerIncidents = 0;
+
+	/** Сервер: подтянуть живые данные конторы из леджера в реплицируемые члены. */
+	void RefreshCompanyMirror();
 
 	/** Сервер: когда в эфир в следующий раз прорвётся чужой голос (только пока включена рация). */
 	float NextRadioGhostTime;

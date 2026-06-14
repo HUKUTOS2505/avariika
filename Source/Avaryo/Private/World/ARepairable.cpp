@@ -642,12 +642,11 @@ float ARepairable::RepairerToolQuality() const
 	}
 	if (!ToolCat.IsNone())
 	{
-		if (const UGameInstance* GI = GetWorld() ? GetWorld()->GetGameInstance() : nullptr)
+		// Уровень апгрейда берём из ARunState (реплицируется) — чтобы зона совпадала у клиента,
+		// а не из host-only леджера (у клиента он пустой → рассинхрон зоны → удар током).
+		if (const ARunState* Run = ARunState::Get(GetWorld()))
 		{
-			if (const UCompanyLedgerSubsystem* Ledger = GI->GetSubsystem<UCompanyLedgerSubsystem>())
-			{
-				Q *= 1.f + 0.2f * FMath::Max(0, Ledger->GetEquipmentLevel(ToolCat) - 1);
-			}
+			Q *= 1.f + 0.2f * FMath::Max(0, Run->GetEquipmentLevelRep(ToolCat) - 1);
 		}
 	}
 

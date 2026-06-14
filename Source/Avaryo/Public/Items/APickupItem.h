@@ -79,8 +79,9 @@ public:
 	float EffectMagnitude;
 
 	/** Качество инструмента для мини-игр починки: >1 легче (шире зона, медленнее курсор),
-	 *  <1 тяжелее. 1 — нейтрально. Апгрейды магазина поднимают, дешёвый комплект — опускает. */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Pickup|Use", meta=(ClampMin="0.25", ClampMax="3.0"))
+	 *  <1 тяжелее. 1 — нейтрально. Апгрейды магазина поднимают, дешёвый комплект — опускает.
+	 *  Реплицируется: сервер может менять в рантайме, клиент должен видеть то же. */
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category="Pickup|Use", meta=(ClampMin="0.25", ClampMax="3.0"))
 	float ToolQualityScale = 1.f;
 
 	/** Запас использований. -1 — бесконечно. При нуле предмет исчезает. */
