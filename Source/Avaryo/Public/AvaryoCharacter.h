@@ -269,6 +269,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Audio")
 	TObjectPtr<USoundBase> FootstepRunSound;
 
+	/** Проиграть звук у ВСЕХ игроков (кооп): сервер зовёт — слышат все. */
+	UFUNCTION(NetMulticast, Unreliable)
+	void MulticastSound(USoundBase* Sound, FVector Loc, float Vol);
+
 	/** Шкалы: HP, паника, выносливость, туалет. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Avaryo")
 	TObjectPtr<UVitalsComponent> VitalsComponent;

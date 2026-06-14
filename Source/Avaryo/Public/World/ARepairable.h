@@ -435,6 +435,14 @@ protected:
 	UFUNCTION(NetMulticast, Unreliable)
 	void MulticastExplosionShake();
 
+	/** Проиграть звук у ВСЕХ (кооп): сервер зовёт — слышат и хост, и клиенты. */
+	UFUNCTION(NetMulticast, Unreliable)
+	void MulticastSound(USoundBase* Sound, FVector Loc, float Vol);
+
+	/** Искры замыкания у ВСЕХ. */
+	UFUNCTION(NetMulticast, Unreliable)
+	void MulticastSparkFX(FVector Loc);
+
 	/** Звук взрыва газа (играется у всех через мультикаст). */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Repairable|Audio")
 	TObjectPtr<USoundBase> ExplosionSound;

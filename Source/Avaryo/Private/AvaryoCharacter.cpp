@@ -1240,10 +1240,10 @@ void AAvaryoCharacter::PickupItem(APickupItem* Item)
 		return;
 	}
 
-	// Звук подбора (на листен-сервере слышит хост; клиентам — позже мультикастом)
+	// Звук подбора — у всех
 	if (PickupSound)
 	{
-		UGameplayStatics::PlaySoundAtLocation(this, PickupSound, GetActorLocation());
+		MulticastSound(PickupSound, GetActorLocation(), 1.f);
 	}
 
 	// Передача из рук в руки: забираем предмет у того, кто его протянул
@@ -1584,7 +1584,7 @@ void AAvaryoCharacter::ApplyItemEffect(APickupItem* Item)
 	else if (Item->ItemEffect == EItemEffect::Calm && SmokeSound) { EffSnd = SmokeSound; }
 	if (EffSnd)
 	{
-		UGameplayStatics::PlaySoundAtLocation(this, EffSnd, GetActorLocation());
+		MulticastSound(EffSnd, GetActorLocation(), 1.f);
 	}
 
 	switch (Item->ItemEffect)
@@ -2132,6 +2132,14 @@ void AAvaryoCharacter::Shove()
 	ServerShove_Implementation();
 }
 
+void AAvaryoCharacter::MulticastSound_Implementation(USoundBase* Sound, FVector Loc, float Vol)
+{
+	if (Sound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, Sound, Loc, Vol);
+	}
+}
+
 void AAvaryoCharacter::ServerShove_Implementation()
 {
 	// Нельзя толкать, пока сам ранен или залочен в мини-игре
@@ -2146,9 +2154,9 @@ void AAvaryoCharacter::ServerShove_Implementation()
 	}
 	ShoveReadyTime = Now + ShoveCooldownTime;
 
-	if (ShoveSound) // глухой удар толчка (на листен-сервере слышит хост)
+	if (ShoveSound) // глухой удар толчка — у всех
 	{
-		UGameplayStatics::PlaySoundAtLocation(this, ShoveSound, GetActorLocation());
+		MulticastSound(ShoveSound, GetActorLocation(), 1.f);
 	}
 
 	FVector ViewLoc;

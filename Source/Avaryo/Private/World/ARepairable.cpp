@@ -222,9 +222,9 @@ bool ARepairable::TryInsertBy(AAvaryoCharacter* Who)
 	PrereqIndex++;
 	PrereqProgress = 0.f;
 	MakeNoise(0.6f, Who, GetActorLocation());
-	if (InsertSound) // звук установки (на листен-сервере слышит хост)
+	if (InsertSound) // установка — у всех
 	{
-		UGameplayStatics::PlaySoundAtLocation(this, InsertSound, GetActorLocation());
+		MulticastSound(InsertSound, GetActorLocation(), 1.f);
 	}
 	RefreshStatusVisual();
 	return true;
@@ -720,10 +720,10 @@ void ARepairable::TryHitBy(AAvaryoCharacter* Who)
 		return;
 	}
 
-	// Тактильный «тык» мини-игры (на листен-сервере слышит хост; клиентам — позже мультикастом)
+	// Тактильный «тык» мини-игры — у всех
 	if (MinigameHitSound)
 	{
-		UGameplayStatics::PlaySoundAtLocation(this, MinigameHitSound, GetActorLocation(), 0.5f);
+		MulticastSound(MinigameHitSound, GetActorLocation(), 0.5f);
 	}
 
 	// Prereq-мини-игра (заварка / починка руками): курсор в зелёной зоне = прогресс этапа, промах = откат
@@ -911,10 +911,9 @@ void ARepairable::FinishRepair(AAvaryoCharacter* Who)
 		}
 	}
 
-	// Звук «починили» (на листен-сервере слышит хост; для клиентов — позже через мультикаст)
-	if (RepairDoneSound)
+	if (RepairDoneSound) // «починили» — у всех
 	{
-		UGameplayStatics::PlaySoundAtLocation(this, RepairDoneSound, GetActorLocation());
+		MulticastSound(RepairDoneSound, GetActorLocation(), 1.f);
 	}
 
 	OnRepairFinished.Broadcast(this, Who);
@@ -935,10 +934,9 @@ void ARepairable::ShortCircuit(AAvaryoCharacter* Culprit)
 		}
 	}
 	MakeNoise(1.5f, Culprit, GetActorLocation());
-	if (SparkFX) // мелкие искры дуги (на листен-сервере видит хост; клиентам — позже мультикастом)
+	if (SparkFX) // мелкие искры дуги — у всех
 	{
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, SparkFX, GetActorLocation() + FVector(0, 0, 60.f),
-			GetActorRotation(), FVector(SparkScale));
+		MulticastSparkFX(GetActorLocation() + FVector(0, 0, 60.f));
 	}
 
 	LockoutRemaining = LockoutDuration;
@@ -1015,6 +1013,22 @@ void ARepairable::MulticastExplosionShake_Implementation()
 	if (ExplosionFX)
 	{
 		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ExplosionFX, GetActorLocation(), GetActorRotation());
+	}
+}
+
+void ARepairable::MulticastSound_Implementation(USoundBase* Sound, FVector Loc, float Vol)
+{
+	if (Sound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, Sound, Loc, Vol);
+	}
+}
+
+void ARepairable::MulticastSparkFX_Implementation(FVector Loc)
+{
+	if (SparkFX)
+	{
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, SparkFX, Loc, GetActorRotation(), FVector(SparkScale));
 	}
 }
 
