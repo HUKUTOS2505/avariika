@@ -1310,7 +1310,11 @@ float AAvaryoCharacter::GetSelfNoise01() const
 		return 0.f;
 	}
 	const float Age = GetWorld()->GetTimeSeconds() - SelfNoiseTime;
-	const float Decay = FMath::Clamp(1.f - Age / 0.8f, 0.f, 1.f); // затухает за ~0.8с
+	if (Age <= SelfNoiseHoldTime)
+	{
+		return SelfNoiseLevel; // короткий пик-холд — даже одиночный блип (икота, батарея) видно на шумомере
+	}
+	const float Decay = FMath::Clamp(1.f - (Age - SelfNoiseHoldTime) / SelfNoiseDecayTime, 0.f, 1.f);
 	return SelfNoiseLevel * Decay;
 }
 

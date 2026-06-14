@@ -120,6 +120,9 @@ protected:
 	/** Мерцание и случайные отключения при низком заряде. Чистая косметика, выполняется на всех машинах. */
 	void UpdateFlicker(float DeltaTime);
 
+	/** Внезапная темнота: выключиться, скачок паники + испуганный вздох (шум). Сервер. */
+	void TriggerDeadBatteryFright();
+
 private:
 	/** Яркость включённого луча: BeamIntensity, если задана (>0), иначе из BP. */
 	float OnIntensity() const { return BeamIntensity > 0.f ? BeamIntensity : DefaultIntensity; }

@@ -29,8 +29,30 @@ UFlashlightComponent::UFlashlightComponent()
 
 void UFlashlightComponent::DebugSetBattery(float Pct)
 {
+	const float OldLevel = BatteryLevel;
 	BatteryLevel = FMath::Clamp(Pct, 0.f, 100.f);
 	if (BatteryLevel >= LowBatteryThreshold) { bLowBatteryNotified = false; }
+
+	// Дев-команда `AvBattery 0`: сразу показать испуг от севшей батареи (паника + шум),
+	// не дожидаясь медленного разряда — иначе тест неудобный.
+	if (BatteryLevel <= 0.f && OldLevel > 0.f && bIsOn)
+	{
+		OnBatteryEmpty.Broadcast();
+		TriggerDeadBatteryFright();
+	}
+}
+
+void UFlashlightComponent::TriggerDeadBatteryFright()
+{
+	TurnOff(); // батарея села — выключаемся принудительно
+
+	// Внезапная темнота пугает: скачок паники + испуганный вздох (выдаёт позицию)
+	if (AAvaryoCharacter* Char = Cast<AAvaryoCharacter>(GetOwner()))
+	{
+		if (Char->VitalsComponent) { Char->VitalsComponent->AddPanic(DeadBatteryFright); }
+		Char->MakeNoise(0.5f, Char, Char->GetActorLocation());
+		Char->RegisterSelfNoise(0.5f);
+	}
 }
 
 void UFlashlightComponent::BeginPlay()
@@ -73,15 +95,7 @@ void UFlashlightComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 		if (BatteryLevel <= 0.f && OldLevel > 0.f)
 		{
 			OnBatteryEmpty.Broadcast();
-			TurnOff(); // батарея села — выключаемся принудительно
-
-			// Внезапная темнота пугает: скачок паники + испуганный вздох (выдаёт позицию)
-			if (AAvaryoCharacter* Char = Cast<AAvaryoCharacter>(GetOwner()))
-			{
-				if (Char->VitalsComponent) { Char->VitalsComponent->AddPanic(DeadBatteryFright); }
-				Char->MakeNoise(0.5f, Char, Char->GetActorLocation());
-				Char->RegisterSelfNoise(0.5f);
-			}
+			TriggerDeadBatteryFright();
 		}
 	}
 

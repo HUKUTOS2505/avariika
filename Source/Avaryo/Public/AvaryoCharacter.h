@@ -553,6 +553,15 @@ protected:
 
 	float SelfNoiseLevel = 0.f;  // последний пик «своего шума» 0..1 (для шумомера)
 	float SelfNoiseTime = 0.f;   // когда был пик (для затухания)
+
+	/** Сколько секунд пик шума держится на полную, прежде чем затухать (чтобы короткий блип — икота,
+	 *  севшая батарея — был читаем на шумомере, а не мелькал на доли секунды). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Noise", meta=(ClampMin="0.0"))
+	float SelfNoiseHoldTime = 0.45f;
+
+	/** За сколько секунд пик шума затухает до нуля после удержания. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Noise", meta=(ClampMin="0.1"))
+	float SelfNoiseDecayTime = 1.4f;
 	void CarryHeavyLowered(APickupItem* Item);
 	void StashItem(APickupItem* Item);
 
