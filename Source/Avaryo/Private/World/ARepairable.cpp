@@ -215,7 +215,9 @@ void ARepairable::Tick(float DeltaSeconds)
 			FRepairStage S;
 			if (GetCurrentStage(S))
 			{
-				PrereqProgress = FMath::Min(PrereqProgress + DeltaSeconds / FMath::Max(S.Duration, 0.1f), 1.f);
+				// Паника растягивает заливку/удержание (трясущиеся руки) — как и курсорные мини-игры
+				const float PanicSlow = 1.f + PanicHardenScale * RepairerPanic01();
+				PrereqProgress = FMath::Min(PrereqProgress + DeltaSeconds / FMath::Max(S.Duration * PanicSlow, 0.1f), 1.f);
 				NoiseAccum += DeltaSeconds;
 				if (NoiseAccum >= 1.f)
 				{

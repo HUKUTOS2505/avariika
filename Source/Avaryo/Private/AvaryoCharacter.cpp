@@ -1635,9 +1635,11 @@ void AAvaryoCharacter::BeginUseHeldItem()
 
 		if (Item->UseCastTime > 0.f)
 		{
-			// Применение со временем: держи кнопку (аптечка 6 сек, сигарета 2 сек)
-			UseCastRemaining = Item->UseCastTime;
-			UseCastDuration = Item->UseCastTime;
+			// Применение со временем: держи кнопку. Паника = трясущиеся руки → дольше возишься.
+			const float Panic01 = VitalsComponent ? FMath::Clamp(VitalsComponent->GetPanic() / 100.f, 0.f, 1.f) : 0.f;
+			const float CastTime = Item->UseCastTime * (1.f + Panic01 * ItemUsePanicScale);
+			UseCastRemaining = CastTime;
+			UseCastDuration = CastTime;
 		}
 		else
 		{

@@ -461,6 +461,10 @@ protected:
 	UPROPERTY(Replicated)
 	float UseCastDuration;
 
+	/** Насколько паника удлиняет применение предметов (1 = при 100% паники время ×2). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Inventory")
+	float ItemUsePanicScale = 1.f;
+
 	/** Вытянул ли предмет вперёд для передачи. */
 	UPROPERTY(ReplicatedUsing=OnRep_Offering, BlueprintReadOnly, Category="Avaryo|Inventory")
 	bool bOffering;
