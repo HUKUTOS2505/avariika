@@ -84,8 +84,12 @@ ARepairable::ARepairable()
 	// Утечка газа = лёгкая струйка пара + шипение (НЕ густой дым «как горит»)
 	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> GasFX(TEXT("/Game/NiagaraExamples/Utilities/SpriteGeneration/SmokePuffLight/NS_SmokePuffLight.NS_SmokePuffLight"));
 	if (GasFX.Succeeded()) { GasLeakFX = GasFX.Object; }
-	static ConstructorHelpers::FObjectFinder<USoundBase> HissSnd(TEXT("/Game/Audio/SFX/GasHiss.GasHiss"));
-	if (HissSnd.Succeeded()) { GasHissSound = HissSnd.Object; }
+	// Звук утечки газа ВЫКЛ по просьбе (нынешний — «свист-свист»); вернём с нормальным газ-эффектом
+	// static ConstructorHelpers::FObjectFinder<USoundBase> HissSnd(TEXT("/Game/Audio/SFX/GasHiss.GasHiss"));
+	// if (HissSnd.Succeeded()) { GasHissSound = HissSnd.Object; }
+	// Бульканье (Magic Water) — на ЗАЛИВ БЕНЗИНА (генератор), а не на кофе
+	static ConstructorHelpers::FObjectFinder<USoundBase> FuelSnd(TEXT("/Game/Audio/SFX/DrinkGlug.DrinkGlug"));
+	if (FuelSnd.Succeeded()) { FuelFillSound = FuelSnd.Object; }
 
 	GasHissComp = CreateDefaultSubobject<UAudioComponent>(TEXT("GasHissAudio"));
 	GasHissComp->SetupAttachment(MeshComponent);
@@ -261,7 +265,11 @@ void ARepairable::Tick(float DeltaSeconds)
 	if (FillAudioComp)
 	{
 		USoundBase* WantLoop = nullptr;
-		if (bPrereqAutoFilling) { WantLoop = FillLoopSound; }
+		if (bPrereqAutoFilling)
+		{
+			// Генератор (стартер) = залив бензина → бульканье; остальное (кабель) → прокладка
+			WantLoop = (MinigameType == ERepairMinigameType::Starter && FuelFillSound) ? FuelFillSound : FillLoopSound;
+		}
 		else if (bDoingPrereqHold && !bBotching) { WantLoop = WeldLoopSound; } // сварка (колхоз руками — без дуги)
 		if (WantLoop)
 		{

@@ -41,6 +41,7 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 	virtual bool CanJumpInternal_Implementation() const override;
+	virtual void Landed(const FHitResult& Hit) override;
 
 	// ---------- Инвентарь ----------
 
@@ -276,6 +277,14 @@ public:
 	/** Зацикленный цикл шагов (звуки — многошаговые лупы, играем непрерывно, не по одному). */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Avaryo|Audio")
 	TObjectPtr<UAudioComponent> FootstepAudio;
+
+	/** Звук применения предмета во время каста (играет, пока идёт; гаснет при отмене). */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Avaryo|Audio")
+	TObjectPtr<UAudioComponent> UseCastAudio;
+
+	/** Звук прыжка/приземления. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Audio")
+	TObjectPtr<USoundBase> JumpSound;
 
 	/** Звук тумблера рации (вкл/выкл). */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Audio")

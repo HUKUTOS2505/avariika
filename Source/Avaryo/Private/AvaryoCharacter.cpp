@@ -162,6 +162,14 @@ AAvaryoCharacter::AAvaryoCharacter()
 	FootstepAudio = CreateDefaultSubobject<UAudioComponent>(TEXT("FootstepAudio"));
 	FootstepAudio->SetupAttachment(RootComponent);
 	FootstepAudio->bAutoActivate = false;
+
+	// Звук применения предмета во время каста — гоняется в Tick по UseCastRemaining (реплиц.)
+	UseCastAudio = CreateDefaultSubobject<UAudioComponent>(TEXT("UseCastAudio"));
+	UseCastAudio->SetupAttachment(RootComponent);
+	UseCastAudio->bAutoActivate = false;
+
+	static ConstructorHelpers::FObjectFinder<USoundBase> JumpSnd(TEXT("/Game/Survival_SFX/Movement/Jump_stone.Jump_stone"));
+	if (JumpSnd.Succeeded()) { JumpSound = JumpSnd.Object; }
 }
 
 void AAvaryoCharacter::BeginPlay()
@@ -215,6 +223,22 @@ void AAvaryoCharacter::Tick(float DeltaSeconds)
 		{
 			FootstepAudio->Stop();
 			FootstepAudio->SetSound(nullptr);
+		}
+	}
+
+	// Звук применения предмета во время каста (UseCastRemaining реплицируется → у всех).
+	// Играет всё время каста, гаснет при отмене (UseCastRemaining=0). Лупится, если у волны looping.
+	if (UseCastAudio)
+	{
+		USoundBase* WantUse = (UseCastRemaining > 0.f) ? ItemUseSoundFor(GetHeldItem()) : nullptr;
+		if (WantUse)
+		{
+			if (UseCastAudio->Sound != WantUse) { UseCastAudio->SetSound(WantUse); UseCastAudio->Play(); }
+		}
+		else if (UseCastAudio->Sound != nullptr)
+		{
+			UseCastAudio->Stop();
+			UseCastAudio->SetSound(nullptr);
 		}
 	}
 
@@ -486,6 +510,16 @@ bool AAvaryoCharacter::CanJumpInternal_Implementation() const
 	return (!VitalsComponent || !VitalsComponent->IsWounded())
 		&& !IsUsingItem()
 		&& Super::CanJumpInternal_Implementation();
+}
+
+void AAvaryoCharacter::Landed(const FHitResult& Hit)
+{
+	Super::Landed(Hit);
+	// Звук приземления — локально на каждой машине для приземлившегося персонажа (как шаги)
+	if (JumpSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, JumpSound, GetActorLocation(), bIsCrouched ? 0.4f : 0.7f);
+	}
 }
 
 // ---------- Движение ----------
@@ -1761,11 +1795,7 @@ void AAvaryoCharacter::BeginUseHeldItem()
 			const float CastTime = Item->UseCastTime * (1.f + Panic01 * ItemUsePanicScale);
 			UseCastRemaining = CastTime;
 			UseCastDuration = CastTime;
-			// Звук — В НАЧАЛЕ действия (синхронно с перевязкой/применением), у всех
-			if (USoundBase* S = ItemUseSoundFor(Item))
-			{
-				MulticastSound(S, GetActorLocation(), 1.f);
-			}
+			// Звук каста ведёт UseCastAudio в Tick (играет всё время каста, гаснет при отмене)
 		}
 		else
 		{
@@ -2170,7 +2200,7 @@ USoundBase* AAvaryoCharacter::ItemUseSoundFor(const APickupItem* Item) const
 	{
 		if (Item->ItemEffect == EItemEffect::Heal && HealSound) { return HealSound; }
 		if (Item->ItemEffect == EItemEffect::Calm && SmokeSound) { return SmokeSound; }
-		if (Item->ItemEffect == EItemEffect::Drink && DrinkSound) { return DrinkSound; }
+		if (Item->ItemEffect == EItemEffect::Drink) { return nullptr; } // кофе: нет нормального глотка, звук пока выкл
 	}
 	return UseSound;
 }

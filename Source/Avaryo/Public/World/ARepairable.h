@@ -467,6 +467,10 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Repairable|Audio")
 	TObjectPtr<USoundBase> WeldLoopSound;
 
+	/** Зацикленный звук залива бензина (AutoFill на генераторе) — бульканье. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Repairable|Audio")
+	TObjectPtr<USoundBase> FuelFillSound;
+
 	/** Звук «генератор завёлся» (для объекта со стартером — вместо общего «починили»). */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Repairable|Audio")
 	TObjectPtr<USoundBase> EngineStartSound;
