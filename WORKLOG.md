@@ -17,6 +17,23 @@
 - Перед «релизом» вернуть Health=100, Panic=0 в `VitalsComponent.cpp` (сейчас 50/50 для тестов).
 - 3D-модели делает пользователь в **meshy.ai** по промптам Claude; анимации делает пользователь. Импорт моделей — `Scripts/` + `asset.import` или `set_static_mesh` по метке актора.
 
+## СЕССИЯ 2026-06-15 — МОДУЛЬ «Хаб + Доска заявок» (мета-петля), автономно
+
+Пользователь ушёл учить редактор по урокам **MakeYourGame!** (30 уроков), дал отмашку автономно делать всё, что НЕ требует его глаз: хаб, окружение, «стену с вызовами», диспетчера, звуки, эффекты, механики по `CONCEPT.md`.
+
+**Ключевой факт сессии:** скриншоты, которые я триггерю через плагин, в фоне НЕ рендерятся (редактор не рисует кадр без фокуса/PIE) → свои скрины снять не могу. Но скрины, которые снимает ПОЛЬЗОВАТЕЛЬ, я читаю нормально (вопрос был в пути к файлу). Вывод: красивый арт/визуал — за пользователем (+гайд `DOM_BUILD_GUIDE.md`), за мной — код/гейплей/аудио/координаты. Greybox-«красоту» не строю (отвергнуто ранее).
+
+### МОДУЛЬ «Хаб + Доска заявок» — КОД ГОТОВ, СБОРКА/L_Hub/смоук — ОЖИДАЮТ ЗАКРЫТИЯ РЕДАКТОРА
+Спина мета-петли из `CONCEPT.md` (ХАБ → заявка с доски → выезд → объект → «Акт» → возврат на базу):
+- **`UDispatchSubsystem`** (GameInstanceSubsystem, переживает ServerTravel как леджер): помнит `HomeHubMap` (куда вернуться) + активную заявку (`ActiveCallId/Title`). `BeginJob()` / `ClearActiveCall()`.
+- **`ACallBoard`** (`World/ACallBoard.{h,cpp}`) — «стена с вызовами». Компоненты: Zone (box) + Board (cube-меш, заменит арт) + Label. `TArray<FCallListing>` (Id/Title/Brief/ObjectMap/bAvailable). Дефолт: Дом доступен (`/Game/Avariika/Maps/L_Dom`), Завод/Больница «скоро». `AcceptBy()` (сервер): пишет в DispatchSubsystem хаб+заявку → диспетчер брифинг → `ServerTravel(ObjectMap?listen)` через таймер `TravelDelay`. `HubMapOverride` (явный путь хаба, без PIE-префикса).
+- **`AAvaryoCharacter`**: `FindFocusedCallBoard()` (свип из камеры + оверлап-фолбэк, как у предметов), маршрут E → `Board->AcceptBy(this)`, `FocusedCallBoard` + геттер для HUD.
+- **`ARunState`**: `bHubMode` = есть ли `ACallBoard` на карте. В хабе — НЕ забег: BeginPlay не ломает объекты и `return`, Tick `return` (иначе 0 задач = мгновенная «победа»!), своё приветствие `HubWelcome`. `AnnounceCallAccepted()` (пул `CallBriefing`). `RequestRestart()`: если `DispatchSubsystem->HasHomeHub()` → `ServerTravel(Hub?listen)` (возврат на базу после «Акта»), иначе старый `?restart`.
+- **HUD**: подсказка «[E] Взять заявку: <Title>» когда смотришь на доску.
+- **`Scripts/build_hub.py`** (идемпотентный, headless): создаёт `L_Hub` — функциональный каркас (база 16×11м + гаражный бокс, MOVABLE-свет, PlayerStart, `ACallBoard` с `HubMapOverride`, фургон Hilux/Gazelle, верстак, GameMode Avaryo). Это РАБОЧИЙ каркас, не финальный арт — красоту наводит пользователь/Fab.
+
+**ОСТАЛОСЬ (нужен ЗАКРЫТЫЙ редактор):** 1) `Build.bat avariikaEditor` (новые UCLASS — Live Coding не потянет, нужен полный билд); 2) headless-смоук `-game -nullrhi`; 3) `build_hub.py` headless; 4) коммит+пуш. **Travel между картами проверить в PIE — за пользователем** (ServerTravel headless толком не тестируется; в PIE возможен префикс `UEDPIE_` — потому `HubMapOverride` задаётся явным путём).
+
 ## СЕССИЯ 2026-06-13 (вечер, продолжение) — реалистичные модели предметов + фикс материалов
 
 Пользователь: «грузим модели, ставим реалистичные модели». Сделано (всё в `main`):

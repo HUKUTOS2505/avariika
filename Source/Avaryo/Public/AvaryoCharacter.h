@@ -7,6 +7,7 @@
 class APickupItem;
 class ARepairable;
 class AToilet;
+class ACallBoard;
 class UCameraComponent;
 class UFlashlightComponent;
 class UAudioComponent;
@@ -118,6 +119,10 @@ public:
 	/** Биотуалет под прицелом (для подсказки в HUD). */
 	UFUNCTION(BlueprintPure, Category="Avaryo|Interact")
 	AToilet* GetFocusedToilet() const { return FocusedToilet; }
+
+	/** Доска заявок под прицелом (для подсказки «[E] Взять заявку» в хабе). */
+	UFUNCTION(BlueprintPure, Category="Avaryo|Interact")
+	ACallBoard* GetFocusedCallBoard() const { return FocusedCallBoard; }
 
 	/** Идёт ли «процесс» в биотуалете (мини-игра). */
 	UFUNCTION(BlueprintPure, Category="Avaryo|Interact")
@@ -393,6 +398,10 @@ protected:
 	UPROPERTY(Transient, BlueprintReadOnly, Category="Avaryo|Interact")
 	TObjectPtr<AToilet> FocusedToilet;
 
+	/** Доска заявок под прицелом (хаб). Считается локально в Tick. */
+	UPROPERTY(Transient, BlueprintReadOnly, Category="Avaryo|Interact")
+	TObjectPtr<ACallBoard> FocusedCallBoard;
+
 	/** Где идёт «процесс» (сервер пишет, реплицируется для HUD). */
 	UPROPERTY(Replicated, BlueprintReadOnly, Category="Avaryo|Interact")
 	TObjectPtr<AToilet> CurrentToilet;
@@ -589,6 +598,9 @@ protected:
 
 	/** Найти сломанный ремонтируемый объект под прицелом (трейс из камеры). */
 	ARepairable* FindFocusedRepairable() const;
+
+	/** Найти доску заявок под прицелом или рядом (хаб). */
+	ACallBoard* FindFocusedCallBoard() const;
 
 	/** Серверная логика нажатия/отпускания E. */
 	void InteractPressedAuth();

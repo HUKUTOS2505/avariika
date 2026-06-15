@@ -29,6 +29,7 @@
 #include "UI/AvaryoCameraShakes.h"
 #include "UI/AvaryoHUD.h"
 #include "World/ABioProjectile.h"
+#include "World/ACallBoard.h"
 #include "World/AFloodlight.h"
 #include "World/AFoamPatch.h"
 #include "World/ARepairable.h"
@@ -278,6 +279,7 @@ void AAvaryoCharacter::Tick(float DeltaSeconds)
 		FocusedRepairable = FindFocusedRepairable();
 		FocusedWounded = FindFocusedWoundedTeammate();
 		FocusedToilet = FindFocusedToilet();
+		FocusedCallBoard = FindFocusedCallBoard();
 
 		// Монитор оператора: закрывается, если вышел из зоны/ранен.
 		// Захват камер у ВСЕХ персонажей включён локально только пока монитор открыт
@@ -766,6 +768,49 @@ APickupItem* AAvaryoCharacter::FindFocusedItem() const
 	return Nearest;
 }
 
+ACallBoard* AAvaryoCharacter::FindFocusedCallBoard() const
+{
+	// Доска заявок, на которую смотрим (свип из камеры), либо ближайшая, если стоим вплотную.
+	FVector ViewLoc;
+	FRotator ViewRot;
+	GetActorEyesViewPoint(ViewLoc, ViewRot);
+
+	FCollisionQueryParams Params(FName(TEXT("CallBoardTrace")), false, this);
+	FHitResult Hit;
+	const FCollisionShape Probe = FCollisionShape::MakeSphere(16.f);
+	if (GetWorld()->SweepSingleByChannel(Hit, ViewLoc, ViewLoc + ViewRot.Vector() * PickupRange, FQuat::Identity, ECC_Visibility, Probe, Params))
+	{
+		if (ACallBoard* Board = Cast<ACallBoard>(Hit.GetActor()))
+		{
+			if (Board->HasAvailableCall())
+			{
+				return Board;
+			}
+		}
+	}
+
+	// Фолбэк: ближайшая доска, в зону которой мы вошли
+	TArray<AActor*> Overlapping;
+	GetOverlappingActors(Overlapping, ACallBoard::StaticClass());
+	ACallBoard* Nearest = nullptr;
+	float BestDistSq = TNumericLimits<float>::Max();
+	for (AActor* Actor : Overlapping)
+	{
+		ACallBoard* Board = Cast<ACallBoard>(Actor);
+		if (!Board || !Board->HasAvailableCall())
+		{
+			continue;
+		}
+		const float DistSq = FVector::DistSquared(GetActorLocation(), Board->GetActorLocation());
+		if (DistSq < BestDistSq)
+		{
+			BestDistSq = DistSq;
+			Nearest = Board;
+		}
+	}
+	return Nearest;
+}
+
 void AAvaryoCharacter::TryPickupNearbyItem()
 {
 	if (!HasAuthority())
@@ -873,6 +918,13 @@ void AAvaryoCharacter::InteractPressedAuth()
 	if (DraggedTeammate)
 	{
 		ReleaseDraggedTeammate();
+		return;
+	}
+
+	// Хаб: доска заявок — взять заявку и выехать (в хабе нет предметов/ремонта, конфликта нет)
+	if (ACallBoard* Board = FindFocusedCallBoard())
+	{
+		Board->AcceptBy(this);
 		return;
 	}
 

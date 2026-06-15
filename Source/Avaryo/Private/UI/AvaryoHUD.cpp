@@ -13,6 +13,7 @@
 #include "Game/CompanyLedgerSubsystem.h"
 #include "GameFramework/PlayerState.h"
 #include "Items/APickupItem.h"
+#include "World/ACallBoard.h"
 #include "World/AExitZone.h"
 #include "World/ARepairable.h"
 #include "World/AToilet.h"
@@ -776,7 +777,14 @@ void AAvaryoHUD::DrawHUD()
 			Repairing->GetRepairProgress(), Accent);
 	}
 	// ---------- Подсказка подбора (плашка как в референсе) ----------
-	else if (APickupItem* Focused = Character->GetFocusedItem())
+	else if (ACallBoard* Board = Character->GetFocusedCallBoard())
+		{
+			const TArray<FCallListing>& BC = Board->GetCalls();
+			const int32 Sel = Board->GetSelectedIndex();
+			const FString Title = BC.IsValidIndex(Sel) ? BC[Sel].Title : FString(TEXT("заявка"));
+			DrawPromptBox(FString::Printf(TEXT("[E] Взять заявку: %s"), *Title));
+		}
+		else if (APickupItem* Focused = Character->GetFocusedItem())
 	{
 		DrawPromptBox(FString::Printf(TEXT("[E] Поднять %s"), *Focused->DisplayName.ToString()));
 	}

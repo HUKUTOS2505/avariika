@@ -6,6 +6,8 @@
 #include "Engine/GameInstance.h"
 #include "Engine/World.h"
 #include "Game/CompanyLedgerSubsystem.h"
+#include "Game/DispatchSubsystem.h"
+#include "World/ACallBoard.h"
 #include "EngineUtils.h"
 #include "GameFramework/GameModeBase.h"
 #include "GameFramework/GameStateBase.h"
@@ -42,6 +44,18 @@ namespace DispatcherLines
 	const TArray<FString> MemoryVeteran = {
 		TEXT("А, ветераны. Заявки вы закрываете — за это держим. Не зазнавайтесь."),
 		TEXT("Опытная бригада на смене. Жильцы попросили именно вас. Не подведите."),
+	};
+	// ХАБ: приветствие на базе (диспетчер ждёт, пока бригада возьмёт заявку с доски)
+	const TArray<FString> HubWelcome = {
+		TEXT("Бригада на базе. На доске висят заявки — берите и выезжайте, смена не резиновая."),
+		TEXT("Утро, мужики. Кофе допили — к доске заявок, жильцы ждать не любят."),
+		TEXT("Диспетчерская — бригаде: заявки на стене. Выбирайте объект и в ГАЗель."),
+	};
+	// ХАБ: подтверждение принятой заявки («{X}» — заголовок заявки)
+	const TArray<FString> CallBriefing = {
+		TEXT("Принял. Выезд на объект: {X}. По коням, фонари проверьте."),
+		TEXT("Заявка «{X}» ваша. Грузимся, выезжаем. Не растеряйте инструмент."),
+		TEXT("Есть «{X}». Адрес в навигаторе, погнали. Жду с победой."),
 	};
 	const TArray<FString> RepairDone = {
 		TEXT("«{X}» — принято. Неужели сами справились."),
@@ -237,6 +251,27 @@ void ARunState::BeginPlay()
 		return;
 	}
 
+	// ХАБ? Если на карте есть доска заявок — это база, а не объект: ни поломок,
+	// ни победы/поражения. Диспетчер только приветствует, дальше ждём приёма заявки.
+	for (TActorIterator<ACallBoard> It(GetWorld()); It; ++It)
+	{
+		bHubMode = true;
+		break;
+	}
+	if (bHubMode)
+	{
+		// Вернулись с забега — снять активную заявку (хаб как «дом»)
+		if (UGameInstance* GI = GetWorld()->GetGameInstance())
+		{
+			if (UDispatchSubsystem* D = GI->GetSubsystem<UDispatchSubsystem>())
+			{
+				D->ClearActiveCall();
+			}
+		}
+		GetWorldTimerManager().SetTimer(GreetingTimer, this, &ARunState::SendGreeting, 4.f, false);
+		return;
+	}
+
 	// Рандомизация поломок: каждый забег ломается случайное подмножество
 	// объектов карты (минимум 2, либо все, если их меньше)
 	TArray<ARepairable*> AllRepairables;
@@ -392,6 +427,12 @@ void ARunState::Tick(float DeltaSeconds)
 	Super::Tick(DeltaSeconds);
 
 	if (!HasAuthority() || Phase != ERunPhase::InProgress)
+	{
+		return;
+	}
+
+	// ХАБ — не забег: никакой логики поломок/перегрузки/победы (иначе 0 задач = мгновенная «победа»)
+	if (bHubMode)
 	{
 		return;
 	}
@@ -763,15 +804,27 @@ void ARunState::RequestRestart()
 	{
 		return; // рестарт только с финального экрана
 	}
+	UGameInstance* GI = GetWorld()->GetGameInstance();
+
 	// Квота провалена — контора закрыта: [R] начинает новую карьеру (сброс леджера)
-	if (UGameInstance* GI = GetWorld()->GetGameInstance())
+	if (UCompanyLedgerSubsystem* Ledger = GI ? GI->GetSubsystem<UCompanyLedgerSubsystem>() : nullptr)
 	{
-		if (UCompanyLedgerSubsystem* Ledger = GI->GetSubsystem<UCompanyLedgerSubsystem>())
+		if (Ledger->IsQuotaFailed())
 		{
-			if (Ledger->IsQuotaFailed())
-			{
-				Ledger->ResetCompany();
-			}
+			Ledger->ResetCompany();
+		}
+	}
+
+	// Выехали с базы по заявке? Тогда после «Акта» возвращаемся в ХАБ к доске.
+	// Иначе (тестим карту напрямую, без хаба) — рестарт той же карты, как раньше.
+	if (UDispatchSubsystem* D = GI ? GI->GetSubsystem<UDispatchSubsystem>() : nullptr)
+	{
+		if (D->HasHomeHub())
+		{
+			const FString Hub = D->GetHomeHubMap();
+			D->ClearActiveCall();
+			GetWorld()->ServerTravel(Hub + TEXT("?listen"));
+			return;
 		}
 	}
 
@@ -841,8 +894,20 @@ FString ARunState::ReputationTitle(int32 Points)
 
 // ---------- Диспетчер ----------
 
+void ARunState::AnnounceCallAccepted(const FString& CallTitle)
+{
+	DispatcherSay(DispatcherLines::CallBriefing, CallTitle, /*bImportant=*/true);
+}
+
 void ARunState::SendGreeting()
 {
+	// На базе — своё приветствие, без числа поломок (их тут нет)
+	if (bHubMode)
+	{
+		DispatcherSay(DispatcherLines::HubWelcome, FString(), /*bImportant=*/true);
+		return;
+	}
+
 	DispatcherSay(DispatcherLines::Greeting, FString::FromInt(Objectives.Num()), /*bImportant=*/true);
 	if (bCheapGear)
 	{

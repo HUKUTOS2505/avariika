@@ -191,6 +191,12 @@ public:
 	/** Хлебнул кофе из термоса. Только сервер. */
 	void NotifyCoffee(AAvaryoCharacter* Who);
 
+	/** Хаб: диспетчер подтверждает принятую на доске заявку. Зовёт ACallBoard. Только сервер. */
+	void AnnounceCallAccepted(const FString& CallTitle);
+
+	/** Эта карта — ХАБ (на ней есть доска заявок): без забега, без победы/поражения. */
+	UFUNCTION(BlueprintPure, Category="Run") bool IsHubMode() const { return bHubMode; }
+
 	/** Достался ли бригаде дешёвый комплект оборудования (косяки, §18). */
 	UFUNCTION(BlueprintPure, Category="Run")
 	bool HasCheapGear() const { return bCheapGear; }
@@ -252,6 +258,9 @@ protected:
 
 	/** Есть ли на карте зона выхода (если нет — побеждаем сразу после починок). */
 	bool bHasExitZone;
+
+	/** Эта карта — ХАБ (есть ACallBoard): не забег. Сервер выставляет в BeginPlay. */
+	bool bHubMode = false;
 
 	/** Перегрузка сети: старое здание изредка снова выбивает починенный щиток. */
 	UPROPERTY(EditAnywhere, Category="Run|Overload")
