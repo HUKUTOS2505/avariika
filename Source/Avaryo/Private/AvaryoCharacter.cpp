@@ -3,6 +3,8 @@
 #include "Camera/CameraComponent.h"
 #include "Components/AudioComponent.h"
 #include "Components/SceneCaptureComponent2D.h"
+#include "Components/SkeletalMeshComponent.h"
+#include "GameFramework/SpringArmComponent.h"
 #include "Components/UFlashlightComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Sound/SoundBase.h"
@@ -128,6 +130,24 @@ AAvaryoCharacter::AAvaryoCharacter()
 	// Приседание (Ctrl/C) — пригодится против монстра-слухача
 	GetCharacterMovement()->GetNavAgentPropertiesRef().bCanCrouch = true;
 	GetCharacterMovement()->MaxWalkSpeedCrouched = 250.f;
+	GetCharacterMovement()->CrouchedHalfHeight = 50.f; // заметно ниже стоя (камера реально опустится)
+
+	// Камера от 3-го лица на пружине (тумблер V). Пружина с коллизией — не клипается сквозь стены.
+	TPSpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("TPSpringArm"));
+	TPSpringArm->SetupAttachment(GetRootComponent());
+	TPSpringArm->TargetArmLength = 300.f;
+	TPSpringArm->SocketOffset = FVector(0.f, 40.f, 60.f); // чуть вбок+вверх, как в шутерах от 3-го лица
+	TPSpringArm->bUsePawnControlRotation = true;
+	TPSpringArm->bDoCollisionTest = true;
+	TPSpringArm->ProbeSize = 8.f;
+	TPSpringArm->bInheritPitch = true;
+	TPSpringArm->bInheritYaw = true;
+	TPSpringArm->bInheritRoll = false;
+
+	ThirdPersonCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("ThirdPersonCamera"));
+	ThirdPersonCamera->SetupAttachment(TPSpringArm);
+	ThirdPersonCamera->bUsePawnControlRotation = false; // вращение даёт пружина
+	ThirdPersonCamera->SetActive(false); // по умолчанию вид от 1-го лица
 
 	// Сердцебиение паники: личный звук (2D), стартует выключенным, гонится в Tick
 	HeartbeatAudio = CreateDefaultSubobject<UAudioComponent>(TEXT("HeartbeatAudio"));
@@ -198,8 +218,38 @@ void AAvaryoCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// Камера из Blueprint — к ней крепится предмет в руках
-	ViewCamera = FindComponentByClass<UCameraComponent>();
+	// Камера от 1-го лица из Blueprint — к ней крепится предмет в руках.
+	// ВАЖНО: теперь есть ещё ThirdPersonCamera (C++), поэтому берём ИМЕННО не-TP камеру,
+	// иначе FindComponentByClass мог бы вернуть TP-камеру.
+	{
+		TArray<UCameraComponent*> Cams;
+		GetComponents<UCameraComponent>(Cams);
+		for (UCameraComponent* Cam : Cams)
+		{
+			if (Cam && Cam != ThirdPersonCamera)
+			{
+				ViewCamera = Cam;
+				break;
+			}
+		}
+	}
+
+	// Меш «рук» от 1-го лица (из Blueprint), чтобы прятать его в 3-м лице
+	{
+		TArray<USkeletalMeshComponent*> Skels;
+		GetComponents<USkeletalMeshComponent>(Skels);
+		for (USkeletalMeshComponent* S : Skels)
+		{
+			if (S && S != GetMesh() && S->GetName().Contains(TEXT("FirstPerson")))
+			{
+				FirstPersonMeshComp = S;
+				break;
+			}
+		}
+	}
+
+	// Начальный вид (от 1-го лица) — на локальном игроке
+	ApplyCameraView();
 
 	// Фонарь по умолчанию выключен
 	if (FlashlightComponent && FlashlightComponent->IsOn())
@@ -483,6 +533,9 @@ void AAvaryoCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	PlayerInputComponent->BindKey(EKeys::C, IE_Pressed, this, &AAvaryoCharacter::StartCrouchInput);
 	PlayerInputComponent->BindKey(EKeys::C, IE_Released, this, &AAvaryoCharacter::StopCrouchInput);
 
+	// Смена вида: 1-е лицо ↔ 3-е лицо (V)
+	PlayerInputComponent->BindKey(EKeys::V, IE_Pressed, this, &AAvaryoCharacter::ToggleCameraMode);
+
 	// Монитор оператора (только в зоне ГАЗели)
 	PlayerInputComponent->BindKey(EKeys::Tab, IE_Pressed, this, &AAvaryoCharacter::ToggleMonitor);
 
@@ -744,6 +797,12 @@ APickupItem* AAvaryoCharacter::FindFocusedItem() const
 			{
 				return Item;
 			}
+		}
+		// Смотрим прямо на ремонтируемый объект (щиток/труба/генератор) — он важнее, чем
+		// предмет, валяющийся рядом на полу. Иначе подсказка «Поднять аптечку» перебивает починку.
+		if (Cast<ARepairable>(Hit.GetActor()))
+		{
+			return nullptr;
 		}
 	}
 
@@ -2462,6 +2521,36 @@ void AAvaryoCharacter::StartCrouchInput()
 void AAvaryoCharacter::StopCrouchInput()
 {
 	UnCrouch();
+}
+
+void AAvaryoCharacter::ToggleCameraMode()
+{
+	if (!IsLocallyControlled())
+	{
+		return; // вид — личный для каждого игрока, не реплицируется
+	}
+	bThirdPersonView = !bThirdPersonView;
+	ApplyCameraView();
+}
+
+void AAvaryoCharacter::ApplyCameraView()
+{
+	if (!IsLocallyControlled())
+	{
+		return; // активная камера и owner-no-see — локальный рендер владельца
+	}
+	if (ThirdPersonCamera) { ThirdPersonCamera->SetActive(bThirdPersonView); }
+	if (ViewCamera) { ViewCamera->SetActive(!bThirdPersonView); }
+	// Тело: в 3-м лице показываем владельцу (видишь своего оператора), в 1-м — прячем от себя
+	if (USkeletalMeshComponent* Body = GetMesh())
+	{
+		Body->SetOwnerNoSee(!bThirdPersonView);
+	}
+	// «Руки» от 1-го лица — наоборот: видны в FP, скрыты в TP
+	if (FirstPersonMeshComp)
+	{
+		FirstPersonMeshComp->SetOwnerNoSee(bThirdPersonView);
+	}
 }
 
 void AAvaryoCharacter::ConsumeHeldItemCharge()

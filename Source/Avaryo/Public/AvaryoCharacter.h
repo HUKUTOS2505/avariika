@@ -10,6 +10,8 @@ class AToilet;
 class ACallBoard;
 class AToolCase;
 class UCameraComponent;
+class USpringArmComponent;
+class USkeletalMeshComponent;
 class UFlashlightComponent;
 class UAudioComponent;
 class USoundBase;
@@ -241,6 +243,12 @@ public:
 	void StartCrouchInput();
 	void StopCrouchInput();
 
+	/** Переключить вид от 1-го лица ↔ от 3-го (клавиша V). Локально, без репликации. */
+	void ToggleCameraMode();
+
+	UFUNCTION(BlueprintPure, Category="Avaryo|Camera")
+	bool IsThirdPerson() const { return bThirdPersonView; }
+
 	/** Налобный фонарик. Источник света (SpotLight) добавляется в Blueprint. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Avaryo")
 	TObjectPtr<UFlashlightComponent> FlashlightComponent;
@@ -438,9 +446,27 @@ protected:
 	/** Применён ли лок к контроллеру (локальное состояние для переходов). */
 	bool bAppliedInputLock;
 
-	/** Камера персонажа (из Blueprint), к ней крепится предмет в руках. */
+	/** Камера персонажа (из Blueprint, вид от 1-го лица), к ней крепится предмет в руках. */
 	UPROPERTY(Transient)
 	TObjectPtr<UCameraComponent> ViewCamera;
+
+	/** Пружина для вида от 3-го лица (анти-клиппинг сквозь стены). */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Avaryo|Camera")
+	TObjectPtr<USpringArmComponent> TPSpringArm;
+
+	/** Камера вида от 3-го лица (на пружине). Активна по тумблеру V. */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Avaryo|Camera")
+	TObjectPtr<UCameraComponent> ThirdPersonCamera;
+
+	/** Меш «рук» от 1-го лица (из Blueprint), скрываем в 3-м лице. Находится в BeginPlay. */
+	UPROPERTY(Transient)
+	TObjectPtr<USkeletalMeshComponent> FirstPersonMeshComp;
+
+	/** Текущий вид: true — от 3-го лица. ЛОКАЛЬНОЕ (у каждого свой вид), не реплицируется. */
+	bool bThirdPersonView = false;
+
+	/** Применить активную камеру + видимость тела/рук по bThirdPersonView. Только локальный игрок. */
+	void ApplyCameraView();
 
 	/** Был ли ранен в прошлый кадр (для авто-сброса тяжёлого при ранении). */
 	bool bWasWounded;
