@@ -87,3 +87,5 @@ Scripts/_*.py
 *.log
 Content/Realistic_Starter_VFX_Pack_Niagara_Vol2/
 Content/hazmat/
+# Импортированные звуки (1.4ГБ) — локально, git-стратегия для аудио не решена
+Content/Audio/Lib/
