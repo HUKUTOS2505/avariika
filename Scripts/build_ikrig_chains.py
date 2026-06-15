@@ -34,7 +34,7 @@ def setup(rig_path, root, chains):
 
 # Operator (Mixamo-style)
 R["op"] = setup("/Game/Characters/Operator/Rig/IK_Operator.IK_Operator", "Hips", [
-    ("Spine", "Spine", "Spine02"),
+    ("Spine", "Spine02", "Spine"),  # Meshy spine is reversed: Spine02 is bottom (child of Hips), Spine is top (parent of neck)
     ("Neck", "neck", "neck"),
     ("Head", "Head", "Head"),
     ("LeftClavicle", "LeftShoulder", "LeftShoulder"),
