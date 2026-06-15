@@ -188,3 +188,26 @@
 ## 7. Пропустить
 
 Оружейные/стрелковые (rifle/pistol/aim/reload/fire/ironsights/ADS), таргетинг-aim-offset (AO_), аддитивы (_Additive), facial/HeadOnly, *_120fps-дубли, MOBA-ability-клипы, читаемые только с VFX-китом конкретного героя; **плюс** избыточные дубли turn-in-place / idle-break / melee-combo, размазанные по героям Paragon — оставляем по ОДНОМУ набору, остальное дроп.
+
+---
+
+## 8. RawAssets/новое — готовые uasset-паки (robocopy в Content), сильно закрывают дыры
+
+Все ниже — НЕ FBX, а готовые .uasset-деревья → импорт robocopy в `Content/<Pack>/` (как в [[asset-import-method]]). Скелеты: UE4 Manny → `RTG_MCO`, UE5 Manny (CA_Mannequin) → `RTG_UEFN`, собака → свой скелет (ретаргет не нужен).
+
+| Потребность | Пак | Скелет → как | Статус |
+|---|---|---|---|
+| **Собака-монстр (quadruped)** | AnimX German Shepherd (`под монстра собаку`) — свой скелет+меш+AnimBP+**AI BP**, полный сет move/crouch-stalk/jump/swim/combat(укусы,лапы,урон×6,смерть)/action + бонус кошка | свой → **use-as-is** | ✅ полностью |
+| **Хит-реакции (богато)** | Hit Reaction Pack (~96: Back/Front/Left/Right × Light/Heavy) | UE4 → RTG_MCO | ✅ (лучше Meshy/ASP) |
+| **Нокдаун + откачка** | Knocked Down Pack — Knocked_+Revive_ (Back/Front/Left/Right) + Idle_Standing + Death/Hit | UE4 → RTG_MCO | ✅ откачка со всех сторон |
+| **Рубильник/вентиль/цепь + КООП** | Replicated Interaction Kit Vol.1 — AM/AS Button/Switch/WallSwitch/FloorValve/WallValve/Chain (On/Off) + Control Rig, **реплизация из коробки** | UE5 → RTG_UEFN / система as-is | ✅✅ кооп-готов |
+| **Ремонт/работа (реалистично)** | work-animations — Drilling/Fixing/DrivingNails/Jackhammer/Digging/**CarryBag**/HangingSomethingHeavy/Foreman | UE5 → RTG_UEFN | ✅✅ замена кривой MC-дрели |
+| Ремонт (запас, sci-fi) | Sci-fi Worker Animset — FixCircuitBoard/FixPanel/FixLandingGear/DeepShipWork | UE4 → RTG_MCO | ✅ запасной |
+| **First-aid/питьё/подбор/девайс** | Item & Consumable — Bandage_loop, DrinkingPotion(start/loop/end), PickUp1-6, UseDevice_loop | UE4 → RTG_MCO | ✅ |
+| **Лут/обыск контейнеров + kneel** | Loot Anim Set — Backpack/Cabinet/Corpse/Fridge/Locker/Shelf(Hi/Mid/Low)/Trashcan/Chest GrabItem + **FloorPickUp_Kneel** (+ анимир. мебель) | UE4 → RTG_MCO | ✅ |
+| Складская мебель (пропы) | Storage Units Set — шкафы/локеры open/close/locked | UE5 / пропы | ✅ пропы для хаба/уровня |
+
+### Дыры, которые НЕ закрылись даже с «новое»
+1. **Нести/тащить ТИММЕЙТА** (даун-игрок) — нет (CarryBag = предмет, не человек). → Control Rig / парный клип / докупка.
+2. **Рукопожатие / обнять-утешить** (2 игрока) — нет (Motifect-эмоуты одиночные). → Control Rig / парный.
+3. **Слухач-монстр** (гуманоид-существо) — анимы НЕ скачаны в проект. Кандидаты названы (Animations For Monsters / Monster Animation Set / Giant Monster + AI-киты), но в `новое` их нет. Собака закрыта, слухач — placeholder (Paragon `Steel_*` или зомби-пак), пока не докачаешь.
