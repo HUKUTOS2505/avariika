@@ -19,7 +19,7 @@ Meshy-локомоция — так себе, поэтому движение/id
 
 ---
 
-## ✅ УЖЕ ЕСТЬ ИЗ ПАКА (16 шт · Op_*)
+## ✅ УЖЕ ЕСТЬ ИЗ ПАКА (94 шт · Op_*)
 
 Папка: `Content/Characters/Operator/Anims_Retarget/Op_*` (имена уточни по папке)
 
@@ -68,31 +68,44 @@ IDLE (3):        Op_Relaxed_Idle + 2 фиджета (Op_Fidget_1/2)
 
 > 💡 Завязать на «монстр рядом / низкий рассудок»: подменять обычную ходьбу на Op_Scared_Walk. Сильный хоррор-эффект бесплатно.
 
+### 🌀 Состояния / эмоции / флавор (новое из MC)
+
+| Механика | ПАК | Применение |
+|---|---|---|
+| Woozy/шатание (idle+ходьба) | Op_am_StandDrunk_Idle_01 · Op_am_Drunk_Loco_Walk_01 | газ / высокая паника / дезориентация |
+| Сбой инструмента (злость) | Op_am_Stand_Emotion_Frustrated_01_All · _StompFeet | провал ремонта |
+| Успех ремонта (радость) | Op_am_Stand_React_Excited_01 (+Loop/Start/Stop) · _HeelClick | починил |
+| Грусть | Op_am_Stand_Emotion_Sad_01 | смерть напарника / провал |
+| Осмотр / поиск поломки | Op_am_Stand_Idle_03_LookAround | idle-разведка |
+| Указать (кооп) · помахать · почесаться · болтать | Op_am_Stand_LookAt_05_PointRHand · Op_am_Stand_Wave_02_LHand · _Idle_06_ScratchArm · _Conv_Talk_05_Generic | кооп / флавор |
+
 ### 🔧 Действия (механики C++)
 
 | Механика | ПАК (цель) | Fallback Meshy | Статус |
 |---|---|---|---|
-| Подбор предмета (E) | 🎯 MC Sample | A_Collect_Object / A_Male_Bend_Over_Pick_Up | 🟡 Meshy fallback |
-| РЕМОНТ (главная) | 🎯 MC Fix&Build / Control Rig | A_Scheming_Hand_Rub | ⚠️ заглушка Meshy |
-| Толчок | 🎯 MC Sample | A_Step_Forward_and_Push | ⚠️ Meshy, обрезать |
-| Бросок | 🎯 MC Sample (throw) | A_Thrust_Slash | ⚠️ Meshy, обрезать |
-| Питьё (расходник) | 🎯 MC Sample | A_Stand_and_Drink | 🟡 Meshy fallback |
+| Подбор предмета (E) | Op_am_Vend_Success_GrabItem | A_Collect_Object | ✅ ПАК |
+| РЕМОНТ (главная) | Op_am_StandDrillLow_01_Drill (+транз) | A_Scheming_Hand_Rub | ✅ ПАК (стоя; на коленях — нет) |
+| Толчок / удар по машине | Op_am_Vend_Fail_HitMachine | A_Step_Forward_and_Push | ✅ ПАК |
+| Интеракт-панель (рубильник/вентиль) | Op_am_Vend_Start | — | 🟡 репурпоз (отдельного нет) |
+| Бросок | — | A_Thrust_Slash | ⚠️ Meshy (в паках нет) |
+| Питьё (расходник) | Op_am_Moonshine_01_Drink_Loop (+транз) | A_Stand_and_Drink | ✅ ПАК |
 
 ### 💥 Реакции на монстра
 
 | Механика | ПАК | Fallback Meshy | Статус |
 |---|---|---|---|
-| Реакция на удар | 🎯 MC Sample | A_Hit_Reaction | 🟡 Meshy fallback |
-| Реакция электрошок | — | A_Electrocution_Reaction | 🟡 Meshy |
-| Реакция в лицо | — | A_Face_Punch_Reaction | 🟡 Meshy |
+| Реакция на удар | Op_Hit_React_1..4 (ASP, безоружные) | A_Hit_Reaction | ✅ ПАК |
+| Нокдаун / спотык-восстановление | Op_am_Ready_Fight_01_Knockdown_A / _02_Kickdown_A (+ж-версии) | — | ✅ ПАК |
+| Реакция электрошок | репурпоз Op_Hit_React + дрожь | A_Electrocution_Reaction | 🟡 Meshy/репурпоз |
+| Джампскейр-флинч | репурпоз Op_Hit_React / Knockdown | A_Face_Punch_Reaction | 🟡 репурпоз |
 
 ### ☠️ Смерть
 
 | Механика | ПАК | Fallback Meshy | Статус |
 |---|---|---|---|
-| Смерть (общая) | Op_Death | A_Electrocuted_Fall | ✅ ПАК |
-| Смерть назад (вариант) | 🎯 MC Sample | A_dying_backwards | 🟡 Meshy для направления |
-| Запас | — | A_Dead · A_Fall_Dead_from_Abdominal_Injury | 🟡 Meshy |
+| Смерть назад | Op_MOB1_Stand_Relaxed_Death_B_IPC | A_dying_backwards | ✅ ПАК |
+| Смерть вперёд / вбок / коллапс | Op_Death_1 / Op_Death_2 / Op_Death_3 (ASP) | A_Electrocuted_Fall | ✅ ПАК |
+| Падение на пол (даун, не финал) | Op_am_InjuredBelly_DropToFloor (+Loop) | A_Fall_Dead_from_Abdominal_Injury | ✅ ПАК |
 
 > Loop = OFF, холд последнего кадра. Стыковка из любой позы → Blend ~0,15с в AnimBP.
 
@@ -100,22 +113,26 @@ IDLE (3):        Op_Relaxed_Idle + 2 фиджета (Op_Fidget_1/2)
 
 | Механика | ПАК | Fallback Meshy | Статус |
 |---|---|---|---|
-| Хромая ходьба вперёд | 🎯 MC Sample (injured) | A_Limping_Walk_3_inplace | 🟡 Meshy fallback |
+| Раненый: ходьба вперёд (+Start/Stop) | Op_am_InjuredBelly_Loco_Walk_Fwd | A_Limping_Walk_3_inplace | ✅ ПАК |
+| Раненый: idle + повороты L/R 90/180 | Op_am_InjuredBelly_Idle_01/02/03 + TurnL/R | — | ✅ ПАК |
+| Ползание (раненый ползёт) | Op_am_ProneCrawl_CrawlStartStop_Fwd (+транз Stand↔Prone) | — | ✅ ПАК |
 | Раненый идёт назад | — | A_Injured_Walk_Backward_inplace | 🟡 Meshy |
 
 ### 🤝 Даун / откачка напарника
 
 | Механика | ПАК | Fallback Meshy | Статус |
 |---|---|---|---|
-| Лежит-зовёт (даун-idle) | 🎯 MC Sample | A_Prone_Reach_Help | 🟡 Meshy fallback |
-| Вставание (подняли) | 🎯 MC Sample | A_Stand_Up1 | 🟡 Meshy fallback |
+| Даун-idle (лежит на полу) | Op_am_InjuredBelly_DropToFloor_Loop | A_Prone_Reach_Help | ✅ ПАК |
+| Вставание (откачали/подняли) | Op_am_InjuredBelly_DropToFloor_GetUp | A_Stand_Up1 | ✅ ПАК |
 
 ### 🦵 Прыжок
 
 | Механика | ПАК | Fallback Meshy | Статус |
 |---|---|---|---|
-| Прыжок вверх | 🎯 Game Anim Sample | A_Regular_Jump | 🟡 Meshy fallback |
-| Прыжок вниз / приземление | 🎯 Game Anim Sample | A_Jumping_Down | 🟡 Meshy |
+| Прыжок с места | Op_Jump_From_Stand (ASP) | A_Regular_Jump | ✅ ПАК |
+| Прыжок с разбега / приземление | Op_Jump_From_Jog (ASP) | A_Jumping_Down | ✅ ПАК |
+
+> GAS-джамп (M_Neutral_Jump_*) — рваные motion-matching фрагменты, без чистого взлёта. Взяли ASP-джамп (классический, цельный).
 
 ### 👥 Кооп (особое)
 
@@ -158,15 +175,19 @@ Op_Power_Walk       → уверенная (когда всё чинено, ид
 ## СВОДКА
 
 ```
-✅ ИЗ ПАКА (16):        движение-вперёд (шаг/трусца/бег+стопы), присед, idle+фиджеты,
-                        2 хоррор-ходьбы, смерть, 3 бонус-ходьбы
-🎯 ДОБРАТЬ ИЗ ПАКОВ:    направления (назад+strafe), прыжок (Game Anim Sample);
-                        действия+реакции (MC Sample)
-🟡 MESHY fallback:      то, чего из пака ещё нет — работает, заменим позже
-🔧 Control Rig:         нести напарника
+✅ ИЗ ПАКА (94 Op_*):   локомоция все 8 направлений (walk/jog/run) + присед все направления,
+                        idle+фиджеты, 2 хоррор-ходьбы, бонус-ходьбы;
+                        раненый (idle/повороты/ходьба/ползание/даун↔вставание),
+                        смерть (назад/вперёд/вбок/коллапс), хит-реакции, нокдаун/спотык,
+                        прыжок (с места/разбега), ремонт-стоя, подбор/толчок/интеракт,
+                        питьё, woozy-шатание, эмоции (злость/радость/грусть), флавор
+🟡 MESHY fallback:      бросок, раненый-назад, электрошок/флинч (репурпоз Hit) — пак-версий нет
+🔧 Control Rig:         нести напарника; ремонт на коленях
 ```
 
-Приоритет теперь: на каждую механику сначала ищем ПАК-версию (Op_*), Meshy — временная подпорка. Главный пробел сейчас — **направления движения** (назад + strafe), их добираем из Game Animation Sample.
+Полный проход 4 паков завершён — всё пригодное ретаргетнуто (см. ANIM_PACK_AUDIT.md).
+Осталось живьём из паков взять нечего; дыры закрываются Meshy/Control Rig.
+**Следующий шаг — не ретаргет, а сборка: BlendSpace + AnimBP на Op_* и подключение оператора телом игрока.**
 
 ---
 
