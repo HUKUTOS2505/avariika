@@ -2,6 +2,7 @@
 
 #include "AvaryoCharacter.h"
 #include "Components/UFlashlightComponent.h"
+#include "Game/ARunState.h"
 #include "Components/PointLightComponent.h"
 #include "EngineUtils.h"
 #include "Net/UnrealNetwork.h"
@@ -94,6 +95,13 @@ void UVitalsComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 		return; // вся динамика — на сервере
 	}
 
+	// База (хаб) — безопасная зона: паники тут быть не должно (нет аварий/монстра).
+	bool bSafeZone = false;
+	if (const ARunState* Run = ARunState::Get(GetWorld()))
+	{
+		bSafeZone = Run->IsHubMode();
+	}
+
 	// --- Паника ---
 	float PanicDelta = 0.f;
 
@@ -158,7 +166,15 @@ void UVitalsComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 		}
 	}
 
-	Panic = FMath::Clamp(Panic + PanicDelta * DeltaTime, 0.f, 100.f);
+	if (bSafeZone)
+	{
+		// На базе паника не растёт и плавно гаснет к нулю (в т.ч. дебаг-стартовое значение)
+		Panic = FMath::Max(0.f, Panic - 25.f * DeltaTime);
+	}
+	else
+	{
+		Panic = FMath::Clamp(Panic + PanicDelta * DeltaTime, 0.f, 100.f);
+	}
 
 	// --- Выносливость ---
 	const bool bMoving = Char->GetVelocity().SizeSquared2D() > 100.f;
@@ -370,6 +386,11 @@ void UVitalsComponent::Heal(float Amount)
 void UVitalsComponent::AddPanic(float Amount)
 {
 	if (!IsVitalAuthority()) { return; }
+	// База (хаб) — безопасная зона: паника не добавляется ничем
+	if (const ARunState* Run = ARunState::Get(GetWorld()))
+	{
+		if (Run->IsHubMode()) { return; }
+	}
 	Panic = FMath::Clamp(Panic + Amount, 0.f, 100.f);
 }
 
