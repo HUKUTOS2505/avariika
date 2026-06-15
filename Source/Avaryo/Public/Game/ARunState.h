@@ -191,8 +191,8 @@ public:
 	/** Хлебнул кофе из термоса. Только сервер. */
 	void NotifyCoffee(AAvaryoCharacter* Who);
 
-	/** Хаб: диспетчер подтверждает принятую на доске заявку. Зовёт ACallBoard. Только сервер. */
-	void AnnounceCallAccepted(const FString& CallTitle);
+	/** Хаб: диспетчер подтверждает принятую на доске заявку (+ребёт, если ящик не собран). Зовёт ACallBoard. Только сервер. */
+	void AnnounceCallAccepted(const FString& CallTitle, bool bKitLoaded);
 
 	/** Хаб: диспетчер реагирует на собранный ящик инструмента. Зовёт AToolCase. Только сервер. */
 	void AnnounceKitLoaded();
@@ -364,11 +364,32 @@ protected:
 
 	float NextCreakTime; // когда следующий скрип
 
+	/** Сколько реплик «нетерпения» уже отправлено (по порогам времени забега). */
+	int32 ImpatienceLevel = 0;
+
+	/** Сервер: диспетчер язвит, когда забег затягивается (пороги по времени). */
+	void TickImpatience();
+
 	UPROPERTY(EditAnywhere, Category="Run|Ambient")
 	float CreakIntervalMin;
 
 	UPROPERTY(EditAnywhere, Category="Run|Ambient")
 	float CreakIntervalMax;
+
+	/** Пул скрипов/стуков здания (грузится из /Game/Audio/Lib в BeginPlay, только сервер). */
+	UPROPERTY(Transient)
+	TArray<TObjectPtr<USoundBase>> CreakPool;
+
+	/** Пул редких «жутких» звуков (тихо, изредка, для нагнетания). */
+	UPROPERTY(Transient)
+	TArray<TObjectPtr<USoundBase>> DreadPool;
+
+	/** Загрузить все USoundBase из папки контента в массив (UObjectLibrary). */
+	static void LoadSoundFolder(const FString& Path, TArray<TObjectPtr<USoundBase>>& Out);
+
+	/** Проиграть атмосферный звук в точке у ВСЕХ (кооп: слышат хост и клиенты). */
+	UFUNCTION(NetMulticast, Unreliable)
+	void MulticastAmbientSound(USoundBase* Sound, FVector Loc, float Vol);
 
 	/** Сервер: выдать монтёру дешёвый фонарь, если на забег выпал дешёвый комплект (один раз). */
 	void ApplyCheapGear(AAvaryoCharacter* Who);

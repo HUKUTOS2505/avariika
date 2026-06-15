@@ -154,18 +154,20 @@ void ACallBoard::AcceptBy(AAvaryoCharacter* Who)
 	{
 		HubMap = W->PersistentLevel->GetOutermost()->GetName();
 	}
+	bool bKitLoaded = false;
 	if (UGameInstance* GI = W->GetGameInstance())
 	{
 		if (UDispatchSubsystem* D = GI->GetSubsystem<UDispatchSubsystem>())
 		{
+			bKitLoaded = D->IsKitLoaded(); // собрали ли ящик перед выездом
 			D->BeginJob(HubMap, Call.Id, Call.Title);
 		}
 	}
 
-	// Диспетчер на базе подтверждает заявку (если RunState поднят)
+	// Диспетчер на базе подтверждает заявку (если RunState поднят) и ребёт за забытый ящик
 	if (ARunState* Run = ARunState::Get(W))
 	{
-		Run->AnnounceCallAccepted(Call.Title);
+		Run->AnnounceCallAccepted(Call.Title, bKitLoaded);
 	}
 
 	if (AcceptSound)

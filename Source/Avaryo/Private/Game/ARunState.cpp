@@ -4,6 +4,7 @@
 #include "Components/UFlashlightComponent.h"
 #include "Components/VitalsComponent.h"
 #include "Engine/GameInstance.h"
+#include "Engine/ObjectLibrary.h"
 #include "Engine/World.h"
 #include "Game/CompanyLedgerSubsystem.h"
 #include "Game/DispatchSubsystem.h"
@@ -64,6 +65,12 @@ namespace DispatcherLines
 		TEXT("Кофе допили? Жильцы на линии, доска заявок ждёт."),
 		TEXT("Эфир тихий, прям подозрительно. Может, на выезд, а?"),
 	};
+	// ХАБ: взяли заявку БЕЗ собранного ящика инструмента — диспетчер ребёт
+	const TArray<FString> NoKitWarning = {
+		TEXT("Опять без ящика рванули? На объекте локтями чинить будете."),
+		TEXT("Инструмент собрать забыли. Классика. Ну хоть фонарь не потеряйте."),
+		TEXT("Выехали налегке, без кейса. Я уже вижу «колхоз» в акте."),
+	};
 	// ХАБ: бригада собрала ящик инструмента
 	const TArray<FString> KitLoaded = {
 		TEXT("Ящик собрали — уже плюс. Грузите в ГАЗель и на выезд."),
@@ -75,6 +82,13 @@ namespace DispatcherLines
 		TEXT("Прибыли на «{X}». Осмотритесь и за работу."),
 		TEXT("Объект «{X}». Что там сломано — то и чиним. Аккуратнее."),
 		TEXT("«{X}» — вы на месте. Связь держите, если что — по рации."),
+	};
+	// ОБЪЕКТ: диспетчер теряет терпение, пока забег затягивается (эскалация по времени)
+	const TArray<FString> Impatience = {
+		TEXT("Вы там не уснули? Заявка не на год выдана."),
+		TEXT("Время идёт, премия тает. Шевелитесь уже."),
+		TEXT("Жильцы названивают каждые пять минут. Когда закончите-то?!"),
+		TEXT("Я уж думал, вы там с домовым кофе пьёте. РАБОТАЕМ."),
 	};
 	const TArray<FString> RepairDone = {
 		TEXT("«{X}» — принято. Неужели сами справились."),
@@ -292,6 +306,11 @@ void ARunState::BeginPlay()
 		GetWorldTimerManager().SetTimer(HubIdleTimer, this, &ARunState::SendHubIdle, 35.f, true, 35.f);
 		return;
 	}
+
+	// Атмосферный саундскейп: скрипы/стуки здания + редкие жуткие звуки (только сервер мультикастит)
+	LoadSoundFolder(TEXT("/Game/Audio/Lib/creak_struct"), CreakPool);
+	LoadSoundFolder(TEXT("/Game/Audio/Lib/door_impact"), CreakPool); // стуки/хлопки сюда же
+	LoadSoundFolder(TEXT("/Game/Audio/Lib/jumpscare"), DreadPool);
 
 	// Рандомизация поломок: каждый забег ломается случайное подмножество
 	// объектов карты (минимум 2, либо все, если их меньше)
@@ -527,6 +546,7 @@ void ARunState::Tick(float DeltaSeconds)
 	TickRadioInterference(Now);
 	TickOverload(DeltaSeconds);
 	TickAmbient(Now);
+	TickImpatience();
 
 	if (NumPlayers > 0 && NumWounded == NumPlayers)
 	{
@@ -755,10 +775,70 @@ void ARunState::TickAmbient(float Now)
 	}
 	if (Anyone)
 	{
-		const FVector Around = Anyone->GetActorLocation() + FVector(FMath::FRandRange(-600.f, 600.f), FMath::FRandRange(-600.f, 600.f), 0.f);
+		const FVector Around = Anyone->GetActorLocation()
+			+ FVector(FMath::FRandRange(-700.f, 700.f), FMath::FRandRange(-700.f, 700.f), FMath::FRandRange(-50.f, 250.f));
 		MakeNoise(0.4f, nullptr, Around);
+
+		// Слышимый скрип/стук здания у всех (раньше был только noise-эвент + текст)
+		if (CreakPool.Num() > 0)
+		{
+			USoundBase* S = CreakPool[FMath::RandRange(0, CreakPool.Num() - 1)];
+			MulticastAmbientSound(S, Around, FMath::FRandRange(0.35f, 0.6f));
+		}
+		// Изредка — тихий «жуткий» звук (нагнетание; чаще, если есть несломанные задачи)
+		const bool bTense = !AreAllObjectivesComplete();
+		if (DreadPool.Num() > 0 && FMath::FRand() < (bTense ? 0.18f : 0.06f))
+		{
+			USoundBase* D = DreadPool[FMath::RandRange(0, DreadPool.Num() - 1)];
+			MulticastAmbientSound(D, Around, 0.25f);
+		}
 	}
 	DispatcherSay(DispatcherLines::Creak, FString(), /*bImportant=*/false);
+}
+
+void ARunState::TickImpatience()
+{
+	if (Phase != ERunPhase::InProgress)
+	{
+		return;
+	}
+	// Пороги нетерпения: 4 / 7 / 10 минут забега
+	static const float Thresholds[] = { 240.f, 420.f, 600.f };
+	if (ImpatienceLevel < (int32)UE_ARRAY_COUNT(Thresholds) && GetElapsedSeconds() >= Thresholds[ImpatienceLevel])
+	{
+		++ImpatienceLevel;
+		DispatcherSay(DispatcherLines::Impatience, FString(), /*bImportant=*/true);
+	}
+}
+
+void ARunState::LoadSoundFolder(const FString& Path, TArray<TObjectPtr<USoundBase>>& Out)
+{
+	UObjectLibrary* Lib = UObjectLibrary::CreateLibrary(USoundBase::StaticClass(), false, GIsEditor);
+	if (!Lib)
+	{
+		return;
+	}
+	Lib->AddToRoot();
+	Lib->LoadAssetDataFromPath(Path);
+	Lib->LoadAssetsFromAssetData();
+	TArray<FAssetData> Data;
+	Lib->GetAssetDataList(Data);
+	for (const FAssetData& AD : Data)
+	{
+		if (USoundBase* S = Cast<USoundBase>(AD.GetAsset()))
+		{
+			Out.Add(S);
+		}
+	}
+	Lib->RemoveFromRoot();
+}
+
+void ARunState::MulticastAmbientSound_Implementation(USoundBase* Sound, FVector Loc, float Vol)
+{
+	if (Sound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, Sound, Loc, Vol);
+	}
 }
 
 void ARunState::OnObjectiveRepaired(ARepairable* Repairable, AAvaryoCharacter* FinishedBy)
@@ -915,9 +995,13 @@ FString ARunState::ReputationTitle(int32 Points)
 
 // ---------- Диспетчер ----------
 
-void ARunState::AnnounceCallAccepted(const FString& CallTitle)
+void ARunState::AnnounceCallAccepted(const FString& CallTitle, bool bKitLoaded)
 {
 	DispatcherSay(DispatcherLines::CallBriefing, CallTitle, /*bImportant=*/true);
+	if (!bKitLoaded)
+	{
+		DispatcherSay(DispatcherLines::NoKitWarning, FString(), /*bImportant=*/true);
+	}
 	// взяли заявку — болтовня на базе больше не нужна
 	GetWorldTimerManager().ClearTimer(HubIdleTimer);
 }
