@@ -1,42 +1,12 @@
 [
  {
-  "label": "ItemConsumable: bandage/drink/pickup/usedevice/eat (UE4 -> RTG_MCO)",
-  "retargeter": "/Game/Characters/Operator/Rig/RTG_MCO_to_Operator.RTG_MCO_to_Operator",
-  "source_mesh": "/Game/ItemConsumableAnims/Demo/Mannequin/Character/Mesh/SK_Mannequin.SK_Mannequin",
+  "label": "CharacterEmotes: 12 hub emotes (UE5 Manny -> RTG_UEFN)",
+  "retargeter": "/Game/Characters/Operator/Rig/RTG_UEFN_to_Operator.RTG_UEFN_to_Operator",
+  "source_mesh": "/Game/CharacterEmotes/Demo/Characters/Mannequins/Meshes/SKM_Manny.SKM_Manny",
   "operator_mesh": "/Game/Characters/Operator/SK_Operator.SK_Operator",
-  "pack_root": "/Game/ItemConsumableAnims",
+  "pack_root": "/Game/CharacterEmotes",
   "dest": "/Game/Characters/Operator/Anims_Retarget",
   "prefix": "Op_",
-  "wants": ["Bandage_start","Bandage_loop","Bandage_end","DrinkingPotion_start","DrinkingPotion_loop","DrinkingPotion_end","PickUp1","PickUp2","PickUp3","UseDevice_start","UseDevice_loop","UseDevice_end","Eat1"]
- },
- {
-  "label": "KnockedDown: knocked+revive+downed-idle all dirs (UE4 -> RTG_MCO)",
-  "retargeter": "/Game/Characters/Operator/Rig/RTG_MCO_to_Operator.RTG_MCO_to_Operator",
-  "source_mesh": "/Game/KnockedDown/EpicContent/Mannequin/Character/Mesh/SK_Mannequin.SK_Mannequin",
-  "operator_mesh": "/Game/Characters/Operator/SK_Operator.SK_Operator",
-  "pack_root": "/Game/KnockedDown",
-  "dest": "/Game/Characters/Operator/Anims_Retarget",
-  "prefix": "Op_",
-  "wants": ["Knocked_Back","Knocked_Front","Knocked_Left","Knocked_Right","Revive_Back","Revive_Front","Revive_Left","Revive_Right","Idle_Front","Idle_Back","Idle_Left","Idle_Right"]
- },
- {
-  "label": "HitReaction directional in-place (UE4 -> RTG_MCO)",
-  "retargeter": "/Game/Characters/Operator/Rig/RTG_MCO_to_Operator.RTG_MCO_to_Operator",
-  "source_mesh": "/Game/JKMotion_HitReaction/Showcase/UE4_Mannequin/Character/Mesh/SK_Mannequin.SK_Mannequin",
-  "operator_mesh": "/Game/Characters/Operator/SK_Operator.SK_Operator",
-  "pack_root": "/Game/JKMotion_HitReaction",
-  "dest": "/Game/Characters/Operator/Anims_Retarget",
-  "prefix": "Op_",
-  "wants": ["UE4M_HitReaction_Front_01","UE4M_HitReaction_Front_02","UE4M_HitReaction_Back_01","UE4M_HitReaction_Back_02","UE4M_HitReaction_Left_01","UE4M_HitReaction_Left_02","UE4M_HitReaction_Right_01","UE4M_HitReaction_Right_02"]
- },
- {
-  "label": "Loot: kneel pickup + container grabs (UE4 -> RTG_MCO)",
-  "retargeter": "/Game/Characters/Operator/Rig/RTG_MCO_to_Operator.RTG_MCO_to_Operator",
-  "source_mesh": "/Game/Loot_Anim_Set/Demo/Mannequin/Character/Mesh/SK_Mannequin.SK_Mannequin",
-  "operator_mesh": "/Game/Characters/Operator/SK_Operator.SK_Operator",
-  "pack_root": "/Game/Loot_Anim_Set",
-  "dest": "/Game/Characters/Operator/Anims_Retarget",
-  "prefix": "Op_",
-  "wants": ["Loot_FloorPickUp_Kneel_RightHand","Loot_FloorPickUp_Kneel_SmallBox","Loot_FloorPickUp_BendOver_RightHand","Loot_Locker_GrabItem","Loot_Fridge_GrabItem","Loot_HighShelf_SearchAndGrab","Loot_LowShelf_GrabItem","Loot_Trashcan_SearchAndGrab","Loot_Corpse_GrabItem","Loot_Hole_ArmReach_GrabItem"]
+  "wants": ["Emote101_UE5Anim","Emote102_UE5Anim","Emote103_UE5Anim","Emote104_UE5Anim","Emote105_UE5Anim","Emote106_UE5Anim","Emote107_UE5Anim","Emote108_UE5Anim","Emote109_UE5Anim","Emote110_UE5Anim","Emote111_UE5Anim","Emote112_UE5Anim"]
  }
 ]
