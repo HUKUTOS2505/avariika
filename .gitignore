@@ -58,6 +58,11 @@ Content/PostApocalypticHouse/
 Content/__ExternalActors__/PostApocalypticHouse/
 Content/Hyper/
 Content/Survival_SFX/
+# Исходные аним-паки — нужны только локально для ретаргета на оператора.
+# В игру попадают как Op_* в Content/Characters/Operator/Anims_Retarget/ (закоммичены).
+Content/AnimStarterPack/
+Content/MC_Sample/
+Content/MCO_Mocap_Basics/
 
 # Временные отладочные скрипты (префикс _)
 Scripts/_*.py
