@@ -11,6 +11,7 @@
 #include "Game/ARunState.h"
 #include "Game/DispatchSubsystem.h"
 #include "Kismet/GameplayStatics.h"
+#include "Sound/SoundBase.h"
 #include "TimerManager.h"
 #include "UObject/ConstructorHelpers.h"
 #include "UObject/Package.h"
@@ -46,6 +47,12 @@ ACallBoard::ACallBoard()
 	Label->SetWorldSize(18.f);
 	Label->SetText(NSLOCTEXT("CallBoard", "Label", "ДОСКА ЗАЯВОК"));
 	Label->SetTextRenderColor(FColor(255, 140, 0)); // оранжевый акцент проекта
+
+	// Звуки по умолчанию (переопределяемы на инстансе/в Blueprint)
+	static ConstructorHelpers::FObjectFinder<USoundBase> AcceptSnd(TEXT("/Game/Audio/SFX/RadioComm.RadioComm"));
+	if (AcceptSnd.Succeeded()) { AcceptSound = AcceptSnd.Object; }
+	static ConstructorHelpers::FObjectFinder<USoundBase> EngineSnd(TEXT("/Game/Audio/SFX/EngineStart.EngineStart"));
+	if (EngineSnd.Succeeded()) { EngineStartSound = EngineSnd.Object; }
 }
 
 void ACallBoard::BeginPlay()
@@ -164,6 +171,11 @@ void ACallBoard::AcceptBy(AAvaryoCharacter* Who)
 	if (AcceptSound)
 	{
 		UGameplayStatics::PlaySound2D(W, AcceptSound);
+	}
+	if (EngineStartSound)
+	{
+		// двигатель «поехали» — от места доски/гаража (3D)
+		UGameplayStatics::PlaySoundAtLocation(W, EngineStartSound, GetActorLocation());
 	}
 
 	// Небольшая пауза на брифинг, затем выезд

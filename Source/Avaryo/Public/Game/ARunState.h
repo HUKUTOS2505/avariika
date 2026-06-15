@@ -385,8 +385,14 @@ protected:
 	UPROPERTY(Transient)
 	TObjectPtr<UAudioComponent> AmbientAudio;
 
-	/** Приветственная реплика по таймеру после старта смены. */
+	/** Приветственная реплика по таймеру после старта смены (на объекте — с названием заявки). */
 	void SendGreeting();
+
+	/** Хаб: фоновая болтовня диспетчера, пока бригада не взяла заявку (по таймеру). */
+	void SendHubIdle();
+
+	/** Хаб: таймер фоновой болтовни. */
+	FTimerHandle HubIdleTimer;
 
 	/** Имя монтёра для реплик («Монтёр», пока PlayerState не приехал). */
 	static FString CrewName(const AAvaryoCharacter* Who);

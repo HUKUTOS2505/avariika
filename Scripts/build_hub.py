@@ -119,8 +119,8 @@ try:
     else:
         R["steps"].append("WARN: /Script/Avaryo.CallBoard не найден — собери C++ (модуль не скомпилирован?)")
 
-    # ── Фургон в гараже (Hilux если есть, иначе SM_Gazelle, иначе пропуск) ──
-    van_mesh = safe_load("/Game/Avariika/Meshes/Hilux/Hilux.Hilux") or safe_load("/Game/Avariika/Meshes/SM_Gazelle/SM_Gazelle.SM_Gazelle")
+    # ── Фургон в гараже (SM_Gazelle — одиночный меш, надёжно) ──
+    van_mesh = safe_load("/Game/Avariika/Meshes/SM_Gazelle.SM_Gazelle")
     if van_mesh:
         van = eas.spawn_actor_from_class(SM, unreal.Vector(2100, 550, 10), unreal.Rotator(pitch=0, yaw=0, roll=0))
         van.static_mesh_component.set_static_mesh(van_mesh)
@@ -139,6 +139,17 @@ try:
     else:
         box("Hub_ToolRack_PH", 700, 1000, 50, 120, 60, 100)  # заглушка-стойка
         R["steps"].append("toolbench PH (cube)")
+
+    # ── Локальный эмбиент базы: гул лампы у доски заявок (3D AmbientSound) ──
+    hum = safe_load("/Game/Audio/SFX/Hazard/Hazard_LampHum_Loop.Hazard_LampHum_Loop")
+    if hum:
+        amb = eas.spawn_actor_from_class(unreal.AmbientSound, unreal.Vector(120, 550, 200), unreal.Rotator(0, 0, 0))
+        amb.set_actor_label("Hub_Ambient_LampHum"); R["actors"] += 1
+        try:
+            ac = amb.get_component_by_class(unreal.AudioComponent)
+            ac.set_sound(hum); ac.set_editor_property("volume_multiplier", 0.4)
+        except Exception as e: R["steps"].append("ambient err: %s" % e)
+        R["steps"].append("hub ambient lamp hum")
 
     # ── GameMode Avaryo (тот же режим — спавн персонажа/HUD/RunState-хаб) ──
     gm = safe_load("/Game/Avariika/Blueprints/BP_AvaryoGameMode")

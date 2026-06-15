@@ -73,13 +73,17 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="CallBoard")
 	FString HubMapOverride;
 
-	/** Сколько секунд держать брифинг перед выездом (диспетчер успевает сказать). */
+	/** Сколько секунд держать брифинг перед выездом (диспетчер + завод двигателя успевают прозвучать). */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="CallBoard")
-	float TravelDelay = 1.2f;
+	float TravelDelay = 2.2f;
 
-	/** Бип/щелчок рации при приёме заявки. */
+	/** Бип/щелчок рации при приёме заявки (дефолт — RadioComm). */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="CallBoard")
 	TObjectPtr<USoundBase> AcceptSound;
+
+	/** Звук заводящегося двигателя «поехали» при приёме заявки (дефолт — EngineStart). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="CallBoard")
+	TObjectPtr<USoundBase> EngineStartSound;
 
 	/** Выбранная заявка (для подсказки HUD). */
 	UFUNCTION(BlueprintPure, Category="CallBoard")

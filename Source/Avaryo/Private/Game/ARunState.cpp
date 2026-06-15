@@ -57,6 +57,19 @@ namespace DispatcherLines
 		TEXT("Заявка «{X}» ваша. Грузимся, выезжаем. Не растеряйте инструмент."),
 		TEXT("Есть «{X}». Адрес в навигаторе, погнали. Жду с победой."),
 	};
+	// ХАБ: фоновая болтовня, пока бригада тупит на базе и не берёт заявку
+	const TArray<FString> HubIdle = {
+		TEXT("Бригада, заявки сами себя не возьмут. Доска вон висит."),
+		TEXT("Я, конечно, не тороплю… но счётчик смены идёт. Берите вызов."),
+		TEXT("Кофе допили? Жильцы на линии, доска заявок ждёт."),
+		TEXT("Эфир тихий, прям подозрительно. Может, на выезд, а?"),
+	};
+	// ОБЪЕКТ: прибытие на заявку (диспетчер называет объект; «{X}» — заголовок)
+	const TArray<FString> ArrivedAtCall = {
+		TEXT("Прибыли на «{X}». Осмотритесь и за работу."),
+		TEXT("Объект «{X}». Что там сломано — то и чиним. Аккуратнее."),
+		TEXT("«{X}» — вы на месте. Связь держите, если что — по рации."),
+	};
 	const TArray<FString> RepairDone = {
 		TEXT("«{X}» — принято. Неужели сами справились."),
 		TEXT("Отметил: «{X}» готов. Продолжаем не ломать остальное."),
@@ -269,6 +282,8 @@ void ARunState::BeginPlay()
 			}
 		}
 		GetWorldTimerManager().SetTimer(GreetingTimer, this, &ARunState::SendGreeting, 4.f, false);
+		// Фоновая болтовня на базе, пока бригада не взяла заявку
+		GetWorldTimerManager().SetTimer(HubIdleTimer, this, &ARunState::SendHubIdle, 35.f, true, 35.f);
 		return;
 	}
 
@@ -897,6 +912,16 @@ FString ARunState::ReputationTitle(int32 Points)
 void ARunState::AnnounceCallAccepted(const FString& CallTitle)
 {
 	DispatcherSay(DispatcherLines::CallBriefing, CallTitle, /*bImportant=*/true);
+	// взяли заявку — болтовня на базе больше не нужна
+	GetWorldTimerManager().ClearTimer(HubIdleTimer);
+}
+
+void ARunState::SendHubIdle()
+{
+	if (HasAuthority() && bHubMode)
+	{
+		DispatcherSay(DispatcherLines::HubIdle, FString(), /*bImportant=*/false);
+	}
 }
 
 void ARunState::SendGreeting()
@@ -906,6 +931,18 @@ void ARunState::SendGreeting()
 	{
 		DispatcherSay(DispatcherLines::HubWelcome, FString(), /*bImportant=*/true);
 		return;
+	}
+
+	// На объекте: если выехали по заявке с базы — диспетчер называет объект
+	if (const UGameInstance* GI = GetWorld()->GetGameInstance())
+	{
+		if (const UDispatchSubsystem* D = GI->GetSubsystem<UDispatchSubsystem>())
+		{
+			if (D->HasActiveCall())
+			{
+				DispatcherSay(DispatcherLines::ArrivedAtCall, D->GetActiveCallTitle(), /*bImportant=*/true);
+			}
+		}
 	}
 
 	DispatcherSay(DispatcherLines::Greeting, FString::FromInt(Objectives.Num()), /*bImportant=*/true);
