@@ -63,6 +63,21 @@ Content/Survival_SFX/
 Content/AnimStarterPack/
 Content/MC_Sample/
 Content/MCO_Mocap_Basics/
+# Импортированы из RawAssets/новое (Fab) — источники ретаргета/use-as-is, локально.
+# Шиппинг-стратегия для use-as-is (собака/InteractionKit/Loot/Storage) ещё не решена.
+Content/AnimX/
+Content/JKMotion_HitReaction/
+Content/KnockedDown/
+Content/InteractionKitVol1/
+Content/ScifiWorkerAnimset/
+Content/WorkAnimations/
+Content/ItemConsumableAnims/
+Content/Loot_Anim_Set/
+Content/StorageUnitsSet/
+# Прочие импортированные аним-паки (Fab), локально
+Content/CharacterEmotes/
+Content/Attaku/
+Content/ActorCore_Sample_Motions/
 
 # Временные отладочные скрипты (префикс _)
 Scripts/_*.py
