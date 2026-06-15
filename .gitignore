@@ -82,6 +82,18 @@ Content/ActorCore_Sample_Motions/
 # Временные отладочные скрипты (префикс _)
 Scripts/_*.py
 
+# Выводы скриптов (манифесты/чанки) — генерируются прогоном, в git не держим
+Scripts/manifests/
+
+# Исходники мокап-пака (MocapOnline), затесавшиеся в Source/ рядом с модулем Avaryo.
+# Это НЕ код модуля (Source/Avaryo/), а FBX/Maya/MB-артефакты пака — локально.
+Source/FBX/
+Source/Maya/
+Source/Motionbuilder/
+Source/SKMannequin_A_Pose/
+Source/SKMannequin_T_Pose/
+Source/*.txt
+
 # Прочее
 *.tmp
 *.log
