@@ -244,6 +244,7 @@ public:
 	void StopCrouchInput();
 
 	/** Переключить вид от 1-го лица ↔ от 3-го (клавиша V). Локально, без репликации. */
+	UFUNCTION(BlueprintCallable, Category="Avaryo|Camera")
 	void ToggleCameraMode();
 
 	UFUNCTION(BlueprintPure, Category="Avaryo|Camera")
