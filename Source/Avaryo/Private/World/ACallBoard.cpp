@@ -66,7 +66,10 @@ void ACallBoard::BeginPlay()
 		Dom.Id = TEXT("Dom");
 		Dom.Title = TEXT("Дом — частный сектор");
 		Dom.Brief = TEXT("Бытовая авария: электрика, газ.");
-		Dom.ObjectMap = TEXT("/Game/Avariika/Maps/L_Dom");
+		// ВРЕМЕННО: едем на рабочую Lvl_FirstPerson — там весь геймплей (поломки, зона
+		// выхода, предметы). Переключить на /Game/Avariika/Maps/L_Dom, когда дом-карта
+		// будет наполнена ремонтируемыми + зоной выхода.
+		Dom.ObjectMap = TEXT("/Game/FirstPerson/Lvl_FirstPerson");
 		Dom.bAvailable = true;
 		Calls.Add(Dom);
 
