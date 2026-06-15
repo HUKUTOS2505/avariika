@@ -601,11 +601,8 @@ void ARunState::TickOverload(float DeltaSeconds)
 		OverloadCooldown = 12.f; // не выбивать снова сразу
 		DispatcherSay(DispatcherLines::Overload, FString(), /*bImportant=*/true);
 		MakeNoise(0.9f, nullptr, Breaker->GetActorLocation());
-		// Слышимый скачок напряжения «BZZT» у всех (раньше перегруз был беззвучным)
-		if (SurgeSound)
-		{
-			MulticastAmbientSound(SurgeSound, Breaker->GetActorLocation(), 0.85f);
-		}
+		// Скачок напряжения: «BZZT» + у монтёров рядом на миг гаснет фонарь (раньше перегруз был беззвучным)
+		MulticastPowerSurge(Breaker->GetActorLocation(), 1.2f);
 	}
 }
 
@@ -845,6 +842,27 @@ void ARunState::MulticastAmbientSound_Implementation(USoundBase* Sound, FVector 
 	if (Sound)
 	{
 		UGameplayStatics::PlaySoundAtLocation(this, Sound, Loc, Vol);
+	}
+}
+
+void ARunState::MulticastPowerSurge_Implementation(FVector Loc, float FlashlightOutDuration)
+{
+	// «BZZT» от щитка
+	if (SurgeSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, SurgeSound, Loc, 0.85f);
+	}
+	// Локально на каждой машине: у монтёров рядом на миг гаснет фонарь (электрика-хоррор)
+	const float RadiusSq = FMath::Square(1400.f);
+	for (TActorIterator<AAvaryoCharacter> It(GetWorld()); It; ++It)
+	{
+		if (FVector::DistSquared(It->GetActorLocation(), Loc) <= RadiusSq)
+		{
+			if (UFlashlightComponent* FL = It->FindComponentByClass<UFlashlightComponent>())
+			{
+				FL->ForceBlackout(FlashlightOutDuration);
+			}
+		}
 	}
 }
 

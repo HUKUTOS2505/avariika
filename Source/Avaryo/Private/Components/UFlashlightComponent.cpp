@@ -202,10 +202,24 @@ void UFlashlightComponent::ApplyLightState()
 	}
 }
 
+void UFlashlightComponent::ForceBlackout(float Duration)
+{
+	// Берём максимум — повторный скачок не укорачивает темноту
+	ForcedBlackoutRemaining = FMath::Max(ForcedBlackoutRemaining, Duration);
+}
+
 void UFlashlightComponent::UpdateFlicker(float DeltaTime)
 {
 	if (!AttachedLight || !bIsOn)
 	{
+		return;
+	}
+
+	// Принудительное отключение (перегрузка/скачок) — приоритетнее заряда и дешёвого юнита
+	if (ForcedBlackoutRemaining > 0.f)
+	{
+		ForcedBlackoutRemaining -= DeltaTime;
+		AttachedLight->SetIntensity(0.f);
 		return;
 	}
 

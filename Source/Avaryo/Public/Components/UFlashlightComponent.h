@@ -38,6 +38,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Flashlight")
 	void Toggle();
 
+	/** Принудительно вырубить луч на Duration сек (скачок напряжения/перегрузка). Локально на каждой машине. */
+	UFUNCTION(BlueprintCallable, Category="Flashlight")
+	void ForceBlackout(float Duration);
+
 	/** Восстановить заряд на Amount процентов (итог зажат в 0-100). */
 	UFUNCTION(BlueprintCallable, Category="Flashlight")
 	void Recharge(float Amount);
@@ -134,6 +138,7 @@ private:
 
 	float DefaultIntensity;       // интенсивность света по умолчанию (запоминается в BeginPlay)
 	float BlackoutTimeRemaining;  // сколько ещё длится случайное отключение
+	float ForcedBlackoutRemaining = 0.f; // принудительное отключение (перегрузка) — приоритетнее всего
 	bool bLowBatteryNotified;     // чтобы OnBatteryLow сработал один раз на разряд
 	bool bClickReady = false;     // первый ApplyLightState (BeginPlay) щелчок не играет
 };

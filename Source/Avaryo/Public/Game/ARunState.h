@@ -391,6 +391,10 @@ protected:
 	UFUNCTION(NetMulticast, Unreliable)
 	void MulticastAmbientSound(USoundBase* Sound, FVector Loc, float Vol);
 
+	/** Скачок напряжения: «BZZT» в точке + у монтёров рядом на миг гаснет фонарь. У ВСЕХ машин. */
+	UFUNCTION(NetMulticast, Unreliable)
+	void MulticastPowerSurge(FVector Loc, float FlashlightOutDuration);
+
 	/** Сервер: выдать монтёру дешёвый фонарь, если на забег выпал дешёвый комплект (один раз). */
 	void ApplyCheapGear(AAvaryoCharacter* Who);
 
