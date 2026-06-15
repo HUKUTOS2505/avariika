@@ -267,6 +267,8 @@ ARunState::ARunState()
 	if (RadioSnd.Succeeded()) { RadioBlipSound = RadioSnd.Object; }
 	static ConstructorHelpers::FObjectFinder<USoundBase> AmbSnd(TEXT("/Game/Audio/SFX/Ambient_Boiler.Ambient_Boiler"));
 	if (AmbSnd.Succeeded()) { AmbientLoopSound = AmbSnd.Object; }
+	static ConstructorHelpers::FObjectFinder<USoundBase> SurgeSnd(TEXT("/Game/Audio/SFX/Hazard/Hazard_Overload_1.Hazard_Overload_1"));
+	if (SurgeSnd.Succeeded()) { SurgeSound = SurgeSnd.Object; }
 }
 
 void ARunState::BeginPlay()
@@ -599,6 +601,11 @@ void ARunState::TickOverload(float DeltaSeconds)
 		OverloadCooldown = 12.f; // не выбивать снова сразу
 		DispatcherSay(DispatcherLines::Overload, FString(), /*bImportant=*/true);
 		MakeNoise(0.9f, nullptr, Breaker->GetActorLocation());
+		// Слышимый скачок напряжения «BZZT» у всех (раньше перегруз был беззвучным)
+		if (SurgeSound)
+		{
+			MulticastAmbientSound(SurgeSound, Breaker->GetActorLocation(), 0.85f);
+		}
 	}
 }
 

@@ -405,6 +405,10 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Run|Audio")
 	TObjectPtr<USoundBase> AmbientLoopSound;
 
+	/** Звук скачка напряжения «BZZT», когда перегрузка снова выбивает щиток. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Run|Audio")
+	TObjectPtr<USoundBase> SurgeSound;
+
 	/** Хэндл играющего эмбиента (чтобы не собрался GC). */
 	UPROPERTY(Transient)
 	TObjectPtr<UAudioComponent> AmbientAudio;
