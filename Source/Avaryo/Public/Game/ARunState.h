@@ -200,6 +200,9 @@ public:
 	/** Эта карта — ХАБ (на ней есть доска заявок): без забега, без победы/поражения. */
 	UFUNCTION(BlueprintPure, Category="Run") bool IsHubMode() const { return bHubMode; }
 
+	/** Есть ли зона выхода (если да — победа требует прийти в неё; если нет — победа сразу). Диагностика. */
+	UFUNCTION(BlueprintPure, Category="Run") bool HasExitZone() const { return bHasExitZone; }
+
 	/** Достался ли бригаде дешёвый комплект оборудования (косяки, §18). */
 	UFUNCTION(BlueprintPure, Category="Run")
 	bool HasCheapGear() const { return bCheapGear; }

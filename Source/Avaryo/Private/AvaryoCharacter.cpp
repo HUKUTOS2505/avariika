@@ -815,6 +815,18 @@ APickupItem* AAvaryoCharacter::FindFocusedItem() const
 		}
 	}
 
+	// Если стоим в радиусе ремонта сломанного объекта — НЕ перебиваем подсказку ремонта
+	// предметом из-под ног (это и есть баг «смотрю на щиток, а пишет поднять X»).
+	// Хочешь взять предмет рядом — наведись прямо на него (свип из камеры выше это ловит).
+	for (TActorIterator<ARepairable> It(GetWorld()); It; ++It)
+	{
+		if (It->IsBroken()
+			&& FVector::DistSquared(GetActorLocation(), It->GetActorLocation()) < FMath::Square(It->RepairRange))
+		{
+			return nullptr;
+		}
+	}
+
 	// Фолбэк: ближайший ПОДБИРАЕМЫЙ предмет, в радиус которого мы вошли
 	TArray<AActor*> Overlapping;
 	GetOverlappingActors(Overlapping, APickupItem::StaticClass());
