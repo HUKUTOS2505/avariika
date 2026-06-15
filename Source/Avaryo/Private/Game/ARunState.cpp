@@ -64,6 +64,12 @@ namespace DispatcherLines
 		TEXT("Кофе допили? Жильцы на линии, доска заявок ждёт."),
 		TEXT("Эфир тихий, прям подозрительно. Может, на выезд, а?"),
 	};
+	// ХАБ: бригада собрала ящик инструмента
+	const TArray<FString> KitLoaded = {
+		TEXT("Ящик собрали — уже плюс. Грузите в ГАЗель и на выезд."),
+		TEXT("Инструмент в кейсе? Молодцы. Теперь не забудьте его на объекте."),
+		TEXT("Кит собран. Хоть что-то по инструкции сегодня. Поехали."),
+	};
 	// ОБЪЕКТ: прибытие на заявку (диспетчер называет объект; «{X}» — заголовок)
 	const TArray<FString> ArrivedAtCall = {
 		TEXT("Прибыли на «{X}». Осмотритесь и за работу."),
@@ -914,6 +920,11 @@ void ARunState::AnnounceCallAccepted(const FString& CallTitle)
 	DispatcherSay(DispatcherLines::CallBriefing, CallTitle, /*bImportant=*/true);
 	// взяли заявку — болтовня на базе больше не нужна
 	GetWorldTimerManager().ClearTimer(HubIdleTimer);
+}
+
+void ARunState::AnnounceKitLoaded()
+{
+	DispatcherSay(DispatcherLines::KitLoaded, FString(), /*bImportant=*/false);
 }
 
 void ARunState::SendHubIdle()

@@ -194,6 +194,9 @@ public:
 	/** Хаб: диспетчер подтверждает принятую на доске заявку. Зовёт ACallBoard. Только сервер. */
 	void AnnounceCallAccepted(const FString& CallTitle);
 
+	/** Хаб: диспетчер реагирует на собранный ящик инструмента. Зовёт AToolCase. Только сервер. */
+	void AnnounceKitLoaded();
+
 	/** Эта карта — ХАБ (на ней есть доска заявок): без забега, без победы/поражения. */
 	UFUNCTION(BlueprintPure, Category="Run") bool IsHubMode() const { return bHubMode; }
 

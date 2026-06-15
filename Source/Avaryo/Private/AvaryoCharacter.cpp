@@ -30,6 +30,7 @@
 #include "UI/AvaryoHUD.h"
 #include "World/ABioProjectile.h"
 #include "World/ACallBoard.h"
+#include "World/AToolCase.h"
 #include "World/AFloodlight.h"
 #include "World/AFoamPatch.h"
 #include "World/ARepairable.h"
@@ -280,6 +281,7 @@ void AAvaryoCharacter::Tick(float DeltaSeconds)
 		FocusedWounded = FindFocusedWoundedTeammate();
 		FocusedToilet = FindFocusedToilet();
 		FocusedCallBoard = FindFocusedCallBoard();
+		FocusedToolCase = FindFocusedToolCase();
 
 		// Монитор оператора: закрывается, если вышел из зоны/ранен.
 		// Захват камер у ВСЕХ персонажей включён локально только пока монитор открыт
@@ -811,6 +813,47 @@ ACallBoard* AAvaryoCharacter::FindFocusedCallBoard() const
 	return Nearest;
 }
 
+AToolCase* AAvaryoCharacter::FindFocusedToolCase() const
+{
+	FVector ViewLoc;
+	FRotator ViewRot;
+	GetActorEyesViewPoint(ViewLoc, ViewRot);
+
+	FCollisionQueryParams Params(FName(TEXT("ToolCaseTrace")), false, this);
+	FHitResult Hit;
+	const FCollisionShape Probe = FCollisionShape::MakeSphere(16.f);
+	if (GetWorld()->SweepSingleByChannel(Hit, ViewLoc, ViewLoc + ViewRot.Vector() * PickupRange, FQuat::Identity, ECC_Visibility, Probe, Params))
+	{
+		if (AToolCase* Case = Cast<AToolCase>(Hit.GetActor()))
+		{
+			if (!Case->IsLoaded())
+			{
+				return Case;
+			}
+		}
+	}
+
+	TArray<AActor*> Overlapping;
+	GetOverlappingActors(Overlapping, AToolCase::StaticClass());
+	AToolCase* Nearest = nullptr;
+	float BestDistSq = TNumericLimits<float>::Max();
+	for (AActor* Actor : Overlapping)
+	{
+		AToolCase* Case = Cast<AToolCase>(Actor);
+		if (!Case || Case->IsLoaded())
+		{
+			continue;
+		}
+		const float DistSq = FVector::DistSquared(GetActorLocation(), Case->GetActorLocation());
+		if (DistSq < BestDistSq)
+		{
+			BestDistSq = DistSq;
+			Nearest = Case;
+		}
+	}
+	return Nearest;
+}
+
 void AAvaryoCharacter::TryPickupNearbyItem()
 {
 	if (!HasAuthority())
@@ -925,6 +968,13 @@ void AAvaryoCharacter::InteractPressedAuth()
 	if (ACallBoard* Board = FindFocusedCallBoard())
 	{
 		Board->AcceptBy(this);
+		return;
+	}
+
+	// Хаб: ящик инструмента — собрать кит перед выездом
+	if (AToolCase* Case = FindFocusedToolCase())
+	{
+		Case->UseBy(this);
 		return;
 	}
 

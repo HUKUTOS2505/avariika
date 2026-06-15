@@ -8,6 +8,7 @@ class APickupItem;
 class ARepairable;
 class AToilet;
 class ACallBoard;
+class AToolCase;
 class UCameraComponent;
 class UFlashlightComponent;
 class UAudioComponent;
@@ -123,6 +124,10 @@ public:
 	/** Доска заявок под прицелом (для подсказки «[E] Взять заявку» в хабе). */
 	UFUNCTION(BlueprintPure, Category="Avaryo|Interact")
 	ACallBoard* GetFocusedCallBoard() const { return FocusedCallBoard; }
+
+	/** Ящик инструмента под прицелом (для подсказки «[E] Собрать кит» в хабе). */
+	UFUNCTION(BlueprintPure, Category="Avaryo|Interact")
+	AToolCase* GetFocusedToolCase() const { return FocusedToolCase; }
 
 	/** Идёт ли «процесс» в биотуалете (мини-игра). */
 	UFUNCTION(BlueprintPure, Category="Avaryo|Interact")
@@ -402,6 +407,10 @@ protected:
 	UPROPERTY(Transient, BlueprintReadOnly, Category="Avaryo|Interact")
 	TObjectPtr<ACallBoard> FocusedCallBoard;
 
+	/** Ящик инструмента под прицелом (хаб). Считается локально в Tick. */
+	UPROPERTY(Transient, BlueprintReadOnly, Category="Avaryo|Interact")
+	TObjectPtr<AToolCase> FocusedToolCase;
+
 	/** Где идёт «процесс» (сервер пишет, реплицируется для HUD). */
 	UPROPERTY(Replicated, BlueprintReadOnly, Category="Avaryo|Interact")
 	TObjectPtr<AToilet> CurrentToilet;
@@ -601,6 +610,9 @@ protected:
 
 	/** Найти доску заявок под прицелом или рядом (хаб). */
 	ACallBoard* FindFocusedCallBoard() const;
+
+	/** Найти ящик инструмента под прицелом или рядом (хаб). */
+	AToolCase* FindFocusedToolCase() const;
 
 	/** Серверная логика нажатия/отпускания E. */
 	void InteractPressedAuth();

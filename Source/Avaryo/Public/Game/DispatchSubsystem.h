@@ -42,7 +42,12 @@ public:
 	{
 		ActiveCallId = NAME_None;
 		ActiveCallTitle.Reset();
+		bKitLoaded = false; // на новую смену ящик собираем заново
 	}
+
+	/** Собран ли ящик инструмента на базе перед выездом (флавор + реакция диспетчера). */
+	bool IsKitLoaded() const { return bKitLoaded; }
+	void SetKitLoaded(bool bLoaded) { bKitLoaded = bLoaded; }
 
 protected:
 	/** Куда вернуться (хаб). */
@@ -51,4 +56,7 @@ protected:
 	/** Что за заявка сейчас выполняется. */
 	FName ActiveCallId = NAME_None;
 	FString ActiveCallTitle;
+
+	/** Собран ли ящик инструмента (сбрасывается на базе). */
+	bool bKitLoaded = false;
 };

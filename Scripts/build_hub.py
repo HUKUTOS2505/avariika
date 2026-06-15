@@ -140,6 +140,15 @@ try:
         box("Hub_ToolRack_PH", 700, 1000, 50, 120, 60, 100)  # заглушка-стойка
         R["steps"].append("toolbench PH (cube)")
 
+    # ── Ящик инструмента (AToolCase) у верстака — шаг «собрать кит» ──
+    case_cls = unreal.load_class(None, "/Script/Avaryo.ToolCase")
+    if case_cls:
+        tc = eas.spawn_actor_from_class(case_cls, unreal.Vector(750, 880, 0), unreal.Rotator(0, 0, 0))
+        tc.set_actor_label("ToolCase_Hub"); R["actors"] += 1
+        R["steps"].append("ToolCase spawned")
+    else:
+        R["steps"].append("WARN: /Script/Avaryo.ToolCase не найден — собери C++")
+
     # ── Локальный эмбиент базы: гул лампы у доски заявок (3D AmbientSound) ──
     hum = safe_load("/Game/Audio/SFX/Hazard/Hazard_LampHum_Loop.Hazard_LampHum_Loop")
     if hum:

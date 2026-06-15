@@ -14,6 +14,7 @@
 #include "GameFramework/PlayerState.h"
 #include "Items/APickupItem.h"
 #include "World/ACallBoard.h"
+#include "World/AToolCase.h"
 #include "World/AExitZone.h"
 #include "World/ARepairable.h"
 #include "World/AToilet.h"
@@ -783,6 +784,10 @@ void AAvaryoHUD::DrawHUD()
 			const int32 Sel = Board->GetSelectedIndex();
 			const FString Title = BC.IsValidIndex(Sel) ? BC[Sel].Title : FString(TEXT("заявка"));
 			DrawPromptBox(FString::Printf(TEXT("[E] Взять заявку: %s"), *Title));
+		}
+		else if (Character->GetFocusedToolCase())
+		{
+			DrawPromptBox(TEXT("[E] Собрать ящик инструмента"));
 		}
 		else if (APickupItem* Focused = Character->GetFocusedItem())
 	{
