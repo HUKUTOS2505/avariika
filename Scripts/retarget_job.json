@@ -1,22 +1,22 @@
 [
  {
-  "label": "WorkAnimations repair+carry REDO (UE5 SKM_Manny -> RTG_UE5Manny)",
-  "retargeter": "/Game/Characters/Operator/Rig/RTG_UE5Manny_to_Operator.RTG_UE5Manny_to_Operator",
-  "source_mesh": "/Game/WorkAnimations/Demo/Mannequins/Meshes/SKM_Manny.SKM_Manny",
-  "operator_mesh": "/Game/Characters/Operator/SK_Operator.SK_Operator",
-  "pack_root": "/Game/WorkAnimations",
-  "dest": "/Game/Characters/Operator/Anims_Retarget",
-  "prefix": "Op_",
-  "wants": ["AS_Fixing","AS_FixingSomething","AS_Drilling","AS_DrivingNails","AS_TighteningWithSocketWrench","AS_CarryBag","AS_HangingSomethingHeavy"]
- },
- {
-  "label": "CharacterEmotes REDO (UE5 SKM_Manny -> RTG_UE5Manny)",
-  "retargeter": "/Game/Characters/Operator/Rig/RTG_UE5Manny_to_Operator.RTG_UE5Manny_to_Operator",
-  "source_mesh": "/Game/CharacterEmotes/Demo/Characters/Mannequins/Meshes/SKM_Manny.SKM_Manny",
+  "label": "CharacterEmotes UE4 variant -> RTG_MCO (hub)",
+  "retargeter": "/Game/Characters/Operator/Rig/RTG_MCO_to_Operator.RTG_MCO_to_Operator",
+  "source_mesh": "/Game/CharacterEmotes/Demo/Characters/Mannequin_UE4/Meshes/SK_Mannequin.SK_Mannequin",
   "operator_mesh": "/Game/Characters/Operator/SK_Operator.SK_Operator",
   "pack_root": "/Game/CharacterEmotes",
   "dest": "/Game/Characters/Operator/Anims_Retarget",
   "prefix": "Op_",
-  "wants": ["Emote101_UE5Anim","Emote102_UE5Anim","Emote103_UE5Anim","Emote104_UE5Anim","Emote105_UE5Anim","Emote106_UE5Anim","Emote107_UE5Anim","Emote108_UE5Anim","Emote109_UE5Anim","Emote110_UE5Anim","Emote111_UE5Anim","Emote112_UE5Anim"]
+  "wants": ["Emote101_UE4Anim","Emote102_UE4Anim","Emote103_UE4Anim","Emote104_UE4Anim","Emote105_UE4Anim","Emote106_UE4Anim","Emote107_UE4Anim","Emote108_UE4Anim","Emote109_UE4Anim","Emote110_UE4Anim","Emote111_UE4Anim","Emote112_UE4Anim"]
+ },
+ {
+  "label": "ScifiWorker repair UE4 -> RTG_MCO (replace UE5 work)",
+  "retargeter": "/Game/Characters/Operator/Rig/RTG_MCO_to_Operator.RTG_MCO_to_Operator",
+  "source_mesh": "/Game/ScifiWorkerAnimset/Character/Mannequin/Character/Mesh/SK_Mannequin.SK_Mannequin",
+  "operator_mesh": "/Game/Characters/Operator/SK_Operator.SK_Operator",
+  "pack_root": "/Game/ScifiWorkerAnimset",
+  "dest": "/Game/Characters/Operator/Anims_Retarget",
+  "prefix": "Op_",
+  "wants": ["Worker_FixCircuitBoard_Loop","Worker_FixLandingGear_Loop","Worker_FixPanelOverhead_Loop","Worker_FixWiresOverhead_Loop","Worker_InspectUnder_Loop","Worker_HammerPanelStepUp_Loop","Worker_welding_enter","Worker_welding_exit"]
  }
 ]
