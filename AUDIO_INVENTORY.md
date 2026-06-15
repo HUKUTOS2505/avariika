@@ -13,7 +13,7 @@
 | Событие | Статус | Источник (pack + path/stem, variants) | Заметка |
 |---|---|---|---|
 | Шаги ходьба по поверхности | ✅ ЕСТЬ | Survival_SFX `Content/Survival_SFX/Movement/Walk_{grass,gravel,wood,stone}` (×4) | Есть grass/gravel/wood/stone. `stone`≈бетон. Нет **tile/metal** — добрать из FootstepSoundComponent. |
-| Шаги бег | ✅ ЕСТЬ | Survival_SFX `Content/Survival_SFX/Movement/Run_{grass,gravel,wood,stone}` (×4) | Есть и `Jog_` (средний темп). |
+| Шаги бег | ✅ ЕСТЬ | Survival_SFX `Content/Survival_SFX/Movement/Run_{grass,gravel,wood,stone}` (×4) | Есть и `Jog_` (средний темп). | иногда лагает звук накладывается
 | Шаги краулинг/присед | ❌ НЕТ | — | Отдельного crouch-стема нет. Временно — тихий `Walk_` со сдвигом питча. |
 | Прыжок (отталкивание) | ✅ ЕСТЬ | Survival_SFX `Content/Survival_SFX/Movement/Jump_{grass,gravel,stone,wood}` (×4) | — |
 | Приземление (тяжёлый удар) | 🟡 КАНДИДАТ | Ghosthack `Ultimate Fighting Foley/Body Fall` (15–39) | Бетон/кожа thud, прямое попадание. Альт — `Hyperion/Impacts`. |
@@ -31,7 +31,7 @@
 | Паник-вздох (gasp) | ❌ НЕТ | — | Мужской вокал. Шоппинг-лист. |
 | Крик боли (ранение) | ❌ НЕТ | — | Мужской вокал. Шоппинг-лист. |
 | Тяжёлое дыхание при ползании | ❌ НЕТ | — | Мужской вокал. Шоппинг-лист. |
-| Бинтование/лечение | ✅ ЕСТЬ | Survival_SFX `Content/Survival_SFX/Survival/First_aid_*` (10) | Чистый foley бинта/аптечки. |
+| Бинтование/лечение | ✅ ЕСТЬ | Survival_SFX `Content/Survival_SFX/Survival/First_aid_*` (10) | Чистый foley бинта/аптечки. | работает странно аптечка применяется секунд 10 а бинтование 2.5 секунды что то менять  надо
 | Кряхтение при подъёме напарника | ❌ НЕТ | — | Мужской вокал. Шоппинг-лист. |
 | Кашель | ❌ НЕТ | — | Мужской вокал. Шоппинг-лист. |
 | Икота | ❌ НЕТ | — | Мужской вокал. Шоппинг-лист. |
