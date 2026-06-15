@@ -251,6 +251,15 @@ void AAvaryoCharacter::BeginPlay()
 	// Начальный вид (от 1-го лица) — на локальном игроке
 	ApplyCameraView();
 
+	// ВАЖНО: дублируем настройки приседа в RUNTIME — значения из конструктора C++ может
+	// перебить дефолт компонента в Blueprint (тогда Crouch() молча не работает = «присяда нету»).
+	if (UCharacterMovementComponent* Move = GetCharacterMovement())
+	{
+		Move->GetNavAgentPropertiesRef().bCanCrouch = true;
+		Move->MaxWalkSpeedCrouched = 250.f;
+		Move->CrouchedHalfHeight = 50.f; // заметно ниже стоя
+	}
+
 	// Фонарь по умолчанию выключен
 	if (FlashlightComponent && FlashlightComponent->IsOn())
 	{

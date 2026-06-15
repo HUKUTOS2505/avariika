@@ -314,6 +314,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Repair")
 	void SetBroken(bool bNewBroken);
 
+	/** Скриптовый повторный выбив (после «всё починено»): сломать снова + искры + звук замыкания. Только сервер. */
+	void TriggerReTrip();
+
 	/** Паника ремонтника 0..1 (трясущиеся руки усложняют мини-игру). */
 	float RepairerPanic01() const;
 

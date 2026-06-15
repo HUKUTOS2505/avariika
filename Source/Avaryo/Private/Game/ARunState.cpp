@@ -83,6 +83,13 @@ namespace DispatcherLines
 		TEXT("Объект «{X}». Что там сломано — то и чиним. Аккуратнее."),
 		TEXT("«{X}» — вы на месте. Связь держите, если что — по рации."),
 	};
+	// ОБЪЕКТ: «всё починили» → щиток выбивает СНОВА (скриптовый облом перед финишем)
+	const TArray<FString> ReTripJab = {
+		TEXT("Чёрт, щиток снова выбило! За работу, бездари."),
+		TEXT("Рано радовались — опять обесточились. Чините заново, орлы."),
+		TEXT("Эвакуация отменяется: щиток сдох повторно. Кто так чинит?!"),
+		TEXT("Бабах не бабах, а щиток ОПЯТЬ вырубило. Бегом обратно."),
+	};
 	// ОБЪЕКТ: диспетчер теряет терпение, пока забег затягивается (эскалация по времени)
 	const TArray<FString> Impatience = {
 		TEXT("Вы там не уснули? Заявка не на год выдана."),
@@ -898,6 +905,29 @@ void ARunState::OnObjectiveRepaired(ARepairable* Repairable, AAvaryoCharacter* F
 			{
 				It->VitalsComponent->ReducePanic(8.f);
 			}
+		}
+	}
+
+	// СКРИПТОВЫЙ ОБЛОМ: когда ВСЁ починили в первый раз — щиток выбивает снова (ОДИН раз):
+	// искры + звук, прогресс падает (эвакуация отменяется), диспетчер язвит. Нагнетание перед финишем.
+	if (AreAllObjectivesComplete() && !bDidScriptedRetrip)
+	{
+		ARepairable* Breaker = nullptr;
+		for (const TObjectPtr<ARepairable>& Obj : Objectives)
+		{
+			if (Obj && Obj->GetMinigameType() == ERepairMinigameType::Cursor) { Breaker = Obj; break; }
+		}
+		if (Breaker)
+		{
+			bDidScriptedRetrip = true;
+			Breaker->TriggerReTrip(); // сломать снова + искры + звук замыкания
+			RepairedCount = 0;
+			for (const ARepairable* Objective : Objectives)
+			{
+				if (Objective && !Objective->IsBroken()) { ++RepairedCount; }
+			}
+			DispatcherSay(DispatcherLines::ReTripJab, FString(), /*bImportant=*/true);
+			return; // НЕ побеждаем — щиток снова сломан, дочинить заново
 		}
 	}
 

@@ -1079,6 +1079,20 @@ void ARepairable::SetBroken(bool bNewBroken)
 	RefreshStatusVisual();
 }
 
+void ARepairable::TriggerReTrip()
+{
+	if (!HasAuthority())
+	{
+		return;
+	}
+	SetBroken(true); // снова обесточились (OnRep_Broken оживит аварийные лампы)
+	MulticastSparkFX(GetActorLocation()); // искры у всех
+	if (ShortCircuitSound)
+	{
+		MulticastSound(ShortCircuitSound, GetActorLocation(), 1.0f); // звук замыкания
+	}
+}
+
 void ARepairable::ExplodeGas(AAvaryoCharacter* Culprit)
 {
 	ExplosionCooldown = 10.f;
