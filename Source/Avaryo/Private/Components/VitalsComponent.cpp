@@ -10,6 +10,9 @@
 UVitalsComponent::UVitalsComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
+	// Витали — медленные шкалы; тикаем 10 Гц вместо 60. Вся математика на DeltaTime,
+	// значения не меняются, но пер-фреймовые обходы мира (соседи/курящие/вонь/паника) реже в 6 раз.
+	PrimaryComponentTick.TickInterval = 0.1f;
 	SetIsReplicatedByDefault(true);
 
 	// Стартовые 50/50 — чтобы сразу тестировать аптечку и сигареты.

@@ -63,6 +63,7 @@ ARepairable::ARepairable()
 	ExplosionCooldown = 0.f;
 	GasSuppressedTime = 0.f;
 	GasLeakElapsed = 0.f;
+	GasCheckAccum = 0.f;
 	GasSpreadPerSecond = 0.05f; // +5%/с — за ~20 с до максимума
 	GasSpreadMaxScale = 2.0f;
 	CurrentGasRadius = GasRadius;
@@ -464,19 +465,27 @@ void ARepairable::Tick(float DeltaSeconds)
 			// Облако растёт, пока не перекрыли
 			GasLeakElapsed += DeltaSeconds;
 			CurrentGasRadius = GasRadius * FMath::Min(1.f + GasSpreadPerSecond * GasLeakElapsed, GasSpreadMaxScale);
-			for (TActorIterator<AAvaryoCharacter> It(GetWorld()); It; ++It)
+			// Обход игроков — не каждый кадр (дорого при нескольких трубах). Запах копим по накопленному dt,
+			// поджиг проверяем 5 Гц (взрыв и так на кулдауне). Курсор-мини-игра тикает полным Tick — не задета.
+			GasCheckAccum += DeltaSeconds;
+			if (GasCheckAccum >= 0.2f)
 			{
-				if (!It->VitalsComponent
-					|| FVector::DistSquared(It->GetActorLocation(), GetActorLocation()) > FMath::Square(CurrentGasRadius))
+				const float GasDt = GasCheckAccum;
+				GasCheckAccum = 0.f;
+				for (TActorIterator<AAvaryoCharacter> It(GetWorld()); It; ++It)
 				{
-					continue;
-				}
-				It->VitalsComponent->AddSmell(8.f * DeltaSeconds); // провонял газом
-				// Пока облако сбито пеной — поджечь нельзя (огнетушитель спасает от взрыва)
-				if (GasSuppressedTime <= 0.f && ExplosionCooldown <= 0.f && It->VitalsComponent->IsSmoking())
-				{
-					ExplodeGas(*It);
-					break;
+					if (!It->VitalsComponent
+						|| FVector::DistSquared(It->GetActorLocation(), GetActorLocation()) > FMath::Square(CurrentGasRadius))
+					{
+						continue;
+					}
+					It->VitalsComponent->AddSmell(8.f * GasDt); // провонял газом
+					// Пока облако сбито пеной — поджечь нельзя (огнетушитель спасает от взрыва)
+					if (GasSuppressedTime <= 0.f && ExplosionCooldown <= 0.f && It->VitalsComponent->IsSmoking())
+					{
+						ExplodeGas(*It);
+						break;
+					}
 				}
 			}
 		}

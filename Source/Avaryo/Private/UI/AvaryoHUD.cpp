@@ -986,14 +986,17 @@ void AAvaryoHUD::DrawHUD()
 		else if (Vitals->IsSoiled())      Statuses.Add(TEXT("Испачкан"));
 		if (Vitals->IsSmelly())           Statuses.Add(TEXT("Воняет"));
 
-		// В газовом облаке — не курить!
-		for (TActorIterator<ARepairable> It(GetWorld()); It; ++It)
+		// В газовом облаке — не курить! (берём из кэша задач RunState, без обхода всех акторов каждый кадр)
+		if (ARunState* GasRun = ARunState::Get(GetWorld()))
 		{
-			if (It->IsLeakingGas()
-				&& FVector::DistSquared(Character->GetActorLocation(), It->GetActorLocation()) <= FMath::Square(It->GasRadius))
+			for (const ARepairable* Obj : GasRun->GetObjectives())
 			{
-				Statuses.Add(TEXT("ПАХНЕТ ГАЗОМ — НЕ КУРИТЬ!"));
-				break;
+				if (Obj && Obj->IsLeakingGas()
+					&& FVector::DistSquared(Character->GetActorLocation(), Obj->GetActorLocation()) <= FMath::Square(Obj->GasRadius))
+				{
+					Statuses.Add(TEXT("ПАХНЕТ ГАЗОМ — НЕ КУРИТЬ!"));
+					break;
+				}
 			}
 		}
 

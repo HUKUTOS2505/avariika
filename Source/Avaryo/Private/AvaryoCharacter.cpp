@@ -285,11 +285,19 @@ void AAvaryoCharacter::Tick(float DeltaSeconds)
 		{
 			bMonitorOpen = false;
 		}
-		for (TActorIterator<AAvaryoCharacter> It(GetWorld()); It; ++It)
+		// Захват чест-камер переключаем только при СМЕНЕ состояния монитора, а не каждый кадр
+		if (bMonitorOpen != bChestCaptureApplied)
 		{
-			if (It->ChestCamera)
+			bChestCaptureApplied = bMonitorOpen;
+			if (UWorld* W = GetWorld())
 			{
-				It->ChestCamera->bCaptureEveryFrame = bMonitorOpen;
+				for (TActorIterator<AAvaryoCharacter> It(W); It; ++It)
+				{
+					if (It->ChestCamera)
+					{
+						It->ChestCamera->bCaptureEveryFrame = bMonitorOpen;
+					}
+				}
 			}
 		}
 
