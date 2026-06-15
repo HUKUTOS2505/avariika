@@ -19,6 +19,15 @@ WANT = [
 ]
 
 ar = unreal.AssetRegistryHelpers.get_asset_registry()
+# delete previous Op_ results so re-batch (with aligned pose) doesn't collide on rename
+ar.scan_paths_synchronous(["/Game"], True, False)
+for a in ar.get_assets(unreal.ARFilter(class_names=["AnimSequence"], recursive_paths=True)):
+    if str(a.asset_name).startswith("Op_"):
+        try:
+            eal.delete_asset(str(a.package_name))
+        except Exception:
+            pass
+
 f = unreal.ARFilter(class_names=["AnimSequence"], package_paths=["/Game/MCO_Mocap_Basics"], recursive_paths=True)
 byname = {str(a.asset_name): a for a in ar.get_assets(f)}
 picks = [byname[n] for n in WANT if n in byname]
