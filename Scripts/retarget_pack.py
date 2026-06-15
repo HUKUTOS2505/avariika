@@ -18,6 +18,12 @@ def run_job(J):
         if nm in want: found[nm] = a
     picks = list(found.values())
     R["picked"] = sorted(found.keys()); R["missing"] = sorted(want - set(found.keys()))
+    # delete existing dest Op_<name> so re-retargets overwrite cleanly
+    for n in found.keys():
+        dp = dest + "/" + prefix + n
+        try:
+            if eal.does_asset_exist(dp): eal.delete_asset(dp)
+        except Exception: pass
     if picks and rt and src and op:
         try:
             unreal.IKRetargetBatchOperation.duplicate_and_retarget(picks, src, op, rt, search="", replace="", prefix=prefix, suffix="")

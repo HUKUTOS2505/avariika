@@ -1,7 +1,17 @@
 [
  {
-  "label": "CharacterEmotes: 12 hub emotes (UE5 Manny -> RTG_UEFN)",
-  "retargeter": "/Game/Characters/Operator/Rig/RTG_UEFN_to_Operator.RTG_UEFN_to_Operator",
+  "label": "WorkAnimations repair+carry REDO (UE5 SKM_Manny -> RTG_UE5Manny)",
+  "retargeter": "/Game/Characters/Operator/Rig/RTG_UE5Manny_to_Operator.RTG_UE5Manny_to_Operator",
+  "source_mesh": "/Game/WorkAnimations/Demo/Mannequins/Meshes/SKM_Manny.SKM_Manny",
+  "operator_mesh": "/Game/Characters/Operator/SK_Operator.SK_Operator",
+  "pack_root": "/Game/WorkAnimations",
+  "dest": "/Game/Characters/Operator/Anims_Retarget",
+  "prefix": "Op_",
+  "wants": ["AS_Fixing","AS_FixingSomething","AS_Drilling","AS_DrivingNails","AS_TighteningWithSocketWrench","AS_CarryBag","AS_HangingSomethingHeavy"]
+ },
+ {
+  "label": "CharacterEmotes REDO (UE5 SKM_Manny -> RTG_UE5Manny)",
+  "retargeter": "/Game/Characters/Operator/Rig/RTG_UE5Manny_to_Operator.RTG_UE5Manny_to_Operator",
   "source_mesh": "/Game/CharacterEmotes/Demo/Characters/Mannequins/Meshes/SKM_Manny.SKM_Manny",
   "operator_mesh": "/Game/Characters/Operator/SK_Operator.SK_Operator",
   "pack_root": "/Game/CharacterEmotes",
