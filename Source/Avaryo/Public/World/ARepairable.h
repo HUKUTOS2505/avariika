@@ -367,6 +367,10 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Repair|Gas")
 	float GasSpreadMaxScale;
 
+	/** Во сколько раз быстрее облако РАССЕИВАЕТСЯ под пеной огнетушителя, чем копится (способ убрать газ). */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Repair|Gas")
+	float GasDisperseRate;
+
 	/** Мини-игра: позиция курсора, центр зелёной зоны, промахи, блокировка. */
 	UPROPERTY(Replicated)
 	float CursorPos;

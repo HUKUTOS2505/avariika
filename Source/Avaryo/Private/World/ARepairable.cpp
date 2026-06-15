@@ -66,6 +66,7 @@ ARepairable::ARepairable()
 	GasCheckAccum = 0.f;
 	GasSpreadPerSecond = 0.05f; // +5%/с — за ~20 с до максимума
 	GasSpreadMaxScale = 2.0f;
+	GasDisperseRate = 3.0f; // под пеной облако рассеивается ~втрое быстрее, чем копилось
 	CurrentGasRadius = GasRadius;
 	LastShownPercent = -1;
 
@@ -462,8 +463,16 @@ void ARepairable::Tick(float DeltaSeconds)
 		GasSuppressedTime = FMath::Max(GasSuppressedTime - DeltaSeconds, 0.f);
 		if (IsLeakingGas())
 		{
-			// Облако растёт, пока не перекрыли
-			GasLeakElapsed += DeltaSeconds;
+			// Пена огнетушителя не только не даёт поджечь — она РАЗВЕИВАЕТ облако:
+			// пока сбито пеной, газ не копится, а рассеивается (реальный способ «убрать газ»).
+			if (GasSuppressedTime > 0.f)
+			{
+				GasLeakElapsed = FMath::Max(0.f, GasLeakElapsed - DeltaSeconds * GasDisperseRate);
+			}
+			else
+			{
+				GasLeakElapsed += DeltaSeconds; // иначе облако растёт, пока не перекрыли/не развеяли
+			}
 			CurrentGasRadius = GasRadius * FMath::Min(1.f + GasSpreadPerSecond * GasLeakElapsed, GasSpreadMaxScale);
 			// Обход игроков — не каждый кадр (дорого при нескольких трубах). Запах копим по накопленному dt,
 			// поджиг проверяем 5 Гц (взрыв и так на кулдауне). Курсор-мини-игра тикает полным Tick — не задета.
