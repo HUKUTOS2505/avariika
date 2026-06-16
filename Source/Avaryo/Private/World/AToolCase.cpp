@@ -4,6 +4,7 @@
 #include "Components/BoxComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/TextRenderComponent.h"
+#include "Engine/Font.h"
 #include "Engine/GameInstance.h"
 #include "Engine/StaticMesh.h"
 #include "Engine/World.h"
@@ -39,6 +40,8 @@ AToolCase::AToolCase()
 	Label->SetHorizontalAlignment(EHTA_Center);
 	Label->SetWorldSize(14.f);
 	Label->SetTextRenderColor(FColor(255, 140, 0));
+	static ConstructorHelpers::FObjectFinder<UFont> CyrFont(TEXT("/Engine/EngineFonts/Roboto.Roboto"));
+	if (CyrFont.Succeeded()) { Label->SetFont(CyrFont.Object); } // рантайм-шрифт с кириллицей
 
 	static ConstructorHelpers::FObjectFinder<USoundBase> Snd(TEXT("/Game/Audio/SFX/FlashClick.FlashClick"));
 	if (Snd.Succeeded()) { LoadSound = Snd.Object; }

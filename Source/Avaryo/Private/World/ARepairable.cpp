@@ -23,6 +23,7 @@
 #include "Sound/SoundBase.h"
 #include "UI/AvaryoCameraShakes.h"
 #include "UObject/ConstructorHelpers.h"
+#include "Engine/Font.h"
 
 ARepairable::ARepairable()
 {
@@ -39,6 +40,10 @@ ARepairable::ARepairable()
 	StatusText->SetRelativeLocation(FVector(0.f, 0.f, 120.f));
 	StatusText->SetHorizontalAlignment(EHTA_Center);
 	StatusText->SetWorldSize(28.f);
+	// КИРИЛЛИЦА: дефолтный шрифт TextRender (RobotoDistanceField, offline) без кириллицы → прямоугольники.
+	// Берём РАНТАЙМ-шрифт Roboto (рендерит любые глифы, как HUD).
+	static ConstructorHelpers::FObjectFinder<UFont> CyrFont(TEXT("/Engine/EngineFonts/Roboto.Roboto"));
+	if (CyrFont.Succeeded()) { StatusText->SetFont(CyrFont.Object); }
 
 	// Аварийная лампа: в ночной темноте сломанный объект видно по красной пульсации
 	AlarmLight = CreateDefaultSubobject<UPointLightComponent>(TEXT("AlarmLight"));
@@ -78,9 +83,12 @@ ARepairable::ARepairable()
 	static ConstructorHelpers::FObjectFinder<USoundBase> HitSnd(TEXT("/Game/Audio/SFX/Cues/SC_MinigameHit.SC_MinigameHit")); // случайный из 5
 	if (HitSnd.Succeeded()) { MinigameHitSound = HitSnd.Object; }
 
-	// VFX по умолчанию (из бесплатных паков; переопределяемы в Blueprint)
-	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> ExpFX(TEXT("/Game/NiagaraExamples/FX_Explosions/NS_Explosion.NS_Explosion"));
-	if (ExpFX.Succeeded()) { ExplosionFX = ExpFX.Object; }
+	// VFX взрыва: новый пак NiagaraExplosion01 (наземный взрыв со вспышками-молниями), с фолбэком
+	// на движковый пример (пак тяжёлый/локальный, на свежем клоне его нет).
+	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> ExpFXNew(TEXT("/Game/NiagaraExplosion01/Niagaras/Ground/N_ExplosionGround_001.N_ExplosionGround_001"));
+	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> ExpFXOld(TEXT("/Game/NiagaraExamples/FX_Explosions/NS_Explosion.NS_Explosion"));
+	if (ExpFXNew.Succeeded()) { ExplosionFX = ExpFXNew.Object; }
+	else if (ExpFXOld.Succeeded()) { ExplosionFX = ExpFXOld.Object; }
 	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> SpkFX(TEXT("/Game/NiagaraExamples/FX_Sparks/NS_Spark_Burst.NS_Spark_Burst"));
 	if (SpkFX.Succeeded()) { SparkFX = SpkFX.Object; }
 	// Утечка газа = лёгкая струйка пара + шипение (НЕ густой дым «как горит»)

@@ -4,7 +4,9 @@
 #include "Components/StaticMeshComponent.h"
 #include "Components/TextRenderComponent.h"
 #include "Components/VitalsComponent.h"
+#include "Engine/Font.h"
 #include "Engine/World.h"
+#include "UObject/ConstructorHelpers.h"
 #include "Game/ARunState.h"
 #include "GameFramework/PlayerController.h"
 #include "Net/UnrealNetwork.h"
@@ -27,6 +29,8 @@ AToilet::AToilet()
 	Label->SetWorldSize(26.f);
 	Label->SetText(NSLOCTEXT("Toilet", "Label", "Биотуалет"));
 	Label->SetTextRenderColor(FColor(120, 200, 255));
+	static ConstructorHelpers::FObjectFinder<UFont> CyrFont(TEXT("/Engine/EngineFonts/Roboto.Roboto"));
+	if (CyrFont.Succeeded()) { Label->SetFont(CyrFont.Object); } // рантайм-шрифт с кириллицей
 
 	CursorSpeed = 0.8f;
 	GreenHalfWidth = 0.07f;

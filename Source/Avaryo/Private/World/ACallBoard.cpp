@@ -4,6 +4,7 @@
 #include "Components/BoxComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/TextRenderComponent.h"
+#include "Engine/Font.h"
 #include "Engine/GameInstance.h"
 #include "Engine/Level.h"
 #include "Engine/StaticMesh.h"
@@ -47,6 +48,8 @@ ACallBoard::ACallBoard()
 	Label->SetWorldSize(18.f);
 	Label->SetText(NSLOCTEXT("CallBoard", "Label", "ДОСКА ЗАЯВОК"));
 	Label->SetTextRenderColor(FColor(255, 140, 0)); // оранжевый акцент проекта
+	static ConstructorHelpers::FObjectFinder<UFont> CyrFont(TEXT("/Engine/EngineFonts/Roboto.Roboto"));
+	if (CyrFont.Succeeded()) { Label->SetFont(CyrFont.Object); } // рантайм-шрифт с кириллицей
 
 	// Звуки по умолчанию (переопределяемы на инстансе/в Blueprint)
 	static ConstructorHelpers::FObjectFinder<USoundBase> AcceptSnd(TEXT("/Game/Audio/SFX/RadioComm.RadioComm"));

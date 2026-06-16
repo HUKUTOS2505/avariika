@@ -104,3 +104,7 @@ Content/Audio/Lib/
 Content/Garage_Tools_Props/
 Content/Survival_Horror_Props_Pack/
 Content/GoreAndHorrorMegapack/
+
+# Импортированный пак взрывов (864МБ) — локально
+Content/NiagaraExplosion01/
+Content/__ExternalActors__/NiagaraExplosion01/

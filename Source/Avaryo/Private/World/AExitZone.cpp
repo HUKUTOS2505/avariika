@@ -4,6 +4,7 @@
 #include "Components/BoxComponent.h"
 #include "Components/PointLightComponent.h"
 #include "Components/TextRenderComponent.h"
+#include "Engine/Font.h"
 #include "Engine/World.h"
 #include "EngineUtils.h"
 #include "Game/ARunState.h"
@@ -31,6 +32,8 @@ AExitZone::AExitZone()
 	Label->SetWorldSize(40.f);
 	Label->SetText(NSLOCTEXT("ExitZone", "Label", "ГАЗель\n(сначала почините всё)"));
 	Label->SetTextRenderColor(FColor(255, 140, 0)); // оранжевый акцент проекта
+	static ConstructorHelpers::FObjectFinder<UFont> CyrFont(TEXT("/Engine/EngineFonts/Roboto.Roboto"));
+	if (CyrFont.Succeeded()) { Label->SetFont(CyrFont.Object); } // рантайм-шрифт с кириллицей
 
 	// Маяк готовности (Movable — работает без билда света)
 	Beacon = CreateDefaultSubobject<UPointLightComponent>(TEXT("Beacon"));
