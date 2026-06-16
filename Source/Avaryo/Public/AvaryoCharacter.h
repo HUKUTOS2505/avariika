@@ -250,6 +250,14 @@ public:
 	UFUNCTION(BlueprintPure, Category="Avaryo|Camera")
 	bool IsThirdPerson() const { return bThirdPersonView; }
 
+	/** Держим ли газоанализатор (ToolTag=GasDetector) — тогда HUD рисует уровень газа. */
+	UFUNCTION(BlueprintPure, Category="Avaryo|Gas")
+	bool IsHoldingGasDetector() const;
+
+	/** Уровень газа в точке игрока 0..1 (по ближайшей травящей трубе) — для газоанализатора. */
+	UFUNCTION(BlueprintPure, Category="Avaryo|Gas")
+	float GetGasReading() const;
+
 	/** Налобный фонарик. Источник света (SpotLight) добавляется в Blueprint. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Avaryo")
 	TObjectPtr<UFlashlightComponent> FlashlightComponent;

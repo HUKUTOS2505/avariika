@@ -2544,6 +2544,30 @@ void AAvaryoCharacter::StopCrouchInput()
 	UnCrouch();
 }
 
+bool AAvaryoCharacter::IsHoldingGasDetector() const
+{
+	const APickupItem* Held = GetHeldItem();
+	return Held && Held->ToolTag == FName(TEXT("GasDetector"));
+}
+
+float AAvaryoCharacter::GetGasReading() const
+{
+	float Best = 0.f;
+	for (TActorIterator<ARepairable> It(GetWorld()); It; ++It)
+	{
+		if (It->IsLeakingGas())
+		{
+			const float R = It->GetCurrentGasRadius();
+			if (R > 0.f)
+			{
+				const float D = FVector::Dist(GetActorLocation(), It->GetActorLocation());
+				Best = FMath::Max(Best, FMath::Clamp(1.f - D / R, 0.f, 1.f));
+			}
+		}
+	}
+	return Best;
+}
+
 void AAvaryoCharacter::ToggleCameraMode()
 {
 	if (!IsLocallyControlled())

@@ -300,6 +300,17 @@ void AAvaryoHUD::DrawHUD()
 				Flashlight->GetBatteryLevel(),
 				bOn ? FLinearColor(0.95f, 0.85f, 0.25f) : FLinearColor(0.45f, 0.42f, 0.2f), Y);
 		}
+
+		// Газоанализатор: держишь прибор — видишь уровень газа рядом (зелёный→красный).
+		// Найти утечку и понять, развеяли ли газ пеной перед сваркой.
+		if (Character->IsHoldingGasDetector())
+		{
+			Y += 22.f;
+			const float Gas = FMath::Clamp(Character->GetGasReading(), 0.f, 1.f);
+			const FLinearColor GasColor = FMath::Lerp(FLinearColor(0.2f, 0.8f, 0.3f), FLinearColor(0.9f, 0.15f, 0.1f), Gas);
+			DrawBar(Gas > 0.6f ? TEXT("ГАЗ — ОПАСНО!") : (Gas > 0.05f ? TEXT("Газоанализатор: газ") : TEXT("Газоанализатор: чисто")),
+				Gas * 100.f, GasColor, Y);
+		}
 	}
 
 	// ---------- Рация диспетчера (сверху по центру, плашки гаснут сами) ----------
