@@ -28,7 +28,11 @@
 		},
 		{
 			"Name": "meshy",
-			"Enabled": true
+			"Enabled": true,
+			"SupportedTargetPlatforms": [
+				"Win64",
+				"Mac"
+			]
 		},
 		{
 			"Name": "OnlineSubsystem",
@@ -52,6 +56,29 @@
 			"TargetAllowList": [
 				"Editor"
 			]
+		},
+		{
+			"Name": "EOSCore",
+			"Enabled": true
+		},
+		{
+			"Name": "UnrealMonsterAssetInstaller",
+			"Enabled": true,
+			"TargetAllowList": [
+				"Editor"
+			]
+		},
+		{
+			"Name": "WorldBLD",
+			"Enabled": true
+		},
+		{
+			"Name": "TickOptToolkit",
+			"Enabled": true
+		},
+		{
+			"Name": "Imperfecter",
+			"Enabled": true
 		}
 	]
 }

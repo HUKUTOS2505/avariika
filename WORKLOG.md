@@ -17,6 +17,176 @@
 - Перед «релизом» вернуть Health=100, Panic=0 в `VitalsComponent.cpp` (сейчас 50/50 для тестов).
 - 3D-модели делает пользователь в **meshy.ai** по промптам Claude; анимации делает пользователь. Импорт моделей — `Scripts/` + `asset.import` или `set_static_mesh` по метке актора.
 
+## СЕССИЯ 2026-06-17 (ВЕЧЕР) — верификация аним-монтажей CitizenNPC + захват окон (юзер отъехал, авторежим)
+
+Авторежим, редактор ОТКРЫТ (MCP `unreal` жив, 5.7.4). Решение юзера: персонажей-паков докупать ПОТОМ, сейчас остаёмся на **UE4 / CitizenNPC**. PIE не использовал (без фокуса окна дохнет за ~2с — юзер away).
+
+- **Захват окон решён (новый инструмент).** screen-capture-mcp юзер поставил, но он СЛОМАН на PS 5.1 (шлёт буквальные `\n`). Сделал свой `.claude/scripts/capture-window.ps1` (WinAPI `PrintWindow(hwnd,hdc,2)` = PW_RENDERFULLCONTENT) — снимает окно по заголовку, **даже когда оно перекрыто/не в фокусе/на 2-м мониторе** → юзер может alt-tab. Без `-Title` = оба монитора (VirtualScreen). Окна редакторов ассетов (AnimBP) — дочерние top-level, нужен `EnumWindows` (не MainWindowTitle). Проверено: снял и главный редактор, и окно AnimGraph. См. [[screen-window-capture]].
+- **АНИМ-МОНТАЖИ CitizenNPC — ЦЕПОЧКА ГОТОВА (блокер из памяти оказался УСТАРЕВШИМ).** Прежняя заметка «у `ABP_CitizenNPC_male` нет montage-слота» НЕВЕРНА. Проверил (read-only, без правок):
+  - 7 монтажей `/Game/Avariika/Anim/Montages/` (M_Fix 14с/M_Hit 4.2/M_Death 1.1/M_Knocked 0.9/M_Revive 2.5/M_Bandage 0.4/M_Drink 1.3) — все `AnimMontage`, скелет `UE4_Mannequin_Skeleton`, группа `DefaultGroup`.
+  - `SKEL_CitizenNPC_ma.compatible_skeletons = [UE4_Mannequin_Skeleton]` — связка ЖИВА → UE4-mann монтажи играют на CitizenNPC напрямую.
+  - **Визуально подтверждён AnimGraph** (скрин окна): `Default (State Machine)` → **`Slot 'DefaultSlot'` (Group 'DefaultGroup')** → `Output Pose`. Слот вставлен и подключён. `get_anim_blueprint_info` → `montage_slot_groups:["DefaultGroup"]`.
+  - ⚠️ Гочи: `mcp__unreal__execute_python` НЕ возвращает stdout (только Output Log) → писать в файл + читать; AnimGraph-графы не отдаются через Python-свойства (нет MCP-инструмента на slot-узел — но он уже и не нужен).
+- **НЕ делал (риск без присмотра):** правок AnimGraph (он untracked в git, нет безопасного отката — только мой файл-бэкап `Saved/_abp_backup/`). Оказалось и не требовалось.
+
+**ЧИСТКА АНИМ-БИБЛИОТЕКИ (юзер: «удаляем SK_Operator_Skeleton, SKM_MCUE5v2, кота; собаку и StorageUnitsSet оставляем»):**
+- ✅ Удалены: `/Game/Characters/Operator` (194 файла, БЫЛ в git → откатываемо), корневые `/Game/Op_*` (~21), `/Game/_Packs/MC_Sample` (MCUE5v2/Mixamo), кот `/Game/AnimX/_Common/CatMannequin` (110). До удаления: убраны 2 актора-превью оператора (`PREVIEW_RIG_GOOD_UE4/BAD_UE5`) с `Lvl_FirstPerson` (сохранён), удалена тест-карта `L_AnimTest`.
+- ✅ Сохранены: собака `/Game/AnimX/Dogs` (97), грид-материал `MI_Grid_Gray` (его держит твоя `Test`), `StorageUnitsSet`, CitizenNPC (639). 7 монтажей не зависели от удалённого (проверено).
+- ⚠️ **ГОЧА: удаление ассетов через редактор СМЕРТЕЛЬНО медленное** (EAL.delete_asset/delete_directory дёргает revision-control на каждый ассет, ~1с; на ~470 ассетах редактор ЗАВИС в дедлоке, MCP-таймауты). Файловое `rm` при ОТКРЫТОМ редакторе невозможно (.uasset замаплены → «Device or resource busy»). **РЕШЕНИЕ: закрыть редактор → `rm -rf` папок (untracked паки сносятся за секунды).** Юзер разрешил taskkill. Редактор закрыт принудительно (PID убит), уровень был сохранён → потерь нет. Закоммитить удаления (git видит `D`).
+- ⚠️ После принудительного закрытия — при следующем старте редактор пере-сканит asset registry (норма); проверить, что `Lvl_FirstPerson` грузится без спама missing-ref.
+
+**A — триггеры монтажей: СДЕЛАНО (Build Succeeded, exit 0).** В `AAvaryoCharacter` (h+cpp):
+- 7 `UAnimMontage*` UPROPERTY (`Avaryo|Anim`), грузятся в BeginPlay через `LoadObject` из `/Game/Avariika/Anim/Montages/` (не перезатирают BP-дефолты).
+- `MulticastPlayMontage(UAnimMontage*)` (NetMulticast Unreliable) → `GetMesh()->GetAnimInstance()->Montage_Play` у всех (кооп, тело видят напарники).
+- **Привязано 5 реакций (событийные, single-shot):** M_Hit ← `TakeDamage` (урон прошёл, не ранен); M_Death ← `VitalsComponent->OnWounded` (HP→0); M_Revive ← `OnRevived`; M_Bandage ← `ApplyItemEffect` Heal (на лекаре); M_Drink ← `ApplyItemEffect` Drink. Делегаты привязаны на сервере в BeginPlay.
+- ⚠️ **M_Fix (луп ремонта) и M_Knocked — ОТЛОЖЕНЫ** (нужна loop/edge-state логика, безопаснее с PIE-фидбеком; монтажи уже грузятся, осталось только вызвать).
+- **PIE-ПРОВЕРКА за юзером:** получить урон → Hit; HP в 0 → Death (валится); поднять напарника аптечкой → у него Revive, у лекаря Bandage; выпить кофе/термос → Drink. Монтаж играет на ТЕЛЕ (видно в 3-м лице / напарникам; владельцу в 1-м лице тело скрыто — это норма).
+2. (фон) докупка модульного воркер-пака (UE5 Manny) когда юзер решит — тогда консолидация скелета на Manny + триггеры заиграют на купленном теле.
+
+## СЕССИЯ 2026-06-17 (ДЕНЬ) — WorldBLD собран, чистка диска, апскейл/Scalability (ФСР-база), паки фабрики
+
+Автономно, редактор был ЗАКРЫТ (MCP не отвечал → идеальный момент для билд-батча). Engine 5.7.4.
+
+- **WorldBLD (`worldbld.com`, окружение: город/дорога/«год») — УСТАНОВЛЕН + СОБРАН.** Скопирован в `Plugins/WorldBLD` (3 C++-модуля Bootstrap/Runtime/Editor, EngineVersion 5.7.0), добавлен в `avariika.uproject`. **Билд сначала упал** (`Build.bat` exit 6): unity/jumbo-сборка склеила `SWorldBLDConfirmPurchaseModal.cpp` + `SWorldBLDAssetDetailPanel.cpp` в один TU, а у обоих в анонимном namespace был `static FSlateFontInfo GetCreditsValueFont()` → ODR-коллизия «function already has a body» (C2084) + каскад `[`-ошибок. **Фикс:** переименовал копию в модалке покупки → `GetModalCreditsValueFont()` (1 определение + 1 вызов, стр.29/154). Ребилд **Succeeded, exit 0**. ⚠️ Плагин платный/контентный, `Plugins/` в gitignore → ЛОКАЛЬНЫЙ, на свежем клоне re-copy из RawAssets + ребилд; правка ODR — в `SWorldBLDConfirmPurchaseModal.cpp`.
+- **Полный ребилд `UnrealEditor-Avaryo.dll` (clean, не Live Coding) — ЗАПЕК предыдущие правки навсегда:** `IsWelding()` + газ-петля «сварка=взрыв» + модульные части в `ApplyCameraView` (FirstPersonPrimitiveType-тогл) теперь в базовой DLL, а не в patch-DLL Live Coding. Warning про packaging от UFUNCTION ушёл.
+- **Апскейл / Scalability («DLC ФСР»):** встроенный апскейлер UE 5.7 = **TSR** (Temporal Super Resolution) — наш бесплатный аналог FSR/DLSS, уже дефолт. **AMD FSR3 / NVIDIA DLSS в движок НЕ входят** (поиск по Engine/Plugins пуст) — это отдельные плагины FAB/NVIDIA, докинуть позже опцией в меню. Создал **`Config/DefaultScalability.ini`**: `ResolutionQuality` (= r.ScreenPercentage, коэф. апскейла) по уровням 50/67/80/**100**(Epic)/100, `EffectsQuality` гейтит тяжёлые партиклы/воду. Ничего не форсит → на сильной машине (Epic) картинка не меняется; слабая машина авто-бенчмарком падает на Low и TSR дотягивает. Вода FluidFlux — показывать при EffectsQuality≥2 (логика в актёре, ориентир записан). `r.AntiAliasingMethod` — TSR (дефолт, не трогал).
+- **Чистка диска (было 40ГБ → стало ~63ГБ свободно):** удалены дубликаты RawAssets уже импортированного (EOSCore 21ГБ, Residential Vol.2, AtmosphericHouse, CitizenNPC, NiagaraExplosion01, 3 plugin-source), Paragon-боёвка 9ГБ (не наш жанр), Explosions Builder 1.5ГБ. Импортированы в Content: UltraDynamicSky, EasyFog, FluidNinja (`/Game/FluidNinjaLive`), FluidFlux (`/Game/FluidFlux`, 858 ассетов). См. [[water-tech-decision]].
+- **ПАКИ ФАБРИКИ — ЗАГРУЖЕНЫ ВСЕ (юзер: «грузи все 3, потом сделаем скан, проверим что оставляем»):**
+  - `Content/IndustrialFactory` (22ГБ, 2587 uasset, 15 карт) → `/Game/IndustrialFactory/`. Огромный модульный кит (бочки/ящики/кирпич/кабели/бульдозер/...) + демо-сцена **FactoryDocks** с сублевелами (Env/Lighting Day-Overcast/Sounds/Effects/Canal/Outdoor). MOVE из RawAssets (rename, 0 диска).
+  - `Content/Warehouse` (17ГБ, 2523 uasset, 9 карт) → `/Game/Warehouse/`. **«Warehouse - Abandoned Factory District»** (Scans Factory, фотограмметрия): демо Warehouse_01_P + сублевелы день/ночь/улица/EngineHouse/камеры/аудио. MOVE из RawAssets (rename, 0 диска). **СНАЧАЛА ПРОПУСТИЛ** этот пак (спутал с AbandonedFactory) — юзер заметил «что то не так», догрузил.
+  - `Content/AbandonedFactory` (3.7ГБ, 603 uasset, 10 карт) → `/Game/AbandonedFactory/`. **«Abandoned Factory Buildings - Day Night Scene»** (3-й, отдельный Scans-пак), демо тоже названы Warehouse_01/02/03. Взята UE5.0-версия (распаковал split-RAR через 7z; 1 файл `t_WallA_01_1004_n` упал по CRC → перезалил чистой копией из UE4.27-версии).
+  - **ИТОГО 3 пака Scans Factory** (юзер ждал именно Warehouse + Industrial Abandoned): `/Game/IndustrialFactory` (Industrial Abandoned), `/Game/Warehouse` (Warehouse District), `/Game/AbandonedFactory` (Abandoned Factory Buildings).
+  - **Корни /Game проверены** grep'ом по бинарю uasset (каждый пак ↔ своя папка) — коллизий с нашими папками нет. **Нужен рестарт редактора** для пере-скана asset registry.
+  - **СКАН/ВЫБОР — отдельный шаг (с юзером, нужен открытый редактор для визуалки):** 3 фабричных окружения, держать все избыточно (~43ГБ). Кандидат на Workflow-сравнение (качество/перекрытие/пригодность под наш ремонт-хоррор). RawAssets-источники: Industrial перемещён (нет), Warehouse перемещён (нет), Abandoned Factory Buildings 14ГБ ещё в RawAssets (фоллбэк).
+
+**ОЖИДАЕТ (нужен открытый редактор или решение юзера):**
+1. **Импорт звуков/анимаций** (нужен ОТКРЫТЫЙ редактор; headless-pythonscript у нас крашит на Niagara CDO): `звуки` (rope creak — 1 WAV распакован, остальное в `.rar`); `еще анимации` = **1436 FBX** в 5 паках (Getting Up ×2, Motifect Injured/Exhausted, Motifect Emotes/Social, GASP-retargeted-to-UE5-Mannequin 2.3ГБ). Курировать, не лить всё.
+2. **Выбор пака фабрики** (A IndustrialFactory vs B Abandoned Factory Scans) → импорт + удаление второго.
+3. GASP 2.3ГБ — оставить как апгрейд локомоции или удалить (наши скелеты — CitizenNPC/Mixamo, не UE5-маннекен → ретаргет нужен).
+4. Editor-restart чтобы подхватить WorldBLD + UltraDynamicSky/EasyFog/FluidNinja/FluidFlux.
+
+
+
+Полностью автономно (юзер: «делай что хочешь, открывай/закрывай редактор, иди по WORKLOG»). MCP `unreal` (StraySpark) ЖИВ — основной канал, Engine 5.7.4.
+
+- **EOSCore (eelDev, кооп-бэкенд) + UnrealMonsterAssetInstaller — УСТАНОВЛЕНЫ и СОБРАНЫ** (`Build.bat avariikaEditor … -WaitMutex` → Succeeded, exit 0). Из пака `RawAssets/EOSCore v1.9.6.5 5.5/` взят вариант под 5.7 — **`EOSCoreE942549feccaaV16` (uplugin EngineVersion 5.7.0)** + полный Source + EOS SDK (в паке 5 вариантов: 5.0/5.4/5.5/5.6/5.7). ⚠️ **`Plugins/` в .gitignore → плагины ЛОКАЛЬНЫЕ, НЕ в репо** (на свежем клоне re-add из RawAssets + ребилд). EOS-ключи в `Config/DefaultEngine.ini` → `[/Script/OnlineSubsystemEOSCore.EOSCoreSettings]` (формат — стандартный UE-struct-text). `DefaultPlatformService=Null` (LAN/PIE работает); онлайн EOS = флипнуть на `EOSCore` + раскомментить NetDriver-блок + плейтест. ⚠️ ClientSecret в git-файле → **ротировать если репо публичный**. См. [[eos-plugins-batch]].
+- **Бригада CitizenNPC импортирована** (`Content/CitizenNPC`, 639 ассетов, 1.1ГБ, НЕ gitignored). Самодостаточная **модульная UE4-Mannequin система**: своя локомоция (`ABP_CitizenNPC_male/female`: idle/walk/run/jump + BlendSpace), **Leader-Pose «одежда отдельно»** (`BP_master_character`: SK_Hat/Hair/Head/Chest/Hand-Glove/Eyeglasses + SM_RightHand/LeftHand). Скелеты `SKEL_CitizenNPC_ma/fe`. Типажи: construction_worker ×3, firefighter, police ×5, waste_driver, worker.
+- **Сварочник заменён** (Lvl_FirstPerson, актор `WeldingMachine`): meshy `SM_WeldingMachine` → `Garage_Tools_Props/Meshes/07_Welding_Machine/SM_Welding_Machine`, scale 1.0 (~49см), материал `MI_07_Welding_Machine` форс-назначен (был синий override). Уровень сохранён. ⚠️ **Кабели/торч НЕ добавлены** — пак-BP `BP_Welding_Machine` = 6 мешей (тело+торч+зажим+электрод+коннекторы), нужен визуальный заход.
+- **Тело игрока — Option A (юзер: «а» = бригада = тело игрока). PASS-2 СДЕЛАН:** `BP_AvaryoCharacter` CharacterMesh0 (унаследованный нативный Mesh) hazmat → `SK_ma_construction_worker_01_c` + `ABP_CitizenNPC_male` (скелет `SKEL_CitizenNPC_ma`). **+ добавлены компоненты `SK_WorkerHead` (`SK_ma_head_06`) и `SK_WorkerHands` (`SK_ma_hands_average`)** на ТОМ ЖЕ ABP+скелете, оффсет тела (0,0,-90 / yaw-90), `bOwnerNoSee=true` (скрыты от владельца, как тело). Части синхронятся одним аниматором без Leader-Pose-графа. BP компилируется + сохранён. ⚠️ **НУЖЕН PIE-EYEBALL:** выравнивание головы/кистей на шее/запястьях (если съехало — править RelativeLocation Z; стандартный ACharacter оффсет -90 мог отличаться в кастомном AvaryoCharacter). Откат тела на hazmat = 1 однострочник (mesh→`/Game/hazmat/Mesh/hazmat`, anim→`/Game/Hospital/Free_Content_Epic_Games/Mannequin/Animations/ThirdPerson_AnimBP`; голову/кисти удалить из BP).
+- **СКЕЛЕТЫ (важно для ретаргета):** hazmat = `UE4_Mannequin_Skeleton`; CitizenNPC = свой UE4-Mann `SKEL_CitizenNPC_ma`; `SK_Operator` (196 `Op_` анимов) = **Mixamo** (24 кости Hips/Spine — НЕ маннекен) → `Op_` на бригаду = **Mixamo→UE4Mann IK-ретаргет**.
+- ⚠️ **Готчи сессии:** (1) MCP `execute_python` надёжно гонит только ОДНОСТРОЧНЫЙ код (многострочный с def/try не выполняется → писать в файл и читать, либо однострочники с `;`); (2) скрин редакторского вьюпорта в автономе НЕ обновляется (старый кадр) → визуалка только через PIE; (3) **в MCP НЕТ IK-ретаргет-инструмента**.
+
+- **+ МЕХАНИКА (утро 06-17): сварка рядом с утечкой газа = ВЗРЫВ.** Новый `AAvaryoCharacter::IsWelding()` (чинит Hold-этапом + в руках `ToolTag==Welder`, открытая дуга); газовая петля в `ARepairable::Tick` теперь поджигает облако при `It->VitalsComponent->IsSmoking() || It->IsWelding()` (было только курение). → «перекрой газ (вентиль) ПЕРЕД заваркой» — один из 4 газ-способов. Пена по-прежнему гасит (контрплей). **Live Coding: succeeded** (⚠️ warning про packaging от новой UFUNCTION — перед кук-билдом сделать полный ребилд). PIE-тест: утечка газа + варить рядом → бабах; перекрыть вентилем / запенить → безопасно.
+
+**ОЖИДАЕТ (верифицируемая сессия с PIE/юзером):**
+1. Достроить тело игрока: модульные голова/кисти/каска/одежда (Leader Pose) + FP-меш под монтёра. Хирургия ядрового BP — только с визуальной проверкой.
+2. Ретаргет `Op_`(Mixamo)→`SKEL_CitizenNPC`(UE4Mann) через IK Retargeter (`IK_UE4Mann` — половина есть) → геймплейный AnimBP бригаде поверх локомоции.
+3. Дверь-анима `anim_OpenDoor` (Free_Interaction_Animation) → в `ADoor` (играть по E).
+4. Сварочник: кабели/торч (6 мешей пак-BP).
+5. Стройка дома (слайс подвал+1эт) — план ч.4 ниже, нужны планы/глаза юзера.
+
+**НЕ закоммичено** (грязное дерево 1495 файлов + секрет в ini + плагины в gitignore) — всё на диске сохранено, коммит по ревью юзера. См. [[operator-character-anim-system]].
+
+## СЕССИЯ 2026-06-16 (НОЧЬ, ч.4) — решения по MCP-каналу + план стройки (юзер: «делай сам»)
+
+Сравнили MCP-варианты (Claudius / StraySpark 2.0.2 / ClaudusBridge / Rekall / Claude Unreal). Итоги:
+- **StraySpark 2.0.2 — основной канал** (нативный MCP, 304 тулзы, AnimGraph-стейт-машины ПОДТВЕРЖДЕНЫ). ⚠️ Это НЕ v4: нет `run_tool_script`/catalog/background. Обновить юзер не может — живём на 2.0.2 (Full preset, 1M контекст тянет).
+- **`.mcp.json` → только `unreal`** (NWIRO убран из моего конфига: дублирует + бьёт контекст; его editor-UI у юзера остаётся).
+- **ClaudusBridge** — единственный с «зрением» (WebRTC /preview + watcher), но их доки НЕ подтверждают работу при свёрнутом/нефокусном окне (наш кейс). Юзер НЕ купил. Отложено; вопрос подан в их Discord-тикет (ответ 48-72ч). Зрение пока — скрины юзера.
+- **Способ стройки дома: 🅱️-1** — я строю по координатам, юзер раз в этаж кидает скрин для сверки (его скрины я ВИЖУ; мои самозахваты — нет). Начинаем с вертикального слайса **подвал + 1 этаж** (план 1-го этажа уже есть — `one_itaj.png`).
+
+**КРИТ для следующей сессии (нужно от юзера):**
+1. **Рестарт Claude Code** (в этой папке) + **подтвердить доверие** MCP `unreal` → тогда у меня 304 нативных тулзы StraySpark.
+2. **Редактор держать открытым** (MCP-сервер живёт внутри него; порт 13579).
+3. **Прислать планы**: подвал + 2/3 этаж + чердак (примерные размеры комнат, высота этажа).
+4. Дальше: я собираю слайс (подвал+1эт) из модулей Residential + подвал AtmosphericHouse, юзер шлёт скрины для сверки; параллельно — AnimBP оператора (StraySpark умеет стейт-машины).
+
+## СЕССИЯ 2026-06-16 (НОЧЬ, ч.3) — установлены MCP-плагины (UnrealMCPServer + NWIRO)
+
+Юзер закинул 2 плагина в `RawAssets/` → поставил оба в `Plugins/` проекта:
+- **`Plugins/UnrealMCPServer57/`** (StraySpark, v2.0.2) — MCP-сервер UE: **304 инструмента**, `run_tool_script` (батч-транзакции — ключ для стройки дома!), catalog-режим, фоновые задачи. Слушает **`http://localhost:13579/mcp`** (Streamable HTTP, без токена, localhost-only). Собрался из исходников (Build Succeeded).
+- **`Plugins/NwiroIntegrationKit/`** (Leartes, v1.0.3) — тоже MCP-сервер на **порту 5353 (209 инструментов)** + in-editor AI-UI. Подхватил готовый бинарь.
+- **`.mcp.json`** в корне: NWIRO прописал себя сам (5353), я дописал `unreal` (13579). Оба `type:http`.
+- **Проверено:** оба сервера стартуют на запуске редактора (порты слушают, лог `LogUnrealMCP: MCP server ready with 304 tools`).
+- ⚠️ **АКТИВАЦИЯ:** Claude Code подхватит MCP-серверы только после **рестарта Claude Code** + **подтверждения доверия** проектным MCP (он спросит). До этого работаю через старый Claudius (file-mode). MCP-серверы живут ВНУТРИ редактора → редактор должен быть открыт.
+- **После активации:** перейти на UnrealMCPServer как основной канал (чище/быстрее Claudius + `run_tool_script` для стройки). NWIRO можно отключить из `.mcp.json`, если 304+209 тулзов раздувают контекст (его in-editor UI всё равно останется юзеру).
+
+## СЕССИЯ 2026-06-16 (НОЧЬ, ч.2) — МЕХАНИКА «живой провод» (электро-цепочка из плана)
+
+Юзер: «делай механики» (планировку дома пришлёт позже). Сделал электро-аварию по плану «⚡ выключить рубильник → починить проводку».
+- **Аддитивно в `ARepairable`** (новые флаги по умолчанию ВЫКЛ → существующие объекты не затронуты): `bLiveWireWhenBroken` + `LiveWireShockDamage/Interval/Panic` (конфиг), `bElectricallyPowered` (Replicated, рантайм-питание), геттеры `IsLiveWire()`/`IsLiveWireHot()`/`IsPowered()`, метод `SetPowered(bool)` (ставит и `bElectricallyPowered`, и `bFloodElectrified`).
+- **Поведение:** пока сломан + питание подано → провод «горячий»: Tick бьёт током всех в радиусе `RepairRange*1.15` (сухой контакт — **сапоги НЕ спасают**, в отличие от потопа), и `CanBeRepairedBy`/`CanBotchBy`/`CanContinueRepair` возвращают false (чинить нельзя). Срубить рубильник → не горячий → чинить (изолента = RequiredTool/этап).
+- **`APowerSwitch.ApplyToFloods`** теперь зовёт `SetPowered` вместо `SetFloodElectrified` → один рубильник рулит и потопом, и живым проводом.
+- **Сборка Succeeded** (15с, только пред-существующие deprecation-варнинги). **Верификация** (`Scripts/verify_livewire.py`): спавн сломанного живого провода под питанием → `IsLiveWireHot()=true` ✅. Power-off-кейс скриптом не проверить (флаг реплик-онли, методы рубильника не-UFUNCTION) — логика тривиальна (`&& bElectricallyPowered`) + вызовы проверены по коду.
+- **Готчи:** UE Python снимает `b`-префикс у bool-UPROPERTY (`bBroken`→`broken`, `bLiveWireWhenBroken`→`live_wire_when_broken`); реплик-онли проперти (без EditAnywhere) не ставятся `set_editor_property`.
+- **+ HUD-подсказка на объекте** (`RefreshStatusVisual`, код состояния 3000): «{имя} — ПОД НАПРЯЖЕНИЕМ! сними рубильник» электро-жёлтым, пока горячий. Live Coding.
+- **+ МЕХАНИКА «свет на домовом питании»** (`APowerSwitch.ApplyToFloods`): рубильник гасит/зажигает лампы у акторов с тегом **`PoweredLight`** (`GetComponents<ULightComponent>` → SetVisibility(bPowerOn)). **Размен питание↔темнота:** ВКЛ = светло, но провод/вода под током; ВЫКЛ = безопасно чинить, но темно → фонарь (кооп-хоррор-напряжение). Тег-гейтед → существующие карты не затронуты. Live Coding.
+- **Итоговая пересборка Succeeded** (запекла подсказку + свет в бинарь, чтобы не откатились при рестарте). Редактор закрыт.
+- **Рубильник теперь рулит тремя вещами:** электрификация потопа + живой провод + свет дома (тег `PoweredLight`). Цельный «электро/питание» слайс.
+- **Ожидает:** размещение в доме (live-wire щиток `SM_ElectricBox` + рубильник + изолента + лампы с тегом `PoweredLight`) — когда будет планировка.
+
+## СЕССИЯ 2026-06-16 (НОЧЬ) — смена ассет-пака дома: удалён PostApoc, импорт Atmospheric + Residential
+
+**Решение по дому (после сравнения 4 паков):** старый `PostApocalypticHouse` (постапок-руина, пиратский плейсхолдер) — НЕ наш сеттинг. Берём **реалистичные современные дома**.
+- **Камера-фикс ПОДТВЕРЖДЁН пользователем** («работает хорошо») — 1-е лицо больше не в стене, фонарь по центру. См. ниже ч.2 + [[character-camera-crouch]].
+- **`PostApocalypticHouse` УДАЛЁН** (4.8 ГБ + 21 МБ external actors, gitignored → чисто дисковое, на git ноль). Редактор закрылся чисто перед удалением. ⚠️ Осиротел `Content/Avariika/Maps/L_Dom.umap` (git-трекается, ссылался на пак) — НЕ удалял, ждёт решения пользователя. `LV_Main_moy` был внутри пака → удалён вместе с ним.
+- **Импортируем 3 пака (юзер закинул в `RawAssets/`):**
+  - `AtmosphericHouse` — **целиком** (1633 ассета, 9.3 ГБ; корень `/Game/AtmosphericHouse/`; есть подвал-модули + свапер clean↔worn + демо-карты House_clean_day/worn_night/Showcase). robocopy → `Content/AtmosphericHouse/`.
+  - `Residential Houses Vol.2` (RAR x3, ~12 ГБ) + `Residential Vol.1` (качается) — **дедуп между ними** (один дев, сильное пересечение), импорт не-дублей. Vol.1 = меблированные дома (на скринах обставлено), Vol.2 = больше коробок (на витрине пусто, но мебель в пакете). Residential = реалистичный пригород США (наш сеттинг).
+- **Метод импорта:** робокопия дерева в `Content/<Pack>/` (редактор закрыт → подхватит при старте). Тяжёлые текстуры → следить за Streaming Pool (уже 2500).
+- **Дальше (автономно, разрешил юзер):** дедуп+импорт Residential, разбор структуры, сборка 1-го этажа по `HOUSE_PLAN.md`, перенос систем (двери/вода/газ/электрика — пак-независимы).
+
+**Сборка L_Dom (автономно, юзер отъехал, разрешил открывать редактор):**
+- Удалены старые карты `L_Dom`+`L_Dom_Phase1` (1016 файлов; в коде `ACallBoard` были только комментарии → ничего не сломалось).
+- Импорт подтверждён: редактор видит ResidentialHouses (House01-12, Garage01) в реестре.
+- **Создана `/Game/Avariika/Maps/L_Dom`** (`Scripts/build_house_v1.py` + `build_house_v2_fix.py`, оба с гардом на world==L_Dom): готовый дом **House01** (599 мешей, габарит **22.8×27.8×9 м** — ~3 этажа), земля-плоскость, DirectionalLight+SkyLight+SkyAtmosphere+Fog, PlayerStart по центру (floor+100), **GameMode override = BP_AvaryoGameMode** (проектный дефолт = тестовый blueprinsTest/BP_Gamemode, поэтому override обязателен). Сохранено.
+- ⚠️ **Готчи:** House01 = ~600 child-акторов → габариты считать по всем акторам, не по родителю BP (родитель давал 2.4м); `world.get_world_settings()` ставит GameMode (get_all_level_actors WorldSettings НЕ возвращает); мои `viewport.take_screenshot` не создают файл (нужен фокус окна).
+- **Ожидает юзера (визуал):** PIE-тест L_Dom (не в стене ли PlayerStart? как House01 на вид?). Дальше — подвал из AtmosphericHouse + аварии (вода/электрика/газ/двери) по комнатам — нужны глаза/выбор дома.
+
+## СЕССИЯ 2026-06-16 (ПОЗДНИЙ ВЕЧЕР, ч.2) — КОРЕНЬ бага «в стене»/коллизии: FP-камера уехала вбок
+
+**Симптом** (юзер, скрины three.png/fo.png): в 1-м лице игрок «внутри стены», фонарь светит СПРАВА от персонажа, не входит в комнаты; в 3-м лице всё ок. Двери/паника были ни при чём.
+**Диагностика** (`Scripts/diagnose_fp_offset.py` — спавн BP в редакт. мир, дамп world_off всех компонентов): капсула radius=34, halfheight=96. **FirstPersonCamera world_off от центра капсулы = (X −16, Y +80, Z +61).** Камера висела на сокете кости `head` тела `CharacterMesh0` (yaw −90, rel −20/0/−96); FP-меш без корректирующего трансформа (rel 0,0,0) → голова уходит на +80 см вбок, далеко за радиус капсулы 34. Фонарь+предмет в руках — дети камеры, ехали с ней.
+**Фикс** (`AvaryoCharacter.cpp`, Live Coding, без новых членов → шла с открытым редактором):
+- `BeginPlay`: FP-камеру (`ViewCamera`) намертво перецепляем к `GetCapsuleComponent()` по центру (rel (0,0,64), `bUsePawnControlRotation=true`). Геометрия костей больше не влияет. **Нужен `#include "Components/CapsuleComponent.h"`** — иначе `UCapsuleComponent` неполный тип → C2446/overload fail (споткнулся на этом, добавил инклюд).
+- `ApplyCameraView`: FP-«меш» (полное тело, не руки) прячем от владельца всегда (`SetOwnerNoSee(true)`) — иначе клиппит центрированную камеру. Для других тело рисует `CharacterMesh0` (WorldSpaceRepresentation).
+- `UpdateCrouchEye`: при центрированной камере (родитель == капсула) — ранний выход: присед опускает камеру сам (движок ужимает капсулу ~46 см). Старый способ (двигать FP-меш по Z) оставлен фолбэком.
+**Ожидает плейтеста:** рестарт PIE (не редактора) → 1-е лицо по центру, фонарь прямо, вход в комнаты, присед опускает обзор.
+
+## СЕССИЯ 2026-06-16 (ПОЗДНИЙ ВЕЧЕР) — карта дома LV_Main_moy: двери, паника, фонарь, каталог пака
+
+**Карта `LV_Main_moy`** (рабочая копия дома из `PostApocalypticHouse/Maps/`, World Partition). Фиксы по фидбеку:
+- **Открывающиеся двери.** Новый C++-класс `ADoor` (`Source/Avaryo/World/ADoor.{h,cpp}`): Hinge(root)+DoorMesh(static, ECR_Block)+Zone(box); распахивается вокруг петли (OpenAngle=95°, OpenSpeed=4.5), `bOpen` реплицируется, звук. Роутинг E в `AvaryoCharacter` (`FindFocusedDoor`+`ToggleBy`) добавлен после рубильника. `Scripts/place_openable_doors.py` заменил **7 статичных дверей** (`SM_Door_01a`×6 + `SM_Door_02a`×1) на `ADoor` в их трансформах (пивот меша на петле X=0 → меш с offset 0 стоит на месте). Гаражную/фасадную не трогали. Карта сохранена. **Ожидает плейтеста: E у двери → распахнуть → войти в комнату** (это и был баг «упираюсь в текстуры в 1-м лице» — закрытый лист двери блокировал проход).
+  - ⚠️ Готча: `dm.set_relative_location(...)` на компоненте требует аргументы `sweep`/`teleport` → использовать `set_editor_property("relative_location", Vector)`.
+- **Паника отключена для тестов** (`VitalsComponent.cpp`): cvar `Av.NoPanic` default=1 (AddPanic игнорится, паника утекает к 0). **Перед релизом вернуть 0.**
+- **Фонарь приглушён** (Headlamp intensity 8000→900) + клампы автоэкспозиции в `DefaultEngine.ini` (Min 0.5 / Max 4.0) — лечило «белый экран». `r.Streaming.PoolSize=2500` (было «лимит» Texture Streaming Pool Over Budget на three.png).
+
+**Док для стройки:** `HOUSE_STRUCTURE.md` переписан в ПОЛНЫЙ каталог — все 71 кусок `Mesh\Structure` (фундамент/стены/фасад/проёмы/полы/лестницы/перила/крыльцо/крыша/дымоход) + 102 `Mesh\Props` по группам + `Blockout` + порядок стройки по шагам. Отправлен пользователю.
+
+## СЕССИЯ 2026-06-16 (ВЕЧЕР) — реорганизация папок + сцена «Вода 2.1» на карте
+
+**Реорг папок (по просьбе «всё по папкам»):** 29 чужих/неиспользуемых паков → **`/Game/_Packs/`** (корень ~40→~26). Игровые/код-залоченные папки (`Audio`,`Avariika`,`hazmat`,`Characters`,`Hospital`,`Niagara*`,`Survival_SFX`,`Input`,`EasyOptionsMenu`,`LevelPrototyping`) ОСТАВЛЕНЫ в корне — вшиты в C++/карты, по сути уже разложены по типам. Игра ЦЕЛА (аудит зависимостей: перенесённое не в графе игры; лог чист; 97 акторов на Lvl_FirstPerson). `PROJECT_STRUCTURE.md` — карта «что за что».
+- **Метод:** `EditorAssetLibrary.rename_directory("/Game/X","/Game/_Packs/X")` — надёжно для обычных паков. Дубликаты общего UE-манекена между аним-паками = unreferenced, чистил `delete_directory`/filesystem.
+- **🟡 Застряли (entangled, unused, оставлены в корне):** `GoreAndHorrorMegapack` (split), `JKMotion_HitReaction`, `ResourcePack` (кросс-зависит с `_Packs/FootstepSystem`). Дочистить ручным перетаскиванием в CB.
+- **⚠️ Дом-переименование (PostApocalypticHouse→moduleHouse) НЕ удалось скриптом:** `rename_directory` для WP-папки (5ГБ, 6 карт) вернул false и НИЧЕГО не сделал (а `AssetTools.rename_assets` ранее крашил). PostApocalypticHouse ЦЕЛ (667 ассетов). **РЕШЕНИЕ: переименовать вручную в Content Browser** (ПКМ по папке → Rename → moduleHouse; диалог корректно тащит WP). Пустой остаток `/Game/moduleHouse` снёс.
+
+**Вода 2.1 — слайс собран и РАЗМЕЩЁН на Lvl_FirstPerson** (`Scripts/setup_water_cascade.py`): `Repairable_WaterPipe` (bFloodsWhenBroken, разлив+ток), `APowerSwitch` «WaterPowerSwitch» (рубильник снимает ток), `RubberBoots` (диэлектрик). C++ собран (slice 1a flood + slice 1b APowerSwitch+routing). **Ожидает плейтеста:** зайти в разлив без сапог при питании ВКЛ = бьёт током; рубильник ВЫКЛ или сапоги = безопасно → чинить трубу.
+
+## СЕССИЯ 2026-06-16 (ДЕНЬ) — фиксы камеры/приседа, перенос карты, песочница Test, старт «Вода 2.1»
+
+**Текущий модуль: 🚰 Прорыв воды 2.1** (флагман). Дизайн + статус всего проекта зафиксированы в `AVARIIKA_MEHANIKI.md` §12 (что есть) и §13 (что понадобится). Пользователь дал мне выбирать направление — выбрал воду (единственный из 4 базовых каскадов, кого нет; содержит всё ядро: цепочка + порядок-наказание + дефицит снаряжения). План слайса 1: потоп (мирроринг газового облака в `ARepairable`) + электрифицированная зона (вода+питание=ток) + рубильник (снять ток) + резиновые сапоги (закрыть уязвимость) + добить существующими этапами (вентиль+сварка).
+
+**Фиксы по тесту пользователя (всё собрано, в `main`-коде локально, PIE-подтверждено):**
+- **Присед не опускал камеру в 1-м лице.** Корень: FP-камера висит на кости `head` FP-меша (шаблон UE5.5 true-FPS), а поиск FP-меша по имени `Contains("FirstPerson")` молча давал NULL → `UpdateCrouchEye` не работал. Фикс: брать «единственный скелетный меш кроме GetMesh()» + ленивое самолечение; `UpdateCrouchEye` (Tick) двигает FP-меш по Z на −46. Замер: FP cam Z 366.9→317.3 при присяде. ✅
+- **В 3-м лице «только тень, нет тела».** Корень — НЕ `owner_no_see` (часы потрачены зря на флаги): тело `CharacterMesh0` помечено `FirstPersonPrimitiveType=WorldSpaceRepresentation` (UE5.5 first-person рендер прячет его ОТ владельца, тень оставляет). Фикс: `ApplyCameraView` переключает `None` (3-е лицо) ↔ `WorldSpaceRepresentation` (1-е). ✅ скрин подтвердил оператора.
+- **Ctrl в прыжке дёргал камеру** → `StartCrouchInput` игнорит присед в воздухе (`IsFalling`). ✅
+
+**Карта Test = песочница пользователя** (учит UE по урокам): World Settings → GameMode Override = `BP_GameMode` (его `BP_Pawn` + `BP_PlayerController` из `Content/Avariika/blueprinsTest/`). Avaryo-логику на Test НЕ навязывать.
+
+**🚚 Главная карта ПЕРЕНЕСЕНА:** `/Game/FirstPerson/Lvl_FirstPerson` → **`/Game/Avariika/Maps/Lvl_FirstPerson`** (имя сохранено — гарды скриптов по подстроке работают). 94 актора + GameMode override целы. Обновлены `DefaultEngine.ini` (EditorStartupMap), C++ `ACallBoard.cpp`/`AvariikaOnlineSubsystem.h`, пересобрано. ⚠️ **Готча:** перенос WP/OFPA-уровня — `rename_asset`=no-op, `AssetTools.rename_assets` КРАШИТ редактор (но физически перенос успевает пройти). Бэкап лежал в `_mapmove_backup`. Старые dev-`Scripts/*.py` и доки (README/ASSETS) ещё ссылаются на старый путь — на игру не влияет.
+
+**🔑 Новый факт по верификации:** снять ИГРОВОЙ PIE-кадр (то, что видит игрок) — `unreal.AutomationLibrary.take_high_res_screenshot(w,h,name)`; а `viewport.take_screenshot` отдаёт РЕДАКТОРСКИЙ вьюпорт (не игру). PIE сам закрывается за ~2с, если окно редактора не в фокусе.
+
 ## СЕССИЯ 2026-06-16 (НОЧЬ, полный автономный доступ) — фиксы по фидбеку + PIE-верификация
 
 Пользователь ушёл спать, дал ПОЛНЫЙ доступ: «открываешь/выключаешь редактор когда удобно, дорабатываешь механики, ведёшь свой список задач, тестишь, звуки/эффекты». Задачи — TaskList #14-19.

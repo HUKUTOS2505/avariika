@@ -2,12 +2,15 @@
 
 #include "Camera/CameraComponent.h"
 #include "Components/AudioComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "Components/SceneCaptureComponent2D.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Components/UFlashlightComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Sound/SoundBase.h"
+#include "Animation/AnimMontage.h"
+#include "Animation/AnimInstance.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Engine/TextureRenderTarget2D.h"
 #include "World/AExitZone.h"
@@ -33,6 +36,8 @@
 #include "World/ABioProjectile.h"
 #include "World/ACallBoard.h"
 #include "World/AToolCase.h"
+#include "World/APowerSwitch.h"
+#include "World/ADoor.h"
 #include "World/AFloodlight.h"
 #include "World/AFoamPatch.h"
 #include "World/ARepairable.h"
@@ -218,6 +223,26 @@ void AAvaryoCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	// Монтажи-реакции: грузим один раз (UE4-mann скелет → играют на CitizenNPC через compatible skeleton).
+	// Слот 'DefaultSlot' в ABP_CitizenNPC_male уже подключён. Если задано в Blueprint — не перезатираем.
+	{
+		auto LoadM = [](const TCHAR* Path) { return LoadObject<UAnimMontage>(nullptr, Path); };
+		if (!FixMontage)     FixMontage     = LoadM(TEXT("/Game/Avariika/Anim/Montages/M_Fix.M_Fix"));
+		if (!HitMontage)     HitMontage     = LoadM(TEXT("/Game/Avariika/Anim/Montages/M_Hit.M_Hit"));
+		if (!DeathMontage)   DeathMontage   = LoadM(TEXT("/Game/Avariika/Anim/Montages/M_Death.M_Death"));
+		if (!KnockedMontage) KnockedMontage = LoadM(TEXT("/Game/Avariika/Anim/Montages/M_Knocked.M_Knocked"));
+		if (!ReviveMontage)  ReviveMontage  = LoadM(TEXT("/Game/Avariika/Anim/Montages/M_Revive.M_Revive"));
+		if (!BandageMontage) BandageMontage = LoadM(TEXT("/Game/Avariika/Anim/Montages/M_Bandage.M_Bandage"));
+		if (!DrinkMontage)   DrinkMontage   = LoadM(TEXT("/Game/Avariika/Anim/Montages/M_Drink.M_Drink"));
+	}
+
+	// Реакции ранения/подъёма привязываем на сервере (там считается витал и шлётся мультикаст всем).
+	if (HasAuthority() && VitalsComponent)
+	{
+		VitalsComponent->OnWounded.AddDynamic(this, &AAvaryoCharacter::HandleWounded);
+		VitalsComponent->OnRevived.AddDynamic(this, &AAvaryoCharacter::HandleRevived);
+	}
+
 	// Камера от 1-го лица из Blueprint — к ней крепится предмет в руках.
 	// ВАЖНО: теперь есть ещё ThirdPersonCamera (C++), поэтому берём ИМЕННО не-TP камеру,
 	// иначе FindComponentByClass мог бы вернуть TP-камеру.
@@ -234,19 +259,49 @@ void AAvaryoCharacter::BeginPlay()
 		}
 	}
 
+	// ИСПРАВЛЕНИЕ КОЛЛИЗИИ/«В СТЕНЕ»: в BP FP-камера висела на head-сокете тела (yaw -90),
+	// из-за чего уезжала на ~80 см ВБОК от капсулы (радиус всего 34) → в 1-м лице игрок оказывался
+	// внутри стены, а фонарь (её ребёнок) светил сбоку. Жёстко перецепляем камеру прямо к капсуле
+	// по центру — геометрия костей больше не влияет; фонарь и предмет в руках едут вместе с ней.
+	if (ViewCamera && GetCapsuleComponent())
+	{
+		// Высота глаза над центром капсулы стоя (см) и небольшой вынос вперёд.
+		// Вынос держим 0 (в пределах радиуса капсулы 34), иначе камера снова полезет в стену.
+		const float EyeHeight = 64.f;
+		const float EyeForward = 0.f;
+		ViewCamera->AttachToComponent(GetCapsuleComponent(), FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+		ViewCamera->SetRelativeLocation(FVector(EyeForward, 0.f, EyeHeight));
+		ViewCamera->SetRelativeRotation(FRotator::ZeroRotator);
+		ViewCamera->bUsePawnControlRotation = true;
+		UE_LOG(LogTemp, Warning, TEXT("[AvaryoCam] FP-камера перецеплена к центру капсулы: rel=(%.0f,0,%.0f)"),
+			EyeForward, EyeHeight);
+	}
+
 	// Меш «рук» от 1-го лица (из Blueprint), чтобы прятать его в 3-м лице
 	{
 		TArray<USkeletalMeshComponent*> Skels;
 		GetComponents<USkeletalMeshComponent>(Skels);
 		for (USkeletalMeshComponent* S : Skels)
 		{
-			if (S && S != GetMesh() && S->GetName().Contains(TEXT("FirstPerson")))
+			// Единственный скелетный меш, кроме тела (GetMesh()), — это FP-меш. По имени не ищем:
+			// надёжнее просто «не тело» (имя в рантайме могло не совпасть и поиск падал в NULL).
+			if (S && S != GetMesh())
 			{
 				FirstPersonMeshComp = S;
 				break;
 			}
 		}
 	}
+
+	// Запоминаем высоту FP-меша стоя — от неё опускаем глаз при присяде (см. UpdateCrouchEye).
+	if (FirstPersonMeshComp)
+	{
+		FPMeshStandingZ = FirstPersonMeshComp->GetRelativeLocation().Z;
+		bFPMeshBaseCached = true;
+	}
+	UE_LOG(LogTemp, Warning, TEXT("[AvaryoCrouch] FPMesh=%s cached=%d standZ=%.1f"),
+		FirstPersonMeshComp ? *FirstPersonMeshComp->GetName() : TEXT("NULL"),
+		bFPMeshBaseCached ? 1 : 0, FPMeshStandingZ);
 
 	// Начальный вид (от 1-го лица) — на локальном игроке
 	ApplyCameraView();
@@ -278,6 +333,9 @@ void AAvaryoCharacter::BeginPlay()
 void AAvaryoCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
+
+	// Присед: плавно опускаем «глаз» (FP-меш с камерой) — локально у владельца.
+	UpdateCrouchEye(DeltaSeconds);
 
 	// Шаги — зацикленный цикл (звуки многошаговые): играем непрерывно во время движения,
 	// переключая ходьба/бег; стоим — стоп. На всех машинах по скорости каждого персонажа.
@@ -341,6 +399,8 @@ void AAvaryoCharacter::Tick(float DeltaSeconds)
 		FocusedToilet = FindFocusedToilet();
 		FocusedCallBoard = FindFocusedCallBoard();
 		FocusedToolCase = FindFocusedToolCase();
+		FocusedPowerSwitch = FindFocusedPowerSwitch();
+		FocusedDoor = FindFocusedDoor();
 
 		// Монитор оператора: закрывается, если вышел из зоны/ранен.
 		// Захват камер у ВСЕХ персонажей включён локально только пока монитор открыт
@@ -602,9 +662,48 @@ float AAvaryoCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 	const float Actual = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	if (HasAuthority() && VitalsComponent)
 	{
+		const bool bWasWoundedBefore = VitalsComponent->IsWounded();
 		VitalsComponent->ApplyDamage(DamageAmount);
+		// Реакция на удар — только если урон прошёл и не свалились в ранение (там сыграет Death через OnWounded)
+		if (HitMontage && DamageAmount > 0.f && !bWasWoundedBefore && !VitalsComponent->IsWounded())
+		{
+			MulticastPlayMontage(HitMontage);
+		}
 	}
 	return Actual;
+}
+
+void AAvaryoCharacter::MulticastPlayMontage_Implementation(UAnimMontage* Montage)
+{
+	if (!Montage)
+	{
+		return;
+	}
+	// Тело (GetMesh) видят напарники; на нём ABP_CitizenNPC_male со слотом DefaultSlot.
+	if (USkeletalMeshComponent* BodyMesh = GetMesh())
+	{
+		if (UAnimInstance* AnimInst = BodyMesh->GetAnimInstance())
+		{
+			AnimInst->Montage_Play(Montage);
+		}
+	}
+}
+
+void AAvaryoCharacter::HandleWounded()
+{
+	// HP→0: монтёр валится. Death-монтаж (если нет — Knocked как запасной).
+	if (UAnimMontage* M = DeathMontage ? DeathMontage : KnockedMontage)
+	{
+		MulticastPlayMontage(M);
+	}
+}
+
+void AAvaryoCharacter::HandleRevived()
+{
+	if (ReviveMontage)
+	{
+		MulticastPlayMontage(ReviveMontage);
+	}
 }
 
 bool AAvaryoCharacter::CanJumpInternal_Implementation() const
@@ -751,6 +850,17 @@ APickupItem* AAvaryoCharacter::GetItemInSlot(int32 SlotIndex) const
 APickupItem* AAvaryoCharacter::GetHeldItem() const
 {
 	return GetItemInSlot(ActiveSlot);
+}
+
+bool AAvaryoCharacter::IsWelding() const
+{
+	// Варит = чинит Hold-этапом со сварочником в руках (открытая электро-дуга). Поджигает газ рядом.
+	if (!CurrentRepairable || !CurrentRepairable->IsDoingPrereqHold())
+	{
+		return false;
+	}
+	const APickupItem* Held = GetHeldItem();
+	return Held && Held->ToolTag == FName(TEXT("Welder"));
 }
 
 bool AAvaryoCharacter::CanPickupItem(APickupItem* Item) const
@@ -934,6 +1044,83 @@ AToolCase* AAvaryoCharacter::FindFocusedToolCase() const
 	return Nearest;
 }
 
+APowerSwitch* AAvaryoCharacter::FindFocusedPowerSwitch() const
+{
+	// Сначала прицельный свип из камеры, затем — ближайший в зоне оверлапа.
+	FVector ViewLoc;
+	FRotator ViewRot;
+	GetActorEyesViewPoint(ViewLoc, ViewRot);
+
+	FCollisionQueryParams Params(FName(TEXT("PowerSwitchTrace")), false, this);
+	FHitResult Hit;
+	const FCollisionShape Probe = FCollisionShape::MakeSphere(16.f);
+	if (GetWorld()->SweepSingleByChannel(Hit, ViewLoc, ViewLoc + ViewRot.Vector() * PickupRange, FQuat::Identity, ECC_Visibility, Probe, Params))
+	{
+		if (APowerSwitch* Sw = Cast<APowerSwitch>(Hit.GetActor()))
+		{
+			return Sw;
+		}
+	}
+
+	TArray<AActor*> Overlapping;
+	GetOverlappingActors(Overlapping, APowerSwitch::StaticClass());
+	APowerSwitch* Nearest = nullptr;
+	float BestDistSq = TNumericLimits<float>::Max();
+	for (AActor* Actor : Overlapping)
+	{
+		APowerSwitch* Sw = Cast<APowerSwitch>(Actor);
+		if (!Sw)
+		{
+			continue;
+		}
+		const float DistSq = FVector::DistSquared(GetActorLocation(), Sw->GetActorLocation());
+		if (DistSq < BestDistSq)
+		{
+			BestDistSq = DistSq;
+			Nearest = Sw;
+		}
+	}
+	return Nearest;
+}
+
+ADoor* AAvaryoCharacter::FindFocusedDoor() const
+{
+	FVector ViewLoc;
+	FRotator ViewRot;
+	GetActorEyesViewPoint(ViewLoc, ViewRot);
+
+	FCollisionQueryParams Params(FName(TEXT("DoorTrace")), false, this);
+	FHitResult Hit;
+	const FCollisionShape Probe = FCollisionShape::MakeSphere(16.f);
+	if (GetWorld()->SweepSingleByChannel(Hit, ViewLoc, ViewLoc + ViewRot.Vector() * PickupRange, FQuat::Identity, ECC_Visibility, Probe, Params))
+	{
+		if (ADoor* D = Cast<ADoor>(Hit.GetActor()))
+		{
+			return D;
+		}
+	}
+
+	TArray<AActor*> Overlapping;
+	GetOverlappingActors(Overlapping, ADoor::StaticClass());
+	ADoor* Nearest = nullptr;
+	float BestDistSq = TNumericLimits<float>::Max();
+	for (AActor* Actor : Overlapping)
+	{
+		ADoor* D = Cast<ADoor>(Actor);
+		if (!D)
+		{
+			continue;
+		}
+		const float DistSq = FVector::DistSquared(GetActorLocation(), D->GetActorLocation());
+		if (DistSq < BestDistSq)
+		{
+			BestDistSq = DistSq;
+			Nearest = D;
+		}
+	}
+	return Nearest;
+}
+
 void AAvaryoCharacter::TryPickupNearbyItem()
 {
 	if (!HasAuthority())
@@ -1055,6 +1242,20 @@ void AAvaryoCharacter::InteractPressedAuth()
 	if (AToolCase* Case = FindFocusedToolCase())
 	{
 		Case->UseBy(this);
+		return;
+	}
+
+	// Объект: рубильник — обесточить залитую зону (каскад «вода», шаг 5)
+	if (APowerSwitch* Switch = FindFocusedPowerSwitch())
+	{
+		Switch->ToggleBy(this);
+		return;
+	}
+
+	// Дверь — распахнуть/закрыть
+	if (ADoor* Door = FindFocusedDoor())
+	{
+		Door->ToggleBy(this);
 		return;
 	}
 
@@ -1876,6 +2077,11 @@ void AAvaryoCharacter::ApplyItemEffect(APickupItem* Item)
 		}
 		const bool bRevive = Target != this && Target->VitalsComponent->IsWounded();
 		Target->VitalsComponent->Heal(Item->EffectMagnitude);
+		// Анимация перевязки на том, кто применяет аптечку (подъём напарника проиграет ReviveMontage у цели через OnRevived)
+		if (BandageMontage)
+		{
+			MulticastPlayMontage(BandageMontage);
+		}
 		if (bRevive && !Target->VitalsComponent->IsWounded())
 		{
 			if (ARunState* Run = ARunState::Get(GetWorld()))
@@ -1905,6 +2111,10 @@ void AAvaryoCharacter::ApplyItemEffect(APickupItem* Item)
 		VitalsComponent->RestoreStamina(Item->EffectMagnitude > 0.f ? Item->EffectMagnitude : 60.f);
 		VitalsComponent->ReducePanic(5.f);
 		VitalsComponent->AddBladder(18.f);
+		if (DrinkMontage)
+		{
+			MulticastPlayMontage(DrinkMontage);
+		}
 		ConsumeCharge(Item);
 		if (ARunState* Run = ARunState::Get(GetWorld()))
 		{
@@ -2536,6 +2746,15 @@ void AAvaryoCharacter::FumbleHeavy()
 
 void AAvaryoCharacter::StartCrouchInput()
 {
+	// В прыжке/падении присесть нельзя (движок буферит присед до приземления, и тогда
+	// камера резко дёргается). Поэтому в воздухе Ctrl просто игнорируем.
+	if (UCharacterMovementComponent* Move = GetCharacterMovement())
+	{
+		if (Move->IsFalling())
+		{
+			return;
+		}
+	}
 	Crouch();
 }
 
@@ -2544,10 +2763,64 @@ void AAvaryoCharacter::StopCrouchInput()
 	UnCrouch();
 }
 
+void AAvaryoCharacter::UpdateCrouchEye(float DeltaSeconds)
+{
+	// Камера теперь прицеплена прямо к капсуле (см. BeginPlay). При Crouch() движок ужимает
+	// капсулу и опускает её центр (~46 см) → камера едет вниз сама, «как реальный присед».
+	// Поэтому ручное опускание FP-меша больше не нужно (и на камеру уже не влияет).
+	// «Центрирована ли» определяем по родителю камеры (== капсула).
+	if (ViewCamera && GetCapsuleComponent() && ViewCamera->GetAttachParent() == GetCapsuleComponent())
+	{
+		return;
+	}
+
+	// --- Фолбэк (камера НЕ перецеплена): старый способ — двигаем сам FP-меш по Z. ---
+	// Ленивое получение FP-меша: если на BeginPlay компонент ещё не был зарегистрирован,
+	// берём единственный скелетный меш кроме тела прямо здесь (самолечение).
+	if (!FirstPersonMeshComp)
+	{
+		TArray<USkeletalMeshComponent*> Skels;
+		GetComponents<USkeletalMeshComponent>(Skels);
+		for (USkeletalMeshComponent* S : Skels)
+		{
+			if (S && S != GetMesh())
+			{
+				FirstPersonMeshComp = S;
+				FPMeshStandingZ = S->GetRelativeLocation().Z;
+				bFPMeshBaseCached = true;
+				break;
+			}
+		}
+	}
+	if (!bFPMeshBaseCached || !FirstPersonMeshComp)
+	{
+		return;
+	}
+	const float Target = bIsCrouched ? -FMath::Abs(CrouchEyeDrop) : 0.f;
+	CrouchEyeOffset = FMath::FInterpTo(CrouchEyeOffset, Target, DeltaSeconds, FMath::Max(0.1f, CrouchEyeInterpSpeed));
+	FVector RL = FirstPersonMeshComp->GetRelativeLocation();
+	RL.Z = FPMeshStandingZ + CrouchEyeOffset;
+	FirstPersonMeshComp->SetRelativeLocation(RL);
+}
+
 bool AAvaryoCharacter::IsHoldingGasDetector() const
 {
 	const APickupItem* Held = GetHeldItem();
 	return Held && Held->ToolTag == FName(TEXT("GasDetector"));
+}
+
+bool AAvaryoCharacter::HasRubberBoots() const
+{
+	// Сапоги «надеты», если лежат в любом слоте инвентаря (носить в руках не нужно).
+	for (int32 i = 0; i < NumSlots; ++i)
+	{
+		const APickupItem* Item = GetItemInSlot(i);
+		if (Item && Item->ToolTag == FName(TEXT("RubberBoots")))
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 float AAvaryoCharacter::GetGasReading() const
@@ -2586,15 +2859,44 @@ void AAvaryoCharacter::ApplyCameraView()
 	}
 	if (ThirdPersonCamera) { ThirdPersonCamera->SetActive(bThirdPersonView); }
 	if (ViewCamera) { ViewCamera->SetActive(!bThirdPersonView); }
-	// Тело: в 3-м лице показываем владельцу (видишь своего оператора), в 1-м — прячем от себя
+	// Тело (CharacterMesh0). ГЛАВНОЕ: в шаблоне UE5.5 first-person тело помечено
+	// FirstPersonPrimitiveType=WorldSpaceRepresentation — движок прячет его ОТ ВЛАДЕЛЬЦА
+	// (оставляя тень), поэтому в 3-м лице была «только тень», а owner_no_see ни при чём.
+	// В 3-м лице → None (обычный меш, владелец видит своего оператора, видят и другие);
+	// в 1-м → WorldSpaceRepresentation (скрыто от владельца, видно другим, кидает тень).
 	if (USkeletalMeshComponent* Body = GetMesh())
 	{
+		Body->SetFirstPersonPrimitiveType(bThirdPersonView
+			? EFirstPersonPrimitiveType::None
+			: EFirstPersonPrimitiveType::WorldSpaceRepresentation);
 		Body->SetOwnerNoSee(!bThirdPersonView);
+		if (bThirdPersonView)
+		{
+			Body->SetVisibility(true, true);
+		}
 	}
-	// «Руки» от 1-го лица — наоборот: видны в FP, скрыты в TP
+	// FP-«меш» здесь — полноразмерное тело, а не отдельные руки. С центрированной на капсуле
+	// камерой оно клиппило бы вид изнутри головы/торса, поэтому от ВЛАДЕЛЬЦА прячем всегда
+	// (тело для других игроков рисует CharacterMesh0 как WorldSpaceRepresentation).
 	if (FirstPersonMeshComp)
 	{
-		FirstPersonMeshComp->SetOwnerNoSee(bThirdPersonView);
+		FirstPersonMeshComp->SetOwnerNoSee(true);
+	}
+
+	// Модульные части тела монтёра (голова/кисти из CitizenNPC) — тот же режим видимости, что у тела:
+	// в 3-м лице владелец их видит (None), в 1-м — скрыты от владельца (WorldSpaceRepresentation), но видны другим.
+	TArray<USkeletalMeshComponent*> ModularParts;
+	GetComponents<USkeletalMeshComponent>(ModularParts);
+	for (USkeletalMeshComponent* Part : ModularParts)
+	{
+		if (!Part || Part == GetMesh() || Part == FirstPersonMeshComp)
+		{
+			continue;
+		}
+		Part->SetFirstPersonPrimitiveType(bThirdPersonView
+			? EFirstPersonPrimitiveType::None
+			: EFirstPersonPrimitiveType::WorldSpaceRepresentation);
+		Part->SetOwnerNoSee(!bThirdPersonView);
 	}
 }
 

@@ -9,6 +9,8 @@ class ARepairable;
 class AToilet;
 class ACallBoard;
 class AToolCase;
+class APowerSwitch;
+class ADoor;
 class UCameraComponent;
 class USpringArmComponent;
 class USkeletalMeshComponent;
@@ -18,6 +20,7 @@ class USoundBase;
 class USceneCaptureComponent2D;
 class UTextureRenderTarget2D;
 class UVitalsComponent;
+class UAnimMontage;
 
 /**
  * Базовый персонаж "Аварийки": налобный фонарик, шкалы (HP/паника/выносливость/туалет)
@@ -102,6 +105,10 @@ public:
 	UFUNCTION(BlueprintPure, Category="Avaryo|Repair")
 	ARepairable* GetCurrentRepairable() const { return CurrentRepairable; }
 
+	/** Варит ли прямо сейчас (чинит Hold-этапом со сварочником в руках) — открытая электро-дуга поджигает газ рядом. */
+	UFUNCTION(BlueprintPure, Category="Avaryo|Repair")
+	bool IsWelding() const;
+
 	// ---------- Перетаскивание раненого ----------
 
 	/** Кого тащу (E на раненом — схватил, повторное E — отпустил). */
@@ -130,6 +137,14 @@ public:
 	/** Ящик инструмента под прицелом (для подсказки «[E] Собрать кит» в хабе). */
 	UFUNCTION(BlueprintPure, Category="Avaryo|Interact")
 	AToolCase* GetFocusedToolCase() const { return FocusedToolCase; }
+
+	/** Рубильник под прицелом (для подсказки «[E] обесточить/включить» — каскад «вода»). */
+	UFUNCTION(BlueprintPure, Category="Avaryo|Interact")
+	APowerSwitch* GetFocusedPowerSwitch() const { return FocusedPowerSwitch; }
+
+	/** Дверь под прицелом (для подсказки «[E] открыть/закрыть»). */
+	UFUNCTION(BlueprintPure, Category="Avaryo|Interact")
+	ADoor* GetFocusedDoor() const { return FocusedDoor; }
 
 	/** Идёт ли «процесс» в биотуалете (мини-игра). */
 	UFUNCTION(BlueprintPure, Category="Avaryo|Interact")
@@ -254,6 +269,10 @@ public:
 	UFUNCTION(BlueprintPure, Category="Avaryo|Gas")
 	bool IsHoldingGasDetector() const;
 
+	/** Есть ли в инвентаре резиновые сапоги (ToolTag=RubberBoots) — диэлектрик от тока в залитой зоне. */
+	UFUNCTION(BlueprintPure, Category="Avaryo|Water")
+	bool HasRubberBoots() const;
+
 	/** Уровень газа в точке игрока 0..1 (по ближайшей травящей трубе) — для газоанализатора. */
 	UFUNCTION(BlueprintPure, Category="Avaryo|Gas")
 	float GetGasReading() const;
@@ -340,6 +359,21 @@ public:
 	/** Проиграть звук у ВСЕХ игроков (кооп): сервер зовёт — слышат все. */
 	UFUNCTION(NetMulticast, Unreliable)
 	void MulticastSound(USoundBase* Sound, FVector Loc, float Vol);
+
+	// ---------- Анимации-реакции (монтажи на DefaultSlot тела) ----------
+	// Все 7 — на UE4_Mannequin_Skeleton, играют на CitizenNPC через compatible skeleton.
+	// Грузятся в BeginPlay (LoadObject); можно переопределить дефолтами в Blueprint.
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Anim") TObjectPtr<UAnimMontage> FixMontage;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Anim") TObjectPtr<UAnimMontage> HitMontage;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Anim") TObjectPtr<UAnimMontage> DeathMontage;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Anim") TObjectPtr<UAnimMontage> KnockedMontage;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Anim") TObjectPtr<UAnimMontage> ReviveMontage;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Anim") TObjectPtr<UAnimMontage> BandageMontage;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Anim") TObjectPtr<UAnimMontage> DrinkMontage;
+
+	/** Проиграть монтаж на теле (GetMesh) у ВСЕХ игроков (кооп). Зовёт сервер. */
+	UFUNCTION(NetMulticast, Unreliable)
+	void MulticastPlayMontage(UAnimMontage* Montage);
 
 	/** Выбрать звук применения по эффекту предмета (аптечка/сигарета/общий). */
 	USoundBase* ItemUseSoundFor(const APickupItem* Item) const;
@@ -428,6 +462,14 @@ protected:
 	UPROPERTY(Transient, BlueprintReadOnly, Category="Avaryo|Interact")
 	TObjectPtr<AToolCase> FocusedToolCase;
 
+	/** Рубильник под прицелом/рядом (каскад «вода»). Считается локально в Tick. */
+	UPROPERTY(Transient, BlueprintReadOnly, Category="Avaryo|Interact")
+	TObjectPtr<APowerSwitch> FocusedPowerSwitch;
+
+	/** Дверь под прицелом/рядом. Считается локально в Tick. */
+	UPROPERTY(Transient, BlueprintReadOnly, Category="Avaryo|Interact")
+	TObjectPtr<ADoor> FocusedDoor;
+
 	/** Где идёт «процесс» (сервер пишет, реплицируется для HUD). */
 	UPROPERTY(Replicated, BlueprintReadOnly, Category="Avaryo|Interact")
 	TObjectPtr<AToilet> CurrentToilet;
@@ -476,6 +518,32 @@ protected:
 
 	/** Применить активную камеру + видимость тела/рук по bThirdPersonView. Только локальный игрок. */
 	void ApplyCameraView();
+
+	// ---------- FP-камера: центрирование на капсуле ----------
+	// FP-камера в BP висела на head-сокете тела (yaw -90, смещ.) → уезжала на ~80 см вбок
+	// от капсулы (радиус 34) → в 1-м лице игрок «в стене», фонарь светил сбоку.
+	// В BeginPlay перецепляем камеру прямо к капсуле по центру; фонарь/предмет в руках — её дети.
+	// Высота/вынос камеры — константы в BeginPlay (без новых членов, чтобы шла Live Coding).
+	// «Центрирована ли» определяем по родителю камеры (== капсула) в UpdateCrouchEye.
+
+	// ---------- Присед: ручное опускание глаза (фолбэк, если камера НЕ центрирована) ----------
+	/** Базовая отн. высота FP-меша стоя (кеш в BeginPlay). */
+	float FPMeshStandingZ = 0.f;
+	bool bFPMeshBaseCached = false;
+
+	/** Текущее смещение FP-меша вниз при присяде (плавно лерпится). */
+	float CrouchEyeOffset = 0.f;
+
+	/** Насколько опускается глаз при полном присяде, см. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Camera")
+	float CrouchEyeDrop = 46.f;
+
+	/** Скорость плавного опускания/подъёма глаза при присяде. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Camera")
+	float CrouchEyeInterpSpeed = 9.f;
+
+	/** Плавно ведёт высоту FP-меша по состоянию присяда (камера опускается «как реально»). */
+	void UpdateCrouchEye(float DeltaSeconds);
 
 	/** Был ли ранен в прошлый кадр (для авто-сброса тяжёлого при ранении). */
 	bool bWasWounded;
@@ -637,6 +705,14 @@ protected:
 	UFUNCTION()
 	void OnRep_Inventory();
 
+	/** Реакция-монтаж на ранение (HP→0): тело валится. Привязан к VitalsComponent->OnWounded. */
+	UFUNCTION()
+	void HandleWounded();
+
+	/** Реакция-монтаж на подъём напарником. Привязан к VitalsComponent->OnRevived. */
+	UFUNCTION()
+	void HandleRevived();
+
 	/** Найти предмет под прицелом (трейс из камеры) или ближайший рядом. */
 	APickupItem* FindFocusedItem() const;
 
@@ -648,6 +724,12 @@ protected:
 
 	/** Найти ящик инструмента под прицелом или рядом (хаб). */
 	AToolCase* FindFocusedToolCase() const;
+
+	/** Найти рубильник под прицелом или рядом (каскад «вода»). */
+	APowerSwitch* FindFocusedPowerSwitch() const;
+
+	/** Найти дверь под прицелом или рядом. */
+	ADoor* FindFocusedDoor() const;
 
 	/** Серверная логика нажатия/отпускания E. */
 	void InteractPressedAuth();
