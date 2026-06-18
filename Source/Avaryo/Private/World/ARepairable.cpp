@@ -92,9 +92,9 @@ ARepairable::ARepairable()
 
 	// Вода/потоп (каскад 2.1) — по умолчанию выключено, включается на трубе-источнике.
 	bFloodsWhenBroken = false;
-	FloodRadius = 500.f;
-	FloodSpreadPerSecond = 0.06f; // +6%/с
-	FloodSpreadMaxScale = 2.2f;
+	FloodRadius = 300.f;            // компактная лужа у трубы (была 500 -> росла до 11м, било по всей комнате)
+	FloodSpreadPerSecond = 0.03f;  // медленнее растёт
+	FloodSpreadMaxScale = 1.5f;    // максимум ~4.5м (а не 11м)
 	bFloodElectrified = true;      // вода добралась до проводки — зона под током, пока не обесточат
 	FloodShockDamage = 18.f;
 	FloodShockInterval = 3.0f; // раз в 3 секунды (по фидбеку — ритмичный удар, не каждую секунду)

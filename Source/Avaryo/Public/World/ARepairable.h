@@ -684,7 +684,7 @@ protected:
 
 	/** Z-смещение поверхности воды/декали от трубы (на пол). Это же уровень воды для удара током. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Repairable|VFX")
-	float FloodDecalZOffset = -40.f;
+	float FloodDecalZOffset = -50.f;
 
 	/** Полу-размер плоскости воды (см) при scale=1 (движковый Plane=50). Радиус -> масштаб плоскости. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Repairable|VFX", meta=(ClampMin="1.0"))
@@ -692,7 +692,7 @@ protected:
 
 	/** Вода: на сколько ВВЕРХ от поверхности бьёт стоящего В воде (рост капсулы + мелководье). */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Repairable|Water")
-	float FloodReachUp = 180.f;
+	float FloodReachUp = 140.f;
 
 	/** Вода ПОДНИМАЕТСЯ: прибавка к высоте поражения за секунду (после горизонтального разлива). */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Repairable|Water")
@@ -700,7 +700,7 @@ protected:
 
 	/** Максимальный подъём воды по высоте (чтобы не дойти до платформы/этажа выше). */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Repairable|Water")
-	float FloodRiseMax = 120.f;
+	float FloodRiseMax = 60.f;
 
 	/** Масштаб искр замыкания (мелкие). */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Repairable|VFX", meta=(ClampMin="0.05"))
