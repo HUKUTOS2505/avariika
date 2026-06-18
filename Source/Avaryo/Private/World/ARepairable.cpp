@@ -94,7 +94,7 @@ ARepairable::ARepairable()
 	FloodSpreadMaxScale = 2.2f;
 	bFloodElectrified = true;      // вода добралась до проводки — зона под током, пока не обесточат
 	FloodShockDamage = 18.f;
-	FloodShockInterval = 1.0f;
+	FloodShockInterval = 3.0f; // раз в 3 секунды (по фидбеку — ритмичный удар, не каждую секунду)
 	FloodElapsed = 0.f;
 	FloodCheckAccum = 0.f;
 	FloodShockCooldown = 0.f;
@@ -103,7 +103,7 @@ ARepairable::ARepairable()
 	// Электрика / «живой провод» (план: выключить рубильник → починить проводку)
 	bLiveWireWhenBroken = false;
 	LiveWireShockDamage = 18.f;
-	LiveWireShockInterval = 1.0f;
+	LiveWireShockInterval = 3.0f; // раз в 3 секунды (единый ритм удара током)
 	LiveWirePanic = 22.f;
 	LiveWireShockCooldown = 0.f;
 	bElectricallyPowered = true; // по умолчанию запитано; рубильник снимает
@@ -595,10 +595,16 @@ void ARepairable::Tick(float DeltaSeconds)
 				// Кулдаун проверяем ВНУТРИ цикла (не снимок) — иначе в кооп бьёт всех безсапожных за один тик.
 				for (TActorIterator<AAvaryoCharacter> It(GetWorld()); It; ++It)
 				{
-					if (!It->VitalsComponent
-						|| FVector::DistSquared(It->GetActorLocation(), GetActorLocation()) > FMath::Square(CurrentFloodRadius))
+					// В ВОДЕ = в радиусе по ГОРИЗОНТАЛИ (XY, разлив вокруг) И в пределах уровня воды по ВЫСОТЕ
+					// (вода поднимается со временем). Стоящего ВЫШЕ (на платформе) не бьёт — раньше была 3D-сфера.
+					if (!It->VitalsComponent) { continue; }
 					{
-						continue;
+						const FVector P = It->GetActorLocation(), Cn = GetActorLocation();
+						const float WaterZ = Cn.Z + FloodDecalZOffset;
+						const float ReachUp = FloodReachUp + FMath::Min(FloodRisePerSec * FloodElapsed, FloodRiseMax);
+						const bool bInWater = (FMath::Square(P.X - Cn.X) + FMath::Square(P.Y - Cn.Y)) <= FMath::Square(CurrentFloodRadius)
+							&& P.Z <= WaterZ + ReachUp && P.Z >= WaterZ - 150.f;
+						if (!bInWater) { continue; }
 					}
 					It->VitalsComponent->MakeWet(-1.f); // стоит в воде → промок (сапоги от мокроты не спасают)
 					if (bFloodElectrified && FloodShockCooldown <= 0.f && !It->HasRubberBoots())
@@ -663,8 +669,10 @@ void ARepairable::Tick(float DeltaSeconds)
 		FloodDecalComp->SetHiddenInGame(!bFloodVis);
 		if (bFloodVis)
 		{
-			FloodDecalComp->SetWorldLocation(GetActorLocation()); // проекция вниз ляжет на пол под трубой
-			const float S = CurrentFloodRadius / 256.f; // base DecalSize.Y/Z=256 → footprint = радиусу
+			const FVector DC = GetActorLocation();
+			FloodDecalComp->SetWorldRotation(FRotator(FloodDecalPitch, 0.f, 0.f)); // проекция вниз (тюнится FloodDecalPitch)
+			FloodDecalComp->SetWorldLocation(FVector(DC.X, DC.Y, DC.Z + FloodDecalZOffset)); // опустить на пол
+			const float S = CurrentFloodRadius / 256.f; // base DecalSize.Y/Z=256 -> footprint = радиусу
 			FloodDecalComp->SetWorldScale3D(FVector(1.f, S, S));
 		}
 	}

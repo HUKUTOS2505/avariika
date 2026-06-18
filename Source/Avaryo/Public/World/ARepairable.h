@@ -678,6 +678,26 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Repairable|VFX")
 	float FloodDecalDepth = 300.f;
 
+	/** Наклон декали-проекции. -90 = вниз на пол. Лужи не видно? попробуй +90 (зависит от оси) — тюнится живьём. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Repairable|VFX")
+	float FloodDecalPitch = -90.f;
+
+	/** Z-смещение поверхности воды/декали от трубы (на пол). Это же уровень воды для удара током. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Repairable|VFX")
+	float FloodDecalZOffset = -40.f;
+
+	/** Вода: на сколько ВВЕРХ от поверхности бьёт стоящего В воде (рост капсулы + мелководье). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Repairable|Water")
+	float FloodReachUp = 180.f;
+
+	/** Вода ПОДНИМАЕТСЯ: прибавка к высоте поражения за секунду (после горизонтального разлива). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Repairable|Water")
+	float FloodRisePerSec = 20.f;
+
+	/** Максимальный подъём воды по высоте (чтобы не дойти до платформы/этажа выше). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Repairable|Water")
+	float FloodRiseMax = 120.f;
+
 	/** Масштаб искр замыкания (мелкие). */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Repairable|VFX", meta=(ClampMin="0.05"))
 	float SparkScale = 0.6f;
