@@ -101,6 +101,7 @@ public:
 	UFUNCTION(BlueprintPure, Category="Vitals") bool IsPanicking() const { return Panic >= PanicThreshold; }
 	UFUNCTION(BlueprintPure, Category="Vitals") bool IsIncidentSlowed() const { return IncidentSlowRemaining > 0.f; }
 	UFUNCTION(BlueprintPure, Category="Vitals") bool IsWet() const { return WetRemaining > 0.f; }
+	UFUNCTION(BlueprintPure, Category="Vitals") bool IsExhaustStunned() const { return ExhaustStunRemaining > 0.f; }
 	UFUNCTION(BlueprintPure, Category="Vitals") bool IsSoiled() const { return bSoiled; }
 	UFUNCTION(BlueprintPure, Category="Vitals") float GetSmell() const { return Smell; }
 	UFUNCTION(BlueprintPure, Category="Vitals") bool IsSmelly() const { return Smell >= SmellThreshold; }
@@ -257,6 +258,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Vitals|Stamina")
 	float WindedDuration;
 
+	/** Стан-стаггер в момент изнурения (выдохся в ноль) — еле плетёшься эту секунду. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Vitals|Stamina")
+	float ExhaustStunTime = 1.0f;
+
 protected:
 	/** Стоит ли монтёр в досягаемости достаточно яркого «успокаивающего» света (не тревожно-красного). */
 	bool IsLitByNearbyLight(const AActor* OwnerChar) const;
@@ -266,6 +271,10 @@ protected:
 	float HiccupAccum = 0.f;    // таймер икоты при полном пузыре
 	float WindedRemaining = 0.f; // секунды отдышки после спринта-в-ноль
 	float WindedNoiseAccum = 0.f; // таймер шумного выдоха
+
+	/** Остаток стана изнурения. Реплик. — скорость считается и у владельца. */
+	UPROPERTY(Replicated)
+	float ExhaustStunRemaining = 0.f;
 	float LightScanAccum = 0.f; // троттл сканера успокаивающего света
 	bool bInLightCached = false; // последний результат сканера света
 	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadOnly, Category="Vitals")

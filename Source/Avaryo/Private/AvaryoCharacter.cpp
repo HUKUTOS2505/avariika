@@ -846,6 +846,10 @@ void AAvaryoCharacter::RefreshMoveSpeed()
 	{
 		Speed *= WetMoveMultiplier; // промок — хлюпаешь медленнее
 	}
+	if (VitalsComponent->IsExhaustStunned())
+	{
+		Speed *= 0.3f; // выдохся в ноль — стаггер, еле плетёшься секунду
+	}
 	if (bStumbling)
 	{
 		Speed = FMath::Min(Speed, TripSlowSpeed); // споткнулся — резко сбросил ход

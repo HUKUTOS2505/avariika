@@ -92,6 +92,7 @@ void UVitalsComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	DOREPLIFETIME(UVitalsComponent, bWounded);
 	DOREPLIFETIME(UVitalsComponent, bUnconscious);
 	DOREPLIFETIME(UVitalsComponent, WoundedBleedOut);
+	DOREPLIFETIME(UVitalsComponent, ExhaustStunRemaining);
 	DOREPLIFETIME(UVitalsComponent, bSoiled);
 	DOREPLIFETIME(UVitalsComponent, IncidentSlowRemaining);
 	DOREPLIFETIME(UVitalsComponent, WetRemaining);
@@ -216,11 +217,18 @@ void UVitalsComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 			Stamina = 0.f;
 			bSprinting = false; // выдохся
 			WindedRemaining = WindedDuration; // отдышка пошла
+			ExhaustStunRemaining = ExhaustStunTime; // и стан-стаггер: секунду еле плетёшься
 		}
 	}
 	else
 	{
 		Stamina = FMath::Min(100.f, Stamina + StaminaRegenPerSecond * DeltaTime);
+	}
+
+	// Стан изнурения гаснет (еле плетёшься первую секунду после выдоха).
+	if (ExhaustStunRemaining > 0.f)
+	{
+		ExhaustStunRemaining = FMath::Max(0.f, ExhaustStunRemaining - DeltaTime);
 	}
 
 	// Отдышка: выдохшись в ноль, монтёр пару секунд шумно дышит — тактически выдаёт позицию
