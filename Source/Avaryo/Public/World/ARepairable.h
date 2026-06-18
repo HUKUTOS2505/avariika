@@ -596,6 +596,10 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Repairable|Audio")
 	TObjectPtr<USoundBase> ShortCircuitSound;
 
+	/** Короткий «пзык» для ЧАСТЫХ ударов током (вода/живой провод) — отдельно от длинного КЗ-звука. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Repairable|Audio")
+	TObjectPtr<USoundBase> ShockZapSound;
+
 	/** Звук докрутки вентиля на один тык (трещотка ключа). */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Repairable|Audio")
 	TObjectPtr<USoundBase> ValveTurnSound;
@@ -659,6 +663,18 @@ protected:
 	/** Масштаб струи воды. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Repairable|VFX", meta=(ClampMin="0.05"))
 	float WaterSprayScale = 1.0f;
+
+	/** Растущая поверхность разлива (плоскость-меш на полу, масштаб по радиусу затопления). */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Repairable|VFX")
+	TObjectPtr<UStaticMeshComponent> FloodPlaneComp;
+
+	/** Полу-ширина меша лужи (см) при scale=1 — пересчёт радиуса в масштаб. Подкрути по глазам. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Repairable|VFX", meta=(ClampMin="1.0"))
+	float FloodPlaneUnit = 100.f;
+
+	/** Z-смещение лужи от трубы (опустить на пол). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Repairable|VFX")
+	float FloodPlaneZOffset = -40.f;
 
 	/** Масштаб искр замыкания (мелкие). */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Repairable|VFX", meta=(ClampMin="0.05"))

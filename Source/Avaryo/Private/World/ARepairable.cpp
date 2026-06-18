@@ -8,7 +8,9 @@
 #include "Components/VitalsComponent.h"
 #include "Engine/DamageEvents.h"
 #include "Engine/GameInstance.h"
+#include "Engine/StaticMesh.h"
 #include "Engine/World.h"
+#include "Materials/MaterialInterface.h"
 #include "EngineUtils.h"
 #include "Game/ARunState.h"
 #include "Game/CompanyLedgerSubsystem.h"
@@ -56,12 +58,20 @@ ARepairable::ARepairable()
 	AlarmLight->SetAttenuationRadius(700.f);
 	AlarmLight->SetCastShadows(false); // дёшево: лампочек несколько, тени не нужны
 
+	// Поверхность разлива воды: горизонтальная плоскость-меш на полу, растёт по радиусу затопления.
+	FloodPlaneComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("FloodPlane"));
+	FloodPlaneComp->SetupAttachment(MeshComponent);
+	FloodPlaneComp->SetUsingAbsoluteRotation(true); // лужа всегда горизонтальна, не наклоняется с трубой
+	FloodPlaneComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	FloodPlaneComp->SetCastShadow(false);
+	FloodPlaneComp->SetHiddenInGame(true); // показываем только пока затоплено (в Tick на всех клиентах)
+
 	DisplayName = FText::FromString(TEXT("Объект"));
 	RepairDuration = 8.f;
 	RequiredTool = NAME_None;
 	RepairRange = 350.f;
 	bLeaksGasWhenBroken = false;
-	GasRadius = 450.f;
+	GasRadius = 600.f; // щедрее: урон по газу покрывает видимую токсичную тучу (была 450 — «не всегда бьёт»)
 	ExplosionDamage = 45.f;
 	bBroken = true;
 	RepairProgress = 0.f;
@@ -124,6 +134,14 @@ ARepairable::ARepairable()
 	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> WaterFXOld(TEXT("/Game/Realistic_Starter_VFX_Pack_Niagara_Vol2/Niagara/Water/NS_Water_1.NS_Water_1"));
 	if (WaterFXNew.Succeeded()) { WaterSprayFX = WaterFXNew.Object; }
 	else if (WaterFXOld.Succeeded()) { WaterSprayFX = WaterFXOld.Object; }
+	// Меш+материал лужи разлива (плоскость воды). Пак локальный — на свежем клоне лужи просто не будет.
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> FloodMesh(TEXT("/Game/IndustrialFactory/Effects/Water_01/sm_Water_01_01.sm_Water_01_01"));
+	static ConstructorHelpers::FObjectFinder<UMaterialInterface> FloodMat(TEXT("/Game/IndustrialFactory/Effects/Water_01/mi_Water_01_01.mi_Water_01_01"));
+	if (FloodPlaneComp && FloodMesh.Succeeded())
+	{
+		FloodPlaneComp->SetStaticMesh(FloodMesh.Object);
+		if (FloodMat.Succeeded()) { FloodPlaneComp->SetMaterial(0, FloodMat.Object); }
+	}
 	// Звук утечки газа ВЫКЛ по просьбе (нынешний — «свист-свист»); вернём с нормальным газ-эффектом
 	// static ConstructorHelpers::FObjectFinder<USoundBase> HissSnd(TEXT("/Game/Audio/SFX/GasHiss.GasHiss"));
 	// if (HissSnd.Succeeded()) { GasHissSound = HissSnd.Object; }
@@ -155,6 +173,10 @@ ARepairable::ARepairable()
 	if (EngSnd.Succeeded()) { EngineStartSound = EngSnd.Object; }
 	static ConstructorHelpers::FObjectFinder<USoundBase> ShortSnd(TEXT("/Game/Audio/SFX/ElectricZap.ElectricZap"));
 	if (ShortSnd.Succeeded()) { ShortCircuitSound = ShortSnd.Object; }
+	// Короткий «пзык» для частых ударов током (вода/живой провод). Фолбэк — длинный КЗ-зап. EditAnywhere → легко сменить.
+	static ConstructorHelpers::FObjectFinder<USoundBase> ZapSnd(TEXT("/Game/Audio/Lib/electrical/Ghosthack-ME_Magic_Fire_Weld_Machine_Inventor_Multiple_Short_Electrode_Sparkling_Hits.Ghosthack-ME_Magic_Fire_Weld_Machine_Inventor_Multiple_Short_Electrode_Sparkling_Hits"));
+	if (ZapSnd.Succeeded()) { ShockZapSound = ZapSnd.Object; }
+	else if (ShortCircuitSound) { ShockZapSound = ShortCircuitSound; }
 	// Вентиль: трещотка ключа на тык + срыв резьбы (случайный вариант, чтобы не «долбило одно»)
 	static ConstructorHelpers::FObjectFinder<USoundBase> ValveSnd(TEXT("/Game/Audio/SFX/Repair/SC_ValveRatchet.SC_ValveRatchet")); // случайный из 3
 	if (ValveSnd.Succeeded()) { ValveTurnSound = ValveSnd.Object; }
@@ -581,7 +603,7 @@ void ARepairable::Tick(float DeltaSeconds)
 						It->VitalsComponent->AddPanic(20.f);
 						FloodShockCooldown = FloodShockInterval;
 						MulticastSparkFX(It->GetActorLocation()); // телеграф: искры по воде
-						if (ShortCircuitSound) { MulticastSound(ShortCircuitSound, It->GetActorLocation(), 0.9f); } // разряд слышно
+						if (ShockZapSound) { MulticastSound(ShockZapSound, It->GetActorLocation(), 0.9f); } // короткий разряд
 					}
 				}
 			}
@@ -609,7 +631,7 @@ void ARepairable::Tick(float DeltaSeconds)
 				It->VitalsComponent->AddPanic(LiveWirePanic);
 				LiveWireShockCooldown = LiveWireShockInterval;
 				MulticastSparkFX(GetActorLocation()); // искры на проводе
-				if (ShortCircuitSound) { MulticastSound(ShortCircuitSound, GetActorLocation(), 0.9f); } // разряд слышно
+				if (ShockZapSound) { MulticastSound(ShockZapSound, GetActorLocation(), 0.9f); } // короткий разряд
 				break; // один разряд на интервал
 			}
 		}
@@ -627,6 +649,20 @@ void ARepairable::Tick(float DeltaSeconds)
 		{
 			const float Pulse = 0.55f + 0.45f * FMath::Sin(GetWorld()->GetTimeSeconds() * 4.f + GetUniqueID() % 7);
 			AlarmLight->SetIntensity(3000.f * Pulse);
+		}
+	}
+
+	// Все машины: растущая поверхность разлива (по реплицируемому CurrentFloodRadius — растёт постепенно).
+	if (FloodPlaneComp)
+	{
+		const bool bFloodVis = IsFlooding();
+		FloodPlaneComp->SetHiddenInGame(!bFloodVis);
+		if (bFloodVis)
+		{
+			const FVector C = GetActorLocation();
+			FloodPlaneComp->SetWorldLocation(FVector(C.X, C.Y, C.Z + FloodPlaneZOffset));
+			const float Sc = CurrentFloodRadius / FMath::Max(FloodPlaneUnit, 1.f);
+			FloodPlaneComp->SetWorldScale3D(FVector(Sc, Sc, 1.f));
 		}
 	}
 
