@@ -273,6 +273,10 @@ public:
 	UFUNCTION(BlueprintPure, Category="Avaryo|Water")
 	bool HasRubberBoots() const;
 
+	/** Противогаз «надет» (лежит в любом слоте инвентаря) → фильтрует воздух: нет запаха/удушья/урона от газа.
+	 *  Намеренно plain-метод (без UFUNCTION) — добавляется через Live Coding без полного ребилда. */
+	bool HasGasMask() const;
+
 	/** Уровень газа в точке игрока 0..1 (по ближайшей травящей трубе) — для газоанализатора. */
 	UFUNCTION(BlueprintPure, Category="Avaryo|Gas")
 	float GetGasReading() const;

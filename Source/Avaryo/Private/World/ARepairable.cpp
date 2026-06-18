@@ -521,7 +521,14 @@ void ARepairable::Tick(float DeltaSeconds)
 					{
 						continue;
 					}
-					It->VitalsComponent->AddSmell(8.f * GasDt); // провонял газом
+					// Дыхательная опасность: ПРОТИВОГАЗ (ToolTag GasMask) фильтрует воздух — полностью спасает.
+					// Без маски в облаке: надышался (запах → кашель в VitalsComponent), удушье (паника) и токсичный урон.
+					if (!It->HasGasMask())
+					{
+						It->VitalsComponent->AddSmell(8.f * GasDt);  // провонял газом (запах сам триггерит кашель)
+						It->VitalsComponent->AddPanic(10.f * GasDt); // нечем нормально дышать → паника
+						It->TakeDamage(5.f * GasDt, FDamageEvent(), nullptr, this); // токсично — урон по чуть-чуть (~5 HP/с)
+					}
 					// Открытый огонь рядом поджигает облако: курение ИЛИ электро-дуга сварки. Пена (огнетушитель) спасает.
 					if (GasSuppressedTime <= 0.f && ExplosionCooldown <= 0.f && (It->VitalsComponent->IsSmoking() || It->IsWelding()))
 					{

@@ -2872,6 +2872,20 @@ bool AAvaryoCharacter::HasRubberBoots() const
 	return false;
 }
 
+bool AAvaryoCharacter::HasGasMask() const
+{
+	// Противогаз «надет», если лежит в любом слоте инвентаря (как сапоги — носить в руках не нужно).
+	for (int32 i = 0; i < NumSlots; ++i)
+	{
+		const APickupItem* Item = GetItemInSlot(i);
+		if (Item && Item->ToolTag == FName(TEXT("GasMask")))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
 float AAvaryoCharacter::GetGasReading() const
 {
 	float Best = 0.f;
