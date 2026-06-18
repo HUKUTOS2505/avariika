@@ -145,6 +145,19 @@ void AAvaryoHUD::DrawHUD()
 		}
 	}
 
+	// ---------- Слепящая дуга: варит без сварочной маски (arc eye) ----------
+	// Холодный бело-голубой стробоскоп дуги заливает экран — варить вслепую трудно,
+	// это и есть давление «надень маску». Параллельно копится паника (см. Character::Tick).
+	if (Character->IsWelding() && !Character->HasWeldingMask())
+	{
+		const float Time = GetWorld() ? GetWorld()->GetTimeSeconds() : 0.f;
+		const float Flick = 0.55f + 0.45f * FMath::Abs(FMath::Sin(Time * 37.f)); // рваное мерцание дуги
+		const FLinearColor Arc(0.78f, 0.86f, 1.0f, 0.58f * Flick);
+		DrawRect(Arc, 0.f, 0.f, SizeX, SizeY);
+		DrawText(TEXT("ГЛАЗА! Нужна сварочная маска"), FLinearColor(0.05f, 0.05f, 0.08f),
+			SizeX * 0.5f - 150.f, SizeY * 0.30f, Font, 1.0f);
+	}
+
 	// ---------- Зарядка броска (удержание G): полоска силы у центра ----------
 	if (Character->IsChargingThrow())
 	{

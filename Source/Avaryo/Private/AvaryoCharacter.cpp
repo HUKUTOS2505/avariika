@@ -374,6 +374,14 @@ void AAvaryoCharacter::Tick(float DeltaSeconds)
 	// Присед: плавно опускаем «глаз» (FP-меш с камерой) — локально у владельца.
 	UpdateCrouchEye(DeltaSeconds);
 
+	// Сварка без маски → «зайчики» сварщика (arc eye): глаза жжёт. НЕ урон по HP — в реале это
+	// боль/временная слепота, а не рана (как и газ). Сервер копит панику варящему; слепящую
+	// HUD-вспышку рисует AvaryoHUD по тем же условиям. Маску достаточно держать в инвентаре.
+	if (VitalsComponent && IsWelding() && !HasWeldingMask())
+	{
+		VitalsComponent->AddPanic(15.f * DeltaSeconds);
+	}
+
 	// Шаги — зацикленный цикл (звуки многошаговые): играем непрерывно во время движения,
 	// переключая ходьба/бег; стоим — стоп. На всех машинах по скорости каждого персонажа.
 	if (FootstepAudio)
@@ -2890,6 +2898,20 @@ bool AAvaryoCharacter::HasGasMask() const
 	{
 		const APickupItem* Item = GetItemInSlot(i);
 		if (Item && Item->ToolTag == FName(TEXT("GasMask")))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+bool AAvaryoCharacter::HasWeldingMask() const
+{
+	// Маска «надета», если лежит в любом слоте инвентаря (как сапоги/противогаз — носить в руках не нужно).
+	for (int32 i = 0; i < NumSlots; ++i)
+	{
+		const APickupItem* Item = GetItemInSlot(i);
+		if (Item && Item->ToolTag == FName(TEXT("WeldingMask")))
 		{
 			return true;
 		}

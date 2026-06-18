@@ -277,6 +277,10 @@ public:
 	 *  Намеренно plain-метод (без UFUNCTION) — добавляется через Live Coding без полного ребилда. */
 	bool HasGasMask() const;
 
+	/** Сварочная маска в инвентаре (ToolTag=WeldingMask) → защищает глаза от дуги при сварке.
+	 *  Без неё IsWelding() жжёт глаза: паника + слепящая HUD-вспышка («arc eye»). Plain-метод (Live Coding). */
+	bool HasWeldingMask() const;
+
 	/** Уровень газа в точке игрока 0..1 (по ближайшей травящей трубе) — для газоанализатора. */
 	UFUNCTION(BlueprintPure, Category="Avaryo|Gas")
 	float GetGasReading() const;
