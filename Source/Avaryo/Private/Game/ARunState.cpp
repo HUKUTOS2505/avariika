@@ -488,10 +488,10 @@ void ARunState::Tick(float DeltaSeconds)
 
 	RefreshCompanyMirror(); // живой баланс/уровни (магазин/мини-игра у клиента) — дёшево
 
-	// Статистика + поражение (вся бригада ранена — поднимать некому)
+	// Статистика + поражение (вся бригада БЕЗ СОЗНАНИЯ — поднять некому; раненый ещё ползёт/лечится сам)
 	const float Now = GetWorld()->GetTimeSeconds();
 	int32 NumPlayers = 0;
-	int32 NumWounded = 0;
+	int32 NumUnconscious = 0;
 	for (TActorIterator<AAvaryoCharacter> It(GetWorld()); It; ++It)
 	{
 		UVitalsComponent* Vitals = It->VitalsComponent;
@@ -500,9 +500,9 @@ void ARunState::Tick(float DeltaSeconds)
 			continue;
 		}
 		++NumPlayers;
-		if (Vitals->IsWounded())
+		if (Vitals->IsUnconscious())
 		{
-			++NumWounded;
+			++NumUnconscious;
 		}
 
 		ApplyCheapGear(*It);
@@ -557,7 +557,7 @@ void ARunState::Tick(float DeltaSeconds)
 	TickAmbient(Now);
 	TickImpatience();
 
-	if (NumPlayers > 0 && NumWounded == NumPlayers)
+	if (NumPlayers > 0 && NumUnconscious == NumPlayers)
 	{
 		FinishRun(ERunPhase::Lost);
 	}
