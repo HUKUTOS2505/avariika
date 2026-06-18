@@ -52,7 +52,7 @@ APowerSwitch::APowerSwitch()
 	static ConstructorHelpers::FObjectFinder<UFont> CyrFont(TEXT("/Engine/EngineFonts/Roboto.Roboto"));
 	if (CyrFont.Succeeded()) { Label->SetFont(CyrFont.Object); } // рантайм-шрифт с кириллицей
 
-	static ConstructorHelpers::FObjectFinder<USoundBase> Snd(TEXT("/Game/Audio/SFX/FlashClick.FlashClick"));
+	static ConstructorHelpers::FObjectFinder<USoundBase> Snd(TEXT("/Game/Audio/Lib/repair_tool/Ghosthack-H_Impact_Metal_Klonk.Ghosthack-H_Impact_Metal_Klonk"));
 	if (Snd.Succeeded()) { ClickSound = Snd.Object; }
 }
 

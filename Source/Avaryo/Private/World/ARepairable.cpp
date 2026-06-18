@@ -205,6 +205,21 @@ ARepairable::ARepairable()
 	FillAudioComp->bAutoActivate = false;
 	if (FillLoopSound) { FillAudioComp->SetSound(FillLoopSound); }
 
+	// Бегущая вода при затоплении (луп, как шипение газа).
+	static ConstructorHelpers::FObjectFinder<USoundBase> FloodSnd(TEXT("/Game/Audio/Lib/water/Ghosthack-SF_Garage_Mechanic_Sink_Running_Long_01.Ghosthack-SF_Garage_Mechanic_Sink_Running_Long_01"));
+	if (FloodSnd.Succeeded()) { FloodLoopSound = FloodSnd.Object; }
+	FloodLoopComp = CreateDefaultSubobject<UAudioComponent>(TEXT("FloodAudio"));
+	FloodLoopComp->SetupAttachment(MeshComponent);
+	FloodLoopComp->bAutoActivate = false;
+	FloodLoopComp->SetVolumeMultiplier(0.7f);
+	if (FloodLoopSound) { FloodLoopComp->SetSound(FloodLoopSound); }
+	FloodLoopComp->bOverrideAttenuation = true;
+	FloodLoopComp->AttenuationOverrides.bAttenuate = true;
+	FloodLoopComp->AttenuationOverrides.bSpatialize = true;
+	FloodLoopComp->AttenuationOverrides.AttenuationShape = EAttenuationShape::Sphere;
+	FloodLoopComp->AttenuationOverrides.AttenuationShapeExtents = FVector(300.f, 0.f, 0.f);
+	FloodLoopComp->AttenuationOverrides.FalloffDistance = 2500.f;
+
 	// Холостой ход генератора: отдельный луп, играет пока объект-стартер починен (3D-затухание).
 	EngineIdleComp = CreateDefaultSubobject<UAudioComponent>(TEXT("EngineIdleAudio"));
 	EngineIdleComp->SetupAttachment(MeshComponent);
@@ -1379,6 +1394,12 @@ void ARepairable::RefreshStatusVisual()
 	{
 		if (bLeakingNow && !GasHissComp->IsPlaying()) { GasHissComp->Play(); }
 		else if (!bLeakingNow && GasHissComp->IsPlaying()) { GasHissComp->Stop(); }
+	}
+	if (FloodLoopComp)
+	{
+		const bool bFloodNow = IsFlooding();
+		if (bFloodNow && !FloodLoopComp->IsPlaying()) { FloodLoopComp->Play(); }
+		else if (!bFloodNow && FloodLoopComp->IsPlaying()) { FloodLoopComp->Stop(); }
 	}
 
 	// Струя воды: висит на трубе пока затоплено (мирроринг газового облака).

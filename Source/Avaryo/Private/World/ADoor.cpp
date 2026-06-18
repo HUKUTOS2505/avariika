@@ -34,7 +34,7 @@ ADoor::ADoor()
 	Zone->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	Zone->SetCollisionResponseToAllChannels(ECR_Overlap);
 
-	static ConstructorHelpers::FObjectFinder<USoundBase> Snd(TEXT("/Game/Audio/SFX/FlashClick.FlashClick"));
+	static ConstructorHelpers::FObjectFinder<USoundBase> Snd(TEXT("/Game/Audio/Lib/door_impact/Ghosthack-MFW_Gate_Wood_Large_Open.Ghosthack-MFW_Gate_Wood_Large_Open"));
 	if (Snd.Succeeded()) { OpenSound = Snd.Object; }
 }
 

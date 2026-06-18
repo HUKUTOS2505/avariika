@@ -722,6 +722,14 @@ protected:
 	UPROPERTY(Transient)
 	TObjectPtr<UAudioComponent> GasHissComp;
 
+	/** Звук бегущей воды при затоплении (луп). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Repairable|Audio")
+	TObjectPtr<USoundBase> FloodLoopSound;
+
+	/** Хэндл лупа бегущей воды. */
+	UPROPERTY(Transient)
+	TObjectPtr<UAudioComponent> FloodLoopComp;
+
 	/** Последний показанный на табличке процент — чтобы не перерисовывать текст каждый кадр. */
 	int32 LastShownPercent;
 
