@@ -145,6 +145,34 @@ void AAvaryoHUD::DrawHUD()
 		}
 	}
 
+	// ---------- Здоровье диегетически: вспышка на урон + сердцебиение-пульс на низком HP ----------
+	{
+		const float DF = Character->GetDamageFlash01();
+		if (DF > 0.f)
+		{
+			DrawRect(FLinearColor(0.65f, 0.f, 0.f, 0.55f * DF), 0.f, 0.f, SizeX, SizeY); // вспышка боли на любой урон
+		}
+		if (Vitals && !Vitals->IsWounded() && !Character->IsMonitorOpen())
+		{
+			const float HP = Vitals->GetHealth();
+			const float Thr = 35.f; // совпадает с HeartbeatHealthThreshold
+			if (HP < Thr)
+			{
+				const float Sev = FMath::Clamp(1.f - HP / Thr, 0.f, 1.f);
+				const float Time = GetWorld() ? GetWorld()->GetTimeSeconds() : 0.f;
+				const float Beat = FMath::Pow(FMath::Abs(FMath::Sin(Time * (3.0f + 4.0f * Sev))), 4.f); // резкий толчок сердца
+				const float A = 0.5f * Sev * Beat;
+				const FLinearColor Edge(0.7f, 0.f, 0.f, A);
+				const float BandX = SizeX * 0.18f;
+				const float BandY = SizeY * 0.18f;
+				DrawRect(Edge, 0.f, 0.f, SizeX, BandY);
+				DrawRect(Edge, 0.f, SizeY - BandY, SizeX, BandY);
+				DrawRect(Edge, 0.f, 0.f, BandX, SizeY);
+				DrawRect(Edge, SizeX - BandX, 0.f, BandX, SizeY);
+			}
+		}
+	}
+
 	// ---------- Слепящая дуга: варит без сварочной маски (arc eye) ----------
 	// Холодный бело-голубой стробоскоп дуги заливает экран — варить вслепую трудно,
 	// это и есть давление «надень маску». Параллельно копится паника (см. Character::Tick).

@@ -297,6 +297,21 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Audio")
 	TObjectPtr<USoundBase> HeartbeatSound;
 
+	/** Звук боли при получении урона («крик»). Пусто → молча (озвучим в саунд-проходе). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Audio")
+	TObjectPtr<USoundBase> PainSound;
+
+	/** Ниже этого HP включается сердцебиение (диегетический «совсем плохо»). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo")
+	float HeartbeatHealthThreshold = 35.f;
+
+	/** Длительность красной вспышки на экране при получении урона, сек. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo")
+	float DamageFlashTime = 0.45f;
+
+	/** Остаток красной вспышки урона (локально на всех машинах, ставится мультикастом). */
+	float DamageFlashRemaining = 0.f;
+
 	/** Звук подбора предмета. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Audio")
 	TObjectPtr<USoundBase> PickupSound;
@@ -382,6 +397,14 @@ public:
 	/** Проиграть монтаж на теле (GetMesh) у ВСЕХ игроков (кооп). Зовёт сервер. */
 	UFUNCTION(NetMulticast, Unreliable)
 	void MulticastPlayMontage(UAnimMontage* Montage);
+
+	/** Фидбек удара у ВСЕХ: крик боли + красная вспышка экрана у пострадавшего. Зовёт сервер. */
+	UFUNCTION(NetMulticast, Unreliable)
+	void MulticastPainHit();
+
+	/** Сила красной вспышки урона 0..1 — для HUD. */
+	UFUNCTION(BlueprintPure, Category="Avaryo")
+	float GetDamageFlash01() const { return DamageFlashTime > 0.f ? FMath::Clamp(DamageFlashRemaining / DamageFlashTime, 0.f, 1.f) : 0.f; }
 
 	/** Выбрать звук применения по эффекту предмета (аптечка/сигарета/общий). */
 	USoundBase* ItemUseSoundFor(const APickupItem* Item) const;

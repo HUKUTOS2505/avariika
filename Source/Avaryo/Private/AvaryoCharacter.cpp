@@ -382,6 +382,12 @@ void AAvaryoCharacter::Tick(float DeltaSeconds)
 		VitalsComponent->AddPanic(15.f * DeltaSeconds);
 	}
 
+	// Красная вспышка урона гаснет (на всех машинах; HUD пострадавшего её читает).
+	if (DamageFlashRemaining > 0.f)
+	{
+		DamageFlashRemaining = FMath::Max(0.f, DamageFlashRemaining - DeltaSeconds);
+	}
+
 	// Шаги — зацикленный цикл (звуки многошаговые): играем непрерывно во время движения,
 	// переключая ходьба/бег; стоим — стоп. На всех машинах по скорости каждого персонажа.
 	if (FootstepAudio)
@@ -488,19 +494,21 @@ void AAvaryoCharacter::Tick(float DeltaSeconds)
 			}
 		}
 
-		// Сердцебиение при панике — только локальный игрок слышит своё (громче/быстрее с паникой)
+		// Сердцебиение — диегетический индикатор НИЗКОГО HP («совсем плохо»): только локальный
+		// игрок слышит своё, громче/чаще по мере приближения к нулю.
 		if (HeartbeatAudio)
 		{
-			const bool bPanic = VitalsComponent && VitalsComponent->IsPanicking();
-			if (bPanic)
+			const float HP = VitalsComponent ? VitalsComponent->GetHealth() : 100.f;
+			const bool bLowHP = VitalsComponent && !VitalsComponent->IsWounded() && HP < HeartbeatHealthThreshold;
+			if (bLowHP)
 			{
-				const float P = FMath::Clamp(VitalsComponent->GetPanic() / 100.f, 0.f, 1.f);
+				const float Sev = FMath::Clamp(1.f - HP / FMath::Max(HeartbeatHealthThreshold, 1.f), 0.f, 1.f);
 				if (!HeartbeatAudio->IsPlaying())
 				{
 					HeartbeatAudio->Play();
 				}
-				HeartbeatAudio->SetVolumeMultiplier(0.4f + 0.6f * P);
-				HeartbeatAudio->SetPitchMultiplier(0.9f + 0.5f * P);
+				HeartbeatAudio->SetVolumeMultiplier(0.35f + 0.65f * Sev);
+				HeartbeatAudio->SetPitchMultiplier(0.85f + 0.5f * Sev);
 			}
 			else if (HeartbeatAudio->IsPlaying())
 			{
@@ -709,6 +717,11 @@ float AAvaryoCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 	{
 		const bool bWasWoundedBefore = VitalsComponent->IsWounded();
 		VitalsComponent->ApplyDamage(DamageAmount);
+		// Фидбек урона: крик боли + красная вспышка экрана у всех (грейс на старте — как у Hit-монтажа).
+		if (DamageAmount > 0.f && GetGameTimeSinceCreation() > 2.0f)
+		{
+			MulticastPainHit();
+		}
 		// Реакция на удар — только если урон прошёл и не свалились в ранение (там сыграет Death через OnWounded)
 		// Грейс-период: не проигрываем реакцию на урон первые 2с после спавна — иначе урон
 		// на старте (ток/вода у точки спавна) даёт длинный Hit-монтаж (трясёт руками + слайд).
@@ -722,6 +735,15 @@ float AAvaryoCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 		}
 	}
 	return Actual;
+}
+
+void AAvaryoCharacter::MulticastPainHit_Implementation()
+{
+	DamageFlashRemaining = DamageFlashTime; // красная вспышка у пострадавшего (HUD читает на всех)
+	if (PainSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, PainSound, GetActorLocation());
+	}
 }
 
 void AAvaryoCharacter::MulticastPlayMontage_Implementation(UAnimMontage* Montage)
