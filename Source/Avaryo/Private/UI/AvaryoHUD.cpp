@@ -173,6 +173,15 @@ void AAvaryoHUD::DrawHUD()
 		}
 	}
 
+	// ---------- Амбре: провонял (§16) → болезненно-зелёный тинт экрана (звук мух — в саунд-проходе) ----------
+	if (Vitals && Vitals->IsSmelly() && !Character->IsMonitorOpen())
+	{
+		const float Sm = FMath::Clamp((Vitals->GetSmell() - 50.f) / 50.f, 0.f, 1.f); // 50→100 = 0→1
+		const float Time = GetWorld() ? GetWorld()->GetTimeSeconds() : 0.f;
+		const float Wobble = 0.85f + 0.15f * FMath::Sin(Time * 2.3f); // лёгкое «дурнотное» колыхание
+		DrawRect(FLinearColor(0.15f, 0.35f, 0.1f, (0.10f + 0.15f * Sm) * Wobble), 0.f, 0.f, SizeX, SizeY);
+	}
+
 	// ---------- Слепящая дуга: варит без сварочной маски (arc eye) ----------
 	// Холодный бело-голубой стробоскоп дуги заливает экран — варить вслепую трудно,
 	// это и есть давление «надень маску». Параллельно копится паника (см. Character::Tick).

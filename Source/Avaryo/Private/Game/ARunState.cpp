@@ -1041,6 +1041,7 @@ int32 ARunState::ComputePlayerBalance(const FPlayerRunStats& S)
 {
 	return S.Repairs * 1500 + S.Revives * 1000 + S.Drags * 500 + S.ToiletVisits * 300
 		- S.TimesWounded * 1000 - S.Incidents * 2000 - S.BotchedRepairs * 800
+		- S.ExplosionsCaused * 5000 - S.ShortsCaused * 1500 // §19: штраф за ущерб (взрыв/замыкание)
 		- FMath::RoundToInt(S.PanicSeconds) * 10;
 }
 
