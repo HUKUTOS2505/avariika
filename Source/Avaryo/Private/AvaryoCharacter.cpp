@@ -2149,9 +2149,13 @@ void AAvaryoCharacter::ApplyItemEffect(APickupItem* Item)
 		break;
 	}
 	case EItemEffect::Calm:
-		if (VitalsComponent->GetPanic() > 1.f)
+		if (VitalsComponent->IsSmoking())
 		{
-			VitalsComponent->StartSmoking(); // 15 сек по 2 очка паники в секунду
+			VitalsComponent->StopSmoking(); // уже куришь → потушить (рядом газ — чтоб не рвануло), без расхода заряда
+		}
+		else if (VitalsComponent->GetPanic() > 1.f)
+		{
+			VitalsComponent->StartSmoking(); // закурить: 15 сек паника снижается (но открытый огонь у газа = взрыв)
 			ConsumeCharge(Item);
 		}
 		break;

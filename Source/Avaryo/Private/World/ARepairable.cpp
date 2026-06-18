@@ -75,7 +75,7 @@ ARepairable::ARepairable()
 	RequiredTool = NAME_None;
 	RepairRange = 350.f;
 	bLeaksGasWhenBroken = false;
-	GasRadius = 450.f; // зона запаха/взрыва (газ НЕ наносит HP-урон — бытовой газ не токсичен)
+	GasRadius = 150.f; // СТАРТ мал (только-только травит); копится со временем (см. рост ниже). Газ НЕ токсичен — опасность ВЗРЫВ
 	ExplosionDamage = 45.f;
 	bBroken = true;
 	RepairProgress = 0.f;
@@ -84,8 +84,8 @@ ARepairable::ARepairable()
 	GasSuppressedTime = 0.f;
 	GasLeakElapsed = 0.f;
 	GasCheckAccum = 0.f;
-	GasSpreadPerSecond = 0.05f; // +5%/с — за ~20 с до максимума
-	GasSpreadMaxScale = 2.0f;
+	GasSpreadPerSecond = 0.20f; // копится: +20%/с от стартового радиуса
+	GasSpreadMaxScale = 4.0f;   // до ×4 (150 -> 600см) — «изначально мало, дальше больше»
 	GasDisperseRate = 3.0f; // под пеной облако рассеивается ~втрое быстрее, чем копилось
 	CurrentGasRadius = GasRadius;
 	LastShownPercent = -1;
@@ -1390,6 +1390,11 @@ void ARepairable::RefreshStatusVisual()
 		GasFXComp = nullptr;
 	}
 	// Шипение газа — синхронно с облаком
+	if (GasFXComp) // облако растёт визуально по мере накопления газа (CurrentGasRadius реплицируется)
+	{
+		const float GasVisScale = GasFXScale * FMath::Max(CurrentGasRadius / FMath::Max(GasRadius, 1.f), 1.f);
+		GasFXComp->SetRelativeScale3D(FVector(GasVisScale));
+	}
 	if (GasHissComp)
 	{
 		if (bLeakingNow && !GasHissComp->IsPlaying()) { GasHissComp->Play(); }

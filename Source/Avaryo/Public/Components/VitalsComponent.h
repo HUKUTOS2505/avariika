@@ -67,6 +67,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Vitals")
 	void StartSmoking();
 
+	/** Потушить сигарету немедленно (например рядом газ — чтобы не рвануло). */
+	UFUNCTION(BlueprintCallable, Category="Vitals")
+	void StopSmoking();
+
 	UFUNCTION(BlueprintPure, Category="Vitals")
 	bool IsSmoking() const { return SmokingRemaining > 0.f; }
 

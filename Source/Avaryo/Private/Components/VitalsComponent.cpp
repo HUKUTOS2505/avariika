@@ -460,3 +460,9 @@ void UVitalsComponent::StartSmoking()
 	if (!IsVitalAuthority()) { return; }
 	SmokingRemaining = SmokingDuration;
 }
+
+void UVitalsComponent::StopSmoking()
+{
+	if (!IsVitalAuthority()) { return; }
+	SmokingRemaining = 0.f; // потушил — больше не «открытый огонь» рядом с газом
+}
