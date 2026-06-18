@@ -439,6 +439,11 @@ void AAvaryoHUD::DrawHUD()
 				Row = FString::Printf(TEXT("[-] %s"), *Objective->DisplayName.ToString());
 				RowColor = TextDim;
 			}
+			if (Objective->IsOnFire())
+			{
+				Row = FString::Printf(TEXT("[ГОРИТ!] %s"), *Objective->DisplayName.ToString());
+				RowColor = FLinearColor(1.0f, 0.3f, 0.1f); // огненно-красный
+			}
 			DrawText(Row, RowColor, ListX, ListY, Font, 0.95f);
 			ListY += RowH;
 		}
@@ -854,7 +859,11 @@ void AAvaryoHUD::DrawHUD()
 	else if (ARepairable* FocusedRep = Character->GetFocusedRepairable())
 	{
 		FString Prompt;
-		if (FocusedRep->GetLockoutRemaining() > 0.f)
+		if (FocusedRep->IsOnFire())
+		{
+			Prompt = FString::Printf(TEXT("%s — ГОРИТ! Потуши огнетушителем"), *FocusedRep->DisplayName.ToString());
+		}
+		else if (FocusedRep->GetLockoutRemaining() > 0.f)
 		{
 			Prompt = FString::Printf(TEXT("%s замкнуло — подождите %d с"),
 				*FocusedRep->DisplayName.ToString(), FMath::CeilToInt(FocusedRep->GetLockoutRemaining()));

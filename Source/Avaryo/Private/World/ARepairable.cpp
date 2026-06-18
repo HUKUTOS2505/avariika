@@ -133,6 +133,12 @@ ARepairable::ARepairable()
 	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> GasFXOld(TEXT("/Game/NiagaraExamples/Utilities/SpriteGeneration/SmokePuffLight/NS_SmokePuffLight.NS_SmokePuffLight"));
 	if (GasFXNew.Succeeded()) { GasLeakFX = GasFXNew.Object; }
 	else if (GasFXOld.Succeeded()) { GasLeakFX = GasFXOld.Object; }
+	// Пламя горящего объекта (после взрыва). Фолбэк-цепочка — паки локальные (gitignore);
+	// если ни одного нет, FireFX останется null → статус «Горит» работает, но без визуала огня.
+	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> FireFXA(TEXT("/Game/IndustrialFactory/Effects/Fire_01/ns_Fire_01_01.ns_Fire_01_01"));
+	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> FireFXB(TEXT("/Game/M5VFXVOL2/Niagara/Fire_for_BP/NFire_BP_00.NFire_BP_00"));
+	if (FireFXA.Succeeded()) { FireFX = FireFXA.Object; }
+	else if (FireFXB.Succeeded()) { FireFX = FireFXB.Object; }
 	// Струя воды из прорванной трубы (напорная). Фолбэк — галерейный всплеск; оба пака локальные.
 	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> WaterFXNew(TEXT("/Game/FluidNinjaLive/UseCases/012_NiagaraParticleCapture/NS_WaterHose_SingleProjection.NS_WaterHose_SingleProjection"));
 	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> WaterFXOld(TEXT("/Game/Realistic_Starter_VFX_Pack_Niagara_Vol2/Niagara/Water/NS_Water_1.NS_Water_1"));
@@ -308,6 +314,7 @@ void ARepairable::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifet
 	DOREPLIFETIME(ARepairable, bPrereqAutoFilling);
 	DOREPLIFETIME(ARepairable, bDoingPrereqMinigame);
 	DOREPLIFETIME(ARepairable, bElectricallyPowered);
+	DOREPLIFETIME(ARepairable, bBurning);             // очаг пожара — для HUD/таблички/гейта
 	DOREPLIFETIME(ARepairable, bFloodElectrified);   // зона под током — для клиентского HUD
 	DOREPLIFETIME(ARepairable, CurrentGasRadius);     // рост газ-облака — для HUD/газодетектора
 	DOREPLIFETIME(ARepairable, CurrentFloodRadius);   // рост разлива — для HUD
@@ -720,6 +727,10 @@ bool ARepairable::CanBeRepairedBy(const AAvaryoCharacter* Who) const
 	{
 		return false; // провод под напряжением — сначала обесточь рубильником
 	}
+	if (IsOnFire())
+	{
+		return false; // горит — сначала потушить огнетушителем
+	}
 	if (Repairer && Repairer != Who)
 	{
 		return false; // объект уже кто-то чинит
@@ -753,6 +764,10 @@ bool ARepairable::CanBotchBy(const AAvaryoCharacter* Who) const
 	{
 		return false; // под напряжением — даже колхозить нельзя, пока не обесточат
 	}
+	if (IsOnFire())
+	{
+		return false; // горит — сначала потушить
+	}
 	if (Who->VitalsComponent && Who->VitalsComponent->IsWounded())
 	{
 		return false;
@@ -767,6 +782,10 @@ bool ARepairable::CanContinueRepair() const
 	if (IsLiveWireHot())
 	{
 		return false; // если питание вернули посреди починки — провод снова под током, нельзя
+	}
+	if (IsOnFire())
+	{
+		return false; // загорелось посреди починки — нельзя, туши
 	}
 	const bool bInRange = FVector::DistSquared(Repairer->GetActorLocation(), GetActorLocation()) <= FMath::Square(RepairRange);
 	if (bDoingPrereqHold || bPrereqAutoFilling || bDoingPrereqMinigame)
@@ -1186,6 +1205,16 @@ void ARepairable::FinishRepair(AAvaryoCharacter* Who)
 		return;               // НЕ завершаем — bBroken остаётся true
 	}
 
+	// Щиток (Cursor) + питание ещё подано (рубильник ВКЛ) → повторный выбив вместо успеха.
+	// Дисциплина: сперва обесточь рубильником, потом чини. По образцу генератора выше.
+	if (bCircuitBreakerShortsIfPanelLive && MinigameType == ERepairMinigameType::Cursor
+		&& !bBotching && bElectricallyPowered)
+	{
+		ShortCircuit(Who);    // дуга + лок-аут
+		RepairProgress = 0.f; // КЗ сжигает прогресс
+		return;               // НЕ завершаем — bBroken остаётся true
+	}
+
 	const bool bWasBotch = bBotching;
 
 	if (IsMinigameRepair() && !bWasBotch && Who)
@@ -1331,6 +1360,10 @@ void ARepairable::ExplodeGas(AAvaryoCharacter* Culprit)
 	{
 		Run->NotifyGasExplosion(Culprit); // диспетчер уже в курсе
 	}
+
+	// Взрыв оставляет очаг пожара: объект ГОРИТ, пока не потушат огнетушителем (чинить нельзя).
+	bBurning = true;
+	RefreshStatusVisual(); // на листен-сервере OnRep не придёт
 }
 
 void ARepairable::MulticastExplosionShake_Implementation()
@@ -1371,6 +1404,21 @@ void ARepairable::MulticastSparkFX_Implementation(FVector Loc)
 void ARepairable::OnRep_Broken()
 {
 	RefreshStatusVisual();
+}
+
+void ARepairable::OnRep_Burning()
+{
+	RefreshStatusVisual();
+}
+
+void ARepairable::ExtinguishFire()
+{
+	if (!HasAuthority() || !bBurning)
+	{
+		return;
+	}
+	bBurning = false;
+	RefreshStatusVisual(); // на листен-сервере OnRep не придёт
 }
 
 void ARepairable::RefreshStatusVisual()
@@ -1422,6 +1470,20 @@ void ARepairable::RefreshStatusVisual()
 		WaterSprayComp = nullptr;
 	}
 
+	// Пламя: горит после взрыва, гаснет при тушении (мирроринг газового облака).
+	if (bBurning && FireFX && !FireFXComp)
+	{
+		FireFXComp = UNiagaraFunctionLibrary::SpawnSystemAttached(FireFX, MeshComponent, NAME_None,
+			FireFXOffset, FRotator::ZeroRotator, EAttachLocation::KeepRelativeOffset, false);
+		if (FireFXComp) { FireFXComp->SetRelativeScale3D(FVector(FireFXScale)); }
+	}
+	else if (!bBurning && FireFXComp)
+	{
+		FireFXComp->Deactivate();
+		FireFXComp->DestroyComponent();
+		FireFXComp = nullptr;
+	}
+
 	if (!StatusText)
 	{
 		return;
@@ -1430,7 +1492,11 @@ void ARepairable::RefreshStatusVisual()
 	const int32 Percent = FMath::RoundToInt(RepairProgress * 100.f);
 	// Код состояния для защиты от перерисовки: 101 — починено, 1000+N — блокировка N секунд
 	int32 ShownPercent = bBroken ? Percent : 101;
-	if (bBroken && LockoutRemaining > 0.f)
+	if (IsOnFire())
+	{
+		ShownPercent = 4000; // горит — высший приоритет таблички
+	}
+	else if (bBroken && LockoutRemaining > 0.f)
 	{
 		ShownPercent = 1000 + FMath::CeilToInt(LockoutRemaining);
 	}
@@ -1448,7 +1514,12 @@ void ARepairable::RefreshStatusVisual()
 	}
 	LastShownPercent = ShownPercent;
 
-	if (!bBroken)
+	if (IsOnFire())
+	{
+		StatusText->SetText(FText::Format(NSLOCTEXT("Repair", "StatusOnFire", "{0} — ГОРИТ!\nпотуши огнетушителем"), DisplayName));
+		StatusText->SetTextRenderColor(FColor(255, 90, 0)); // огненно-оранжевый
+	}
+	else if (!bBroken)
 	{
 		StatusText->SetText(FText::Format(NSLOCTEXT("Repair", "StatusOk", "{0} — ОК"), DisplayName));
 		StatusText->SetTextRenderColor(FColor(80, 220, 80));

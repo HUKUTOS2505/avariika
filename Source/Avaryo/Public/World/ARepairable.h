@@ -131,6 +131,13 @@ public:
 	void SuppressGas(float Duration);
 	bool IsGasSuppressed() const { return GasSuppressedTime > 0.f; }
 
+	/** Горит ли объект прямо сейчас (очаг пожара после взрыва) — для HUD/таблички и гейта починки. */
+	UFUNCTION(BlueprintPure, Category="Repair|Fire")
+	bool IsOnFire() const { return bBurning; }
+
+	/** Потушить очаг струёй огнетушителя. Только сервер. */
+	void ExtinguishFire();
+
 	/** Текущий (разросшийся) радиус газового облака, см. Для HUD и автотестов. */
 	UFUNCTION(BlueprintPure, Category="Repair|Gas")
 	float GetCurrentGasRadius() const { return CurrentGasRadius; }
@@ -294,6 +301,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Repair|Starter")
 	float GeneratorPanelScanRadius;
 
+	/** Щиток (Cursor): починить при ещё ПОДАННОМ питании (рубильник ВКЛ) → повторное замыкание
+	 *  вместо успеха. Дисциплина: сперва обесточь рубильником, потом чини. ВЫКЛ по умолчанию. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Repair|Cursor")
+	bool bCircuitBreakerShortsIfPanelLive = false;
+
 	/** Урон от обратного удара шнура (рано отпустил / перетянул). */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Repair|Starter")
 	float StarterKickDamage;
@@ -426,6 +438,10 @@ protected:
 	/** Сломан ли. Выставляется в редакторе/скриптом; чинится игроками. */
 	UPROPERTY(EditAnywhere, ReplicatedUsing=OnRep_Broken, BlueprintReadOnly, Category="Repair")
 	bool bBroken;
+
+	/** Горит ли объект (очаг пожара после взрыва газа). Тушится огнетушителем; чинить нельзя пока горит. */
+	UPROPERTY(ReplicatedUsing=OnRep_Burning, BlueprintReadOnly, Category="Repair")
+	bool bBurning = false;
 
 	/** Прогресс починки 0..1, реплицируется для HUD и таблички. */
 	UPROPERTY(Replicated)
@@ -714,6 +730,22 @@ protected:
 	UPROPERTY(Transient)
 	TObjectPtr<UNiagaraComponent> GasFXComp;
 
+	/** Niagara-пламя горящего объекта (после взрыва). Грузится в конструкторе с фолбэком. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Repairable|VFX")
+	TObjectPtr<UNiagaraSystem> FireFX;
+
+	/** Смещение пламени относительно объекта. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Repairable|VFX")
+	FVector FireFXOffset = FVector(0.f, 0.f, 10.f);
+
+	/** Масштаб пламени. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Repairable|VFX", meta=(ClampMin="0.05"))
+	float FireFXScale = 1.0f;
+
+	/** Хэндл играющего пламени. */
+	UPROPERTY(Transient)
+	TObjectPtr<UNiagaraComponent> FireFXComp;
+
 	/** Хэндл играющей струи воды. */
 	UPROPERTY(Transient)
 	TObjectPtr<UNiagaraComponent> WaterSprayComp;
@@ -735,6 +767,9 @@ protected:
 
 	UFUNCTION()
 	void OnRep_Broken();
+
+	UFUNCTION()
+	void OnRep_Burning();
 
 	/** Обновить табличку (текст + цвет) из текущего состояния. */
 	void RefreshStatusVisual();

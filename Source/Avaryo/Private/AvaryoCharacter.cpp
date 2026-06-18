@@ -2513,15 +2513,16 @@ void AAvaryoCharacter::TickSpray(float DeltaSeconds)
 		}
 	}
 
-	// Пеной можно сбить газовое облако: пока дуешь в зону утечки, поджечь нельзя
+	// Пеной можно сбить газовое облако (пока дуешь — поджечь нельзя) И потушить горящий объект.
 	const FVector SprayPoint = ViewLoc + Dir * 200.f;
 	for (TActorIterator<ARepairable> RepIt(GetWorld()); RepIt; ++RepIt)
 	{
-		if (RepIt->IsLeakingGas()
-			&& FVector::DistSquared(RepIt->GetActorLocation(), SprayPoint) <= FMath::Square(450.f))
+		if (FVector::DistSquared(RepIt->GetActorLocation(), SprayPoint) > FMath::Square(450.f))
 		{
-			RepIt->SuppressGas(2.0f); // держится пару секунд после струи
+			continue;
 		}
+		if (RepIt->IsLeakingGas()) { RepIt->SuppressGas(2.0f); } // держится пару секунд после струи
+		if (RepIt->IsOnFire())     { RepIt->ExtinguishFire(); }  // струя гасит пламя
 	}
 }
 
