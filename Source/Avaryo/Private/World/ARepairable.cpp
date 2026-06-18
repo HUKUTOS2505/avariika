@@ -558,7 +558,7 @@ void ARepairable::Tick(float DeltaSeconds)
 			{
 				FloodCheckAccum = 0.f;
 				// Один разряд на зону за интервал (не по каждому игроку), бьёт того, кто без диэлектрика.
-				const bool bCanShock = bFloodElectrified && FloodShockCooldown <= 0.f;
+				// Кулдаун проверяем ВНУТРИ цикла (не снимок) — иначе в кооп бьёт всех безсапожных за один тик.
 				for (TActorIterator<AAvaryoCharacter> It(GetWorld()); It; ++It)
 				{
 					if (!It->VitalsComponent
@@ -567,7 +567,7 @@ void ARepairable::Tick(float DeltaSeconds)
 						continue;
 					}
 					It->VitalsComponent->MakeWet(-1.f); // стоит в воде → промок (сапоги от мокроты не спасают)
-					if (bCanShock && !It->HasRubberBoots())
+					if (bFloodElectrified && FloodShockCooldown <= 0.f && !It->HasRubberBoots())
 					{
 						It->TakeDamage(FloodShockDamage, FDamageEvent(), nullptr, this);
 						It->VitalsComponent->AddPanic(20.f);
@@ -1107,8 +1107,9 @@ void ARepairable::FinishRepair(AAvaryoCharacter* Who)
 	if (bGeneratorShortsIfPanelLive && MinigameType == ERepairMinigameType::Starter
 		&& !bBotching && HasLivePanelNearby())
 	{
-		ShortCircuit(Who); // дуга по рядом стоящим + лок-аут + диспетчер прокомментирует
-		return;            // НЕ завершаем — bBroken остаётся true
+		ShortCircuit(Who);    // дуга по рядом стоящим + лок-аут + диспетчер прокомментирует
+		RepairProgress = 0.f; // КЗ сжигает прогресс — стартер проходить заново (а не доделать 1 рывком)
+		return;               // НЕ завершаем — bBroken остаётся true
 	}
 
 	const bool bWasBotch = bBotching;

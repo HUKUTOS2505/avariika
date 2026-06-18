@@ -707,7 +707,9 @@ float AAvaryoCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 		if (HitMontage && DamageAmount > 0.f && !bWasWoundedBefore && !VitalsComponent->IsWounded()
 			&& GetGameTimeSinceCreation() > 2.0f)
 		{
-			if (UCharacterMovementComponent* Mv = GetCharacterMovement()) { Mv->StopMovementImmediately(); }
+			// (StopMovementImmediately убран: реакции-монтажи сейчас отключены, а газ шлёт TakeDamage
+			//  ~5×/с → обнуление скорости каждый тик не давало уйти из облака. Вернуть ВМЕСТЕ с
+			//  раскомментом Montage_Play в MulticastPlayMontage, чтобы стоп шёл со стопроцентной реакцией.)
 			MulticastPlayMontage(HitMontage);
 		}
 	}
