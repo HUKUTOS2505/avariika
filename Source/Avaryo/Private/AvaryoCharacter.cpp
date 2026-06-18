@@ -2153,9 +2153,9 @@ void AAvaryoCharacter::ApplyItemEffect(APickupItem* Item)
 		{
 			VitalsComponent->StopSmoking(); // уже куришь → потушить (рядом газ — чтоб не рвануло), без расхода заряда
 		}
-		else if (VitalsComponent->GetPanic() > 1.f)
+		else
 		{
-			VitalsComponent->StartSmoking(); // закурить: 15 сек паника снижается (но открытый огонь у газа = взрыв)
+			VitalsComponent->StartSmoking(); // закурить (без гейта по панике — закуривается всегда; калм помогает если паника есть)
 			ConsumeCharge(Item);
 		}
 		break;

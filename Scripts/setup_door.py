@@ -38,9 +38,18 @@ try:
             if "Door" in c.get_name():
                 dm = c; break
     if dm and leaf:
-        dm.set_static_mesh(leaf); R["steps"].append("полотно SM_InsideDoor назначено на %s" % dm.get_name())
+        dm.set_static_mesh(leaf)
+        try: dm.set_relative_scale3d(unreal.Vector(1.0, 1.0, 1.0))  # сброс масштаба куба-плейсхолдера (была «палка»)
+        except Exception as e: R["steps"].append("scale reset err %s" % e)
+        R["steps"].append("полотно SM_InsideDoor + масштаб 1.0 назначено на %s" % dm.get_name())
     else:
         R["steps"].append("DoorMesh не найден или меш не загрузился (dm=%s)" % (dm.get_name() if dm else None))
+
+    # звук открытия на ИНСТАНС (CDO-дефолт не обновит уже стоящую дверь)
+    snd = unreal.load_asset("/Game/Audio/Lib/door_impact/Ghosthack-SF_Household_Cabinet_Cupboard_Slide_Door_Close_01")
+    if snd:
+        try: door.set_editor_property("open_sound", snd); R["steps"].append("open_sound (household) назначен")
+        except Exception as e: R["steps"].append("open_sound err %s" % e)
 
     les.save_current_level(); R["steps"].append("saved")
 except Exception as e:
