@@ -668,7 +668,7 @@ protected:
 
 	/** Растущая лужа разлива — ДЕКАЛЬ на полу (повторяет пол, размер = CurrentFloodRadius = зоне удара). */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Repairable|VFX")
-	TObjectPtr<UDecalComponent> FloodDecalComp;
+	TObjectPtr<UStaticMeshComponent> FloodWaterComp;
 
 	/** Материал лужи (декаль-домен). Свапается в Details — можно поставить FluidFlux wet-decal и т.п. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Repairable|VFX")
@@ -685,6 +685,10 @@ protected:
 	/** Z-смещение поверхности воды/декали от трубы (на пол). Это же уровень воды для удара током. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Repairable|VFX")
 	float FloodDecalZOffset = -40.f;
+
+	/** Полу-размер плоскости воды (см) при scale=1 (движковый Plane=50). Радиус -> масштаб плоскости. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Repairable|VFX", meta=(ClampMin="1.0"))
+	float FloodWaterUnit = 50.f;
 
 	/** Вода: на сколько ВВЕРХ от поверхности бьёт стоящего В воде (рост капсулы + мелководье). */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Repairable|Water")

@@ -60,12 +60,15 @@ ARepairable::ARepairable()
 	AlarmLight->SetCastShadows(false); // дёшево: лампочек несколько, тени не нужны
 
 	// Лужа разлива — ДЕКАЛЬ: проецируется вниз на пол (повторяет пол, без клиппинга/парения).
-	FloodDecalComp = CreateDefaultSubobject<UDecalComponent>(TEXT("FloodDecal"));
-	FloodDecalComp->SetupAttachment(MeshComponent);
-	FloodDecalComp->SetUsingAbsoluteRotation(true); // проекция строго вниз, не зависит от поворота трубы
-	FloodDecalComp->SetUsingAbsoluteScale(true);    // масштаб трубы не раздувает лужу
-	FloodDecalComp->SetRelativeRotation(FRotator(-90.f, 0.f, 0.f)); // смотрит вниз → проецирует на пол
-	FloodDecalComp->SetHiddenInGame(true);          // видна только пока затоплено (Tick, все клиенты)
+	FloodWaterComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("FloodWater"));
+	FloodWaterComp->SetupAttachment(MeshComponent);
+	FloodWaterComp->SetUsingAbsoluteRotation(true); // проекция строго вниз, не зависит от поворота трубы
+	FloodWaterComp->SetUsingAbsoluteScale(true);    // масштаб трубы не раздувает лужу
+	FloodWaterComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	FloodWaterComp->SetCastShadow(false);
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> FloodPlaneMesh(TEXT("/Engine/BasicShapes/Plane.Plane"));
+	if (FloodPlaneMesh.Succeeded()) { FloodWaterComp->SetStaticMesh(FloodPlaneMesh.Object); } // смотрит вниз → проецирует на пол
+	FloodWaterComp->SetHiddenInGame(true);          // видна только пока затоплено (Tick, все клиенты)
 
 	DisplayName = FText::FromString(TEXT("Объект"));
 	RepairDuration = 8.f;
@@ -136,14 +139,13 @@ ARepairable::ARepairable()
 	if (WaterFXNew.Succeeded()) { WaterSprayFX = WaterFXNew.Object; }
 	else if (WaterFXOld.Succeeded()) { WaterSprayFX = WaterFXOld.Object; }
 	// Материал лужи (декаль-домен): водяная лужа на полу. Фолбэк — асфальтовая лужа (точно декаль). Паки локальные.
-	static ConstructorHelpers::FObjectFinder<UMaterialInterface> PuddleMat(TEXT("/Game/IndustrialFactory/Decals/Puddle_01/m_Puddle_01_01.m_Puddle_01_01"));
-	static ConstructorHelpers::FObjectFinder<UMaterialInterface> PuddleMatAlt(TEXT("/Game/ResidentialHouses/Materials/Decals/Puddles/MI_AsphaltPuddle01.MI_AsphaltPuddle01"));
-	if (PuddleMat.Succeeded()) { FloodDecalMaterial = PuddleMat.Object; }
-	else if (PuddleMatAlt.Succeeded()) { FloodDecalMaterial = PuddleMatAlt.Object; }
-	if (FloodDecalComp)
+	static ConstructorHelpers::FObjectFinder<UMaterialInterface> WaterMat(TEXT("/Game/AnimX/_Common/Demo/DemoLevel/Materials/MI_Water.MI_Water"));
+	static ConstructorHelpers::FObjectFinder<UMaterialInterface> WaterMatAlt(TEXT("/Game/IndustrialFactory/Effects/Water_01/m_Water_01_01.m_Water_01_01"));
+	if (WaterMat.Succeeded()) { FloodDecalMaterial = WaterMat.Object; }
+	else if (WaterMatAlt.Succeeded()) { FloodDecalMaterial = WaterMatAlt.Object; }
+	if (FloodWaterComp)
 	{
-		FloodDecalComp->DecalSize = FVector(FloodDecalDepth, 256.f, 256.f);
-		if (FloodDecalMaterial) { FloodDecalComp->SetDecalMaterial(FloodDecalMaterial); }
+		if (FloodDecalMaterial) { FloodWaterComp->SetMaterial(0, FloodDecalMaterial); }
 	}
 	// Звук утечки газа ВЫКЛ по просьбе (нынешний — «свист-свист»); вернём с нормальным газ-эффектом
 	// static ConstructorHelpers::FObjectFinder<USoundBase> HissSnd(TEXT("/Game/Audio/SFX/GasHiss.GasHiss"));
@@ -663,17 +665,17 @@ void ARepairable::Tick(float DeltaSeconds)
 	}
 
 	// Все машины: растущая лужа-ДЕКАЛЬ. Footprint = CurrentFloodRadius (реплицируется) → видимая вода ТОЧНО = зоне удара.
-	if (FloodDecalComp)
+	if (FloodWaterComp)
 	{
 		const bool bFloodVis = IsFlooding();
-		FloodDecalComp->SetHiddenInGame(!bFloodVis);
+		FloodWaterComp->SetHiddenInGame(!bFloodVis);
 		if (bFloodVis)
 		{
 			const FVector DC = GetActorLocation();
-			FloodDecalComp->SetWorldRotation(FRotator(FloodDecalPitch, 0.f, 0.f)); // проекция вниз (тюнится FloodDecalPitch)
-			FloodDecalComp->SetWorldLocation(FVector(DC.X, DC.Y, DC.Z + FloodDecalZOffset)); // опустить на пол
-			const float S = CurrentFloodRadius / 256.f; // base DecalSize.Y/Z=256 -> footprint = радиусу
-			FloodDecalComp->SetWorldScale3D(FVector(1.f, S, S));
+			FloodWaterComp->SetWorldRotation(FRotator::ZeroRotator); // плоскость воды горизонтальна
+			FloodWaterComp->SetWorldLocation(FVector(DC.X, DC.Y, DC.Z + FloodDecalZOffset)); // опустить на пол
+			const float S = CurrentFloodRadius / FMath::Max(FloodWaterUnit, 1.f); // радиус -> масштаб плоскости (XY)
+			FloodWaterComp->SetWorldScale3D(FVector(S, S, 1.f));
 		}
 	}
 
