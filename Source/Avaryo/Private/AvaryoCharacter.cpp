@@ -2226,7 +2226,7 @@ void AAvaryoCharacter::ApplyItemEffect(APickupItem* Item)
 	{
 		// Нашатырь: будит лежачего тиммейта (оживляет) + сбивает панику. На себе — только бодрит.
 		AAvaryoCharacter* Target = FindHealTarget();
-		if (Target && Target != this && Target->VitalsComponent->IsWounded())
+		if (Target && Target != this && Target->VitalsComponent && Target->VitalsComponent->IsWounded())
 		{
 			Target->VitalsComponent->Heal(40.f);        // поднять выше порога оживления
 			Target->VitalsComponent->ReducePanic(40.f);
@@ -2237,9 +2237,9 @@ void AAvaryoCharacter::ApplyItemEffect(APickupItem* Item)
 			}
 			ConsumeCharge(Item);
 		}
-		else
+		else if (VitalsComponent->GetPanic() > 1.f)
 		{
-			VitalsComponent->ReducePanic(40.f); // нюхнул сам — взбодрился
+			VitalsComponent->ReducePanic(40.f); // нюхнул сам — взбодрился (заряд не тратим впустую)
 			ConsumeCharge(Item);
 		}
 		break;

@@ -409,6 +409,7 @@ void UVitalsComponent::ApplyDamage(float Amount)
 			bWounded = true;
 			bSprinting = false;
 			WoundedBleedOut = WoundedBleedOutTime; // окно: подняться/подлечиться/дотащить
+			if (WoundedBleedOutTime <= 0.f) { bUnconscious = true; } // нет окна → сразу отруб (без софт-лока)
 			OnWounded.Broadcast();
 		}
 		else if (!bUnconscious)
