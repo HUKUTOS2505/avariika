@@ -108,3 +108,43 @@ Content/GoreAndHorrorMegapack/
 # Импортированный пак взрывов (864МБ) — локально
 Content/NiagaraExplosion01/
 Content/__ExternalActors__/NiagaraExplosion01/
+
+# ── Паки, импортированные позже (Fab/marketplace) — та же стратегия: локально, re-copy из RawAssets ──
+Content/AtmosphericHouse/
+Content/ResidentialHouses/
+Content/Warehouse/
+Content/IndustrialFactory/
+Content/AbandonedFactory/
+Content/UltraDynamicSky/
+Content/FluidFlux/
+Content/FluidNinjaLive/
+Content/EasyFog/
+Content/M5VFXVOL2/
+Content/NiagaraExamples/
+Content/NiagaraBundle/
+Content/_Packs/
+Content/Movies/
+Content/Localization/
+Content/Splash/
+# CitizenNPC (1.1ГБ): память отмечала «трекать» — пока локально, как остальные паки.
+# Нужен бэкап на GitHub — скажи, заведу Git LFS / выборочный трекинг.
+Content/CitizenNPC/
+# OFPA-акторы demo/template-карт паков выше — не наш контент
+Content/__ExternalActors__/NiagaraBundle/
+Content/__ExternalActors__/ThirdPerson/
+Content/__ExternalActors__/_Packs/
+Content/__ExternalObjects__/NiagaraBundle/
+Content/__ExternalObjects__/ThirdPerson/
+
+# Бэкапы / сэмплы / рабочие каталоги (локальные)
+_mapmove_backup/
+GameAnimationSample/
+blendspace/
+
+# Рабочие изображения в корне (планы / скрины / референсы) — локальные
+/*.png
+/*.jpg
+/*.jpeg
+
+# Пер-юзер editor-настройки (машинозависимые)
+Config/DefaultEditorPerProjectUserSettings.ini
