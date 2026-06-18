@@ -1,0 +1,42 @@
+{
+ "steps": [
+  "retarget ok"
+ ],
+ "retargeted": [
+  "Op_MOB1_Walk_F_IPC",
+  "Op_MOB1_Jog_F_IPC",
+  "Op_MOB1_Jog_F_to_Stand_Relaxed_RU_IPC",
+  "Op_MOB1_Run_F_IPC",
+  "Op_MOB1_Run_F_to_Stand_Relaxed_RU_IPC",
+  "Op_MOB1_CrouchWalk_F_IPC",
+  "Op_MOB1_Crouch_Idle_V2_IPC",
+  "Op_MOB1_Stand_Relaxed_Idle_v2_IPC",
+  "Op_MOB1_Stand_Relaxed_Fgt_v1_IPC",
+  "Op_MOB1_Stand_Relaxed_Fgt_v4_IPC",
+  "Op_MOB1_Stand_Relaxed_Death_B_IPC",
+  "Op_SCR_Walk_Scared_Fwd_Look_Left_Loop_IP",
+  "Op_SCR_Walk_Scared_Fwd_Look_Right_Loop_IP",
+  "Op_Walk_02_Cheerful_Loop_IP",
+  "Op_Walk_06_Look_Around_Loop_IP",
+  "Op_Walk_13_Power_Walk_Loop_IP"
+ ],
+ "picked": [
+  "MOB1_Walk_F_IPC",
+  "MOB1_Jog_F_IPC",
+  "MOB1_Jog_F_to_Stand_Relaxed_RU_IPC",
+  "MOB1_Run_F_IPC",
+  "MOB1_Run_F_to_Stand_Relaxed_RU_IPC",
+  "MOB1_CrouchWalk_F_IPC",
+  "MOB1_Crouch_Idle_V2_IPC",
+  "MOB1_Stand_Relaxed_Idle_v2_IPC",
+  "MOB1_Stand_Relaxed_Fgt_v1_IPC",
+  "MOB1_Stand_Relaxed_Fgt_v4_IPC",
+  "MOB1_Stand_Relaxed_Death_B_IPC",
+  "SCR_Walk_Scared_Fwd_Look_Left_Loop_IP",
+  "SCR_Walk_Scared_Fwd_Look_Right_Loop_IP",
+  "Walk_02_Cheerful_Loop_IP",
+  "Walk_06_Look_Around_Loop_IP",
+  "Walk_13_Power_Walk_Loop_IP"
+ ],
+ "missing": []
+}

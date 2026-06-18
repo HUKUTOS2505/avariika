@@ -1,0 +1,74 @@
+{
+ "all_bones": [
+  "Hips",
+  "LeftUpLeg",
+  "LeftLeg",
+  "LeftFoot",
+  "LeftToeBase",
+  "RightUpLeg",
+  "RightLeg",
+  "RightFoot",
+  "RightToeBase",
+  "Spine02",
+  "Spine01",
+  "Spine",
+  "LeftShoulder",
+  "LeftArm",
+  "LeftForeArm",
+  "LeftHand",
+  "RightShoulder",
+  "RightArm",
+  "RightForeArm",
+  "RightHand",
+  "neck",
+  "Head",
+  "head_end",
+  "headfront"
+ ],
+ "parents": {
+  "neck": "Spine",
+  "Head": "neck",
+  "head_end": "Head",
+  "headfront": "Head",
+  "Spine02": "Hips",
+  "Spine01": "Spine02",
+  "Spine": "Spine01"
+ },
+ "ref_rot": {
+  "Hips": {
+   "pitch": -5.1,
+   "yaw": 99.5,
+   "roll": -9.5
+  },
+  "Spine": {
+   "pitch": 0.8,
+   "yaw": 0.7,
+   "roll": 85.2
+  },
+  "Spine02": {
+   "pitch": 0.5,
+   "yaw": 0.5,
+   "roll": 88.6
+  },
+  "neck": {
+   "pitch": 1.2,
+   "yaw": 1.2,
+   "roll": 88.7
+  },
+  "Head": {
+   "pitch": 0.4,
+   "yaw": 0.9,
+   "roll": 133.2
+  },
+  "head_end": {
+   "pitch": 0.9,
+   "yaw": 1.2,
+   "roll": 103.5
+  },
+  "headfront": {
+   "pitch": -0.0,
+   "yaw": 0.0,
+   "roll": 180.0
+  }
+ }
+}

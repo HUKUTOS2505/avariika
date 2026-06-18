@@ -1,0 +1,78 @@
+{
+ "steps": [
+  "ops ok",
+  "assign ok",
+  "map ok",
+  "align ok"
+ ],
+ "uefn_chains": [
+  "Spine",
+  "Neck",
+  "Head",
+  "LeftClavicle",
+  "LeftArm",
+  "RightClavicle",
+  "RightArm",
+  "LeftLeg",
+  "RightLeg"
+ ],
+ "ops": [
+  {
+   "i": 0,
+   "name": "Pelvis Motion",
+   "enabled": true
+  },
+  {
+   "i": 1,
+   "name": "FK Chains",
+   "enabled": true
+  },
+  {
+   "i": 2,
+   "name": "Retarget IK Goals",
+   "enabled": false
+  },
+  {
+   "i": 3,
+   "name": "Run IK Rig",
+   "enabled": false
+  },
+  {
+   "i": 4,
+   "name": "Root Motion",
+   "enabled": true
+  },
+  {
+   "i": 5,
+   "name": "Remap Curves",
+   "enabled": true
+  },
+  {
+   "i": 6,
+   "name": "Pelvis Motion_0",
+   "enabled": true
+  },
+  {
+   "i": 7,
+   "name": "FK Chains_0",
+   "enabled": true
+  },
+  {
+   "i": 8,
+   "name": "Retarget IK Goals_0",
+   "enabled": false
+  },
+  {
+   "i": 9,
+   "name": "Run IK Rig_0",
+   "enabled": false
+  },
+  {
+   "i": 10,
+   "name": "Root Motion_0",
+   "enabled": true
+  }
+ ],
+ "has_source": true,
+ "has_target": true
+}

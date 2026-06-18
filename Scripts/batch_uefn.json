@@ -1,0 +1,33 @@
+{
+ "steps": [
+  "ops trimmed",
+  "retarget ok"
+ ],
+ "retargeted": [
+  "Op_M_Neutral_Crouch_Loop_B",
+  "Op_M_Neutral_Crouch_Loop_BL",
+  "Op_M_Neutral_Crouch_Loop_BR",
+  "Op_M_Neutral_Crouch_Loop_F",
+  "Op_M_Neutral_Crouch_Loop_FL",
+  "Op_M_Neutral_Crouch_Loop_FR",
+  "Op_M_Neutral_Crouch_Loop_LL",
+  "Op_M_Neutral_Walk_Loop_RR",
+  "Op_M_Neutral_Walk_Loop_LL",
+  "Op_M_Neutral_Walk_Loop_FR",
+  "Op_M_Neutral_Walk_Loop_FL",
+  "Op_M_Neutral_Walk_Loop_F",
+  "Op_M_Neutral_Walk_Loop_BR",
+  "Op_M_Neutral_Walk_Loop_BL",
+  "Op_M_Neutral_Walk_Loop_B",
+  "Op_M_Neutral_Run_Loop_RR",
+  "Op_M_Neutral_Run_Loop_LL",
+  "Op_M_Neutral_Run_Loop_FR",
+  "Op_M_Neutral_Run_Loop_FL",
+  "Op_M_Neutral_Run_Loop_F",
+  "Op_M_Neutral_Run_Loop_BR",
+  "Op_M_Neutral_Run_Loop_BL",
+  "Op_M_Neutral_Run_Loop_B",
+  "Op_M_Neutral_Crouch_Loop_RR"
+ ],
+ "pick_count": 24
+}

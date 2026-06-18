@@ -1,0 +1,32 @@
+{
+ "steps": [
+  "retarget ok"
+ ],
+ "picked": [
+  "Death_1",
+  "Death_2",
+  "Death_3",
+  "Hit_React_1",
+  "Hit_React_2",
+  "Hit_React_3",
+  "Hit_React_4",
+  "Jump_From_Jog",
+  "Jump_From_Stand"
+ ],
+ "retargeted": [
+  "Op_Jump_From_Stand",
+  "Op_Jump_From_Jog",
+  "Op_Hit_React_4",
+  "Op_Hit_React_3",
+  "Op_Hit_React_2",
+  "Op_Hit_React_1",
+  "Op_Death_3",
+  "Op_Death_2",
+  "Op_Death_1"
+ ],
+ "have": {
+  "rt": true,
+  "src": true,
+  "op": true
+ }
+}

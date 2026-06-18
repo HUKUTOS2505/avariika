@@ -1,0 +1,167 @@
+{
+ "total_mc": 130,
+ "buckets": {
+  "drill": [
+   "am_StandDrillLow_01_Drill",
+   "am_StandDrillLow_Trans_Stand",
+   "am_Stand_Trans_StandDrillLow"
+  ],
+  "drink": [
+   "am_Moonshine_01_Drink_Loop"
+  ],
+  "emotion": [
+   "am_Stand_Emotion_Frustrated_01_All",
+   "am_Stand_Emotion_Frustrated_01_Start",
+   "am_Stand_Emotion_Frustrated_01_StompFeet",
+   "am_Stand_Emotion_Frustrated_01_Stop",
+   "am_Stand_Emotion_Sad_01",
+   "am_Stand_Emotion_ThisGuy_01"
+  ],
+  "getup": [
+   "am_InjuredBelly_DropToFloor_GetUp"
+  ],
+  "grab": [
+   "am_Stand_Emotion_Frustrated_01_GrabHead"
+  ],
+  "hammer": [
+   "am_OrcHammer_Idle_01",
+   "am_OrcHammer_Loco_Walk_Bwd",
+   "am_OrcHammer_Loco_Walk_BwdLeft",
+   "am_OrcHammer_Loco_Walk_BwdLeft_NoRM",
+   "am_OrcHammer_Loco_Walk_BwdRight",
+   "am_OrcHammer_Loco_Walk_BwdRight_NoRM",
+   "am_OrcHammer_Loco_Walk_Bwd_NoRM",
+   "am_OrcHammer_Loco_Walk_Fwd",
+   "am_OrcHammer_Loco_Walk_FwdLeft",
+   "am_OrcHammer_Loco_Walk_FwdLeft_NoRM",
+   "am_OrcHammer_Loco_Walk_FwdRight",
+   "am_OrcHammer_Loco_Walk_FwdRight_NoRM",
+   "am_OrcHammer_Loco_Walk_Fwd_NoRM",
+   "am_OrcHammer_Loco_Walk_Left",
+   "am_OrcHammer_Loco_Walk_Left_NoRM",
+   "am_OrcHammer_Loco_Walk_Right",
+   "am_OrcHammer_Loco_Walk_Right_NoRM"
+  ],
+  "idle": [
+   "am_CoconutsHold_Idle_01",
+   "am_InjuredBelly_Idle_01",
+   "am_InjuredBelly_Idle_TurnL180",
+   "am_InjuredBelly_Idle_TurnL90",
+   "am_InjuredBelly_Idle_TurnR180",
+   "am_InjuredBelly_Idle_TurnR90",
+   "am_PretendHorse_Idle_01",
+   "am_StandDrunk_Idle_01",
+   "am_Stand_Idle_06_ScratchArm",
+   "am_Stand_Idle_StinkyBum",
+   "am_Stand_Idle_StinkyPits"
+  ],
+  "kick": [
+   "af_Ready_Fight_02_Kickdown_B",
+   "am_Dance_LegsKickArmsPump",
+   "am_HandsHips_Dance_LegsKick_01_Loop",
+   "am_HandsHips_Dance_LegsKick_02_Loop",
+   "am_HandsHips_Dance_LegsKick_Start",
+   "am_HandsHips_Dance_LegsKick_Stop",
+   "am_Ready_Fight_02_Kickdown_A"
+  ],
+  "knock": [
+   "af_Ready_Fight_01_Knockdown_B",
+   "am_Ready_Fight_01_Knockdown_A"
+  ],
+  "look": [
+   "am_HandsHips_Dance_LookToSide_01_Loop",
+   "am_HandsHips_Dance_LookToSide_Start",
+   "am_HandsHips_Dance_LookToSide_Stop",
+   "am_InjuredBelly_Idle_02_LookAtHand",
+   "am_InjuredBelly_Idle_03_LookAround",
+   "am_InjuredBelly_Loco_Walk_Fwd_LookAround",
+   "am_Stand_Idle_03_LookAround",
+   "am_Stand_LookAt_05_PointRHand"
+  ],
+  "react": [
+   "am_Stand_React_Excited_01",
+   "am_Stand_React_Excited_01_Loop",
+   "am_Stand_React_Excited_01_Start",
+   "am_Stand_React_Excited_01_Stop",
+   "am_Stand_React_Excited_HeelClick"
+  ],
+  "sit": [
+   "am_SitPiano_Play_01",
+   "am_SitPiano_Trans_Stand",
+   "am_Stand_Trans_SitPiano"
+  ],
+  "talk": [
+   "am_Stand_Conv_Talk_05_Generic"
+  ],
+  "vend": [
+   "am_Vend_Fail_HitMachine",
+   "am_Vend_Start",
+   "am_Vend_Success_GrabItem"
+  ],
+  "wave": [
+   "am_Stand_Wave_02_LHand"
+  ]
+ },
+ "unbucketed": [
+  "af_Pair_Stand_Propose_Success_B",
+  "af_Stand_DanceChickenWing",
+  "af_Stand_DanceGroovy_01_Loop",
+  "af_Stand_DanceGroovy_Start",
+  "af_Stand_DanceGroovy_Stop",
+  "af_Stand_DanceSprinkler",
+  "af_Stand_Sing_01",
+  "am_Cine_BallBalance",
+  "am_CoconutsHold_Loco_Trot",
+  "am_CoconutsHold_Loco_Trot_NoRM",
+  "am_CoconutsHold_Loco_Trot_Start",
+  "am_CoconutsHold_Loco_Trot_Stop",
+  "am_CoconutsHold_Trans_Stand",
+  "am_Drunk_Loco_Walk_01",
+  "am_Drunk_Loco_Walk_01_NoRM",
+  "am_HandsHips_Dance_FreeStyle_Loop",
+  "am_HandsHips_Dance_PumpArms_01_Loop",
+  "am_HandsHips_Dance_PumpArms_Start",
+  "am_HandsHips_Dance_PumpArms_Stop",
+  "am_HandsHips_Trans_Stand",
+  "am_InjuredBelly_DropToFloor",
+  "am_InjuredBelly_DropToFloor_Loop",
+  "am_InjuredBelly_Loco_Walk_Fwd",
+  "am_InjuredBelly_Loco_Walk_Fwd_NoRM",
+  "am_InjuredBelly_Loco_Walk_Fwd_Start",
+  "am_InjuredBelly_Loco_Walk_Fwd_Stop",
+  "am_Loco_Walk_Swagger",
+  "am_Loco_Walk_Swagger_NoRM",
+  "am_MC_MotionTest",
+  "am_Moonshine_Trans_Stand",
+  "am_Pair_Stand_Propose_Success_A",
+  "am_PretendHorse_Loco_Trot",
+  "am_PretendHorse_Loco_Trot_NoRM",
+  "am_PretendHorse_Loco_Trot_Start",
+  "am_PretendHorse_Loco_Trot_Stop",
+  "am_PretendHorse_Trans_Stand",
+  "am_ProneCrawl_CrawlStartStop_Fwd",
+  "am_ProneCrawl_Trans_Stand",
+  "am_SpellBook_01_Chant",
+  "am_SpellBook_02_Read_Loop_01",
+  "am_SpellBook_02_Read_Loop_02",
+  "am_SpellBook_02_Read_Start",
+  "am_SpellBook_02_Read_Stop",
+  "am_SpellBook_03_Chant",
+  "am_SpellBook_Trans_Stand",
+  "am_Staff_Cine_01_WalkFwd",
+  "am_Stand_HatTip_01",
+  "am_Stand_Trans_CoconutsHold",
+  "am_Stand_Trans_HandsHips",
+  "am_Stand_Trans_Moonshine",
+  "am_Stand_Trans_PretendHorse",
+  "am_Stand_Trans_ProneCrawl",
+  "am_Stand_Trans_SpellBook",
+  "am_UndeadFours_Eat_01",
+  "am_UndeadFours_Eat_02",
+  "am_UndeadFours_Trans_Undead",
+  "am_Undead_Trans_UndeadFours",
+  "anim_SpellBook_01_Chant",
+  "anim_SpellBook_Trans_Stand",
+  "anim_Stand_Trans_SpellBook"
+ ]
+}

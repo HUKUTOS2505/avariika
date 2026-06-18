@@ -1,0 +1,29 @@
+{
+ "rigs": {
+  "IK_UE4Mann": "/Game/MCO_Mocap_Basics/Character/Mesh/SK_Mannequin.SK_Mannequin",
+  "IK_MCUE5v2": "/Game/MC_Sample/Demo/Characters/MCUE5v2/Meshes/SKM_MCUE5v2.SKM_MCUE5v2",
+  "IK_Operator": "/Game/Characters/Operator/SK_Operator.SK_Operator",
+  "IK_UEFN": "/Game/Characters/UEFN_Mannequin/Meshes/SKM_UEFN_Mannequin.SKM_UEFN_Mannequin"
+ },
+ "retargeters": {
+  "RTG_MCO_to_Operator": {
+   "source_rig": "/Game/Characters/Operator/Rig/IK_UE4Mann.IK_UE4Mann",
+   "target_rig": "/Game/Characters/Operator/Rig/IK_Operator.IK_Operator",
+   "source_skel": "/Game/MCO_Mocap_Basics/Character/Mesh/SK_Mannequin.SK_Mannequin"
+  },
+  "RTG_MC_to_Operator": {
+   "source_rig": "/Game/Characters/Operator/Rig/IK_MCUE5v2.IK_MCUE5v2",
+   "target_rig": "/Game/Characters/Operator/Rig/IK_Operator.IK_Operator",
+   "source_skel": "/Game/MC_Sample/Demo/Characters/MCUE5v2/Meshes/SKM_MCUE5v2.SKM_MCUE5v2"
+  },
+  "RTG_UEFN_to_Operator": {
+   "source_rig": "/Game/Characters/Operator/Rig/IK_UEFN.IK_UEFN",
+   "target_rig": "/Game/Characters/Operator/Rig/IK_Operator.IK_Operator",
+   "source_skel": "/Game/Characters/UEFN_Mannequin/Meshes/SKM_UEFN_Mannequin.SKM_UEFN_Mannequin"
+  }
+ },
+ "asp_meshes": [
+  "/Game/AnimStarterPack/UE4_Mannequin/Mesh/SK_Mannequin.SK_Mannequin"
+ ],
+ "asp_skel": "/Game/AnimStarterPack/UE4_Mannequin/Mesh/UE4_Mannequin_Skeleton"
+}

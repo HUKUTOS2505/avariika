@@ -1,0 +1,991 @@
+{
+ "asp_anims": [
+  {
+   "name": "MM_Fall_Loop",
+   "pkg": "/Game/Characters/Mannequins/Anims/Unarmed/Jump/MM_Fall_Loop",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MM_Jump",
+   "pkg": "/Game/Characters/Mannequins/Anims/Unarmed/Jump/MM_Jump",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MM_Land",
+   "pkg": "/Game/Characters/Mannequins/Anims/Unarmed/Jump/MM_Land",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MM_Idle",
+   "pkg": "/Game/Characters/Mannequins/Anims/Unarmed/MM_Idle",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MF_Unarmed_Jog_Bwd",
+   "pkg": "/Game/Characters/Mannequins/Anims/Unarmed/Jog/MF_Unarmed_Jog_Bwd",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MF_Unarmed_Jog_Bwd_Left",
+   "pkg": "/Game/Characters/Mannequins/Anims/Unarmed/Jog/MF_Unarmed_Jog_Bwd_Left",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MF_Unarmed_Jog_Bwd_Right",
+   "pkg": "/Game/Characters/Mannequins/Anims/Unarmed/Jog/MF_Unarmed_Jog_Bwd_Right",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MF_Unarmed_Jog_Fwd",
+   "pkg": "/Game/Characters/Mannequins/Anims/Unarmed/Jog/MF_Unarmed_Jog_Fwd",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MF_Unarmed_Jog_Fwd_Left",
+   "pkg": "/Game/Characters/Mannequins/Anims/Unarmed/Jog/MF_Unarmed_Jog_Fwd_Left",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MF_Unarmed_Jog_Fwd_Right",
+   "pkg": "/Game/Characters/Mannequins/Anims/Unarmed/Jog/MF_Unarmed_Jog_Fwd_Right",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MF_Unarmed_Jog_Left",
+   "pkg": "/Game/Characters/Mannequins/Anims/Unarmed/Jog/MF_Unarmed_Jog_Left",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MF_Unarmed_Jog_Right",
+   "pkg": "/Game/Characters/Mannequins/Anims/Unarmed/Jog/MF_Unarmed_Jog_Right",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MF_Unarmed_Walk_Bwd",
+   "pkg": "/Game/Characters/Mannequins/Anims/Unarmed/Walk/MF_Unarmed_Walk_Bwd",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MF_Unarmed_Walk_Bwd_Left",
+   "pkg": "/Game/Characters/Mannequins/Anims/Unarmed/Walk/MF_Unarmed_Walk_Bwd_Left",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MF_Unarmed_Walk_Bwd_Right",
+   "pkg": "/Game/Characters/Mannequins/Anims/Unarmed/Walk/MF_Unarmed_Walk_Bwd_Right",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MF_Unarmed_Walk_Fwd",
+   "pkg": "/Game/Characters/Mannequins/Anims/Unarmed/Walk/MF_Unarmed_Walk_Fwd",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MF_Unarmed_Walk_Fwd_Left",
+   "pkg": "/Game/Characters/Mannequins/Anims/Unarmed/Walk/MF_Unarmed_Walk_Fwd_Left",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MF_Unarmed_Walk_Fwd_Right",
+   "pkg": "/Game/Characters/Mannequins/Anims/Unarmed/Walk/MF_Unarmed_Walk_Fwd_Right",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MF_Unarmed_Walk_Left",
+   "pkg": "/Game/Characters/Mannequins/Anims/Unarmed/Walk/MF_Unarmed_Walk_Left",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MF_Unarmed_Walk_Right",
+   "pkg": "/Game/Characters/Mannequins/Anims/Unarmed/Walk/MF_Unarmed_Walk_Right",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "SK_Mannequin_Anim",
+   "pkg": "/Game/MCO_Mocap_Basics/Character/Mesh/SK_Mannequin_Anim",
+   "skel": "/Script/Engine.Skeleton'/Game/MCO_Mocap_Basics/Character/Mesh/UE4_Mannequin_Skeleton.UE4_Mannequin_Skeleton'"
+  },
+  {
+   "name": "MF_Rifle_Walk_Right",
+   "pkg": "/Game/NiagaraExamples/Gallery/SkeletalMesh/Mannequins/Anims/Rifle/Walk/MF_Rifle_Walk_Right",
+   "skel": "/Script/Engine.Skeleton'/Game/NiagaraExamples/Gallery/SkeletalMesh/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MF_Rifle_Walk_Left",
+   "pkg": "/Game/NiagaraExamples/Gallery/SkeletalMesh/Mannequins/Anims/Rifle/Walk/MF_Rifle_Walk_Left",
+   "skel": "/Script/Engine.Skeleton'/Game/NiagaraExamples/Gallery/SkeletalMesh/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MF_Rifle_Walk_Fwd",
+   "pkg": "/Game/NiagaraExamples/Gallery/SkeletalMesh/Mannequins/Anims/Rifle/Walk/MF_Rifle_Walk_Fwd",
+   "skel": "/Script/Engine.Skeleton'/Game/NiagaraExamples/Gallery/SkeletalMesh/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MF_Rifle_Walk_Bwd",
+   "pkg": "/Game/NiagaraExamples/Gallery/SkeletalMesh/Mannequins/Anims/Rifle/Walk/MF_Rifle_Walk_Bwd",
+   "skel": "/Script/Engine.Skeleton'/Game/NiagaraExamples/Gallery/SkeletalMesh/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MM_Land",
+   "pkg": "/Game/NiagaraExamples/Gallery/SkeletalMesh/Mannequins/Anims/Rifle/Jump/MM_Land",
+   "skel": "/Script/Engine.Skeleton'/Game/NiagaraExamples/Gallery/SkeletalMesh/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MM_Jump",
+   "pkg": "/Game/NiagaraExamples/Gallery/SkeletalMesh/Mannequins/Anims/Rifle/Jump/MM_Jump",
+   "skel": "/Script/Engine.Skeleton'/Game/NiagaraExamples/Gallery/SkeletalMesh/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MM_Fall_Loop",
+   "pkg": "/Game/NiagaraExamples/Gallery/SkeletalMesh/Mannequins/Anims/Rifle/Jump/MM_Fall_Loop",
+   "skel": "/Script/Engine.Skeleton'/Game/NiagaraExamples/Gallery/SkeletalMesh/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MF_Rifle_Jog_Right",
+   "pkg": "/Game/NiagaraExamples/Gallery/SkeletalMesh/Mannequins/Anims/Rifle/Jog/MF_Rifle_Jog_Right",
+   "skel": "/Script/Engine.Skeleton'/Game/NiagaraExamples/Gallery/SkeletalMesh/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MF_Rifle_Jog_Left",
+   "pkg": "/Game/NiagaraExamples/Gallery/SkeletalMesh/Mannequins/Anims/Rifle/Jog/MF_Rifle_Jog_Left",
+   "skel": "/Script/Engine.Skeleton'/Game/NiagaraExamples/Gallery/SkeletalMesh/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MF_Rifle_Jog_Fwd",
+   "pkg": "/Game/NiagaraExamples/Gallery/SkeletalMesh/Mannequins/Anims/Rifle/Jog/MF_Rifle_Jog_Fwd",
+   "skel": "/Script/Engine.Skeleton'/Game/NiagaraExamples/Gallery/SkeletalMesh/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MF_Rifle_Jog_Bwd",
+   "pkg": "/Game/NiagaraExamples/Gallery/SkeletalMesh/Mannequins/Anims/Rifle/Jog/MF_Rifle_Jog_Bwd",
+   "skel": "/Script/Engine.Skeleton'/Game/NiagaraExamples/Gallery/SkeletalMesh/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MF_Rifle_Idle_ADS",
+   "pkg": "/Game/NiagaraExamples/Gallery/SkeletalMesh/Mannequins/Anims/Rifle/MF_Rifle_Idle_ADS",
+   "skel": "/Script/Engine.Skeleton'/Game/NiagaraExamples/Gallery/SkeletalMesh/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MM_WallJump",
+   "pkg": "/Game/Characters/Mannequins/Anims/Unarmed/Jump/MM_WallJump",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MM_Dash",
+   "pkg": "/Game/Characters/Mannequins/Anims/Unarmed/Jump/MM_Dash",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MM_ChargedAttack",
+   "pkg": "/Game/Characters/Mannequins/Anims/Unarmed/Attack/MM_ChargedAttack",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MM_Attack_03",
+   "pkg": "/Game/Characters/Mannequins/Anims/Unarmed/Attack/MM_Attack_03",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MM_Attack_02",
+   "pkg": "/Game/Characters/Mannequins/Anims/Unarmed/Attack/MM_Attack_02",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MM_Attack_01",
+   "pkg": "/Game/Characters/Mannequins/Anims/Unarmed/Attack/MM_Attack_01",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MF_Rifle_Walk_Right",
+   "pkg": "/Game/Characters/Mannequins/Anims/Rifle/Walk/MF_Rifle_Walk_Right",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MF_Rifle_Walk_Left",
+   "pkg": "/Game/Characters/Mannequins/Anims/Rifle/Walk/MF_Rifle_Walk_Left",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MF_Rifle_Walk_Fwd_Right",
+   "pkg": "/Game/Characters/Mannequins/Anims/Rifle/Walk/MF_Rifle_Walk_Fwd_Right",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MF_Rifle_Walk_Fwd_Left",
+   "pkg": "/Game/Characters/Mannequins/Anims/Rifle/Walk/MF_Rifle_Walk_Fwd_Left",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MF_Rifle_Walk_Fwd",
+   "pkg": "/Game/Characters/Mannequins/Anims/Rifle/Walk/MF_Rifle_Walk_Fwd",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MF_Rifle_Walk_Bwd_Right",
+   "pkg": "/Game/Characters/Mannequins/Anims/Rifle/Walk/MF_Rifle_Walk_Bwd_Right",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MF_Rifle_Walk_Bwd_Left",
+   "pkg": "/Game/Characters/Mannequins/Anims/Rifle/Walk/MF_Rifle_Walk_Bwd_Left",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MF_Rifle_Walk_Bwd",
+   "pkg": "/Game/Characters/Mannequins/Anims/Rifle/Walk/MF_Rifle_Walk_Bwd",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MM_Rifle_Jump_Start_Loop",
+   "pkg": "/Game/Characters/Mannequins/Anims/Rifle/Jump/MM_Rifle_Jump_Start_Loop",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MM_Rifle_Jump_Start",
+   "pkg": "/Game/Characters/Mannequins/Anims/Rifle/Jump/MM_Rifle_Jump_Start",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MM_Rifle_Jump_RecoveryAdditive",
+   "pkg": "/Game/Characters/Mannequins/Anims/Rifle/Jump/MM_Rifle_Jump_RecoveryAdditive",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MM_Rifle_Jump_Fall_Loop",
+   "pkg": "/Game/Characters/Mannequins/Anims/Rifle/Jump/MM_Rifle_Jump_Fall_Loop",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MM_Rifle_Jump_Fall_Land",
+   "pkg": "/Game/Characters/Mannequins/Anims/Rifle/Jump/MM_Rifle_Jump_Fall_Land",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MM_Rifle_Jump_Apex",
+   "pkg": "/Game/Characters/Mannequins/Anims/Rifle/Jump/MM_Rifle_Jump_Apex",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MF_Rifle_Jog_Right",
+   "pkg": "/Game/Characters/Mannequins/Anims/Rifle/Jog/MF_Rifle_Jog_Right",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MF_Rifle_Jog_Left",
+   "pkg": "/Game/Characters/Mannequins/Anims/Rifle/Jog/MF_Rifle_Jog_Left",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MF_Rifle_Jog_Fwd_Right",
+   "pkg": "/Game/Characters/Mannequins/Anims/Rifle/Jog/MF_Rifle_Jog_Fwd_Right",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MF_Rifle_Jog_Fwd_Left",
+   "pkg": "/Game/Characters/Mannequins/Anims/Rifle/Jog/MF_Rifle_Jog_Fwd_Left",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MF_Rifle_Jog_Fwd",
+   "pkg": "/Game/Characters/Mannequins/Anims/Rifle/Jog/MF_Rifle_Jog_Fwd",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MF_Rifle_Jog_Bwd_Right",
+   "pkg": "/Game/Characters/Mannequins/Anims/Rifle/Jog/MF_Rifle_Jog_Bwd_Right",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MF_Rifle_Jog_Bwd_Left",
+   "pkg": "/Game/Characters/Mannequins/Anims/Rifle/Jog/MF_Rifle_Jog_Bwd_Left",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MF_Rifle_Jog_Bwd",
+   "pkg": "/Game/Characters/Mannequins/Anims/Rifle/Jog/MF_Rifle_Jog_Bwd",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MM_HitReact_Front_Med_02",
+   "pkg": "/Game/Characters/Mannequins/Anims/Rifle/HitReact/MM_HitReact_Front_Med_02",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MM_HitReact_Front_Med_01",
+   "pkg": "/Game/Characters/Mannequins/Anims/Rifle/HitReact/MM_HitReact_Front_Med_01",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MM_HitReact_Front_Lgt_04",
+   "pkg": "/Game/Characters/Mannequins/Anims/Rifle/HitReact/MM_HitReact_Front_Lgt_04",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MM_HitReact_Front_Lgt_03",
+   "pkg": "/Game/Characters/Mannequins/Anims/Rifle/HitReact/MM_HitReact_Front_Lgt_03",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MM_HitReact_Front_Lgt_02",
+   "pkg": "/Game/Characters/Mannequins/Anims/Rifle/HitReact/MM_HitReact_Front_Lgt_02",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MM_HitReact_Front_Lgt_01",
+   "pkg": "/Game/Characters/Mannequins/Anims/Rifle/HitReact/MM_HitReact_Front_Lgt_01",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MM_HitReact_Front_Hvy_01",
+   "pkg": "/Game/Characters/Mannequins/Anims/Rifle/HitReact/MM_HitReact_Front_Hvy_01",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MM_HitReact_Back_Med_01",
+   "pkg": "/Game/Characters/Mannequins/Anims/Rifle/HitReact/MM_HitReact_Back_Med_01",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MM_Rifle_Idle_ADS_AO_CU",
+   "pkg": "/Game/Characters/Mannequins/Anims/Rifle/AIM/MM_Rifle_Idle_ADS_AO_CU",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MM_Rifle_Idle_ADS_AO_CD",
+   "pkg": "/Game/Characters/Mannequins/Anims/Rifle/AIM/MM_Rifle_Idle_ADS_AO_CD",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MM_Rifle_Idle_ADS_AO_CC",
+   "pkg": "/Game/Characters/Mannequins/Anims/Rifle/AIM/MM_Rifle_Idle_ADS_AO_CC",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MF_Pistol_Walk_Right",
+   "pkg": "/Game/Characters/Mannequins/Anims/Pistol/Walk/MF_Pistol_Walk_Right",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MF_Pistol_Walk_Left",
+   "pkg": "/Game/Characters/Mannequins/Anims/Pistol/Walk/MF_Pistol_Walk_Left",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MF_Pistol_Walk_Fwd_Right",
+   "pkg": "/Game/Characters/Mannequins/Anims/Pistol/Walk/MF_Pistol_Walk_Fwd_Right",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MF_Pistol_Walk_Fwd_Left",
+   "pkg": "/Game/Characters/Mannequins/Anims/Pistol/Walk/MF_Pistol_Walk_Fwd_Left",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MF_Pistol_Walk_Fwd",
+   "pkg": "/Game/Characters/Mannequins/Anims/Pistol/Walk/MF_Pistol_Walk_Fwd",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MF_Pistol_Walk_Bwd_Right",
+   "pkg": "/Game/Characters/Mannequins/Anims/Pistol/Walk/MF_Pistol_Walk_Bwd_Right",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MF_Pistol_Walk_Bwd_Left",
+   "pkg": "/Game/Characters/Mannequins/Anims/Pistol/Walk/MF_Pistol_Walk_Bwd_Left",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MF_Pistol_Walk_Bwd",
+   "pkg": "/Game/Characters/Mannequins/Anims/Pistol/Walk/MF_Pistol_Walk_Bwd",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MM_Pistol_Jump_Start",
+   "pkg": "/Game/Characters/Mannequins/Anims/Pistol/Jump/MM_Pistol_Jump_Start",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MM_Pistol_Jump_RecoveryAdditive",
+   "pkg": "/Game/Characters/Mannequins/Anims/Pistol/Jump/MM_Pistol_Jump_RecoveryAdditive",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MM_Pistol_Jump_Fall_Loop",
+   "pkg": "/Game/Characters/Mannequins/Anims/Pistol/Jump/MM_Pistol_Jump_Fall_Loop",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MF_Pistol_Jog_Right",
+   "pkg": "/Game/Characters/Mannequins/Anims/Pistol/Jog/MF_Pistol_Jog_Right",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MF_Pistol_Jog_Left",
+   "pkg": "/Game/Characters/Mannequins/Anims/Pistol/Jog/MF_Pistol_Jog_Left",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MF_Pistol_Jog_Fwd_Right",
+   "pkg": "/Game/Characters/Mannequins/Anims/Pistol/Jog/MF_Pistol_Jog_Fwd_Right",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MF_Pistol_Jog_Fwd_Left",
+   "pkg": "/Game/Characters/Mannequins/Anims/Pistol/Jog/MF_Pistol_Jog_Fwd_Left",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MF_Pistol_Jog_Fwd",
+   "pkg": "/Game/Characters/Mannequins/Anims/Pistol/Jog/MF_Pistol_Jog_Fwd",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MF_Pistol_Jog_Bwd_Right",
+   "pkg": "/Game/Characters/Mannequins/Anims/Pistol/Jog/MF_Pistol_Jog_Bwd_Right",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MF_Pistol_Jog_Bwd_Left",
+   "pkg": "/Game/Characters/Mannequins/Anims/Pistol/Jog/MF_Pistol_Jog_Bwd_Left",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MF_Pistol_Jog_Bwd",
+   "pkg": "/Game/Characters/Mannequins/Anims/Pistol/Jog/MF_Pistol_Jog_Bwd",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MF_Pistol_Idle_ADS_AO_CU",
+   "pkg": "/Game/Characters/Mannequins/Anims/Pistol/Aim/MF_Pistol_Idle_ADS_AO_CU",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MF_Pistol_Idle_ADS_AO_CD",
+   "pkg": "/Game/Characters/Mannequins/Anims/Pistol/Aim/MF_Pistol_Idle_ADS_AO_CD",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MF_Pistol_Idle_ADS1",
+   "pkg": "/Game/Characters/Mannequins/Anims/Pistol/Aim/MF_Pistol_Idle_ADS1",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "ThirdPerson_Jump",
+   "pkg": "/Game/Hospital/Free_Content_Epic_Games/Mannequin/Animations/ThirdPerson_Jump",
+   "skel": "/Script/Engine.Skeleton'/Game/Hospital/Free_Content_Epic_Games/Mannequin/Character/Mesh/UE4_Mannequin_Skeleton.UE4_Mannequin_Skeleton'"
+  },
+  {
+   "name": "ThirdPersonWalk",
+   "pkg": "/Game/Hospital/Free_Content_Epic_Games/Mannequin/Animations/ThirdPersonWalk",
+   "skel": "/Script/Engine.Skeleton'/Game/Hospital/Free_Content_Epic_Games/Mannequin/Character/Mesh/UE4_Mannequin_Skeleton.UE4_Mannequin_Skeleton'"
+  },
+  {
+   "name": "ThirdPersonRun",
+   "pkg": "/Game/Hospital/Free_Content_Epic_Games/Mannequin/Animations/ThirdPersonRun",
+   "skel": "/Script/Engine.Skeleton'/Game/Hospital/Free_Content_Epic_Games/Mannequin/Character/Mesh/UE4_Mannequin_Skeleton.UE4_Mannequin_Skeleton'"
+  },
+  {
+   "name": "ThirdPersonJump_Start",
+   "pkg": "/Game/Hospital/Free_Content_Epic_Games/Mannequin/Animations/ThirdPersonJump_Start",
+   "skel": "/Script/Engine.Skeleton'/Game/Hospital/Free_Content_Epic_Games/Mannequin/Character/Mesh/UE4_Mannequin_Skeleton.UE4_Mannequin_Skeleton'"
+  },
+  {
+   "name": "ThirdPersonJump_Loop",
+   "pkg": "/Game/Hospital/Free_Content_Epic_Games/Mannequin/Animations/ThirdPersonJump_Loop",
+   "skel": "/Script/Engine.Skeleton'/Game/Hospital/Free_Content_Epic_Games/Mannequin/Character/Mesh/UE4_Mannequin_Skeleton.UE4_Mannequin_Skeleton'"
+  },
+  {
+   "name": "ThirdPersonJump_End",
+   "pkg": "/Game/Hospital/Free_Content_Epic_Games/Mannequin/Animations/ThirdPersonJump_End",
+   "skel": "/Script/Engine.Skeleton'/Game/Hospital/Free_Content_Epic_Games/Mannequin/Character/Mesh/UE4_Mannequin_Skeleton.UE4_Mannequin_Skeleton'"
+  },
+  {
+   "name": "ThirdPersonIdle",
+   "pkg": "/Game/Hospital/Free_Content_Epic_Games/Mannequin/Animations/ThirdPersonIdle",
+   "skel": "/Script/Engine.Skeleton'/Game/Hospital/Free_Content_Epic_Games/Mannequin/Character/Mesh/UE4_Mannequin_Skeleton.UE4_Mannequin_Skeleton'"
+  },
+  {
+   "name": "MM_Rifle_Reload",
+   "pkg": "/Game/Characters/Mannequins/Anims/Rifle/MM_Rifle_Reload",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MM_Rifle_Fire",
+   "pkg": "/Game/Characters/Mannequins/Anims/Rifle/MM_Rifle_Fire",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MM_Rifle_Equip",
+   "pkg": "/Game/Characters/Mannequins/Anims/Rifle/MM_Rifle_Equip",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MM_Rifle_DryFire",
+   "pkg": "/Game/Characters/Mannequins/Anims/Rifle/MM_Rifle_DryFire",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MF_Rifle_Idle_ADS",
+   "pkg": "/Game/Characters/Mannequins/Anims/Rifle/MF_Rifle_Idle_ADS",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MM_Pistol_Reload",
+   "pkg": "/Game/Characters/Mannequins/Anims/Pistol/MM_Pistol_Reload",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MM_Pistol_Fire",
+   "pkg": "/Game/Characters/Mannequins/Anims/Pistol/MM_Pistol_Fire",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MM_Pistol_Equip",
+   "pkg": "/Game/Characters/Mannequins/Anims/Pistol/MM_Pistol_Equip",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MM_Pistol_DryFire",
+   "pkg": "/Game/Characters/Mannequins/Anims/Pistol/MM_Pistol_DryFire",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MF_Pistol_Idle_ADS",
+   "pkg": "/Game/Characters/Mannequins/Anims/Pistol/MF_Pistol_Idle_ADS",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MM_Death_Right_01",
+   "pkg": "/Game/Characters/Mannequins/Anims/Death/MM_Death_Right_01",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MM_Death_Left_01",
+   "pkg": "/Game/Characters/Mannequins/Anims/Death/MM_Death_Left_01",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MM_Death_Front_03",
+   "pkg": "/Game/Characters/Mannequins/Anims/Death/MM_Death_Front_03",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MM_Death_Front_02",
+   "pkg": "/Game/Characters/Mannequins/Anims/Death/MM_Death_Front_02",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MM_Death_Front_01",
+   "pkg": "/Game/Characters/Mannequins/Anims/Death/MM_Death_Front_01",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "MM_Death_Back_01",
+   "pkg": "/Game/Characters/Mannequins/Anims/Death/MM_Death_Back_01",
+   "skel": "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'"
+  },
+  {
+   "name": "Walk_Rt_Rifle_Ironsights",
+   "pkg": "/Game/AnimStarterPack/Walk_Rt_Rifle_Ironsights",
+   "skel": "/Script/Engine.Skeleton'/Game/AnimStarterPack/UE4_Mannequin/Mesh/UE4_Mannequin_Skeleton.UE4_Mannequin_Skeleton'"
+  },
+  {
+   "name": "Walk_Lt_Rifle_Ironsights",
+   "pkg": "/Game/AnimStarterPack/Walk_Lt_Rifle_Ironsights",
+   "skel": "/Script/Engine.Skeleton'/Game/AnimStarterPack/UE4_Mannequin/Mesh/UE4_Mannequin_Skeleton.UE4_Mannequin_Skeleton'"
+  },
+  {
+   "name": "Walk_Fwd_Rifle_Ironsights",
+   "pkg": "/Game/AnimStarterPack/Walk_Fwd_Rifle_Ironsights",
+   "skel": "/Script/Engine.Skeleton'/Game/AnimStarterPack/UE4_Mannequin/Mesh/UE4_Mannequin_Skeleton.UE4_Mannequin_Skeleton'"
+  },
+  {
+   "name": "Walk_Bwd_Rifle_Ironsights",
+   "pkg": "/Game/AnimStarterPack/Walk_Bwd_Rifle_Ironsights",
+   "skel": "/Script/Engine.Skeleton'/Game/AnimStarterPack/UE4_Mannequin/Mesh/UE4_Mannequin_Skeleton.UE4_Mannequin_Skeleton'"
+  },
+  {
+   "name": "Stand_To_Prone",
+   "pkg": "/Game/AnimStarterPack/Stand_To_Prone",
+   "skel": "/Script/Engine.Skeleton'/Game/AnimStarterPack/UE4_Mannequin/Mesh/UE4_Mannequin_Skeleton.UE4_Mannequin_Skeleton'"
+  },
+  {
+   "name": "Stand_to_Crouch_Rifle_Ironsights",
+   "pkg": "/Game/AnimStarterPack/Stand_to_Crouch_Rifle_Ironsights",
+   "skel": "/Script/Engine.Skeleton'/Game/AnimStarterPack/UE4_Mannequin/Mesh/UE4_Mannequin_Skeleton.UE4_Mannequin_Skeleton'"
+  },
+  {
+   "name": "Stand_to_Crouch_Rifle_Hip",
+   "pkg": "/Game/AnimStarterPack/Stand_to_Crouch_Rifle_Hip",
+   "skel": "/Script/Engine.Skeleton'/Game/AnimStarterPack/UE4_Mannequin/Mesh/UE4_Mannequin_Skeleton.UE4_Mannequin_Skeleton'"
+  },
+  {
+   "name": "Sprint_Fwd_Rifle",
+   "pkg": "/Game/AnimStarterPack/Sprint_Fwd_Rifle",
+   "skel": "/Script/Engine.Skeleton'/Game/AnimStarterPack/UE4_Mannequin/Mesh/UE4_Mannequin_Skeleton.UE4_Mannequin_Skeleton'"
+  },
+  {
+   "name": "Reload_Shotgun_Ironsights",
+   "pkg": "/Game/AnimStarterPack/Reload_Shotgun_Ironsights",
+   "skel": "/Script/Engine.Skeleton'/Game/AnimStarterPack/UE4_Mannequin/Mesh/UE4_Mannequin_Skeleton.UE4_Mannequin_Skeleton'"
+  },
+  {
+   "name": "Reload_Shotgun_Hip",
+   "pkg": "/Game/AnimStarterPack/Reload_Shotgun_Hip",
+   "skel": "/Script/Engine.Skeleton'/Game/AnimStarterPack/UE4_Mannequin/Mesh/UE4_Mannequin_Skeleton.UE4_Mannequin_Skeleton'"
+  },
+  {
+   "name": "Reload_Rifle_Ironsights",
+   "pkg": "/Game/AnimStarterPack/Reload_Rifle_Ironsights",
+   "skel": "/Script/Engine.Skeleton'/Game/AnimStarterPack/UE4_Mannequin/Mesh/UE4_Mannequin_Skeleton.UE4_Mannequin_Skeleton'"
+  },
+  {
+   "name": "Reload_Rifle_Hip",
+   "pkg": "/Game/AnimStarterPack/Reload_Rifle_Hip",
+   "skel": "/Script/Engine.Skeleton'/Game/AnimStarterPack/UE4_Mannequin/Mesh/UE4_Mannequin_Skeleton.UE4_Mannequin_Skeleton'"
+  },
+  {
+   "name": "Reload_Pistol",
+   "pkg": "/Game/AnimStarterPack/Reload_Pistol",
+   "skel": "/Script/Engine.Skeleton'/Game/AnimStarterPack/UE4_Mannequin/Mesh/UE4_Mannequin_Skeleton.UE4_Mannequin_Skeleton'"
+  },
+  {
+   "name": "Prone_To_Stand",
+   "pkg": "/Game/AnimStarterPack/Prone_To_Stand",
+   "skel": "/Script/Engine.Skeleton'/Game/AnimStarterPack/UE4_Mannequin/Mesh/UE4_Mannequin_Skeleton.UE4_Mannequin_Skeleton'"
+  },
+  {
+   "name": "Prone_Reload_Shotgun",
+   "pkg": "/Game/AnimStarterPack/Prone_Reload_Shotgun",
+   "skel": "/Script/Engine.Skeleton'/Game/AnimStarterPack/UE4_Mannequin/Mesh/UE4_Mannequin_Skeleton.UE4_Mannequin_Skeleton'"
+  },
+  {
+   "name": "Prone_Reload_Rifle",
+   "pkg": "/Game/AnimStarterPack/Prone_Reload_Rifle",
+   "skel": "/Script/Engine.Skeleton'/Game/AnimStarterPack/UE4_Mannequin/Mesh/UE4_Mannequin_Skeleton.UE4_Mannequin_Skeleton'"
+  },
+  {
+   "name": "Prone_Idle",
+   "pkg": "/Game/AnimStarterPack/Prone_Idle",
+   "skel": "/Script/Engine.Skeleton'/Game/AnimStarterPack/UE4_Mannequin/Mesh/UE4_Mannequin_Skeleton.UE4_Mannequin_Skeleton'"
+  },
+  {
+   "name": "Prone_Fire_2",
+   "pkg": "/Game/AnimStarterPack/Prone_Fire_2",
+   "skel": "/Script/Engine.Skeleton'/Game/AnimStarterPack/UE4_Mannequin/Mesh/UE4_Mannequin_Skeleton.UE4_Mannequin_Skeleton'"
+  },
+  {
+   "name": "Prone_Fire_1",
+   "pkg": "/Game/AnimStarterPack/Prone_Fire_1",
+   "skel": "/Script/Engine.Skeleton'/Game/AnimStarterPack/UE4_Mannequin/Mesh/UE4_Mannequin_Skeleton.UE4_Mannequin_Skeleton'"
+  },
+  {
+   "name": "Prone_Death_2",
+   "pkg": "/Game/AnimStarterPack/Prone_Death_2",
+   "skel": "/Script/Engine.Skeleton'/Game/AnimStarterPack/UE4_Mannequin/Mesh/UE4_Mannequin_Skeleton.UE4_Mannequin_Skeleton'"
+  },
+  {
+   "name": "Prone_Death_1",
+   "pkg": "/Game/AnimStarterPack/Prone_Death_1",
+   "skel": "/Script/Engine.Skeleton'/Game/AnimStarterPack/UE4_Mannequin/Mesh/UE4_Mannequin_Skeleton.UE4_Mannequin_Skeleton'"
+  },
+  {
+   "name": "Jump_From_Stand_Ironsights",
+   "pkg": "/Game/AnimStarterPack/Jump_From_Stand_Ironsights",
+   "skel": "/Script/Engine.Skeleton'/Game/AnimStarterPack/UE4_Mannequin/Mesh/UE4_Mannequin_Skeleton.UE4_Mannequin_Skeleton'"
+  },
+  {
+   "name": "Jump_From_Stand",
+   "pkg": "/Game/AnimStarterPack/Jump_From_Stand",
+   "skel": "/Script/Engine.Skeleton'/Game/AnimStarterPack/UE4_Mannequin/Mesh/UE4_Mannequin_Skeleton.UE4_Mannequin_Skeleton'"
+  },
+  {
+   "name": "Jump_From_Jog",
+   "pkg": "/Game/AnimStarterPack/Jump_From_Jog",
+   "skel": "/Script/Engine.Skeleton'/Game/AnimStarterPack/UE4_Mannequin/Mesh/UE4_Mannequin_Skeleton.UE4_Mannequin_Skeleton'"
+  },
+  {
+   "name": "Jog_Rt_Rifle",
+   "pkg": "/Game/AnimStarterPack/Jog_Rt_Rifle",
+   "skel": "/Script/Engine.Skeleton'/Game/AnimStarterPack/UE4_Mannequin/Mesh/UE4_Mannequin_Skeleton.UE4_Mannequin_Skeleton'"
+  },
+  {
+   "name": "Jog_Lt_Rifle",
+   "pkg": "/Game/AnimStarterPack/Jog_Lt_Rifle",
+   "skel": "/Script/Engine.Skeleton'/Game/AnimStarterPack/UE4_Mannequin/Mesh/UE4_Mannequin_Skeleton.UE4_Mannequin_Skeleton'"
+  },
+  {
+   "name": "Jog_Fwd_Rifle",
+   "pkg": "/Game/AnimStarterPack/Jog_Fwd_Rifle",
+   "skel": "/Script/Engine.Skeleton'/Game/AnimStarterPack/UE4_Mannequin/Mesh/UE4_Mannequin_Skeleton.UE4_Mannequin_Skeleton'"
+  },
+  {
+   "name": "Jog_Bwd_Rifle",
+   "pkg": "/Game/AnimStarterPack/Jog_Bwd_Rifle",
+   "skel": "/Script/Engine.Skeleton'/Game/AnimStarterPack/UE4_Mannequin/Mesh/UE4_Mannequin_Skeleton.UE4_Mannequin_Skeleton'"
+  },
+  {
+   "name": "Idle_Rifle_Ironsights",
+   "pkg": "/Game/AnimStarterPack/Idle_Rifle_Ironsights",
+   "skel": "/Script/Engine.Skeleton'/Game/AnimStarterPack/UE4_Mannequin/Mesh/UE4_Mannequin_Skeleton.UE4_Mannequin_Skeleton'"
+  },
+  {
+   "name": "Idle_Rifle_Hip_Break2",
+   "pkg": "/Game/AnimStarterPack/Idle_Rifle_Hip_Break2",
+   "skel": "/Script/Engine.Skeleton'/Game/AnimStarterPack/UE4_Mannequin/Mesh/UE4_Mannequin_Skeleton.UE4_Mannequin_Skeleton'"
+  },
+  {
+   "name": "Idle_Rifle_Hip_Break1",
+   "pkg": "/Game/AnimStarterPack/Idle_Rifle_Hip_Break1",
+   "skel": "/Script/Engine.Skeleton'/Game/AnimStarterPack/UE4_Mannequin/Mesh/UE4_Mannequin_Skeleton.UE4_Mannequin_Skeleton'"
+  },
+  {
+   "name": "Idle_Rifle_Hip",
+   "pkg": "/Game/AnimStarterPack/Idle_Rifle_Hip",
+   "skel": "/Script/Engine.Skeleton'/Game/AnimStarterPack/UE4_Mannequin/Mesh/UE4_Mannequin_Skeleton.UE4_Mannequin_Skeleton'"
+  },
+  {
+   "name": "Idle_Pistol",
+   "pkg": "/Game/AnimStarterPack/Idle_Pistol",
+   "skel": "/Script/Engine.Skeleton'/Game/AnimStarterPack/UE4_Mannequin/Mesh/UE4_Mannequin_Skeleton.UE4_Mannequin_Skeleton'"
+  },
+  {
+   "name": "Hit_React_4",
+   "pkg": "/Game/AnimStarterPack/Hit_React_4",
+   "skel": "/Script/Engine.Skeleton'/Game/AnimStarterPack/UE4_Mannequin/Mesh/UE4_Mannequin_Skeleton.UE4_Mannequin_Skeleton'"
+  },
+  {
+   "name": "Hit_React_3",
+   "pkg": "/Game/AnimStarterPack/Hit_React_3",
+   "skel": "/Script/Engine.Skeleton'/Game/AnimStarterPack/UE4_Mannequin/Mesh/UE4_Mannequin_Skeleton.UE4_Mannequin_Skeleton'"
+  },
+  {
+   "name": "Hit_React_2",
+   "pkg": "/Game/AnimStarterPack/Hit_React_2",
+   "skel": "/Script/Engine.Skeleton'/Game/AnimStarterPack/UE4_Mannequin/Mesh/UE4_Mannequin_Skeleton.UE4_Mannequin_Skeleton'"
+  },
+  {
+   "name": "Hit_React_1",
+   "pkg": "/Game/AnimStarterPack/Hit_React_1",
+   "skel": "/Script/Engine.Skeleton'/Game/AnimStarterPack/UE4_Mannequin/Mesh/UE4_Mannequin_Skeleton.UE4_Mannequin_Skeleton'"
+  },
+  {
+   "name": "Fire_Shotgun_Ironsights",
+   "pkg": "/Game/AnimStarterPack/Fire_Shotgun_Ironsights",
+   "skel": "/Script/Engine.Skeleton'/Game/AnimStarterPack/UE4_Mannequin/Mesh/UE4_Mannequin_Skeleton.UE4_Mannequin_Skeleton'"
+  },
+  {
+   "name": "Fire_Shotgun_Hip",
+   "pkg": "/Game/AnimStarterPack/Fire_Shotgun_Hip",
+   "skel": "/Script/Engine.Skeleton'/Game/AnimStarterPack/UE4_Mannequin/Mesh/UE4_Mannequin_Skeleton.UE4_Mannequin_Skeleton'"
+  },
+  {
+   "name": "Fire_Rifle_Ironsights",
+   "pkg": "/Game/AnimStarterPack/Fire_Rifle_Ironsights",
+   "skel": "/Script/Engine.Skeleton'/Game/AnimStarterPack/UE4_Mannequin/Mesh/UE4_Mannequin_Skeleton.UE4_Mannequin_Skeleton'"
+  },
+  {
+   "name": "Fire_Rifle_Hip",
+   "pkg": "/Game/AnimStarterPack/Fire_Rifle_Hip",
+   "skel": "/Script/Engine.Skeleton'/Game/AnimStarterPack/UE4_Mannequin/Mesh/UE4_Mannequin_Skeleton.UE4_Mannequin_Skeleton'"
+  },
+  {
+   "name": "Equip_Rifle_Standing",
+   "pkg": "/Game/AnimStarterPack/Equip_Rifle_Standing",
+   "skel": "/Script/Engine.Skeleton'/Game/AnimStarterPack/UE4_Mannequin/Mesh/UE4_Mannequin_Skeleton.UE4_Mannequin_Skeleton'"
+  },
+  {
+   "name": "Equip_Pistol_Standing",
+   "pkg": "/Game/AnimStarterPack/Equip_Pistol_Standing",
+   "skel": "/Script/Engine.Skeleton'/Game/AnimStarterPack/UE4_Mannequin/Mesh/UE4_Mannequin_Skeleton.UE4_Mannequin_Skeleton'"
+  },
+  {
+   "name": "Death_Ironsights_2",
+   "pkg": "/Game/AnimStarterPack/Death_Ironsights_2",
+   "skel": "/Script/Engine.Skeleton'/Game/AnimStarterPack/UE4_Mannequin/Mesh/UE4_Mannequin_Skeleton.UE4_Mannequin_Skeleton'"
+  },
+  {
+   "name": "Death_Ironsights_1",
+   "pkg": "/Game/AnimStarterPack/Death_Ironsights_1",
+   "skel": "/Script/Engine.Skeleton'/Game/AnimStarterPack/UE4_Mannequin/Mesh/UE4_Mannequin_Skeleton.UE4_Mannequin_Skeleton'"
+  },
+  {
+   "name": "Death_3",
+   "pkg": "/Game/AnimStarterPack/Death_3",
+   "skel": "/Script/Engine.Skeleton'/Game/AnimStarterPack/UE4_Mannequin/Mesh/UE4_Mannequin_Skeleton.UE4_Mannequin_Skeleton'"
+  },
+  {
+   "name": "Death_2",
+   "pkg": "/Game/AnimStarterPack/Death_2",
+   "skel": "/Script/Engine.Skeleton'/Game/AnimStarterPack/UE4_Mannequin/Mesh/UE4_Mannequin_Skeleton.UE4_Mannequin_Skeleton'"
+  },
+  {
+   "name": "Death_1",
+   "pkg": "/Game/AnimStarterPack/Death_1",
+   "skel": "/Script/Engine.Skeleton'/Game/AnimStarterPack/UE4_Mannequin/Mesh/UE4_Mannequin_Skeleton.UE4_Mannequin_Skeleton'"
+  },
+  {
+   "name": "Crouch_Walk_Rt_Rifle_Ironsights",
+   "pkg": "/Game/AnimStarterPack/Crouch_Walk_Rt_Rifle_Ironsights",
+   "skel": "/Script/Engine.Skeleton'/Game/AnimStarterPack/UE4_Mannequin/Mesh/UE4_Mannequin_Skeleton.UE4_Mannequin_Skeleton'"
+  },
+  {
+   "name": "Crouch_Walk_Rt_Rifle_Hip",
+   "pkg": "/Game/AnimStarterPack/Crouch_Walk_Rt_Rifle_Hip",
+   "skel": "/Script/Engine.Skeleton'/Game/AnimStarterPack/UE4_Mannequin/Mesh/UE4_Mannequin_Skeleton.UE4_Mannequin_Skeleton'"
+  },
+  {
+   "name": "Crouch_Walk_Lt_Rifle_Ironsights",
+   "pkg": "/Game/AnimStarterPack/Crouch_Walk_Lt_Rifle_Ironsights",
+   "skel": "/Script/Engine.Skeleton'/Game/AnimStarterPack/UE4_Mannequin/Mesh/UE4_Mannequin_Skeleton.UE4_Mannequin_Skeleton'"
+  },
+  {
+   "name": "Crouch_Walk_Lt_Rifle_Hip",
+   "pkg": "/Game/AnimStarterPack/Crouch_Walk_Lt_Rifle_Hip",
+   "skel": "/Script/Engine.Skeleton'/Game/AnimStarterPack/UE4_Mannequin/Mesh/UE4_Mannequin_Skeleton.UE4_Mannequin_Skeleton'"
+  },
+  {
+   "name": "Crouch_Walk_Fwd_Rifle_Ironsights",
+   "pkg": "/Game/AnimStarterPack/Crouch_Walk_Fwd_Rifle_Ironsights",
+   "skel": "/Script/Engine.Skeleton'/Game/AnimStarterPack/UE4_Mannequin/Mesh/UE4_Mannequin_Skeleton.UE4_Mannequin_Skeleton'"
+  },
+  {
+   "name": "Crouch_Walk_Fwd_Rifle_Hip",
+   "pkg": "/Game/AnimStarterPack/Crouch_Walk_Fwd_Rifle_Hip",
+   "skel": "/Script/Engine.Skeleton'/Game/AnimStarterPack/UE4_Mannequin/Mesh/UE4_Mannequin_Skeleton.UE4_Mannequin_Skeleton'"
+  },
+  {
+   "name": "Crouch_Walk_Bwd_Rifle_Ironsights",
+   "pkg": "/Game/AnimStarterPack/Crouch_Walk_Bwd_Rifle_Ironsights",
+   "skel": "/Script/Engine.Skeleton'/Game/AnimStarterPack/UE4_Mannequin/Mesh/UE4_Mannequin_Skeleton.UE4_Mannequin_Skeleton'"
+  },
+  {
+   "name": "Crouch_Walk_Bwd_Rifle_Hip",
+   "pkg": "/Game/AnimStarterPack/Crouch_Walk_Bwd_Rifle_Hip",
+   "skel": "/Script/Engine.Skeleton'/Game/AnimStarterPack/UE4_Mannequin/Mesh/UE4_Mannequin_Skeleton.UE4_Mannequin_Skeleton'"
+  },
+  {
+   "name": "Crouch_to_Stand_Rifle_Ironsights",
+   "pkg": "/Game/AnimStarterPack/Crouch_to_Stand_Rifle_Ironsights",
+   "skel": "/Script/Engine.Skeleton'/Game/AnimStarterPack/UE4_Mannequin/Mesh/UE4_Mannequin_Skeleton.UE4_Mannequin_Skeleton'"
+  },
+  {
+   "name": "Crouch_to_Stand_Rifle_Hip",
+   "pkg": "/Game/AnimStarterPack/Crouch_to_Stand_Rifle_Hip",
+   "skel": "/Script/Engine.Skeleton'/Game/AnimStarterPack/UE4_Mannequin/Mesh/UE4_Mannequin_Skeleton.UE4_Mannequin_Skeleton'"
+  },
+  {
+   "name": "Crouch_Idle_Rifle_Ironsights",
+   "pkg": "/Game/AnimStarterPack/Crouch_Idle_Rifle_Ironsights",
+   "skel": "/Script/Engine.Skeleton'/Game/AnimStarterPack/UE4_Mannequin/Mesh/UE4_Mannequin_Skeleton.UE4_Mannequin_Skeleton'"
+  },
+  {
+   "name": "Crouch_Idle_Rifle_Hip",
+   "pkg": "/Game/AnimStarterPack/Crouch_Idle_Rifle_Hip",
+   "skel": "/Script/Engine.Skeleton'/Game/AnimStarterPack/UE4_Mannequin/Mesh/UE4_Mannequin_Skeleton.UE4_Mannequin_Skeleton'"
+  },
+  {
+   "name": "Aim_Space_Ironsights",
+   "pkg": "/Game/AnimStarterPack/Aim_Space_Ironsights",
+   "skel": "/Script/Engine.Skeleton'/Game/AnimStarterPack/UE4_Mannequin/Mesh/UE4_Mannequin_Skeleton.UE4_Mannequin_Skeleton'"
+  },
+  {
+   "name": "Aim_Space_Hip",
+   "pkg": "/Game/AnimStarterPack/Aim_Space_Hip",
+   "skel": "/Script/Engine.Skeleton'/Game/AnimStarterPack/UE4_Mannequin/Mesh/UE4_Mannequin_Skeleton.UE4_Mannequin_Skeleton'"
+  }
+ ],
+ "asp_skeletons": {
+  "/Script/Engine.Skeleton'/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'": 97,
+  "/Script/Engine.Skeleton'/Game/MCO_Mocap_Basics/Character/Mesh/UE4_Mannequin_Skeleton.UE4_Mannequin_Skeleton'": 1,
+  "/Script/Engine.Skeleton'/Game/NiagaraExamples/Gallery/SkeletalMesh/Mannequins/Meshes/SK_Mannequin.SK_Mannequin'": 12,
+  "/Script/Engine.Skeleton'/Game/Hospital/Free_Content_Epic_Games/Mannequin/Character/Mesh/UE4_Mannequin_Skeleton.UE4_Mannequin_Skeleton'": 7,
+  "/Script/Engine.Skeleton'/Game/AnimStarterPack/UE4_Mannequin/Mesh/UE4_Mannequin_Skeleton.UE4_Mannequin_Skeleton'": 62
+ },
+ "retarget_count": 68,
+ "retarget_list": [
+  "Op_MOB1_CrouchWalk_F_IPC",
+  "Op_MOB1_Crouch_Idle_V2_IPC",
+  "Op_MOB1_Jog_F_IPC",
+  "Op_MOB1_Jog_F_to_Stand_Relaxed_RU_IPC",
+  "Op_MOB1_Run_F_IPC",
+  "Op_MOB1_Run_F_to_Stand_Relaxed_RU_IPC",
+  "Op_MOB1_Stand_Relaxed_Death_B_IPC",
+  "Op_MOB1_Stand_Relaxed_Fgt_v1_IPC",
+  "Op_MOB1_Stand_Relaxed_Fgt_v4_IPC",
+  "Op_MOB1_Stand_Relaxed_Idle_v2_IPC",
+  "Op_MOB1_Walk_F_IPC",
+  "Op_M_Neutral_Crouch_Loop_B",
+  "Op_M_Neutral_Crouch_Loop_BL",
+  "Op_M_Neutral_Crouch_Loop_BR",
+  "Op_M_Neutral_Crouch_Loop_F",
+  "Op_M_Neutral_Crouch_Loop_FL",
+  "Op_M_Neutral_Crouch_Loop_FR",
+  "Op_M_Neutral_Crouch_Loop_LL",
+  "Op_M_Neutral_Crouch_Loop_RR",
+  "Op_M_Neutral_Run_Loop_B",
+  "Op_M_Neutral_Run_Loop_BL",
+  "Op_M_Neutral_Run_Loop_BR",
+  "Op_M_Neutral_Run_Loop_F",
+  "Op_M_Neutral_Run_Loop_FL",
+  "Op_M_Neutral_Run_Loop_FR",
+  "Op_M_Neutral_Run_Loop_LL",
+  "Op_M_Neutral_Run_Loop_RR",
+  "Op_M_Neutral_Walk_Loop_B",
+  "Op_M_Neutral_Walk_Loop_BL",
+  "Op_M_Neutral_Walk_Loop_BR",
+  "Op_M_Neutral_Walk_Loop_F",
+  "Op_M_Neutral_Walk_Loop_FL",
+  "Op_M_Neutral_Walk_Loop_FR",
+  "Op_M_Neutral_Walk_Loop_LL",
+  "Op_M_Neutral_Walk_Loop_RR",
+  "Op_SCR_Walk_Scared_Fwd_Look_Left_Loop_IP",
+  "Op_SCR_Walk_Scared_Fwd_Look_Right_Loop_IP",
+  "Op_Walk_02_Cheerful_Loop_IP",
+  "Op_Walk_06_Look_Around_Loop_IP",
+  "Op_Walk_13_Power_Walk_Loop_IP",
+  "Op_af_Ready_Fight_01_Knockdown_B",
+  "Op_af_Ready_Fight_02_Kickdown_B",
+  "Op_am_InjuredBelly_DropToFloor",
+  "Op_am_InjuredBelly_DropToFloor_GetUp",
+  "Op_am_InjuredBelly_DropToFloor_Loop",
+  "Op_am_InjuredBelly_Idle_01",
+  "Op_am_InjuredBelly_Idle_02_LookAtHand",
+  "Op_am_InjuredBelly_Idle_03_LookAround",
+  "Op_am_InjuredBelly_Idle_TurnL180",
+  "Op_am_InjuredBelly_Idle_TurnL90",
+  "Op_am_InjuredBelly_Idle_TurnR180",
+  "Op_am_InjuredBelly_Idle_TurnR90",
+  "Op_am_InjuredBelly_Loco_Walk_Fwd",
+  "Op_am_InjuredBelly_Loco_Walk_Fwd_LookAround",
+  "Op_am_InjuredBelly_Loco_Walk_Fwd_Start",
+  "Op_am_InjuredBelly_Loco_Walk_Fwd_Stop",
+  "Op_am_ProneCrawl_CrawlStartStop_Fwd",
+  "Op_am_ProneCrawl_Trans_Stand",
+  "Op_am_Ready_Fight_01_Knockdown_A",
+  "Op_am_Ready_Fight_02_Kickdown_A",
+  "Op_am_Stand_Emotion_Frustrated_01_All",
+  "Op_am_Stand_Emotion_Sad_01",
+  "Op_am_Stand_React_Excited_01",
+  "Op_am_Stand_React_Excited_01_Loop",
+  "Op_am_Stand_React_Excited_01_Start",
+  "Op_am_Stand_React_Excited_01_Stop",
+  "Op_am_Stand_Trans_ProneCrawl",
+  "Op_am_Stand_Wave_02_LHand"
+ ],
+ "rigs": [
+  "IK_UE4Mann",
+  "IK_MCUE5v2",
+  "IK_Operator",
+  "IK_UEFN"
+ ],
+ "retargeters": [
+  "RTG_MCO_to_Operator",
+  "RTG_MC_to_Operator",
+  "RTG_UEFN_to_Operator"
+ ],
+ "asp_paths": [
+  "/Game/AnimStarterPack"
+ ]
+}

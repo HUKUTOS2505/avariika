@@ -1,0 +1,9 @@
+{
+ "steps": [
+  "spine chain Spine02->Spine ok",
+  "remap ok",
+  "align ok"
+ ],
+ "spine_start": "Spine02",
+ "spine_end": "Spine"
+}

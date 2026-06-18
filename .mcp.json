@@ -1,0 +1,15 @@
+{
+	"mcpServers":
+	{
+		"unreal":
+		{
+			"type": "http",
+			"url": "http://localhost:13579/mcp"
+		},
+		"nwiro":
+		{
+			"type": "http",
+			"url": "http://localhost:5353/mcp"
+		}
+	}
+}

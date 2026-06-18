@@ -1,0 +1,43 @@
+{
+ "steps": [
+  "retarget ok"
+ ],
+ "picked": [
+  "am_Drunk_Loco_Walk_01",
+  "am_Moonshine_01_Drink_Loop",
+  "am_Moonshine_Trans_Stand",
+  "am_StandDrillLow_01_Drill",
+  "am_StandDrillLow_Trans_Stand",
+  "am_StandDrunk_Idle_01",
+  "am_Stand_Conv_Talk_05_Generic",
+  "am_Stand_Emotion_Frustrated_01_StompFeet",
+  "am_Stand_Idle_03_LookAround",
+  "am_Stand_Idle_06_ScratchArm",
+  "am_Stand_LookAt_05_PointRHand",
+  "am_Stand_React_Excited_HeelClick",
+  "am_Stand_Trans_Moonshine",
+  "am_Stand_Trans_StandDrillLow",
+  "am_Vend_Fail_HitMachine",
+  "am_Vend_Start",
+  "am_Vend_Success_GrabItem"
+ ],
+ "retargeted": [
+  "Op_am_StandDrunk_Idle_01",
+  "Op_am_Stand_Idle_06_ScratchArm",
+  "Op_am_Stand_Trans_StandDrillLow",
+  "Op_am_StandDrillLow_Trans_Stand",
+  "Op_am_StandDrillLow_01_Drill",
+  "Op_am_Drunk_Loco_Walk_01",
+  "Op_am_Stand_React_Excited_HeelClick",
+  "Op_am_Stand_Emotion_Frustrated_01_StompFeet",
+  "Op_am_Stand_LookAt_05_PointRHand",
+  "Op_am_Stand_Idle_03_LookAround",
+  "Op_am_Stand_Conv_Talk_05_Generic",
+  "Op_am_Stand_Trans_Moonshine",
+  "Op_am_Moonshine_Trans_Stand",
+  "Op_am_Moonshine_01_Drink_Loop",
+  "Op_am_Vend_Success_GrabItem",
+  "Op_am_Vend_Start",
+  "Op_am_Vend_Fail_HitMachine"
+ ]
+}

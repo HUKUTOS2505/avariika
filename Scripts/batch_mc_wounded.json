@@ -1,0 +1,113 @@
+{
+ "steps": [
+  "map ok",
+  "align ok",
+  "retarget ok"
+ ],
+ "picked": [
+  "af_Ready_Fight_01_Knockdown_B",
+  "af_Ready_Fight_02_Kickdown_B",
+  "am_InjuredBelly_DropToFloor",
+  "am_InjuredBelly_DropToFloor_GetUp",
+  "am_InjuredBelly_DropToFloor_Loop",
+  "am_InjuredBelly_Idle_01",
+  "am_InjuredBelly_Idle_02_LookAtHand",
+  "am_InjuredBelly_Idle_03_LookAround",
+  "am_InjuredBelly_Idle_TurnL180",
+  "am_InjuredBelly_Idle_TurnL90",
+  "am_InjuredBelly_Idle_TurnR180",
+  "am_InjuredBelly_Idle_TurnR90",
+  "am_InjuredBelly_Loco_Walk_Fwd",
+  "am_InjuredBelly_Loco_Walk_Fwd_LookAround",
+  "am_InjuredBelly_Loco_Walk_Fwd_Start",
+  "am_InjuredBelly_Loco_Walk_Fwd_Stop",
+  "am_ProneCrawl_CrawlStartStop_Fwd",
+  "am_ProneCrawl_Trans_Stand",
+  "am_Ready_Fight_01_Knockdown_A",
+  "am_Ready_Fight_02_Kickdown_A",
+  "am_Stand_Emotion_Frustrated_01_All",
+  "am_Stand_Emotion_Sad_01",
+  "am_Stand_React_Excited_01",
+  "am_Stand_React_Excited_01_Loop",
+  "am_Stand_React_Excited_01_Start",
+  "am_Stand_React_Excited_01_Stop",
+  "am_Stand_Trans_ProneCrawl",
+  "am_Stand_Wave_02_LHand"
+ ],
+ "retargeted": [
+  "Op_am_Stand_React_Excited_01_Stop",
+  "Op_am_Stand_React_Excited_01_Start",
+  "Op_am_Stand_React_Excited_01_Loop",
+  "Op_am_Stand_React_Excited_01",
+  "Op_am_Stand_Emotion_Sad_01",
+  "Op_am_Stand_Emotion_Frustrated_01_All",
+  "Op_am_Ready_Fight_02_Kickdown_A",
+  "Op_am_Ready_Fight_01_Knockdown_A",
+  "Op_af_Ready_Fight_02_Kickdown_B",
+  "Op_af_Ready_Fight_01_Knockdown_B",
+  "Op_am_Stand_Wave_02_LHand",
+  "Op_am_InjuredBelly_Loco_Walk_Fwd_Stop",
+  "Op_am_InjuredBelly_Loco_Walk_Fwd_Start",
+  "Op_am_InjuredBelly_Loco_Walk_Fwd_LookAround",
+  "Op_am_InjuredBelly_Loco_Walk_Fwd",
+  "Op_am_InjuredBelly_Idle_TurnR90",
+  "Op_am_InjuredBelly_Idle_TurnR180",
+  "Op_am_InjuredBelly_Idle_TurnL90",
+  "Op_am_InjuredBelly_Idle_TurnL180",
+  "Op_am_InjuredBelly_Idle_03_LookAround",
+  "Op_am_InjuredBelly_Idle_02_LookAtHand",
+  "Op_am_InjuredBelly_Idle_01",
+  "Op_am_InjuredBelly_DropToFloor_Loop",
+  "Op_am_InjuredBelly_DropToFloor_GetUp",
+  "Op_am_InjuredBelly_DropToFloor",
+  "Op_am_Stand_Trans_ProneCrawl",
+  "Op_am_ProneCrawl_Trans_Stand",
+  "Op_am_ProneCrawl_CrawlStartStop_Fwd"
+ ],
+ "ops": [
+  {
+   "name": "Pelvis Motion",
+   "enabled": true
+  },
+  {
+   "name": "FK Chains",
+   "enabled": true
+  },
+  {
+   "name": "Retarget IK Goals",
+   "enabled": false
+  },
+  {
+   "name": "Run IK Rig",
+   "enabled": false
+  },
+  {
+   "name": "Root Motion",
+   "enabled": true
+  },
+  {
+   "name": "Remap Curves",
+   "enabled": true
+  },
+  {
+   "name": "Pelvis Motion_0",
+   "enabled": false
+  },
+  {
+   "name": "FK Chains_0",
+   "enabled": false
+  },
+  {
+   "name": "Retarget IK Goals_0",
+   "enabled": false
+  },
+  {
+   "name": "Run IK Rig_0",
+   "enabled": false
+  },
+  {
+   "name": "Root Motion_0",
+   "enabled": false
+  }
+ ]
+}
