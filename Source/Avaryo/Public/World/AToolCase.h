@@ -25,6 +25,7 @@ public:
 	AToolCase();
 
 	virtual void BeginPlay() override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="ToolCase")
 	TObjectPtr<UStaticMeshComponent> Case;
@@ -47,7 +48,12 @@ public:
 	void UseBy(AAvaryoCharacter* Who);
 
 protected:
+	/** Собран ли ящик. Реплицируется → у клиентов обновляется подпись/подсказка. */
+	UPROPERTY(ReplicatedUsing=OnRep_Loaded)
 	bool bLoaded = false;
+
+	UFUNCTION()
+	void OnRep_Loaded();
 
 	void RefreshLabel();
 };

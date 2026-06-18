@@ -25,7 +25,7 @@ UFlashlightComponent::UFlashlightComponent()
 	DeadBatteryFright = 12.f;
 
 	DefaultIntensity = -1.f;
-	BeamIntensity = 14000.f; // пунш для хоррора; 0 = брать из BP
+	BeamIntensity = 3500.f; // cd: видимый луч, но не выбивает тёмную комнату в белое (было 14000 = белый экран). 0 = брать из BP
 	BlackoutTimeRemaining = 0.f;
 	bLowBatteryNotified = false;
 

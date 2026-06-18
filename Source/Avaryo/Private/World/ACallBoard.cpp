@@ -72,7 +72,8 @@ void ACallBoard::BeginPlay()
 		// ВРЕМЕННО: едем на рабочую Lvl_FirstPerson — там весь геймплей (поломки, зона
 		// выхода, предметы). Переключить на /Game/Avariika/Maps/L_Dom, когда дом-карта
 		// будет наполнена ремонтируемыми + зоной выхода.
-		Dom.ObjectMap = TEXT("/Game/FirstPerson/Lvl_FirstPerson");
+		// Карта перенесена 2026-06-16: /Game/FirstPerson/ → /Game/Avariika/Maps/.
+		Dom.ObjectMap = TEXT("/Game/Avariika/Maps/Lvl_FirstPerson");
 		Dom.bAvailable = true;
 		Calls.Add(Dom);
 

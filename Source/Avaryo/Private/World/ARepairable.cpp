@@ -75,6 +75,27 @@ ARepairable::ARepairable()
 	CurrentGasRadius = GasRadius;
 	LastShownPercent = -1;
 
+	// Вода/потоп (каскад 2.1) — по умолчанию выключено, включается на трубе-источнике.
+	bFloodsWhenBroken = false;
+	FloodRadius = 500.f;
+	FloodSpreadPerSecond = 0.06f; // +6%/с
+	FloodSpreadMaxScale = 2.2f;
+	bFloodElectrified = true;      // вода добралась до проводки — зона под током, пока не обесточат
+	FloodShockDamage = 18.f;
+	FloodShockInterval = 1.0f;
+	FloodElapsed = 0.f;
+	FloodCheckAccum = 0.f;
+	FloodShockCooldown = 0.f;
+	CurrentFloodRadius = FloodRadius;
+
+	// Электрика / «живой провод» (план: выключить рубильник → починить проводку)
+	bLiveWireWhenBroken = false;
+	LiveWireShockDamage = 18.f;
+	LiveWireShockInterval = 1.0f;
+	LiveWirePanic = 22.f;
+	LiveWireShockCooldown = 0.f;
+	bElectricallyPowered = true; // по умолчанию запитано; рубильник снимает
+
 	// Звуки по умолчанию (можно переопределить в Blueprint)
 	static ConstructorHelpers::FObjectFinder<USoundBase> ExplosionSnd(TEXT("/Game/Audio/SFX/Hazard/Hazard_ExplosionGas_1.Hazard_ExplosionGas_1"));
 	if (ExplosionSnd.Succeeded()) { ExplosionSound = ExplosionSnd.Object; }
@@ -233,6 +254,10 @@ void ARepairable::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifet
 	DOREPLIFETIME(ARepairable, bDoingPrereqHold);
 	DOREPLIFETIME(ARepairable, bPrereqAutoFilling);
 	DOREPLIFETIME(ARepairable, bDoingPrereqMinigame);
+	DOREPLIFETIME(ARepairable, bElectricallyPowered);
+	DOREPLIFETIME(ARepairable, bFloodElectrified);   // зона под током — для клиентского HUD
+	DOREPLIFETIME(ARepairable, CurrentGasRadius);     // рост газ-облака — для HUD/газодетектора
+	DOREPLIFETIME(ARepairable, CurrentFloodRadius);   // рост разлива — для HUD
 }
 
 bool ARepairable::GetCurrentStage(FRepairStage& OutStage) const
@@ -497,8 +522,8 @@ void ARepairable::Tick(float DeltaSeconds)
 						continue;
 					}
 					It->VitalsComponent->AddSmell(8.f * GasDt); // провонял газом
-					// Пока облако сбито пеной — поджечь нельзя (огнетушитель спасает от взрыва)
-					if (GasSuppressedTime <= 0.f && ExplosionCooldown <= 0.f && It->VitalsComponent->IsSmoking())
+					// Открытый огонь рядом поджигает облако: курение ИЛИ электро-дуга сварки. Пена (огнетушитель) спасает.
+					if (GasSuppressedTime <= 0.f && ExplosionCooldown <= 0.f && (It->VitalsComponent->IsSmoking() || It->IsWelding()))
 					{
 						ExplodeGas(*It);
 						break;
@@ -510,6 +535,62 @@ void ARepairable::Tick(float DeltaSeconds)
 		{
 			GasLeakElapsed = 0.f; // перекрыли — облако опадает
 			CurrentGasRadius = GasRadius;
+		}
+
+		// ----- Вода / потоп (каскад 2.1): разлив растёт; под напряжением — бьёт током -----
+		FloodShockCooldown = FMath::Max(FloodShockCooldown - DeltaSeconds, 0.f);
+		if (IsFlooding())
+		{
+			FloodElapsed += DeltaSeconds;
+			CurrentFloodRadius = FloodRadius * FMath::Min(1.f + FloodSpreadPerSecond * FloodElapsed, FloodSpreadMaxScale);
+			FloodCheckAccum += DeltaSeconds;
+			if (FloodCheckAccum >= 0.2f)
+			{
+				FloodCheckAccum = 0.f;
+				// Один разряд на зону за интервал (не по каждому игроку), бьёт того, кто без диэлектрика.
+				const bool bCanShock = bFloodElectrified && FloodShockCooldown <= 0.f;
+				for (TActorIterator<AAvaryoCharacter> It(GetWorld()); It; ++It)
+				{
+					if (!It->VitalsComponent
+						|| FVector::DistSquared(It->GetActorLocation(), GetActorLocation()) > FMath::Square(CurrentFloodRadius))
+					{
+						continue;
+					}
+					if (bCanShock && !It->HasRubberBoots())
+					{
+						It->TakeDamage(FloodShockDamage, FDamageEvent(), nullptr, this);
+						It->VitalsComponent->AddPanic(20.f);
+						FloodShockCooldown = FloodShockInterval;
+						MulticastSparkFX(It->GetActorLocation()); // телеграф: искры по воде
+					}
+				}
+			}
+		}
+		else
+		{
+			FloodElapsed = 0.f;
+			CurrentFloodRadius = FloodRadius;
+		}
+
+		// ----- Электрика: «живой провод» — пока под напряжением, бьёт током рядом стоящих -----
+		// (сухой контакт: сапоги НЕ спасают — единственный способ обезопасить - срубить рубильник)
+		LiveWireShockCooldown = FMath::Max(LiveWireShockCooldown - DeltaSeconds, 0.f);
+		if (IsLiveWireHot() && LiveWireShockCooldown <= 0.f)
+		{
+			const float HotRadius = FMath::Max(RepairRange * 1.15f, 160.f);
+			for (TActorIterator<AAvaryoCharacter> It(GetWorld()); It; ++It)
+			{
+				if (!It->VitalsComponent
+					|| FVector::DistSquared(It->GetActorLocation(), GetActorLocation()) > FMath::Square(HotRadius))
+				{
+					continue;
+				}
+				It->TakeDamage(LiveWireShockDamage, FDamageEvent(), nullptr, this);
+				It->VitalsComponent->AddPanic(LiveWirePanic);
+				LiveWireShockCooldown = LiveWireShockInterval;
+				MulticastSparkFX(GetActorLocation()); // искры на проводе
+				break; // один разряд на интервал
+			}
 		}
 	}
 
@@ -550,6 +631,10 @@ bool ARepairable::CanBeRepairedBy(const AAvaryoCharacter* Who) const
 	{
 		return false; // короткое замыкание — щиток остывает
 	}
+	if (IsLiveWireHot())
+	{
+		return false; // провод под напряжением — сначала обесточь рубильником
+	}
 	if (Repairer && Repairer != Who)
 	{
 		return false; // объект уже кто-то чинит
@@ -579,6 +664,10 @@ bool ARepairable::CanBotchBy(const AAvaryoCharacter* Who) const
 	{
 		return false;
 	}
+	if (IsLiveWireHot())
+	{
+		return false; // под напряжением — даже колхозить нельзя, пока не обесточат
+	}
 	if (Who->VitalsComponent && Who->VitalsComponent->IsWounded())
 	{
 		return false;
@@ -590,6 +679,10 @@ bool ARepairable::CanBotchBy(const AAvaryoCharacter* Who) const
 
 bool ARepairable::CanContinueRepair() const
 {
+	if (IsLiveWireHot())
+	{
+		return false; // если питание вернули посреди починки — провод снова под током, нельзя
+	}
 	const bool bInRange = FVector::DistSquared(Repairer->GetActorLocation(), GetActorLocation()) <= FMath::Square(RepairRange);
 	if (bDoingPrereqHold || bPrereqAutoFilling || bDoingPrereqMinigame)
 	{
@@ -1207,6 +1300,10 @@ void ARepairable::RefreshStatusVisual()
 	{
 		ShownPercent = 1000 + FMath::CeilToInt(LockoutRemaining);
 	}
+	else if (bBroken && IsLiveWireHot())
+	{
+		ShownPercent = 3000; // под напряжением — блокирующее состояние
+	}
 	else if (bBroken && !ArePrereqsDone())
 	{
 		ShownPercent = 2000 + PrereqIndex; // показываем текущий этап
@@ -1227,6 +1324,11 @@ void ARepairable::RefreshStatusVisual()
 		StatusText->SetText(FText::Format(NSLOCTEXT("Repair", "StatusLockout", "{0} — ЗАМКНУЛО ({1} с)"),
 			DisplayName, FMath::CeilToInt(LockoutRemaining)));
 		StatusText->SetTextRenderColor(FColor(255, 60, 0)); // тревожный, не как обычная поломка
+	}
+	else if (IsLiveWireHot())
+	{
+		StatusText->SetText(FText::Format(NSLOCTEXT("Repair", "StatusLiveWire", "{0} — ПОД НАПРЯЖЕНИЕМ!\nсними рубильник"), DisplayName));
+		StatusText->SetTextRenderColor(FColor(255, 230, 0)); // электро-жёлтый
 	}
 	else if (!ArePrereqsDone())
 	{

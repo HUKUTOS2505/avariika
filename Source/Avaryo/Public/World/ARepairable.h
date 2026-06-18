@@ -133,6 +133,86 @@ public:
 	UFUNCTION(BlueprintPure, Category="Repair|Gas")
 	float GetCurrentGasRadius() const { return CurrentGasRadius; }
 
+	// ---------- Вода / потоп (каскад 2.1) ----------
+
+	/** Пока сломан — заливает зону: разлив растёт со временем (как газовое облако). */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Repair|Water")
+	bool bFloodsWhenBroken;
+
+	/** Базовый радиус разлива, см. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Repair|Water")
+	float FloodRadius;
+
+	/** Прирост радиуса разлива в долях/сек. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Repair|Water")
+	float FloodSpreadPerSecond;
+
+	/** Максимальный множитель радиуса разлива. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Repair|Water")
+	float FloodSpreadMaxScale;
+
+	/** Залитая зона под напряжением (вода добралась до проводки): бьёт током без диэлектрика.
+	 *  Снимается отключением питания (рубильник) — каскад 2.1, шаг 5. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Replicated, Category="Repair|Water")
+	bool bFloodElectrified;
+
+	/** Урон током за один разряд в залитой зоне. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Repair|Water")
+	float FloodShockDamage;
+
+	/** Интервал между разрядами, сек. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Repair|Water")
+	float FloodShockInterval;
+
+	/** Заливает ли прямо сейчас (сломан + flood-флаг) — для HUD/анализаторов. */
+	UFUNCTION(BlueprintPure, Category="Repair|Water")
+	bool IsFlooding() const { return bBroken && bFloodsWhenBroken; }
+
+	/** Залитая зона сейчас под током (опасно входить без диэлектрика). */
+	UFUNCTION(BlueprintPure, Category="Repair|Water")
+	bool IsFloodElectrified() const { return IsFlooding() && bFloodElectrified; }
+
+	/** Текущий радиус разлива, см. */
+	UFUNCTION(BlueprintPure, Category="Repair|Water")
+	float GetCurrentFloodRadius() const { return CurrentFloodRadius; }
+
+	/** Обесточить/запитать залитую зону (зовёт рубильник APowerSwitch). Только сервер. */
+	void SetFloodElectrified(bool bElectrified) { bFloodElectrified = bElectrified; }
+
+	// ---------- Электрика / «живой провод» (план: выключить рубильник → починить проводку) ----------
+
+	/** Пока сломан И подано питание — провод под напряжением: бьёт током стоящих рядом и НЕ даёт чинить.
+	 *  Снять напряжение = отключить рубильником (APowerSwitch), затем замотать (RequiredTool/этап «изолента»). */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Repair|Electric")
+	bool bLiveWireWhenBroken;
+
+	/** Урон током за один разряд живого провода. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Repair|Electric")
+	float LiveWireShockDamage;
+
+	/** Интервал между разрядами живого провода, сек. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Repair|Electric")
+	float LiveWireShockInterval;
+
+	/** Паника за один разряд живого провода. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Repair|Electric")
+	float LiveWirePanic;
+
+	/** Живой провод (сломан + флаг) — для HUD/анализаторов. */
+	UFUNCTION(BlueprintPure, Category="Repair|Electric")
+	bool IsLiveWire() const { return bBroken && bLiveWireWhenBroken; }
+
+	/** Под напряжением ПРЯМО СЕЙЧАС (живой провод + питание подано) — опасно лезть и чинить. */
+	UFUNCTION(BlueprintPure, Category="Repair|Electric")
+	bool IsLiveWireHot() const { return IsLiveWire() && bElectricallyPowered; }
+
+	/** Подача питания подана? (для HUD). */
+	UFUNCTION(BlueprintPure, Category="Repair|Electric")
+	bool IsPowered() const { return bElectricallyPowered; }
+
+	/** Подать/снять питание (зовёт рубильник APowerSwitch). Управляет И электрификацией потопа, И живым проводом. Только сервер. */
+	void SetPowered(bool bOn) { bElectricallyPowered = bOn; bFloodElectrified = bOn; }
+
 	// ---------- Мини-игры ----------
 
 	/** Какой мини-игрой чинится: None (держать E) / Cursor (щиток) / Valve (труба) / Starter (генератор). */
@@ -359,8 +439,23 @@ protected:
 	/** Троттл обхода игроков газовой петлёй (не каждый кадр — дорого; курсор-мини-игра при этом тикает полно). */
 	float GasCheckAccum;
 
-	/** Текущий (разросшийся) радиус облака — используется и во взрыве. */
+	/** Текущий (разросшийся) радиус облака — используется и во взрыве. Реплицируется для HUD/газодетектора. */
+	UPROPERTY(Replicated)
 	float CurrentGasRadius;
+
+	// Вода/потоп — рантайм (мирроринг газовых)
+	float FloodElapsed;       // сколько уже льёт (разлив растёт)
+	float FloodCheckAccum;    // троттл обхода игроков
+	float FloodShockCooldown; // пауза между разрядами тока
+	UPROPERTY(Replicated)
+	float CurrentFloodRadius; // текущий радиус разлива (реплицируется для HUD)
+
+	// Электрика — рантайм
+	float LiveWireShockCooldown; // пауза между разрядами живого провода
+
+	/** Подано ли питание на объект (рубильник). Управляет электрификацией потопа и «живым проводом». */
+	UPROPERTY(Replicated)
+	bool bElectricallyPowered;
 
 	/** Прирост радиуса облака в долях от базового в секунду. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Repair|Gas")

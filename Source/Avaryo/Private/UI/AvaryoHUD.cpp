@@ -262,8 +262,12 @@ void AAvaryoHUD::DrawHUD()
 		auto DrawBar = [&](const TCHAR* Label, float Value, const FLinearColor& Color, float Y)
 		{
 			const float X = 30.f, W = 180.f, H = 14.f;
-			DrawRect(BarBG, X, Y, W, H);
+			DrawRect(FLinearColor(0.f, 0.f, 0.f, 0.72f), X, Y, W, H);
 			DrawRect(Color, X, Y, W * FMath::Clamp(Value, 0.f, 100.f) / 100.f, H);
+			DrawRect(AccentDim, X, Y, W, 1.f);
+			DrawRect(AccentDim, X, Y + H - 1.f, W, 1.f);
+			DrawRect(AccentDim, X, Y, 1.f, H);
+			DrawRect(AccentDim, X + W - 1.f, Y, 1.f, H);
 			DrawText(Label, TextMain, X + W + 8.f, Y - 2.f, Font, 0.95f);
 		};
 
@@ -961,9 +965,15 @@ void AAvaryoHUD::DrawHUD()
 		const bool bActive = Character->GetActiveSlot() == SlotIndex;
 		const float CellX = SlotIndex * CellW;
 
+		// Фон каждой ячейки (отделяет слоты); активная — оранжевой РАМКОЙ, не сплошной заливкой.
+		DrawRect(CellBG, CellX + 4.f, PanelY + 4.f, CellW - 8.f, PanelH - 8.f);
 		if (bActive)
 		{
-			DrawRect(Accent, CellX + 5.f, PanelY + 5.f, CellW - 10.f, PanelH - 10.f);
+			const float fx = CellX + 4.f, fy = PanelY + 4.f, fw = CellW - 8.f, fh = PanelH - 8.f;
+			DrawRect(Accent, fx, fy, fw, 2.f);
+			DrawRect(Accent, fx, fy + fh - 2.f, fw, 2.f);
+			DrawRect(Accent, fx, fy, 2.f, fh);
+			DrawRect(Accent, fx + fw - 2.f, fy, 2.f, fh);
 		}
 
 		FString ItemName;

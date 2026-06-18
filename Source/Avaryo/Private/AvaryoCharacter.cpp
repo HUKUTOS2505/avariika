@@ -11,6 +11,7 @@
 #include "Sound/SoundBase.h"
 #include "Animation/AnimMontage.h"
 #include "Animation/AnimInstance.h"
+#include "Engine/SkeletalMesh.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Engine/TextureRenderTarget2D.h"
 #include "World/AExitZone.h"
@@ -302,6 +303,41 @@ void AAvaryoCharacter::BeginPlay()
 	UE_LOG(LogTemp, Warning, TEXT("[AvaryoCrouch] FPMesh=%s cached=%d standZ=%.1f"),
 		FirstPersonMeshComp ? *FirstPersonMeshComp->GetName() : TEXT("NULL"),
 		bFPMeshBaseCached ? 1 : 0, FPMeshStandingZ);
+
+	// Модульный персонаж CitizenNPC: голова и кисти — отдельные скелетные меши на ОБЩЕМ
+	// скелете (SKEL_CitizenNPC_ma). В BP их меши не назначены и нет Leader Pose → их не видно.
+	// Назначаем меши + привязываем к позе тела (Leader Pose копирует кости 1:1). Видимость
+	// в 1/3 лице за них уже настраивает ApplyCameraView (цикл по модульным частям ниже).
+	if (USkeletalMeshComponent* Body = GetMesh())
+	{
+		TArray<USkeletalMeshComponent*> Parts;
+		GetComponents<USkeletalMeshComponent>(Parts);
+		for (USkeletalMeshComponent* Part : Parts)
+		{
+			if (!Part || Part == Body || Part == FirstPersonMeshComp) continue;
+			const FString N = Part->GetName();
+			const bool bHead = N.Contains(TEXT("WorkerHead"));
+			const bool bHands = N.Contains(TEXT("WorkerHand"));
+			if (!bHead && !bHands) continue;
+			if (!Part->GetSkeletalMeshAsset())
+			{
+				const TCHAR* Path = bHead
+					? TEXT("/Game/CitizenNPC/CharacterParts/Meshes/UE4_Mannequin/Basebody/SK_ma_head_06.SK_ma_head_06")
+					: TEXT("/Game/CitizenNPC/CharacterParts/Meshes/UE4_Mannequin/Basebody/SK_ma_hands_average.SK_ma_hands_average");
+				if (USkeletalMesh* M = LoadObject<USkeletalMesh>(nullptr, Path))
+				{
+					Part->SetSkeletalMeshAsset(M);
+				}
+			}
+			// Прицепляем к телу и копируем его позу (общий скелет → кости совпадают 1:1)
+			Part->AttachToComponent(Body, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+			Part->SetRelativeLocationAndRotation(FVector::ZeroVector, FRotator::ZeroRotator);
+			Part->SetLeaderPoseComponent(Body);
+			Part->SetVisibility(true, true);
+			UE_LOG(LogTemp, Warning, TEXT("[AvaryoModular] part=%s mesh=%s -> leader=Body"),
+				*N, Part->GetSkeletalMeshAsset() ? *Part->GetSkeletalMeshAsset()->GetName() : TEXT("NULL"));
+		}
+	}
 
 	// Начальный вид (от 1-го лица) — на локальном игроке
 	ApplyCameraView();
@@ -665,8 +701,12 @@ float AAvaryoCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 		const bool bWasWoundedBefore = VitalsComponent->IsWounded();
 		VitalsComponent->ApplyDamage(DamageAmount);
 		// Реакция на удар — только если урон прошёл и не свалились в ранение (там сыграет Death через OnWounded)
-		if (HitMontage && DamageAmount > 0.f && !bWasWoundedBefore && !VitalsComponent->IsWounded())
+		// Грейс-период: не проигрываем реакцию на урон первые 2с после спавна — иначе урон
+		// на старте (ток/вода у точки спавна) даёт длинный Hit-монтаж (трясёт руками + слайд).
+		if (HitMontage && DamageAmount > 0.f && !bWasWoundedBefore && !VitalsComponent->IsWounded()
+			&& GetGameTimeSinceCreation() > 2.0f)
 		{
+			if (UCharacterMovementComponent* Mv = GetCharacterMovement()) { Mv->StopMovementImmediately(); }
 			MulticastPlayMontage(HitMontage);
 		}
 	}
@@ -684,7 +724,15 @@ void AAvaryoCharacter::MulticastPlayMontage_Implementation(UAnimMontage* Montage
 	{
 		if (UAnimInstance* AnimInst = BodyMesh->GetAnimInstance())
 		{
-			AnimInst->Montage_Play(Montage);
+			// Анти-флейл: если ЭТОТ монтаж уже играет (напр. ток бьёт каждый тик урона),
+			// не перезапускаем его с нуля — иначе руки дёргаются как у «дибила».
+			if (AnimInst->Montage_IsPlaying(Montage))
+			{
+				return;
+			}
+			// ВРЕМЕННО ОТКЛЮЧЕНО (настраиваем чистую локомоцию: ходьба/бег/прыжок/присед):
+			// реакции-монтажи не проигрываем. Вернуть — раскомментить строку ниже.
+			// AnimInst->Montage_Play(Montage);
 		}
 	}
 }
@@ -692,6 +740,7 @@ void AAvaryoCharacter::MulticastPlayMontage_Implementation(UAnimMontage* Montage
 void AAvaryoCharacter::HandleWounded()
 {
 	// HP→0: монтёр валится. Death-монтаж (если нет — Knocked как запасной).
+	if (UCharacterMovementComponent* Mv = GetCharacterMovement()) { Mv->StopMovementImmediately(); }
 	if (UAnimMontage* M = DeathMontage ? DeathMontage : KnockedMontage)
 	{
 		MulticastPlayMontage(M);

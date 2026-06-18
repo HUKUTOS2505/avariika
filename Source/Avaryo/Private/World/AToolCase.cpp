@@ -11,6 +11,7 @@
 #include "Game/ARunState.h"
 #include "Game/DispatchSubsystem.h"
 #include "Kismet/GameplayStatics.h"
+#include "Net/UnrealNetwork.h"
 #include "Sound/SoundBase.h"
 #include "UObject/ConstructorHelpers.h"
 
@@ -45,6 +46,17 @@ AToolCase::AToolCase()
 
 	static ConstructorHelpers::FObjectFinder<USoundBase> Snd(TEXT("/Game/Audio/SFX/FlashClick.FlashClick"));
 	if (Snd.Succeeded()) { LoadSound = Snd.Object; }
+}
+
+void AToolCase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(AToolCase, bLoaded);
+}
+
+void AToolCase::OnRep_Loaded()
+{
+	RefreshLabel();
 }
 
 void AToolCase::BeginPlay()

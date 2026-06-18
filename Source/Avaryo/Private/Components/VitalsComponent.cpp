@@ -7,6 +7,13 @@
 #include "EngineUtils.h"
 #include "Net/UnrealNetwork.h"
 #include "UObject/UObjectIterator.h"
+#include "HAL/IConsoleManager.h"
+
+// Тумблер отключения паники для тестов: `Av.NoPanic 0` вернёт нормальную панику.
+// По умолчанию 1 (паника ВЫКЛ), пока доводим механики/окружение. Вернуть 0 перед релизом.
+static TAutoConsoleVariable<int32> CVarAvNoPanic(
+	TEXT("Av.NoPanic"), 1,
+	TEXT("1 = не накапливать панику (тест), 0 = нормальная паника."));
 
 UVitalsComponent::UVitalsComponent()
 {
@@ -166,9 +173,9 @@ void UVitalsComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 		}
 	}
 
-	if (bSafeZone)
+	if (bSafeZone || CVarAvNoPanic.GetValueOnGameThread() != 0)
 	{
-		// На базе паника не растёт и плавно гаснет к нулю (в т.ч. дебаг-стартовое значение)
+		// База/тест-режим: паника не растёт и плавно гаснет к нулю
 		Panic = FMath::Max(0.f, Panic - 25.f * DeltaTime);
 	}
 	else
@@ -386,6 +393,7 @@ void UVitalsComponent::Heal(float Amount)
 void UVitalsComponent::AddPanic(float Amount)
 {
 	if (!IsVitalAuthority()) { return; }
+	if (CVarAvNoPanic.GetValueOnGameThread() != 0) { return; } // тест: паника выключена
 	// База (хаб) — безопасная зона: паника не добавляется ничем
 	if (const ARunState* Run = ARunState::Get(GetWorld()))
 	{

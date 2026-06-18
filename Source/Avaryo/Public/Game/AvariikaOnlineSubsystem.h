@@ -23,7 +23,7 @@ public:
 	virtual void Deinitialize() override;
 
 	/** Создать сессию и уехать на карту листен-сервером. */
-	void HostGame(int32 MaxPlayers = 6, FString MapName = TEXT("/Game/FirstPerson/Lvl_FirstPerson"));
+	void HostGame(int32 MaxPlayers = 6, FString MapName = TEXT("/Game/Avariika/Maps/Lvl_FirstPerson"));
 
 	/** Найти открытые сессии (результаты — в SearchSettings). */
 	void FindGames();
