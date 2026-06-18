@@ -918,8 +918,17 @@ APickupItem* AAvaryoCharacter::GetHeldItem() const
 
 bool AAvaryoCharacter::IsWelding() const
 {
-	// Варит = чинит Hold-этапом со сварочником в руках (открытая электро-дуга). Поджигает газ рядом.
-	if (!CurrentRepairable || !CurrentRepairable->IsDoingPrereqHold())
+	// Варит = идёт активный этап заварки со сварочником в руках (открытая дуга — жжёт глаза без
+	// маски и поджигает газ рядом). Заварка бывает HoldTool- ИЛИ Minigame-этапом (газовая труба =
+	// Minigame!), у обоих ItemTag=Welder; старый флаг IsDoingPrereqHold ловил только HoldTool —
+	// поэтому при заварке трубы не было ни arc-eye, ни взрыва газа.
+	if (!CurrentRepairable
+		|| (!CurrentRepairable->IsDoingPrereqHold() && !CurrentRepairable->IsDoingPrereqMinigame()))
+	{
+		return false;
+	}
+	FRepairStage Stage;
+	if (!CurrentRepairable->GetCurrentStage(Stage) || Stage.ItemTag != FName(TEXT("Welder")))
 	{
 		return false;
 	}
