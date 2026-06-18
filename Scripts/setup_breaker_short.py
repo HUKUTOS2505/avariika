@@ -23,18 +23,20 @@ try:
             except Exception: pass
             is_cursor = (mt is not None and "CURSOR" in mt.upper()) or ("Breaker" in lbl)
             if is_cursor:
+                readback = "?"
                 try:
-                    a.set_editor_property("b_circuit_breaker_shorts_if_panel_live", True)
-                    R["steps"].append("щиток %s: повторный выбив ВКЛ" % lbl)
+                    a.set_editor_property("bCircuitBreakerShortsIfPanelLive", True)
+                    readback = bool(a.get_editor_property("bCircuitBreakerShortsIfPanelLive"))
+                    R["steps"].append("щиток %s: повторный выбив ВКЛ (read-back=%s)" % (lbl, readback))
                 except Exception as e:
                     R["steps"].append("set flag err on %s: %s" % (lbl, e))
                 ep = "?"
-                try: ep = bool(a.get_editor_property("b_electrically_powered"))
+                try: ep = bool(a.get_editor_property("bElectricallyPowered"))
                 except Exception: pass
-                R["breakers"].append({"label": lbl, "minigame": mt, "electrically_powered": ep})
+                R["breakers"].append({"label": lbl, "minigame": mt, "electrically_powered": ep, "flag_readback": readback})
         elif cn == "PowerSwitch":
             pw = "?"
-            try: pw = bool(a.get_editor_property("b_power_on"))
+            try: pw = bool(a.get_editor_property("bPowerOn"))
             except Exception: pass
             R["switches"].append({"label": a.get_actor_label(), "power_on": pw})
 
