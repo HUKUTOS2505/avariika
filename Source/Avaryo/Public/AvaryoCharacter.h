@@ -281,13 +281,6 @@ public:
 	 *  Без неё IsWelding() жжёт глаза: паника + слепящая HUD-вспышка («arc eye»). Plain-метод (Live Coding). */
 	bool HasWeldingMask() const;
 
-	/** Наушники в инвентаре (ToolTag=EarMuffs) → защита слуха у ревущего генератора. Plain-метод (Live Coding). */
-	bool HasHeadphones() const;
-
-	/** Рядом работает генератор (Starter-объект уже починен → гудит холостым ходом). Без наушников
-	 *  оглушает: паника на сервере + дрожащий HUD-оверлей. Plain-метод (Live Coding). */
-	bool IsNearRunningGenerator() const;
-
 	/** Уровень газа в точке игрока 0..1 (по ближайшей травящей трубе) — для газоанализатора. */
 	UFUNCTION(BlueprintPure, Category="Avaryo|Gas")
 	float GetGasReading() const;
