@@ -47,6 +47,9 @@ struct FPlayerRunStats
 	float SmellSeconds = 0.f;   // времени «воняет» (§16)
 
 	UPROPERTY(BlueprintReadOnly, Category="Run")
+	float SmokeSeconds = 0.f;   // времени с сигаретой (§20: «Главный курильщик»)
+
+	UPROPERTY(BlueprintReadOnly, Category="Run")
 	int32 ShovedOthers = 0;     // сколько раз толкнул товарищей (§18)
 
 	UPROPERTY(BlueprintReadOnly, Category="Run")

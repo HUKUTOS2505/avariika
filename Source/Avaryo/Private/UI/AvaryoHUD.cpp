@@ -457,7 +457,7 @@ void AAvaryoHUD::DrawHUD()
 			int32 MaxRepairs = 0, MaxWounded = 0, MaxRevives = 0, MaxDrags = 0, MaxBotched = 0;
 			int32 MaxShoved = 0, MaxTripped = 0;
 			int32 MaxExplosions = 0, MaxShorts = 0, MaxThrows = 0, MaxCoffees = 0;
-			float MaxPanic = 0.f, MaxSmell = 0.f;
+			float MaxPanic = 0.f, MaxSmell = 0.f, MaxSmoke = 0.f;
 			for (const FPlayerRunStats& S : AllStats)
 			{
 				MaxRepairs = FMath::Max(MaxRepairs, S.Repairs);
@@ -473,6 +473,7 @@ void AAvaryoHUD::DrawHUD()
 				MaxCoffees = FMath::Max(MaxCoffees, S.Coffees);
 				MaxPanic   = FMath::Max(MaxPanic,   S.PanicSeconds);
 				MaxSmell   = FMath::Max(MaxSmell,   S.SmellSeconds);
+				MaxSmoke   = FMath::Max(MaxSmoke,   S.SmokeSeconds);
 			}
 
 			const float ReportW = FMath::Min(820.f, SizeX - 80.f);
@@ -509,6 +510,7 @@ void AAvaryoHUD::DrawHUD()
 				else if (S.ShortsCaused > 0 && S.ShortsCaused == MaxShorts) Title = TEXT("Электрик Эдисон");
 				else if (S.BotchedRepairs > 0 && S.BotchedRepairs == MaxBotched) Title = TEXT("Народный умелец");
 				else if (S.SmellSeconds > 5.f && S.SmellSeconds >= MaxSmell) Title = TEXT("Амбре смены");
+				else if (S.SmokeSeconds > 8.f && S.SmokeSeconds >= MaxSmoke) Title = TEXT("Главный курильщик");
 				else if (S.ToiletVisits >= 2)                          Title = TEXT("Дисциплинированный мочевой пузырь");
 				else if (S.Repairs > 0 && S.Repairs == MaxRepairs)     Title = TEXT("Работник месяца");
 				else if (S.Revives > 0 && S.Revives == MaxRevives)     Title = TEXT("Полевой медик");

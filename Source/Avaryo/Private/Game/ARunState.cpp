@@ -546,6 +546,11 @@ void ARunState::Tick(float DeltaSeconds)
 		}
 		Stats.bWasSmelly = Vitals->IsSmelly();
 
+		if (Vitals->IsSmoking())
+		{
+			Stats.SmokeSeconds += DeltaSeconds; // §20: «Главный курильщик»
+		}
+
 		if (It->IsSlipping())
 		{
 			Stats.SlipSeconds += DeltaSeconds; // катается по пене
