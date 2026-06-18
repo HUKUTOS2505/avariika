@@ -113,9 +113,17 @@ ARepairable::ARepairable()
 	else if (ExpFXOld.Succeeded()) { ExplosionFX = ExpFXOld.Object; }
 	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> SpkFX(TEXT("/Game/NiagaraExamples/FX_Sparks/NS_Spark_Burst.NS_Spark_Burst"));
 	if (SpkFX.Succeeded()) { SparkFX = SpkFX.Object; }
-	// Утечка газа = лёгкая струйка пара + шипение (НЕ густой дым «как горит»)
-	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> GasFX(TEXT("/Game/NiagaraExamples/Utilities/SpriteGeneration/SmokePuffLight/NS_SmokePuffLight.NS_SmokePuffLight"));
-	if (GasFX.Succeeded()) { GasLeakFX = GasFX.Object; }
+	// Утечка газа = ТОКСИЧНАЯ туча (кислотный дым). Фолбэк на лёгкий дымок — пак локальный (gitignore),
+	// на свежем клоне его нет (как у взрыва выше).
+	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> GasFXNew(TEXT("/Game/Realistic_Starter_VFX_Pack_Niagara_Vol2/Niagara/Smoke/NS_Smoke_7_acid.NS_Smoke_7_acid"));
+	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> GasFXOld(TEXT("/Game/NiagaraExamples/Utilities/SpriteGeneration/SmokePuffLight/NS_SmokePuffLight.NS_SmokePuffLight"));
+	if (GasFXNew.Succeeded()) { GasLeakFX = GasFXNew.Object; }
+	else if (GasFXOld.Succeeded()) { GasLeakFX = GasFXOld.Object; }
+	// Струя воды из прорванной трубы (напорная). Фолбэк — галерейный всплеск; оба пака локальные.
+	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> WaterFXNew(TEXT("/Game/FluidNinjaLive/UseCases/012_NiagaraParticleCapture/NS_WaterHose_SingleProjection.NS_WaterHose_SingleProjection"));
+	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> WaterFXOld(TEXT("/Game/Realistic_Starter_VFX_Pack_Niagara_Vol2/Niagara/Water/NS_Water_1.NS_Water_1"));
+	if (WaterFXNew.Succeeded()) { WaterSprayFX = WaterFXNew.Object; }
+	else if (WaterFXOld.Succeeded()) { WaterSprayFX = WaterFXOld.Object; }
 	// Звук утечки газа ВЫКЛ по просьбе (нынешний — «свист-свист»); вернём с нормальным газ-эффектом
 	// static ConstructorHelpers::FObjectFinder<USoundBase> HissSnd(TEXT("/Game/Audio/SFX/GasHiss.GasHiss"));
 	// if (HissSnd.Succeeded()) { GasHissSound = HissSnd.Object; }
@@ -573,6 +581,7 @@ void ARepairable::Tick(float DeltaSeconds)
 						It->VitalsComponent->AddPanic(20.f);
 						FloodShockCooldown = FloodShockInterval;
 						MulticastSparkFX(It->GetActorLocation()); // телеграф: искры по воде
+						if (ShortCircuitSound) { MulticastSound(ShortCircuitSound, It->GetActorLocation(), 0.9f); } // разряд слышно
 					}
 				}
 			}
@@ -600,6 +609,7 @@ void ARepairable::Tick(float DeltaSeconds)
 				It->VitalsComponent->AddPanic(LiveWirePanic);
 				LiveWireShockCooldown = LiveWireShockInterval;
 				MulticastSparkFX(GetActorLocation()); // искры на проводе
+				if (ShortCircuitSound) { MulticastSound(ShortCircuitSound, GetActorLocation(), 0.9f); } // разряд слышно
 				break; // один разряд на интервал
 			}
 		}
@@ -1320,6 +1330,21 @@ void ARepairable::RefreshStatusVisual()
 	{
 		if (bLeakingNow && !GasHissComp->IsPlaying()) { GasHissComp->Play(); }
 		else if (!bLeakingNow && GasHissComp->IsPlaying()) { GasHissComp->Stop(); }
+	}
+
+	// Струя воды: висит на трубе пока затоплено (мирроринг газового облака).
+	const bool bFloodingNow = IsFlooding();
+	if (bFloodingNow && WaterSprayFX && !WaterSprayComp)
+	{
+		WaterSprayComp = UNiagaraFunctionLibrary::SpawnSystemAttached(WaterSprayFX, MeshComponent, NAME_None,
+			WaterSprayOffset, FRotator::ZeroRotator, EAttachLocation::KeepRelativeOffset, false);
+		if (WaterSprayComp) { WaterSprayComp->SetRelativeScale3D(FVector(WaterSprayScale)); }
+	}
+	else if (!bFloodingNow && WaterSprayComp)
+	{
+		WaterSprayComp->Deactivate();
+		WaterSprayComp->DestroyComponent();
+		WaterSprayComp = nullptr;
 	}
 
 	if (!StatusText)

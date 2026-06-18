@@ -648,6 +648,18 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Repairable|VFX", meta=(ClampMin="0.05"))
 	float GasFXScale = 0.35f;
 
+	/** VFX струи воды из прорыва трубы (зацикленный, висит пока затоплено). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Repairable|VFX")
+	TObjectPtr<UNiagaraSystem> WaterSprayFX;
+
+	/** Смещение струи воды от меша. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Repairable|VFX")
+	FVector WaterSprayOffset = FVector(0.f, 0.f, 10.f);
+
+	/** Масштаб струи воды. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Repairable|VFX", meta=(ClampMin="0.05"))
+	float WaterSprayScale = 1.0f;
+
 	/** Масштаб искр замыкания (мелкие). */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Repairable|VFX", meta=(ClampMin="0.05"))
 	float SparkScale = 0.6f;
@@ -659,6 +671,10 @@ protected:
 	/** Хэндл играющего газового облака. */
 	UPROPERTY(Transient)
 	TObjectPtr<UNiagaraComponent> GasFXComp;
+
+	/** Хэндл играющей струи воды. */
+	UPROPERTY(Transient)
+	TObjectPtr<UNiagaraComponent> WaterSprayComp;
 
 	/** Хэндл шипения газа. */
 	UPROPERTY(Transient)
