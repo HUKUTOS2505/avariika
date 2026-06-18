@@ -1030,7 +1030,8 @@ void AAvaryoHUD::DrawHUD()
 	if (Vitals)
 	{
 		TArray<FString> Statuses;
-		if (Vitals->IsWounded())          Statuses.Add(TEXT("Ранен"));
+		if (Vitals->IsUnconscious())      Statuses.Add(TEXT("БЕЗ СОЗНАНИЯ"));
+		else if (Vitals->IsWounded())     Statuses.Add(TEXT("Ранен"));
 		if (Vitals->IsSmoking())          Statuses.Add(TEXT("Курит"));
 		if (Vitals->IsPanicking())        Statuses.Add(TEXT("Паникует"));
 		if (Vitals->GetBladder() > 70.f)  Statuses.Add(TEXT("Хочет в туалет"));

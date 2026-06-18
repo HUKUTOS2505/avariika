@@ -96,6 +96,7 @@ public:
 	UFUNCTION(BlueprintPure, Category="Vitals") float GetStamina() const { return Stamina; }
 	UFUNCTION(BlueprintPure, Category="Vitals") float GetBladder() const { return Bladder; }
 	UFUNCTION(BlueprintPure, Category="Vitals") bool IsWounded() const { return bWounded; }
+	UFUNCTION(BlueprintPure, Category="Vitals") bool IsUnconscious() const { return bUnconscious; }
 	UFUNCTION(BlueprintPure, Category="Vitals") bool IsSprinting() const { return bSprinting; }
 	UFUNCTION(BlueprintPure, Category="Vitals") bool IsPanicking() const { return Panic >= PanicThreshold; }
 	UFUNCTION(BlueprintPure, Category="Vitals") bool IsIncidentSlowed() const { return IncidentSlowRemaining > 0.f; }
@@ -281,6 +282,18 @@ protected:
 
 	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadOnly, Category="Vitals")
 	bool bWounded;
+
+	/** Вторая стадия: без сознания (не подняли вовремя или добили лежачего). Сам встать не может. */
+	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadOnly, Category="Vitals")
+	bool bUnconscious;
+
+	/** Сколько секунд осталось «истекать» в стадии Ранен до отруба (Без сознания). */
+	UPROPERTY(Replicated)
+	float WoundedBleedOut;
+
+	/** Окно от ранения до отруба, сек: успей подняться/подлечиться или дотащить напарника. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Vitals")
+	float WoundedBleedOutTime = 40.f;
 
 	/** Статус "испачкан" после инцидента (пока снимается только перезапуском). */
 	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadOnly, Category="Vitals")

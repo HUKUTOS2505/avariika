@@ -28,7 +28,8 @@ enum class EItemEffect : uint8
 	DeployTrap	UMETA(DisplayName = "Ставит растяжку-шумелку"),
 	ThrowBio	UMETA(DisplayName = "Метает биологический снаряд"),
 	DeployLight	UMETA(DisplayName = "Ставит переносной прожектор"),
-	Drink		UMETA(DisplayName = "Кофе/термос: восстанавливает выносливость")
+	Drink		UMETA(DisplayName = "Кофе/термос: восстанавливает выносливость"),
+	Ammonia		UMETA(DisplayName = "Нашатырь: будит без сознания + сбивает панику")
 };
 
 /**

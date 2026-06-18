@@ -30,6 +30,8 @@ UVitalsComponent::UVitalsComponent()
 	Stamina = 100.f;
 	Bladder = 0.f;
 	bWounded = false;
+	bUnconscious = false;
+	WoundedBleedOut = 0.f;
 	bSoiled = false;
 	IncidentSlowRemaining = 0.f;
 	WetRemaining = 0.f;
@@ -88,6 +90,8 @@ void UVitalsComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	DOREPLIFETIME(UVitalsComponent, Stamina);
 	DOREPLIFETIME(UVitalsComponent, Bladder);
 	DOREPLIFETIME(UVitalsComponent, bWounded);
+	DOREPLIFETIME(UVitalsComponent, bUnconscious);
+	DOREPLIFETIME(UVitalsComponent, WoundedBleedOut);
 	DOREPLIFETIME(UVitalsComponent, bSoiled);
 	DOREPLIFETIME(UVitalsComponent, IncidentSlowRemaining);
 	DOREPLIFETIME(UVitalsComponent, WetRemaining);
@@ -160,6 +164,13 @@ void UVitalsComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 	if (bWounded)
 	{
 		PanicDelta += PanicRiseWoundedPerSecond;
+	}
+
+	// Истечение в стадии Ранен → отруб (Без сознания), если не подняли/не подлечился вовремя.
+	if (bWounded && !bUnconscious && WoundedBleedOut > 0.f)
+	{
+		WoundedBleedOut = FMath::Max(0.f, WoundedBleedOut - DeltaTime);
+		if (WoundedBleedOut <= 0.f) { bUnconscious = true; }
 	}
 
 	// Перекур глушит страх: пассивный рост паники не действует,
@@ -366,7 +377,7 @@ void UVitalsComponent::AddSmell(float Amount)
 void UVitalsComponent::DebugSetVital(FName Which, float Value)
 {
 	const float V = FMath::Clamp(Value, 0.f, 100.f);
-	if (Which == TEXT("health"))       { Health = V; if (bWounded && Health >= WoundedReviveThreshold) { bWounded = false; OnRevived.Broadcast(); } }
+	if (Which == TEXT("health"))       { Health = V; if ((bWounded || bUnconscious) && Health >= WoundedReviveThreshold) { bWounded = false; bUnconscious = false; WoundedBleedOut = 0.f; OnRevived.Broadcast(); } }
 	else if (Which == TEXT("panic"))   { Panic = V; }
 	else if (Which == TEXT("stamina")) { Stamina = V; }
 	else if (Which == TEXT("bladder")) { Bladder = V; } // 100 → инцидент сработает на ближайшем тике
@@ -383,11 +394,19 @@ void UVitalsComponent::ApplyDamage(float Amount)
 	Health = FMath::Max(0.f, Health - Amount);
 	Panic = FMath::Min(100.f, Panic + Amount * 0.5f); // боль пугает
 
-	if (Health <= 0.f && !bWounded)
+	if (Health <= 0.f)
 	{
-		bWounded = true;
-		bSprinting = false;
-		OnWounded.Broadcast();
+		if (!bWounded)
+		{
+			bWounded = true;
+			bSprinting = false;
+			WoundedBleedOut = WoundedBleedOutTime; // окно: подняться/подлечиться/дотащить
+			OnWounded.Broadcast();
+		}
+		else if (!bUnconscious)
+		{
+			bUnconscious = true; // добили лежачего → отруб
+		}
 	}
 }
 
@@ -400,9 +419,11 @@ void UVitalsComponent::Heal(float Amount)
 
 	Health = FMath::Clamp(Health + Amount, 0.f, 100.f);
 
-	if (bWounded && Health >= WoundedReviveThreshold)
+	if ((bWounded || bUnconscious) && Health >= WoundedReviveThreshold)
 	{
 		bWounded = false;
+		bUnconscious = false;
+		WoundedBleedOut = 0.f;
 		OnRevived.Broadcast();
 	}
 }

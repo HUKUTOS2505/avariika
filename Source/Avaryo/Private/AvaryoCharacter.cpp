@@ -837,6 +837,10 @@ void AAvaryoCharacter::RefreshMoveSpeed()
 	{
 		Speed = CrawlSpeed; // ползём
 	}
+	if (VitalsComponent->IsUnconscious())
+	{
+		Speed = 0.f; // без сознания — не двигаемся, ждём подъёма
+	}
 
 	Move->MaxWalkSpeed = Speed;
 }
@@ -1753,6 +1757,21 @@ void AAvaryoCharacter::TickDrag(float DeltaSeconds)
 		DragNoiseAccum = 0.f;
 		MakeNoise(0.5f, this, GetActorLocation());
 	}
+
+	// Дотащили до Газели → полное оживление у машины (поднимает и «без сознания»).
+	if (DraggedTeammate->VitalsComponent)
+	{
+		for (TActorIterator<AExitZone> It(GetWorld()); It; ++It)
+		{
+			if (It->IsOverlappingActor(DraggedTeammate))
+			{
+				DraggedTeammate->VitalsComponent->Heal(100.f);
+				if (ARunState* Run = ARunState::Get(GetWorld())) { Run->AddRevive(this); }
+				ReleaseDraggedTeammate();
+				break;
+			}
+		}
+	}
 }
 
 bool AAvaryoCharacter::CanDragContinue() const
@@ -2119,6 +2138,7 @@ bool AAvaryoCharacter::CanApplyEffect(APickupItem* Item) const
 	case EItemEffect::ThrowBio:   return Item->Charges != 0;
 	case EItemEffect::DeployLight: return Item->Charges != 0;
 	case EItemEffect::Drink:      return VitalsComponent->GetStamina() < 99.f;
+	case EItemEffect::Ammonia:    return FindHealTarget() != nullptr || VitalsComponent->GetPanic() > 1.f;
 	default:                      return false;
 	}
 }
@@ -2176,6 +2196,28 @@ void AAvaryoCharacter::ApplyItemEffect(APickupItem* Item)
 			ConsumeCharge(Item);
 		}
 		break;
+	case EItemEffect::Ammonia:
+	{
+		// Нашатырь: будит лежачего тиммейта (оживляет) + сбивает панику. На себе — только бодрит.
+		AAvaryoCharacter* Target = FindHealTarget();
+		if (Target && Target != this && Target->VitalsComponent->IsWounded())
+		{
+			Target->VitalsComponent->Heal(40.f);        // поднять выше порога оживления
+			Target->VitalsComponent->ReducePanic(40.f);
+			if (BandageMontage) { MulticastPlayMontage(BandageMontage); }
+			if (!Target->VitalsComponent->IsWounded())
+			{
+				if (ARunState* Run = ARunState::Get(GetWorld())) { Run->AddRevive(this); }
+			}
+			ConsumeCharge(Item);
+		}
+		else
+		{
+			VitalsComponent->ReducePanic(40.f); // нюхнул сам — взбодрился
+			ConsumeCharge(Item);
+		}
+		break;
+	}
 	case EItemEffect::Recharge:
 		if (FlashlightComponent && FlashlightComponent->GetBatteryLevel() < 99.f)
 		{
@@ -2269,6 +2311,11 @@ void AAvaryoCharacter::BeginUseHeldItem()
 	if (!Item)
 	{
 		return;
+	}
+
+	if (VitalsComponent && VitalsComponent->IsUnconscious())
+	{
+		return; // без сознания — ничего не применяет (поднять может только напарник)
 	}
 
 	// Применение отменяет передачу
