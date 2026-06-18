@@ -15,9 +15,6 @@ Content/AmericanDrive/Meshes/SM_Entrepot_bois_02.uasset
 Content/AmericanDrive/Meshes/SM_PineTree_01a_PP.uasset
 Content/AmericanDrive/Meshes/SM_PineTree_02a_PP.uasset
 Content/AmericanDrive/Textures/T_Sofa01_N01.uasset
-Content/ResourcePack/Tileable_Materials/Landscape/RockWall/T_RockCliff_4K_Color.uasset
-Content/ResourcePack/Tileable_Materials/Landscape/RockWall/T_RockCliff_4K_Normal.uasset
-Content/ResourcePack/Tileable_Materials/Landscape/Snow/T_Snow_Normal.uasset
 
 # IDE
 .vs/
