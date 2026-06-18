@@ -12,6 +12,8 @@ class UNiagaraSystem;
 class UNiagaraComponent;
 class UAudioComponent;
 class UTextRenderComponent;
+class UDecalComponent;
+class UMaterialInterface;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnRepairFinished, ARepairable*, Repairable, AAvaryoCharacter*, FinishedBy);
 
@@ -664,17 +666,17 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Repairable|VFX", meta=(ClampMin="0.05"))
 	float WaterSprayScale = 1.0f;
 
-	/** Растущая поверхность разлива (плоскость-меш на полу, масштаб по радиусу затопления). */
+	/** Растущая лужа разлива — ДЕКАЛЬ на полу (повторяет пол, размер = CurrentFloodRadius = зоне удара). */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Repairable|VFX")
-	TObjectPtr<UStaticMeshComponent> FloodPlaneComp;
+	TObjectPtr<UDecalComponent> FloodDecalComp;
 
-	/** Полу-ширина меша лужи (см) при scale=1 — пересчёт радиуса в масштаб. Подкрути по глазам. */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Repairable|VFX", meta=(ClampMin="1.0"))
-	float FloodPlaneUnit = 100.f;
-
-	/** Z-смещение лужи от трубы (опустить на пол). */
+	/** Материал лужи (декаль-домен). Свапается в Details — можно поставить FluidFlux wet-decal и т.п. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Repairable|VFX")
-	float FloodPlaneZOffset = -40.f;
+	TObjectPtr<UMaterialInterface> FloodDecalMaterial;
+
+	/** Глубина проекции декали вниз (множитель). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Repairable|VFX")
+	float FloodDecalDepth = 300.f;
 
 	/** Масштаб искр замыкания (мелкие). */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Repairable|VFX", meta=(ClampMin="0.05"))

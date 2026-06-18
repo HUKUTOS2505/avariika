@@ -2,6 +2,7 @@
 
 #include "AvaryoCharacter.h"
 #include "Components/AudioComponent.h"
+#include "Components/DecalComponent.h"
 #include "Components/PointLightComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/TextRenderComponent.h"
@@ -58,20 +59,20 @@ ARepairable::ARepairable()
 	AlarmLight->SetAttenuationRadius(700.f);
 	AlarmLight->SetCastShadows(false); // дёшево: лампочек несколько, тени не нужны
 
-	// Поверхность разлива воды: горизонтальная плоскость-меш на полу, растёт по радиусу затопления.
-	FloodPlaneComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("FloodPlane"));
-	FloodPlaneComp->SetupAttachment(MeshComponent);
-	FloodPlaneComp->SetUsingAbsoluteRotation(true); // лужа всегда горизонтальна, не наклоняется с трубой
-	FloodPlaneComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	FloodPlaneComp->SetCastShadow(false);
-	FloodPlaneComp->SetHiddenInGame(true); // показываем только пока затоплено (в Tick на всех клиентах)
+	// Лужа разлива — ДЕКАЛЬ: проецируется вниз на пол (повторяет пол, без клиппинга/парения).
+	FloodDecalComp = CreateDefaultSubobject<UDecalComponent>(TEXT("FloodDecal"));
+	FloodDecalComp->SetupAttachment(MeshComponent);
+	FloodDecalComp->SetUsingAbsoluteRotation(true); // проекция строго вниз, не зависит от поворота трубы
+	FloodDecalComp->SetUsingAbsoluteScale(true);    // масштаб трубы не раздувает лужу
+	FloodDecalComp->SetRelativeRotation(FRotator(-90.f, 0.f, 0.f)); // смотрит вниз → проецирует на пол
+	FloodDecalComp->SetHiddenInGame(true);          // видна только пока затоплено (Tick, все клиенты)
 
 	DisplayName = FText::FromString(TEXT("Объект"));
 	RepairDuration = 8.f;
 	RequiredTool = NAME_None;
 	RepairRange = 350.f;
 	bLeaksGasWhenBroken = false;
-	GasRadius = 600.f; // щедрее: урон по газу покрывает видимую токсичную тучу (была 450 — «не всегда бьёт»)
+	GasRadius = 450.f; // зона запаха/взрыва (газ НЕ наносит HP-урон — бытовой газ не токсичен)
 	ExplosionDamage = 45.f;
 	bBroken = true;
 	RepairProgress = 0.f;
@@ -134,13 +135,15 @@ ARepairable::ARepairable()
 	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> WaterFXOld(TEXT("/Game/Realistic_Starter_VFX_Pack_Niagara_Vol2/Niagara/Water/NS_Water_1.NS_Water_1"));
 	if (WaterFXNew.Succeeded()) { WaterSprayFX = WaterFXNew.Object; }
 	else if (WaterFXOld.Succeeded()) { WaterSprayFX = WaterFXOld.Object; }
-	// Меш+материал лужи разлива (плоскость воды). Пак локальный — на свежем клоне лужи просто не будет.
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> FloodMesh(TEXT("/Game/IndustrialFactory/Effects/Water_01/sm_Water_01_01.sm_Water_01_01"));
-	static ConstructorHelpers::FObjectFinder<UMaterialInterface> FloodMat(TEXT("/Game/IndustrialFactory/Effects/Water_01/mi_Water_01_01.mi_Water_01_01"));
-	if (FloodPlaneComp && FloodMesh.Succeeded())
+	// Материал лужи (декаль-домен): водяная лужа на полу. Фолбэк — асфальтовая лужа (точно декаль). Паки локальные.
+	static ConstructorHelpers::FObjectFinder<UMaterialInterface> PuddleMat(TEXT("/Game/IndustrialFactory/Decals/Puddle_01/m_Puddle_01_01.m_Puddle_01_01"));
+	static ConstructorHelpers::FObjectFinder<UMaterialInterface> PuddleMatAlt(TEXT("/Game/ResidentialHouses/Materials/Decals/Puddles/MI_AsphaltPuddle01.MI_AsphaltPuddle01"));
+	if (PuddleMat.Succeeded()) { FloodDecalMaterial = PuddleMat.Object; }
+	else if (PuddleMatAlt.Succeeded()) { FloodDecalMaterial = PuddleMatAlt.Object; }
+	if (FloodDecalComp)
 	{
-		FloodPlaneComp->SetStaticMesh(FloodMesh.Object);
-		if (FloodMat.Succeeded()) { FloodPlaneComp->SetMaterial(0, FloodMat.Object); }
+		FloodDecalComp->DecalSize = FVector(FloodDecalDepth, 256.f, 256.f);
+		if (FloodDecalMaterial) { FloodDecalComp->SetDecalMaterial(FloodDecalMaterial); }
 	}
 	// Звук утечки газа ВЫКЛ по просьбе (нынешний — «свист-свист»); вернём с нормальным газ-эффектом
 	// static ConstructorHelpers::FObjectFinder<USoundBase> HissSnd(TEXT("/Game/Audio/SFX/GasHiss.GasHiss"));
@@ -558,9 +561,10 @@ void ARepairable::Tick(float DeltaSeconds)
 					// Без маски в облаке: надышался (запах → кашель в VitalsComponent), удушье (паника) и токсичный урон.
 					if (!It->HasGasMask())
 					{
-						It->VitalsComponent->AddSmell(8.f * GasDt);  // провонял газом (запах сам триггерит кашель)
-						It->VitalsComponent->AddPanic(10.f * GasDt); // нечем нормально дышать → паника
-						It->TakeDamage(5.f * GasDt, FDamageEvent(), nullptr, this); // токсично — урон по чуть-чуть (~5 HP/с)
+						// Бытовой газ НЕ токсичен — здоровью не вредит (опасность = ВЗРЫВ: искра/сварка/курение).
+						// Без маски только провонял + дискомфорт (запах меркаптана) → лёгкая паника. Маска фильтрует → спокоен.
+						It->VitalsComponent->AddSmell(8.f * GasDt);
+						It->VitalsComponent->AddPanic(8.f * GasDt);
 					}
 					// Открытый огонь рядом поджигает облако: курение ИЛИ электро-дуга сварки. Пена (огнетушитель) спасает.
 					if (GasSuppressedTime <= 0.f && ExplosionCooldown <= 0.f && (It->VitalsComponent->IsSmoking() || It->IsWelding()))
@@ -652,17 +656,16 @@ void ARepairable::Tick(float DeltaSeconds)
 		}
 	}
 
-	// Все машины: растущая поверхность разлива (по реплицируемому CurrentFloodRadius — растёт постепенно).
-	if (FloodPlaneComp)
+	// Все машины: растущая лужа-ДЕКАЛЬ. Footprint = CurrentFloodRadius (реплицируется) → видимая вода ТОЧНО = зоне удара.
+	if (FloodDecalComp)
 	{
 		const bool bFloodVis = IsFlooding();
-		FloodPlaneComp->SetHiddenInGame(!bFloodVis);
+		FloodDecalComp->SetHiddenInGame(!bFloodVis);
 		if (bFloodVis)
 		{
-			const FVector C = GetActorLocation();
-			FloodPlaneComp->SetWorldLocation(FVector(C.X, C.Y, C.Z + FloodPlaneZOffset));
-			const float Sc = CurrentFloodRadius / FMath::Max(FloodPlaneUnit, 1.f);
-			FloodPlaneComp->SetWorldScale3D(FVector(Sc, Sc, 1.f));
+			FloodDecalComp->SetWorldLocation(GetActorLocation()); // проекция вниз ляжет на пол под трубой
+			const float S = CurrentFloodRadius / 256.f; // base DecalSize.Y/Z=256 → footprint = радиусу
+			FloodDecalComp->SetWorldScale3D(FVector(1.f, S, S));
 		}
 	}
 
