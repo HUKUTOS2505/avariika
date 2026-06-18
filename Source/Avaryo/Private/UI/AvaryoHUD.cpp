@@ -145,6 +145,35 @@ void AAvaryoHUD::DrawHUD()
 		}
 	}
 
+	// ---------- Оглушение у генератора: ревёт рядом, наушников нет (дрожащая жёлтая виньетка + волна) ----------
+	// Визуальный аналог глухоты/дезориентации (аудио-глушение — позже). Паника копится в Character::Tick.
+	if (!Character->IsMonitorOpen() && Character->IsNearRunningGenerator() && !Character->HasHeadphones())
+	{
+		const float Time = GetWorld() ? GetWorld()->GetTimeSeconds() : 0.f;
+		const float Pulse = 0.5f + 0.5f * FMath::Sin(Time * 16.f);     // быстрая пульсация гула
+		const FLinearColor StunEdge(1.0f, 0.92f, 0.3f, 0.30f * Pulse); // мутно-жёлтый
+		const float BandX = SizeX * 0.13f;
+		const float BandY = SizeY * 0.13f;
+		DrawRect(StunEdge, 0.f, 0.f, SizeX, BandY);
+		DrawRect(StunEdge, 0.f, SizeY - BandY, SizeX, BandY);
+		DrawRect(StunEdge, 0.f, 0.f, BandX, SizeY);
+		DrawRect(StunEdge, SizeX - BandX, 0.f, BandX, SizeY);
+
+		// «Звуковая» волна поперёк экрана — дрожит от гула.
+		const float WaveY = SizeY * 0.27f;
+		for (int32 i = 0; i < 24; ++i)
+		{
+			const float X = (SizeX / 24.f) * i;
+			const float Y = WaveY + FMath::Sin(Time * 6.f + i * 0.5f) * 9.f * Pulse;
+			DrawRect(StunEdge, X, Y, SizeX / 24.f - 3.f, 3.f);
+		}
+
+		const float JitterX = FMath::Sin(Time * 31.f) * 3.f; // дрожащий текст
+		const float JitterY = FMath::Cos(Time * 27.f) * 2.f;
+		DrawText(TEXT("ОГЛУШЁН — нужны наушники"), FLinearColor(1.f, 0.95f, 0.7f),
+			SizeX * 0.5f - 150.f + JitterX, SizeY * 0.32f + JitterY, Font, 1.0f);
+	}
+
 	// ---------- Слепящая дуга: варит без сварочной маски (arc eye) ----------
 	// Холодный бело-голубой стробоскоп дуги заливает экран — варить вслепую трудно,
 	// это и есть давление «надень маску». Параллельно копится паника (см. Character::Tick).

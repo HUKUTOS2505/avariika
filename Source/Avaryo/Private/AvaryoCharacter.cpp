@@ -382,6 +382,13 @@ void AAvaryoCharacter::Tick(float DeltaSeconds)
 		VitalsComponent->AddPanic(15.f * DeltaSeconds);
 	}
 
+	// Ревущий генератор без наушников → оглушает: дискомфорт/дезориентация копит панику (сервер),
+	// дрожащий HUD-оверлей рисует AvaryoHUD по тем же условиям. Наушники достаточно держать в инвентаре.
+	if (VitalsComponent && IsNearRunningGenerator() && !HasHeadphones())
+	{
+		VitalsComponent->AddPanic(6.f * DeltaSeconds);
+	}
+
 	// Шаги — зацикленный цикл (звуки многошаговые): играем непрерывно во время движения,
 	// переключая ходьба/бег; стоим — стоп. На всех машинах по скорости каждого персонажа.
 	if (FootstepAudio)
@@ -2923,6 +2930,38 @@ bool AAvaryoCharacter::HasWeldingMask() const
 		if (Item && Item->ToolTag == FName(TEXT("WeldingMask")))
 		{
 			return true;
+		}
+	}
+	return false;
+}
+
+bool AAvaryoCharacter::HasHeadphones() const
+{
+	// Наушники «надеты», если лежат в любом слоте инвентаря (как другие СИЗ — носить в руках не нужно).
+	for (int32 i = 0; i < NumSlots; ++i)
+	{
+		const APickupItem* Item = GetItemInSlot(i);
+		if (Item && Item->ToolTag == FName(TEXT("EarMuffs")))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+bool AAvaryoCharacter::IsNearRunningGenerator() const
+{
+	// Работающий генератор = Starter-объект, который уже починен (гудит холостым ходом, см. ARepairable::Tick).
+	// Близко = в радиусе шума. Обход по шаблону GetGasReading.
+	static constexpr float DeafenRadius = 700.f; // ~7 м: рядом с ревущим движком
+	for (TActorIterator<ARepairable> It(GetWorld()); It; ++It)
+	{
+		if (It->GetMinigameType() == ERepairMinigameType::Starter && !It->IsBroken())
+		{
+			if (FVector::DistSquared(GetActorLocation(), It->GetActorLocation()) <= FMath::Square(DeafenRadius))
+			{
+				return true;
+			}
 		}
 	}
 	return false;
