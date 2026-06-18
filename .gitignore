@@ -123,6 +123,11 @@ Content/_Packs/
 Content/Movies/
 Content/Localization/
 Content/Splash/
+# Паки под БУДУЩИЕ карты (ТЗ: дом/завод/больница) — локально, как остальные паки.
+# Восстановлены на диск из git-истории bd76ef7 2026-06-18: HospitalCombo = карта
+# «Больница»; Construction_VOL2 = стройпропсы. Источник = git-история (в RawAssets их нет).
+Content/HospitalCombo/
+Content/Construction_VOL2/
 # CitizenNPC (1.1ГБ): память отмечала «трекать» — пока локально, как остальные паки.
 # Нужен бэкап на GitHub — скажи, заведу Git LFS / выборочный трекинг.
 Content/CitizenNPC/
