@@ -6,6 +6,7 @@
 
 class USphereComponent;
 class UStaticMeshComponent;
+class UTexture2D;
 
 /** Размер предмета: тяжёлый занимает руки, лёгкие лежат в четырёх быстрых слотах. */
 UENUM(BlueprintType)
@@ -62,6 +63,10 @@ public:
 	/** Название предмета для HUD ("[E] Подобрать: ..."). */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Pickup")
 	FText DisplayName;
+
+	/** Иконка для слота быстрого доступа (HUD). Пусто → в слоте рисуется текст (фолбэк). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Pickup")
+	TObjectPtr<UTexture2D> Icon;
 
 	/** Тяжёлый или лёгкий. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Pickup")

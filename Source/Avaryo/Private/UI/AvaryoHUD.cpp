@@ -998,32 +998,55 @@ void AAvaryoHUD::DrawHUD()
 			DrawRect(Accent, fx + fw - 2.f, fy, 2.f, fh);
 		}
 
-		FString ItemName;
-		if (Item)
+		const int32 SlotNum = SlotIndex == 0 ? 1 : SlotIndex + 1;
+		if (Item && Item->Icon)
 		{
-			ItemName = Item->DisplayName.ToString();
+			// Иконка предмета по центру ячейки; индекс/заряды — мелким по углам.
+			const float Pad = 6.f;
+			const float IconSz = FMath::Min(CellW - Pad * 2.f, PanelH - Pad * 2.f);
+			const float IconX = CellX + (CellW - IconSz) * 0.5f;
+			const float IconY = PanelY + (PanelH - IconSz) * 0.5f;
+			DrawTexture(Item->Icon, IconX, IconY, IconSz, IconSz, 0.f, 0.f, 1.f, 1.f,
+				bActive ? FLinearColor::White : FLinearColor(0.65f, 0.65f, 0.65f));
+			DrawText(FString::Printf(TEXT("%d"), SlotNum), bActive ? TextMain : TextDim, CellX + 6.f, PanelY + 4.f, Font, 0.8f);
 			if (Item->Charges >= 0)
 			{
-				ItemName += FString::Printf(TEXT(" (%d)"), Item->Charges);
+				DrawText(FString::Printf(TEXT("%d"), Item->Charges), TextDim, CellX + CellW - 24.f, PanelY + 4.f, Font, 0.8f);
 			}
-			if (Item->IsToggledOn())
+			else if (Item->IsToggledOn())
 			{
-				ItemName += TEXT(" [ВКЛ]");
+				DrawText(TEXT("ВКЛ"), Accent, CellX + CellW - 38.f, PanelY + 4.f, Font, 0.7f);
 			}
 		}
 		else
 		{
-			ItemName = SlotIndex == 0 ? TEXT("Нет") : TEXT("Пусто");
+			FString ItemName;
+			if (Item)
+			{
+				ItemName = Item->DisplayName.ToString();
+				if (Item->Charges >= 0)
+				{
+					ItemName += FString::Printf(TEXT(" (%d)"), Item->Charges);
+				}
+				if (Item->IsToggledOn())
+				{
+					ItemName += TEXT(" [ВКЛ]");
+				}
+			}
+			else
+			{
+				ItemName = SlotIndex == 0 ? TEXT("Нет") : TEXT("Пусто");
+			}
+
+			const FString Label = SlotIndex == 0
+				? FString::Printf(TEXT("[1] Тяж: %s"), *ItemName)
+				: FString::Printf(TEXT("[%d] %s"), SlotIndex + 1, *ItemName);
+
+			float W = 0.f, H = 0.f;
+			const float Scale = 1.0f;
+			GetTextSize(Label, W, H, Font, Scale);
+			DrawText(Label, bActive ? TextMain : TextDim, CellX + (CellW - W) * 0.5f, PanelY + (PanelH - H) * 0.5f, Font, Scale);
 		}
-
-		const FString Label = SlotIndex == 0
-			? FString::Printf(TEXT("[1] Тяж: %s"), *ItemName)
-			: FString::Printf(TEXT("[%d] %s"), SlotIndex + 1, *ItemName);
-
-		float W = 0.f, H = 0.f;
-		const float Scale = 1.0f;
-		GetTextSize(Label, W, H, Font, Scale);
-		DrawText(Label, bActive ? TextMain : TextDim, CellX + (CellW - W) * 0.5f, PanelY + (PanelH - H) * 0.5f, Font, Scale);
 	}
 
 	// ---------- Статусы (справа, над панелью) ----------
