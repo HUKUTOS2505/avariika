@@ -283,6 +283,15 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Repair|Starter")
 	int32 StarterPullsToFix;
 
+	/** Генератор: завести при ещё ЗАПИТАННОМ щитке рядом → короткое замыкание вместо успеха
+	 *  («наказание в момент успеха»). ВЫКЛ по умолчанию → ноль влияния на существующий контент. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Repair|Starter")
+	bool bGeneratorShortsIfPanelLive;
+
+	/** Радиус поиска запитанного щитка вокруг генератора, см. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Repair|Starter")
+	float GeneratorPanelScanRadius;
+
 	/** Урон от обратного удара шнура (рано отпустил / перетянул). */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Repair|Starter")
 	float StarterKickDamage;
@@ -532,6 +541,9 @@ protected:
 
 	/** Замыкание: ток по всем рядом, блокировка щитка. Только сервер. */
 	void ShortCircuit(AAvaryoCharacter* Culprit);
+
+	/** Есть ли рядом (в GeneratorPanelScanRadius) ещё ЗАПИТАННЫЙ щиток — для генератор-КЗ. */
+	bool HasLivePanelNearby() const;
 
 	/** Газ рванул: урон и паника по радиусу, очень громко, прогресс починки сгорает. */
 	void ExplodeGas(AAvaryoCharacter* Culprit);

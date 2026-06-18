@@ -14,6 +14,7 @@
 #include "Game/CompanyLedgerSubsystem.h"
 #include "GameFramework/PlayerController.h"
 #include "Items/APickupItem.h"
+#include "World/APowerSwitch.h"
 #include "Kismet/GameplayStatics.h"
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
@@ -207,6 +208,8 @@ ARepairable::ARepairable()
 	StarterWindowStart = 0.7f;
 	StarterWindowEnd = 0.9f;
 	StarterPullsToFix = 3;
+	bGeneratorShortsIfPanelLive = false; // выкл по умолчанию (ноль влияния на существующий контент)
+	GeneratorPanelScanRadius = 1500.f;
 	StarterKickDamage = 5.f;
 	StarterKickPanic = 5.f;
 	StarterGraceTension = 0.15f;
@@ -563,6 +566,7 @@ void ARepairable::Tick(float DeltaSeconds)
 					{
 						continue;
 					}
+					It->VitalsComponent->MakeWet(-1.f); // стоит в воде → промок (сапоги от мокроты не спасают)
 					if (bCanShock && !It->HasRubberBoots())
 					{
 						It->TakeDamage(FloodShockDamage, FDamageEvent(), nullptr, this);
@@ -1098,6 +1102,15 @@ void ARepairable::StarterKickback(AAvaryoCharacter* Who)
 
 void ARepairable::FinishRepair(AAvaryoCharacter* Who)
 {
+	// Генератор + рядом ещё ЗАПИТАННЫЙ щиток → короткое замыкание ВМЕСТО успеха.
+	// До сброса bBroken (ниже) — генератор остаётся сломан: сперва обесточь щиток, потом заводи.
+	if (bGeneratorShortsIfPanelLive && MinigameType == ERepairMinigameType::Starter
+		&& !bBotching && HasLivePanelNearby())
+	{
+		ShortCircuit(Who); // дуга по рядом стоящим + лок-аут + диспетчер прокомментирует
+		return;            // НЕ завершаем — bBroken остаётся true
+	}
+
 	const bool bWasBotch = bBotching;
 
 	if (IsMinigameRepair() && !bWasBotch && Who)
@@ -1164,6 +1177,19 @@ void ARepairable::ShortCircuit(AAvaryoCharacter* Culprit)
 	{
 		Run->NotifyShortCircuit(Culprit); // диспетчер прокомментирует
 	}
+}
+
+bool ARepairable::HasLivePanelNearby() const
+{
+	for (TActorIterator<APowerSwitch> It(GetWorld()); It; ++It)
+	{
+		if (It->IsPowerOn()
+			&& FVector::DistSquared(It->GetActorLocation(), GetActorLocation()) <= FMath::Square(GeneratorPanelScanRadius))
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 void ARepairable::SetBroken(bool bNewBroken)

@@ -74,6 +74,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Vitals")
 	void AddSmell(float Amount);
 
+	/** Промокнуть (стоял в потопе): держит статус «мокрый» Seconds сек (или WetDuration, если <0). Только сервер. */
+	UFUNCTION(BlueprintCallable, Category="Vitals")
+	void MakeWet(float Seconds = -1.f);
+
 	/** Дев-режим: жёстко выставить шкалу по имени (health/panic/stamina/bladder/smell). Только сервер. */
 	void DebugSetVital(FName Which, float Value);
 
@@ -91,6 +95,7 @@ public:
 	UFUNCTION(BlueprintPure, Category="Vitals") bool IsSprinting() const { return bSprinting; }
 	UFUNCTION(BlueprintPure, Category="Vitals") bool IsPanicking() const { return Panic >= PanicThreshold; }
 	UFUNCTION(BlueprintPure, Category="Vitals") bool IsIncidentSlowed() const { return IncidentSlowRemaining > 0.f; }
+	UFUNCTION(BlueprintPure, Category="Vitals") bool IsWet() const { return WetRemaining > 0.f; }
 	UFUNCTION(BlueprintPure, Category="Vitals") bool IsSoiled() const { return bSoiled; }
 	UFUNCTION(BlueprintPure, Category="Vitals") float GetSmell() const { return Smell; }
 	UFUNCTION(BlueprintPure, Category="Vitals") bool IsSmelly() const { return Smell >= SmellThreshold; }
@@ -176,6 +181,14 @@ public:
 	/** Скачок паники при инциденте. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Vitals|Bladder")
 	float IncidentPanicSpike;
+
+	/** Промок: сколько секунд держится статус «мокрый» после выхода из воды. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Vitals|Water")
+	float WetDuration;
+
+	/** Промок: паника/сек, пока мокрый (зябко/неуютно). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Vitals|Water")
+	float WetPanicPerSecond;
 
 	/** HP, выше которого раненый встаёт на ноги. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Vitals|Health")
@@ -271,6 +284,10 @@ protected:
 
 	UPROPERTY(Replicated)
 	float IncidentSlowRemaining;
+
+	/** Сколько секунд осталось быть «мокрым» (промок в потопе). */
+	UPROPERTY(Replicated)
+	float WetRemaining;
 
 	UPROPERTY(Replicated)
 	bool bSprinting;

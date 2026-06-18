@@ -409,6 +409,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Movement")
 	float IncidentSlowMultiplier;
 
+	/** Множитель скорости, пока «промок» (стоял в потопе) — хлюпаешь, идёшь медленнее. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Movement")
+	float WetMoveMultiplier;
+
 	/** Радиус, в котором аптечкой можно поднять раненого тиммейта. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Inventory")
 	float ReviveRange;

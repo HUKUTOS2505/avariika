@@ -32,6 +32,7 @@ UVitalsComponent::UVitalsComponent()
 	bWounded = false;
 	bSoiled = false;
 	IncidentSlowRemaining = 0.f;
+	WetRemaining = 0.f;
 	bSprinting = false;
 
 	PanicRiseInDarkPerSecond = 1.5f;
@@ -59,6 +60,8 @@ UVitalsComponent::UVitalsComponent()
 	BladderPanicMultiplier = 2.f;
 	IncidentSlowDuration = 15.f;
 	IncidentPanicSpike = 25.f;
+	WetDuration = 6.f;
+	WetPanicPerSecond = 1.5f;
 
 	WoundedReviveThreshold = 25.f;
 
@@ -87,9 +90,17 @@ void UVitalsComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	DOREPLIFETIME(UVitalsComponent, bWounded);
 	DOREPLIFETIME(UVitalsComponent, bSoiled);
 	DOREPLIFETIME(UVitalsComponent, IncidentSlowRemaining);
+	DOREPLIFETIME(UVitalsComponent, WetRemaining);
 	DOREPLIFETIME(UVitalsComponent, bSprinting);
 	DOREPLIFETIME(UVitalsComponent, SmokingRemaining);
 	DOREPLIFETIME(UVitalsComponent, Smell);
+}
+
+void UVitalsComponent::MakeWet(float Seconds)
+{
+	if (!IsVitalAuthority()) { return; }
+	const float Dur = (Seconds > 0.f) ? Seconds : WetDuration;
+	WetRemaining = FMath::Max(WetRemaining, Dur);
 }
 
 void UVitalsComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -233,6 +244,12 @@ void UVitalsComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 	if (IncidentSlowRemaining > 0.f)
 	{
 		IncidentSlowRemaining = FMath::Max(0.f, IncidentSlowRemaining - DeltaTime);
+	}
+
+	if (WetRemaining > 0.f)
+	{
+		WetRemaining = FMath::Max(0.f, WetRemaining - DeltaTime);
+		Panic = FMath::Min(100.f, Panic + WetPanicPerSecond * DeltaTime); // мокро и зябко → лёгкая паника
 	}
 
 	// --- Запах / амбре ---

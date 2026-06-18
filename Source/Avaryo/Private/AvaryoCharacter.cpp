@@ -78,6 +78,7 @@ AAvaryoCharacter::AAvaryoCharacter()
 	HeavyCarryMultiplier = 0.65f;
 	CrawlSpeed = 120.f;
 	IncidentSlowMultiplier = 0.7f;
+	WetMoveMultiplier = 0.82f;
 
 	DragSpeedMultiplier = 0.55f;
 	DragNoiseAccum = 0.f;
@@ -808,6 +809,10 @@ void AAvaryoCharacter::RefreshMoveSpeed()
 	if (VitalsComponent->IsIncidentSlowed())
 	{
 		Speed *= IncidentSlowMultiplier;
+	}
+	if (VitalsComponent->IsWet())
+	{
+		Speed *= WetMoveMultiplier; // промок — хлюпаешь медленнее
 	}
 	if (bStumbling)
 	{
