@@ -69,4 +69,6 @@ protected:
 
 	/** Текущий угол распахивания (лерпится в Tick на всех машинах). */
 	float CurrentAngle = 0.f;
+
+	float LastToggleTime = 0.f; // дебаунс E (анти-спам распахивания/звука)
 };

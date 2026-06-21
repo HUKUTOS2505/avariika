@@ -78,6 +78,9 @@ void APowerSwitch::ToggleBy(AAvaryoCharacter* /*Who*/)
 	{
 		return;
 	}
+	const float Now = GetWorld() ? GetWorld()->GetTimeSeconds() : 0.f;
+	if (Now - LastToggleTime < 0.4f) { return; } // дебаунс: анти-спам строб света / ре-электрификация воды мешингом E
+	LastToggleTime = Now;
 	bPowerOn = !bPowerOn;
 	ApplyToFloods();
 	if (ClickSound)

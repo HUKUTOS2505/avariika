@@ -147,8 +147,8 @@ public:
 	/** Поднял раненого тиммейта аптечкой. Только сервер. */
 	void AddRevive(AAvaryoCharacter* Who);
 
-	/** Схватился тащить раненого. Только сервер. */
-	void AddDrag(AAvaryoCharacter* Who);
+	/** Схватился тащить раненого. Victim — кого тащат (для анти-фарма grab/release). Только сервер. */
+	void AddDrag(AAvaryoCharacter* Who, AAvaryoCharacter* Victim = nullptr);
 
 	/** Толкнул товарища (§18). Только сервер. */
 	void AddShove(AAvaryoCharacter* Who);
@@ -332,6 +332,12 @@ protected:
 
 	/** Сервер: фонарям каких монтёров уже выдали дешёвый статус (раздаём один раз). */
 	TSet<TWeakObjectPtr<AAvaryoCharacter>> CheapGearApplied;
+
+	/** Сервер: какие объекты уже засчитаны в оплату (Repairs) — не платим за повторный ремонт того же щитка. */
+	TSet<TWeakObjectPtr<ARepairable>> CountedRepairs;
+
+	/** Сервер: каких раненых уже засчитали за драг — анти-фарм grab/release. */
+	TSet<TWeakObjectPtr<AAvaryoCharacter>> DragCreditedVictims;
 
 	/** Статистика всех монтёров (по мере появления персонажей). */
 	UPROPERTY(Replicated)

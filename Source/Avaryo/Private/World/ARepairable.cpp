@@ -1022,8 +1022,9 @@ float ARepairable::GetEffectiveGreenHalf() const
 void ARepairable::GetEffectiveStarterWindow(float& OutStart, float& OutEnd) const
 {
 	const float Center = (StarterWindowStart + StarterWindowEnd) * 0.5f;
-	const float Half = (StarterWindowEnd - StarterWindowStart) * 0.5f
-		* (1.f - 0.5f * PanicHardenScale * RepairerPanic01()) * RepairerToolQuality();
+	// Floor 0.04 — как у GetEffectiveGreenHalf: паника+дешёвый инструмент не схлопывают окно рывка ниже досягаемого.
+	const float Half = FMath::Max((StarterWindowEnd - StarterWindowStart) * 0.5f
+		* (1.f - 0.5f * PanicHardenScale * RepairerPanic01()) * RepairerToolQuality(), 0.04f);
 	OutStart = Center - Half;
 	OutEnd = Center + Half;
 }
@@ -1361,6 +1362,7 @@ void ARepairable::ExplodeGas(AAvaryoCharacter* Culprit)
 			&& FVector::DistSquared(It->GetActorLocation(), GetActorLocation()) <= FMath::Square(BlastRadius * 1.5f))
 		{
 			It->VitalsComponent->AddPanic(30.f);
+			It->VitalsComponent->Ignite(); // взрывом обдаёт пламенем — загораешься (тушить водой/огнетушителем)
 			It->FumbleHeavy(); // взрывом вышибает сварочник из рук
 		}
 	}

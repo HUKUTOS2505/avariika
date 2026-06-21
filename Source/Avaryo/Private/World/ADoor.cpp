@@ -75,6 +75,9 @@ void ADoor::Tick(float DeltaSeconds)
 void ADoor::ToggleBy(AAvaryoCharacter* /*Who*/)
 {
 	if (!HasAuthority()) { return; }
+	const float Now = GetWorld() ? GetWorld()->GetTimeSeconds() : 0.f;
+	if (Now - LastToggleTime < 0.4f) { return; } // дебаунс: не дать мешить E (ре-свинг полотна + спам звука)
+	LastToggleTime = Now;
 	bOpen = !bOpen;
 	if (OpenSound) { UGameplayStatics::PlaySoundAtLocation(this, OpenSound, GetActorLocation()); }
 	// сервер тоже сразу двигает (клиенты — через OnRep + Tick)

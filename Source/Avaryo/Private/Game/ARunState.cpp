@@ -336,6 +336,9 @@ void ARunState::BeginPlay()
 		? AllRepairables.Num()
 		: FMath::RandRange(2, AllRepairables.Num());
 
+	CountedRepairs.Empty();        // новый забег — заново считаем оплату за объекты и драги
+	DragCreditedVictims.Empty();
+
 	for (int32 i = 0; i < AllRepairables.Num(); ++i)
 	{
 		ARepairable* Repairable = AllRepairables[i];
@@ -640,12 +643,17 @@ void ARunState::AddRevive(AAvaryoCharacter* Who)
 	}
 }
 
-void ARunState::AddDrag(AAvaryoCharacter* Who)
+void ARunState::AddDrag(AAvaryoCharacter* Who, AAvaryoCharacter* Victim)
 {
-	if (HasAuthority() && Who)
+	if (!HasAuthority() || !Who) { return; }
+	// Анти-фарм grab/release: каждого раненого засчитываем за драг ОДИН раз за забег
+	// (раньше +500 капало на каждый захват — мэшь E на лежачем давал бесконечные деньги).
+	if (Victim)
 	{
-		++FindOrAddStats(Who).Drags;
+		if (DragCreditedVictims.Contains(Victim)) { return; }
+		DragCreditedVictims.Add(Victim);
 	}
+	++FindOrAddStats(Who).Drags;
 }
 
 void ARunState::AddShove(AAvaryoCharacter* Who)
@@ -885,8 +893,11 @@ void ARunState::OnObjectiveRepaired(ARepairable* Repairable, AAvaryoCharacter* F
 		return;
 	}
 
-	if (FinishedBy)
+	// Платим за РАЗНЫЕ объекты, а не за каждый OnRepairFinished: щиток с перегрузкой ломается заново,
+	// и без дедупа камп щитка = бесконечный +1500/ремонт (и тривиальный обход квоты диспетчера).
+	if (FinishedBy && Repairable && !CountedRepairs.Contains(Repairable))
 	{
+		CountedRepairs.Add(Repairable);
 		++FindOrAddStats(FinishedBy).Repairs;
 	}
 

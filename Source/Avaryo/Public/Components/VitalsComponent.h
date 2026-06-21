@@ -82,6 +82,15 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Vitals")
 	void MakeWet(float Seconds = -1.f);
 
+	/** Загореться (взрыв газа / открытый огонь): горит Seconds сек (или BurnDuration). DoT + паника + вонь палёным.
+	 *  Мокрый/в воде не загорается. Только сервер. */
+	UFUNCTION(BlueprintCallable, Category="Vitals")
+	void Ignite(float Seconds = -1.f);
+
+	/** Потушить огонь (огнетушитель / прыгнул в воду / промок). Только сервер. */
+	UFUNCTION(BlueprintCallable, Category="Vitals")
+	void Extinguish();
+
 	/** Дев-режим: жёстко выставить шкалу по имени (health/panic/stamina/bladder/smell). Только сервер. */
 	void DebugSetVital(FName Which, float Value);
 
@@ -101,6 +110,7 @@ public:
 	UFUNCTION(BlueprintPure, Category="Vitals") bool IsPanicking() const { return Panic >= PanicThreshold; }
 	UFUNCTION(BlueprintPure, Category="Vitals") bool IsIncidentSlowed() const { return IncidentSlowRemaining > 0.f; }
 	UFUNCTION(BlueprintPure, Category="Vitals") bool IsWet() const { return WetRemaining > 0.f; }
+	UFUNCTION(BlueprintPure, Category="Vitals") bool IsBurning() const { return BurnRemaining > 0.f; }
 	UFUNCTION(BlueprintPure, Category="Vitals") bool IsExhaustStunned() const { return ExhaustStunRemaining > 0.f; }
 	UFUNCTION(BlueprintPure, Category="Vitals") bool IsSoiled() const { return bSoiled; }
 	UFUNCTION(BlueprintPure, Category="Vitals") float GetSmell() const { return Smell; }
@@ -196,6 +206,18 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Vitals|Water")
 	float WetPanicPerSecond;
 
+	/** Горит: сколько секунд горит после поджига, если не потушить. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Vitals|Fire")
+	float BurnDuration;
+
+	/** Горит: урон/сек (DoT). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Vitals|Fire")
+	float BurnDamagePerSecond;
+
+	/** Горит: паника/сек, пока горишь (мечешься). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Vitals|Fire")
+	float BurnPanicPerSecond;
+
 	/** HP, выше которого раненый встаёт на ноги. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Vitals|Health")
 	float WoundedReviveThreshold;
@@ -271,6 +293,7 @@ protected:
 	float HiccupAccum = 0.f;    // таймер икоты при полном пузыре
 	float WindedRemaining = 0.f; // секунды отдышки после спринта-в-ноль
 	float WindedNoiseAccum = 0.f; // таймер шумного выдоха
+	float BurnNoiseAccum = 0.f;  // таймер шума, пока горишь (мечешься/кричишь)
 
 	/** Остаток стана изнурения. Реплик. — скорость считается и у владельца. */
 	UPROPERTY(Replicated)
@@ -314,6 +337,10 @@ protected:
 	/** Сколько секунд осталось быть «мокрым» (промок в потопе). */
 	UPROPERTY(Replicated)
 	float WetRemaining;
+
+	/** Сколько секунд осталось гореть (статус «Горит»). */
+	UPROPERTY(Replicated)
+	float BurnRemaining;
 
 	UPROPERTY(Replicated)
 	bool bSprinting;

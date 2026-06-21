@@ -1107,6 +1107,7 @@ void AAvaryoHUD::DrawHUD()
 		if (Vitals->IsIncidentSlowed())   Statuses.Add(TEXT("Санитарный инцидент!"));
 		else if (Vitals->IsSoiled())      Statuses.Add(TEXT("Испачкан"));
 		if (Vitals->IsWet())              Statuses.Add(TEXT("Промок"));
+		if (Vitals->IsBurning())          Statuses.Add(TEXT("ГОРИТ! [вода/огнетушитель]"));
 		if (Vitals->IsSmelly())           Statuses.Add(TEXT("Воняет"));
 
 		// В газовом облаке — не курить! (берём из кэша задач RunState, без обхода всех акторов каждый кадр)

@@ -35,6 +35,7 @@ UVitalsComponent::UVitalsComponent()
 	bSoiled = false;
 	IncidentSlowRemaining = 0.f;
 	WetRemaining = 0.f;
+	BurnRemaining = 0.f;
 	bSprinting = false;
 
 	PanicRiseInDarkPerSecond = 1.5f;
@@ -64,6 +65,9 @@ UVitalsComponent::UVitalsComponent()
 	IncidentPanicSpike = 25.f;
 	WetDuration = 6.f;
 	WetPanicPerSecond = 1.5f;
+	BurnDuration = 6.f;
+	BurnDamagePerSecond = 6.f;
+	BurnPanicPerSecond = 8.f;
 
 	WoundedReviveThreshold = 25.f;
 
@@ -96,6 +100,7 @@ void UVitalsComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	DOREPLIFETIME(UVitalsComponent, bSoiled);
 	DOREPLIFETIME(UVitalsComponent, IncidentSlowRemaining);
 	DOREPLIFETIME(UVitalsComponent, WetRemaining);
+	DOREPLIFETIME(UVitalsComponent, BurnRemaining);
 	DOREPLIFETIME(UVitalsComponent, bSprinting);
 	DOREPLIFETIME(UVitalsComponent, SmokingRemaining);
 	DOREPLIFETIME(UVitalsComponent, Smell);
@@ -106,6 +111,20 @@ void UVitalsComponent::MakeWet(float Seconds)
 	if (!IsVitalAuthority()) { return; }
 	const float Dur = (Seconds > 0.f) ? Seconds : WetDuration;
 	WetRemaining = FMath::Max(WetRemaining, Dur);
+}
+
+void UVitalsComponent::Ignite(float Seconds)
+{
+	if (!IsVitalAuthority()) { return; }
+	if (WetRemaining > 0.f) { return; } // мокрый/только из воды — не загорается
+	const float Dur = (Seconds > 0.f) ? Seconds : BurnDuration;
+	BurnRemaining = FMath::Max(BurnRemaining, Dur);
+}
+
+void UVitalsComponent::Extinguish()
+{
+	if (!IsVitalAuthority()) { return; }
+	BurnRemaining = 0.f;
 }
 
 void UVitalsComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -244,20 +263,23 @@ void UVitalsComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 		}
 	}
 
-	// --- Туалет ---
-	const float BladderRise = BladderRisePerSecond * (IsPanicking() ? BladderPanicMultiplier : 1.f);
-	Bladder += BladderRise * DeltaTime;
-	if (Bladder >= 100.f)
+	// --- Туалет --- (в хабе/safe-zone пузырь НЕ копится: отдыхаешь, инцидентов там нет — как и паники)
+	if (!bSafeZone)
 	{
-		// Санитарный инцидент: громко, стыдно, попадёт в отчёт
-		Bladder = 0.f;
-		bSoiled = true;
-		IncidentSlowRemaining = IncidentSlowDuration;
-		Panic = FMath::Min(100.f, Panic + IncidentPanicSpike);
-		Smell = FMath::Min(100.f, Smell + SmellIncidentJump); // и амбре теперь надолго
-		Char->MakeNoise(1.f, Char, Char->GetActorLocation()); // очень громко и стыдно
-		Char->RegisterSelfNoise(1.f);
-		OnSanitaryIncident.Broadcast();
+		const float BladderRise = BladderRisePerSecond * (IsPanicking() ? BladderPanicMultiplier : 1.f);
+		Bladder += BladderRise * DeltaTime;
+		if (Bladder >= 100.f)
+		{
+			// Санитарный инцидент: громко, стыдно, попадёт в отчёт
+			Bladder = 0.f;
+			bSoiled = true;
+			IncidentSlowRemaining = IncidentSlowDuration;
+			if (CVarAvNoPanic.GetValueOnGameThread() == 0) { Panic = FMath::Min(100.f, Panic + IncidentPanicSpike); } // уважает тест-тумблер
+			Smell = FMath::Min(100.f, Smell + SmellIncidentJump); // и амбре теперь надолго (снимается визитом в туалет — см. RelieveBladder)
+			Char->MakeNoise(1.f, Char, Char->GetActorLocation()); // очень громко и стыдно
+			Char->RegisterSelfNoise(1.f);
+			OnSanitaryIncident.Broadcast();
+		}
 	}
 
 	if (IncidentSlowRemaining > 0.f)
@@ -268,7 +290,34 @@ void UVitalsComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 	if (WetRemaining > 0.f)
 	{
 		WetRemaining = FMath::Max(0.f, WetRemaining - DeltaTime);
-		Panic = FMath::Min(100.f, Panic + WetPanicPerSecond * DeltaTime); // мокро и зябко → лёгкая паника
+		if (!bSafeZone && CVarAvNoPanic.GetValueOnGameThread() == 0)
+		{
+			Panic = FMath::Min(100.f, Panic + WetPanicPerSecond * DeltaTime); // мокро и зябко → лёгкая паника (уважает NoPanic/hub)
+		}
+	}
+
+	// --- Горит ---
+	if (BurnRemaining > 0.f)
+	{
+		if (WetRemaining > 0.f)
+		{
+			// Вода/мокрота тушит огонь — гаснет быстро (×6)
+			BurnRemaining = FMath::Max(0.f, BurnRemaining - DeltaTime * 6.f);
+		}
+		else
+		{
+			BurnRemaining = FMath::Max(0.f, BurnRemaining - DeltaTime);
+			ApplyDamage(BurnDamagePerSecond * DeltaTime);                      // DoT (сам гейтит инвул/wounded)
+			Panic = FMath::Min(100.f, Panic + BurnPanicPerSecond * DeltaTime); // мечешься в панике
+			Smell = FMath::Min(100.f, Smell + 4.f * DeltaTime);                // палёным воняет
+			BurnNoiseAccum += DeltaTime;
+			if (BurnNoiseAccum >= 0.5f)
+			{
+				BurnNoiseAccum = 0.f;
+				Char->MakeNoise(0.7f, Char, Char->GetActorLocation()); // кричишь/мечешься — слышно
+				Char->RegisterSelfNoise(0.7f);
+			}
+		}
 	}
 
 	// --- Запах / амбре ---
@@ -389,7 +438,7 @@ void UVitalsComponent::DebugSetVital(FName Which, float Value)
 	else if (Which == TEXT("panic"))   { Panic = V; }
 	else if (Which == TEXT("stamina")) { Stamina = V; }
 	else if (Which == TEXT("bladder")) { Bladder = V; } // 100 → инцидент сработает на ближайшем тике
-	else if (Which == TEXT("smell"))   { Smell = V; }
+	else if (Which == TEXT("smell"))   { Smell = V; if (V < SmellThreshold) { bSoiled = false; } } // дев-сброс «испачкан»
 }
 
 void UVitalsComponent::ApplyDamage(float Amount)
@@ -400,7 +449,10 @@ void UVitalsComponent::ApplyDamage(float Amount)
 	}
 
 	Health = FMath::Max(0.f, Health - Amount);
-	Panic = FMath::Min(100.f, Panic + Amount * 0.5f); // боль пугает
+	if (CVarAvNoPanic.GetValueOnGameThread() == 0)
+	{
+		Panic = FMath::Min(100.f, Panic + Amount * 0.5f); // боль пугает (уважает тест-тумблер Av.NoPanic)
+	}
 
 	if (Health <= 0.f)
 	{
@@ -471,6 +523,13 @@ void UVitalsComponent::RelieveBladder()
 {
 	if (!IsVitalAuthority()) { return; }
 	Bladder = 0.f;
+	// Полный визит в биотуалет = заодно привёл себя в порядок: снимаем «испачкан» и сбиваем амбре ниже порога.
+	// (иначе bSoiled висел весь забег — вечный кашель/вонь/аура паники без возможности отмыться.)
+	if (bSoiled)
+	{
+		bSoiled = false;
+		Smell = FMath::Min(Smell, SmellThreshold - 5.f);
+	}
 }
 
 void UVitalsComponent::DrainBladder(float Amount)

@@ -577,7 +577,7 @@ void AAvaryoCharacter::Tick(float DeltaSeconds)
 			if (HeavySlot)
 			{
 				ActiveSlot = 0;
-				DropItem();
+				ReleaseHeldItem(/*bThrown=*/false); // напрямую: DropItem в туалете/минигейме делает early-return и НЕ роняет тяжёлое
 			}
 		}
 		bWasWounded = bWoundedNow;
@@ -1414,7 +1414,7 @@ void AAvaryoCharacter::InteractPressedAuth()
 			DragNoiseAccum = 0.f;
 			if (ARunState* Run = ARunState::Get(GetWorld()))
 			{
-				Run->AddDrag(this); // эвакуация — в «Акт»
+				Run->AddDrag(this, Wounded); // эвакуация — в «Акт» (засчитывается раз на раненого)
 			}
 		}
 	}
@@ -2495,7 +2495,8 @@ void AAvaryoCharacter::OnRep_Offering()
 void AAvaryoCharacter::TickUseCast(float DeltaSeconds)
 {
 	APickupItem* Item = GetHeldItem();
-	if (!Item || Item->ItemEffect == EItemEffect::None || Item->ItemEffect == EItemEffect::Extinguish)
+	if (!Item || Item->ItemEffect == EItemEffect::None || Item->ItemEffect == EItemEffect::Extinguish
+		|| (VitalsComponent && VitalsComponent->IsUnconscious())) // вырубился посреди каста — без hands-free самоподъёма
 	{
 		CancelUseCast();
 		return;
@@ -2533,9 +2534,9 @@ void AAvaryoCharacter::StopSpraying()
 void AAvaryoCharacter::TickSpray(float DeltaSeconds)
 {
 	APickupItem* Item = GetHeldItem();
-	if (!Item || Item->ItemEffect != EItemEffect::Extinguish || Item->Charges <= 0)
+	if (!Item || Item->ItemEffect != EItemEffect::Extinguish || Item->Charges == 0)
 	{
-		StopSpraying();
+		StopSpraying(); // Charges == -1 = бесконечный (а не пустой) — раньше `<= 0` глушил такой баллон сразу
 		return;
 	}
 
@@ -2617,6 +2618,16 @@ void AAvaryoCharacter::TickSpray(float DeltaSeconds)
 		}
 		if (RepIt->IsLeakingGas()) { RepIt->SuppressGas(2.0f); } // держится пару секунд после струи
 		if (RepIt->IsOnFire())     { RepIt->ExtinguishFire(); }  // струя гасит пламя
+	}
+
+	// Пеной тушим и ГОРЯЩИХ монтёров (себя или рядом) — статус «Горит» спадает
+	for (TActorIterator<AAvaryoCharacter> ChIt(GetWorld()); ChIt; ++ChIt)
+	{
+		if (ChIt->VitalsComponent && ChIt->VitalsComponent->IsBurning()
+			&& FVector::DistSquared(ChIt->GetActorLocation(), SprayPoint) <= FMath::Square(450.f))
+		{
+			ChIt->VitalsComponent->Extinguish();
+		}
 	}
 }
 
