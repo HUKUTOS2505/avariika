@@ -52,6 +52,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Bio")
 	float LingerTime;
 
+	/** Предохранитель: не осел и не попал за столько секунд (катится/застрял) — принудительный шлепок. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Bio")
+	float MaxAirborneTime;
+
 	/** Запустить снаряд из точки по направлению (сервер). */
 	void Launch(const FVector& Direction);
 
@@ -60,6 +64,7 @@ protected:
 	float SettledTime;   // сколько времени снаряд почти не движется
 	float LingerRemaining;
 	float StinkNoiseAccum;
+	float AirborneTime;  // сколько летит/катится не осев — для предохранителя MaxAirborneTime
 
 	/** Шлёпок: запах + паника по радиусу, шум, реплика диспетчера. */
 	void Splat(AAvaryoCharacter* DirectHit);

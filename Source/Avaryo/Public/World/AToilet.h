@@ -24,6 +24,7 @@ public:
 	AToilet();
 
 	virtual void Tick(float DeltaSeconds) override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	/** Кабинка (куб-заглушка; меш можно заменить в Blueprint). */

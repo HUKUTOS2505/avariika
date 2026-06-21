@@ -422,6 +422,19 @@ void ARepairable::Tick(float DeltaSeconds)
 		LockoutRemaining = FMath::Max(LockoutRemaining - DeltaSeconds, 0.f);
 	}
 
+	// Сервер: чинящий пешка исчезла (дисконнект/уничтожение пешки) — Repairer занулился, но флаги
+	// этапа остались бы true и фантомили бы луп FillAudioComp + HUD (EndRepairBy сюда уже не доходит).
+	if (HasAuthority() && !Repairer
+		&& (bStarterPulling || bDoingPrereqHold || bPrereqAutoFilling || bDoingPrereqMinigame || bBotching))
+	{
+		bStarterPulling = false;
+		bDoingPrereqHold = false;
+		bPrereqAutoFilling = false;
+		bDoingPrereqMinigame = false;
+		bBotching = false;
+		StarterTension = 0.f;
+	}
+
 	// Сервер: тикаем починку
 	if (HasAuthority() && Repairer)
 	{

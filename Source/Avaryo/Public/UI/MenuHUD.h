@@ -6,6 +6,7 @@
 
 class UAvariikaOnlineSubsystem;
 class UFont;
+class UUserWidget;
 
 /**
  * Главное меню «Аварийки» — рисуется на Canvas в нашем стиле (тёмный фон,
@@ -34,6 +35,9 @@ protected:
 
 	UAvariikaOnlineSubsystem* GetOnline() const;
 	void OpenSettings();
+
+	/** Открытый оверлей настроек (Easy Options) — чтобы не плодить дубли и гасить кнопки меню под ним. */
+	TWeakObjectPtr<UUserWidget> SettingsWidget;
 
 	/** Рисует кнопку-панель с оранжевой рамкой + регистрирует хитбокс. */
 	void DrawButton(const FString& Label, float CenterX, float Y, float Width, float Height, FName BoxName, UFont* Font);

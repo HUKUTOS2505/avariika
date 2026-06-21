@@ -76,6 +76,13 @@ void AMenuHUD::DrawHUD()
 	GetTextSize(Sub, TW, TH, Med, 1.1f);
 	DrawText(Sub, Grey, SX * 0.5f - TW * 0.5f, SY * 0.16f + 64.f, Med, 1.1f);
 
+	// Пока открыт оверлей настроек — не рисуем кнопки меню (иначе их хитбоксы живут под оверлеем,
+	// и клик по прозрачной зоне настроек проваливается на кнопку за ними).
+	if (SettingsWidget.IsValid() && SettingsWidget->IsInViewport())
+	{
+		return;
+	}
+
 	const float CX = SX * 0.5f;
 	const float BW = 380.f, BH = 58.f, Gap = 16.f;
 	float Y = SY * 0.42f;
@@ -199,8 +206,14 @@ void AMenuHUD::OpenSettings()
 		return;
 	}
 
+	if (SettingsWidget.IsValid() && SettingsWidget->IsInViewport())
+	{
+		return; // уже открыто — клик по «Настройки» не должен плодить дубли в вьюпорте (была утечка)
+	}
+
 	if (UUserWidget* Widget = CreateWidget<UUserWidget>(PC, WidgetClass))
 	{
 		Widget->AddToViewport(100);
+		SettingsWidget = Widget;
 	}
 }

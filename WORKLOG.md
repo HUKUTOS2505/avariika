@@ -51,6 +51,17 @@
 (85 uasset, robocopy), ре-скан registry. Запуск: ПКМ на `/Game/DrCGLevelDesignTools/Blueprints/WBP_DrCGLevelDesignTools`
 → Run Editor Utility Widget (Align/Distribute/Scatter/Array/Randomize — для ручной раскладки мебели).
 
+**ФИКСЫ БАГОВ (юзер: «открыть закрывать делай ребилд и те 10 багов»; редактор закрывал САМ, стройку сохранил):** исправлены
+ВСЕ 12 из `CODE_AUDIT.md`. #1 (PowerSwitch свет-кооп) и #4 (драг-джиттер) — раньше Live Coding. Остальные 10 (#2 ATrap
+`bFlashing`, #3 SelfNoise Client-RPC, #5 Toilet лаг-компенсация курсора по пингу, #6 MenuHUD guard+гашение хитбоксов,
+#7 ARepairable sweep флагов при Repairer→null, #8 chest-cam держит захват у поздних, #9 BioProjectile `MaxAirborneTime`,
+#10 Toilet `EndPlay`→разлок, #11 OnlineSubsystem destroy→create через callback, #12 DrawHUD кэш `ARunState` 4→1) —
+правки кода (новые члены/RPC, Live Coding не тянет) → **полный `Build.bat` ребилд Succeeded** (13с, только депрекейшн-варнинги
+CrouchedHalfHeight/meshy — не наши), **смоук `-game -nullrhi` чист** (Engine initialized, `L_MainMenu` поднялся, краша нет).
+Перед закрытием сохранил level+content (`save_before_rebuild.py`, level+dirty=true → стройка цела), редактор открыл обратно.
+Запечено в `UnrealEditor-Avaryo.dll`. PIE-проверка кооп-десинков — за юзером (в соло не видны). ⚠️ Битый ассет
+`Loot_Anim_Set/Paired_Loot_FlipOverCorpse_GrabItem_Vic2.uasset` (PACKAGE_FILE_TAG) — пред-существующий, не наш, на заметку.
+
 **НЕ делал** (на отмашку юзера): расстановку мебели/аварий в карту (его стройка, не вслепую); удаление паков; правки геометрии/настроек.
 
 ## СЕССИЯ 2026-06-21 — РЕШЕНИЕ ПО ПОРЯДКУ СТРОЙКИ ДОМА (структура → потом полировка)

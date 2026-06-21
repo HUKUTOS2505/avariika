@@ -459,17 +459,33 @@ void AAvaryoCharacter::Tick(float DeltaSeconds)
 		{
 			bMonitorOpen = false;
 		}
-		// Захват чест-камер переключаем только при СМЕНЕ состояния монитора, а не каждый кадр
-		if (bMonitorOpen != bChestCaptureApplied)
+		// Захват чест-камер: при ОТКРЫТОМ мониторе держим включённым у ВСЕХ — включая поздно
+		// заспавненных/присоединившихся (раньше переключали только на смене состояния → их тайл был чёрным).
+		// Проверка флага дёшева: на установившемся мониторе цикл почти ничего не делает.
+		if (bMonitorOpen)
 		{
-			bChestCaptureApplied = bMonitorOpen;
+			if (UWorld* W = GetWorld())
+			{
+				for (TActorIterator<AAvaryoCharacter> It(W); It; ++It)
+				{
+					if (It->ChestCamera && !It->ChestCamera->bCaptureEveryFrame)
+					{
+						It->ChestCamera->bCaptureEveryFrame = true;
+					}
+				}
+			}
+			bChestCaptureApplied = true;
+		}
+		else if (bChestCaptureApplied)
+		{
+			bChestCaptureApplied = false;
 			if (UWorld* W = GetWorld())
 			{
 				for (TActorIterator<AAvaryoCharacter> It(W); It; ++It)
 				{
 					if (It->ChestCamera)
 					{
-						It->ChestCamera->bCaptureEveryFrame = bMonitorOpen;
+						It->ChestCamera->bCaptureEveryFrame = false;
 					}
 				}
 			}
@@ -1967,6 +1983,18 @@ void AAvaryoCharacter::RegisterSelfNoise(float Loudness)
 	const float Now = GetWorld() ? GetWorld()->GetTimeSeconds() : 0.f;
 	SelfNoiseLevel = FMath::Max(GetSelfNoise01(), FMath::Clamp(Loudness, 0.f, 1.f));
 	SelfNoiseTime = Now;
+	// Все вызовы серверные, а шумомер рисует локальный владелец → переслать пик клиенту-владельцу.
+	// На листен-хосте свой пешка локальна (рисуется напрямую); присоединившемуся клиенту нужен RPC.
+	if (HasAuthority() && !IsLocallyControlled())
+	{
+		ClientRegisterSelfNoise(SelfNoiseLevel);
+	}
+}
+
+void AAvaryoCharacter::ClientRegisterSelfNoise_Implementation(float Level)
+{
+	SelfNoiseLevel = Level;
+	SelfNoiseTime = GetWorld() ? GetWorld()->GetTimeSeconds() : 0.f; // пик-холд от момента прихода у клиента
 }
 
 float AAvaryoCharacter::GetSelfNoise01() const

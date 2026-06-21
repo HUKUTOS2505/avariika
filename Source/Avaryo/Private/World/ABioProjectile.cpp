@@ -33,11 +33,13 @@ ABioProjectile::ABioProjectile()
 	SplatSmell = 70.f;
 	SplatPanic = 25.f;
 	LingerTime = 5.f;
+	MaxAirborneTime = 8.f;
 
 	bSplatted = false;
 	SettledTime = 0.f;
 	LingerRemaining = 0.f;
 	StinkNoiseAccum = 0.f;
+	AirborneTime = 0.f;
 }
 
 void ABioProjectile::BeginPlay()
@@ -89,6 +91,15 @@ void ABioProjectile::Tick(float DeltaSeconds)
 		{
 			Destroy();
 		}
+		return;
+	}
+
+	// Предохранитель: снаряд, который не осел и не попал (катится по лестнице/застрял в углу),
+	// иначе тикал бы вечно, перебирая всех монтёров каждый кадр. Через MaxAirborneTime — форс-шлепок.
+	AirborneTime += DeltaSeconds;
+	if (AirborneTime >= MaxAirborneTime)
+	{
+		Splat(nullptr);
 		return;
 	}
 

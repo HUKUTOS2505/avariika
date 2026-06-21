@@ -36,15 +36,38 @@ void UAvariikaOnlineSubsystem::HostGame(int32 MaxPlayers, FString MapName)
 		return;
 	}
 	PendingMap = MapName;
+	PendingMaxPlayers = MaxPlayers;
 	if (Sessions->GetNamedSession(SessionName))
 	{
-		Sessions->DestroySession(SessionName); // подчистить прошлую
+		// DestroySession асинхронен на EOS/Steam — создавать новую надо ИЗ коллбэка, иначе CreateSession
+		// с тем же именем падает «session already exists» и хост молча не уезжает (на NULL работало случайно).
+		DestroyHandle = Sessions->AddOnDestroySessionCompleteDelegate_Handle(
+			FOnDestroySessionCompleteDelegate::CreateUObject(this, &UAvariikaOnlineSubsystem::HandleDestroyForRecreate));
+		Sessions->DestroySession(SessionName);
+		return;
 	}
+	DoCreateSession();
+}
 
+void UAvariikaOnlineSubsystem::HandleDestroyForRecreate(FName InName, bool bWasSuccessful)
+{
+	if (Sessions.IsValid())
+	{
+		Sessions->ClearOnDestroySessionCompleteDelegate_Handle(DestroyHandle);
+	}
+	DoCreateSession(); // прошлая сессия снесена — теперь безопасно создать
+}
+
+void UAvariikaOnlineSubsystem::DoCreateSession()
+{
+	if (!Sessions.IsValid())
+	{
+		return;
+	}
 	const bool bLan = IsNullOnline();
 	FOnlineSessionSettings S;
 	S.bIsLANMatch = bLan;
-	S.NumPublicConnections = FMath::Max(1, MaxPlayers);
+	S.NumPublicConnections = FMath::Max(1, PendingMaxPlayers);
 	S.NumPrivateConnections = 0;
 	S.bShouldAdvertise = true;
 	S.bAllowJoinInProgress = true;

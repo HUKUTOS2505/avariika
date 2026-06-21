@@ -100,6 +100,9 @@ void AAvaryoHUD::DrawHUD()
 {
 	Super::DrawHUD();
 
+	// Кэш на кадр: ARunState::Get — TActorIterator-скан мира; раньше дёргали 4× за один DrawHUD.
+	ARunState* Run = ARunState::Get(GetWorld());
+
 	using namespace AvaryoHUDStyle;
 
 	AAvaryoCharacter* Character = Cast<AAvaryoCharacter>(GetOwningPawn());
@@ -368,7 +371,7 @@ void AAvaryoHUD::DrawHUD()
 	}
 
 	// ---------- Рация диспетчера (сверху по центру, плашки гаснут сами) ----------
-	if (ARunState* Run = ARunState::Get(GetWorld()))
+	if (Run)
 	{
 		const float Now = GetWorld()->GetTimeSeconds();
 
@@ -404,7 +407,7 @@ void AAvaryoHUD::DrawHUD()
 	}
 
 	// ---------- Забег: задачи, таймер, фаза (справа сверху) ----------
-	if (ARunState* Run = ARunState::Get(GetWorld()))
+	if (Run)
 	{
 		const int32 Elapsed = FMath::FloorToInt(Run->GetElapsedSeconds());
 		const FString Header = FString::Printf(TEXT("ЗАДАЧИ %d/%d   %02d:%02d"),
@@ -642,7 +645,7 @@ void AAvaryoHUD::DrawHUD()
 		}
 
 		// Задачи: сломанные красным, починенные зелёным
-		if (ARunState* Run = ARunState::Get(GetWorld()))
+		if (Run)
 		{
 			for (const ARepairable* Objective : Run->GetObjectives())
 			{
@@ -1107,7 +1110,7 @@ void AAvaryoHUD::DrawHUD()
 		if (Vitals->IsSmelly())           Statuses.Add(TEXT("Воняет"));
 
 		// В газовом облаке — не курить! (берём из кэша задач RunState, без обхода всех акторов каждый кадр)
-		if (ARunState* GasRun = ARunState::Get(GetWorld()))
+		if (ARunState* GasRun = Run)
 		{
 			for (const ARepairable* Obj : GasRun->GetObjectives())
 			{

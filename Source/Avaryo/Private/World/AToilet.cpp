@@ -9,6 +9,7 @@
 #include "UObject/ConstructorHelpers.h"
 #include "Game/ARunState.h"
 #include "GameFramework/PlayerController.h"
+#include "GameFramework/PlayerState.h"
 #include "Net/UnrealNetwork.h"
 
 AToilet::AToilet()
@@ -141,13 +142,23 @@ void AToilet::TryHitBy(AAvaryoCharacter* Who)
 		return;
 	}
 
-	if (FMath::Abs(CursorPos - GreenCenter) <= GreenHalfWidth)
+	// Лаг-компенсация: клиент целится по курсору, который видит с задержкой (реплика 30Гц + RTT),
+	// а судим по серверном CursorPos. Расширяем зоны на оценку дрейфа курсора у стрелявшего —
+	// хосту (пинг 0) допуск ~0, клиенту ~ширина дрейфа. Иначе честные попадания клиента читались как промах.
+	float Tol = 0.f;
+	if (const APlayerState* PS = Who->GetPlayerState())
+	{
+		const float LagSec = PS->GetPingInMilliseconds() * 0.001f + (1.f / 30.f);
+		Tol = FMath::Min(CursorSpeed * SpeedMultiplier * LagSec, 0.12f);
+	}
+
+	if (FMath::Abs(CursorPos - GreenCenter) <= GreenHalfWidth + Tol)
 	{
 		// Зелёная: дело спорится, почти бесшумно
 		Who->VitalsComponent->DrainBladder(GreenDrain);
 		MakeNoise(0.2f, Who, GetActorLocation());
 	}
-	else if (FMath::Abs(CursorPos - YellowCenter) <= YellowHalfWidth)
+	else if (FMath::Abs(CursorPos - YellowCenter) <= YellowHalfWidth + Tol)
 	{
 		Who->VitalsComponent->DrainBladder(YellowDrain);
 		MakeNoise(0.4f, Who, GetActorLocation());
@@ -193,6 +204,17 @@ void AToilet::FinishSession(AAvaryoCharacter* Who)
 		Run->AddToiletVisit(Who); // дисциплина — в «Акт»
 	}
 	MakeNoise(0.6f, Who, GetActorLocation()); // финальный аккорд
+}
+
+void AToilet::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	// Туалет исчезает (стриминг/destroy/seamless-travel) с сидящим внутри — снять блокировку,
+	// иначе игрок навсегда залочен (движение+обзор off): EndUseBy сбросит SetInteractionLocked.
+	if (Occupant)
+	{
+		EndUseBy(Occupant);
+	}
+	Super::EndPlay(EndPlayReason);
 }
 
 void AToilet::RerollZones()

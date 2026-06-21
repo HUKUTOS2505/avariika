@@ -41,12 +41,16 @@ protected:
 	IOnlineSessionPtr Sessions;
 	TSharedPtr<FOnlineSessionSearch> SearchSettings;
 	FString PendingMap;
+	int32 PendingMaxPlayers = 6;
 
+	void DoCreateSession(); // собственно создание (напрямую или из destroy-коллбэка)
+	void HandleDestroyForRecreate(FName SessionName, bool bWasSuccessful); // re-host: дождаться destroy, потом создать
 	void HandleCreateComplete(FName SessionName, bool bWasSuccessful);
 	void HandleFindComplete(bool bWasSuccessful);
 	void HandleJoinComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result);
 
 	FDelegateHandle CreateHandle;
+	FDelegateHandle DestroyHandle;
 	FDelegateHandle FindHandle;
 	FDelegateHandle JoinHandle;
 

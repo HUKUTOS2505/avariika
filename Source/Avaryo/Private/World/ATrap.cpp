@@ -53,6 +53,7 @@ ATrap::ATrap()
 
 	bArmed = false;
 	bTriggered = false;
+	bFlashing = false;
 	ArmedAtTime = 0.f;
 
 	static ConstructorHelpers::FObjectFinder<USoundBase> PlaceSnd(TEXT("/Game/Survival_SFX/Survival/Trap_place_1.Trap_place_1"));
@@ -101,7 +102,7 @@ void ATrap::Tick(float DeltaSeconds)
 	// Все машины: индикатор мигает, пока ловушка взведена и не сработала
 	if (IndicatorLight)
 	{
-		if (bArmed && !bTriggered)
+		if (bArmed && !bTriggered && !bFlashing)
 		{
 			const float Blink = FMath::Square(FMath::Sin(GetWorld()->GetTimeSeconds() * 6.f));
 			IndicatorLight->SetIntensity(200.f + 1200.f * Blink);
@@ -168,6 +169,7 @@ void ATrap::Spring(AAvaryoCharacter* TriggeredBy)
 
 void ATrap::MulticastFlash_Implementation()
 {
+	bFlashing = true; // на ВСЕХ машинах: прекратить блинк в Tick, иначе у клиентов вспышку сразу затирало (bTriggered не реплик.)
 	if (IndicatorLight)
 	{
 		IndicatorLight->SetLightColor(FColor(255, 255, 255));
