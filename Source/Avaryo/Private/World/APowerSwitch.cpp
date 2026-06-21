@@ -100,25 +100,9 @@ void APowerSwitch::ApplyToFloods()
 	{
 		It->SetPowered(bPowerOn);
 	}
-
-	// Свет на «домовом» питании: гасим/зажигаем лампы у акторов с тегом "PoweredLight".
-	// Размен: питание ВКЛ → светло, но провод/вода под током; ВЫКЛ → безопасно чинить, но темно (фонарь).
-	for (TActorIterator<AActor> It(W); It; ++It)
-	{
-		if (!It->Tags.Contains(FName(TEXT("PoweredLight"))))
-		{
-			continue;
-		}
-		TArray<ULightComponent*> Lights;
-		It->GetComponents<ULightComponent>(Lights);
-		for (ULightComponent* L : Lights)
-		{
-			if (L)
-			{
-				L->SetVisibility(bPowerOn);
-			}
-		}
-	}
+	// Свет на «домовом» питании (тег "PoweredLight") теперь в RefreshVisual() — чтобы лампы гасли
+	// на ВСЕХ машинах (сервер из BeginPlay/ToggleBy, клиенты через OnRep_Power). Раньше было здесь,
+	// в server-only ApplyToFloods → у клиентов свет не гас (кооп-десинк механики «свет↔ток»).
 }
 
 void APowerSwitch::OnRep_Power()
@@ -139,5 +123,28 @@ void APowerSwitch::RefreshVisual()
 			? NSLOCTEXT("PowerSwitch", "On", "РУБИЛЬНИК: ПИТАНИЕ ВКЛ\n[E] обесточить")
 			: NSLOCTEXT("PowerSwitch", "Off", "РУБИЛЬНИК: ОБЕСТОЧЕНО ✓\n[E] включить"));
 		Label->SetTextRenderColor(bPowerOn ? FColor(255, 60, 40) : FColor(80, 255, 120));
+	}
+
+	// Лампы на «домовом» питании (тег "PoweredLight"): гасим/зажигаем на ВСЕХ машинах.
+	// Здесь, а не в server-only ApplyToFloods, иначе у клиентов свет не гас — кооп-десинк.
+	// Размен: ВКЛ → светло, но провод/вода под током; ВЫКЛ → безопасно чинить, но темно (фонарь).
+	if (UWorld* W = GetWorld())
+	{
+		for (TActorIterator<AActor> It(W); It; ++It)
+		{
+			if (!It->Tags.Contains(FName(TEXT("PoweredLight"))))
+			{
+				continue;
+			}
+			TArray<ULightComponent*> Lights;
+			It->GetComponents<ULightComponent>(Lights);
+			for (ULightComponent* L : Lights)
+			{
+				if (L)
+				{
+					L->SetVisibility(bPowerOn);
+				}
+			}
+		}
 	}
 }

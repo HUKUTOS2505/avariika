@@ -834,10 +834,6 @@ void AAvaryoCharacter::RefreshMoveSpeed()
 	{
 		Speed *= DragSpeedMultiplier; // тащишь тело — медленно
 	}
-	if (DraggedBy)
-	{
-		Speed = 0.f; // тебя волокут — не ползай против движения
-	}
 	if (VitalsComponent->IsIncidentSlowed())
 	{
 		Speed *= IncidentSlowMultiplier;
@@ -862,6 +858,10 @@ void AAvaryoCharacter::RefreshMoveSpeed()
 	if (VitalsComponent->IsWounded())
 	{
 		Speed = CrawlSpeed; // ползём
+	}
+	if (DraggedBy)
+	{
+		Speed = 0.f; // тебя волокут — не ползай против движения (ПОСЛЕ IsWounded, иначе CrawlSpeed затирал → джиттер)
 	}
 	if (VitalsComponent->IsUnconscious())
 	{
