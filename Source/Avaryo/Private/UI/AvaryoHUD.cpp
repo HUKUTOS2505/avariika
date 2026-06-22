@@ -310,6 +310,21 @@ void AAvaryoHUD::DrawHUD()
 		return H;
 	};
 
+	// ---------- ХАБ: касса/репутация/квота конторы (петля «зарабатываем на апгрейд» видна на базе, PLAYER_APPEAL #3) ----------
+	// Только в хабе — во время миссии HUD держим диегетично-чистым.
+	if (Run && Run->IsHubMode() && !Character->IsMonitorOpen())
+	{
+		const FString HubLine = FString::Printf(TEXT("КОНТОРА «Аварийка»    ·    Касса: %d ₽    ·    Репутация: %s"),
+			Run->GetCompanyBalanceLive(), *ARunState::ReputationTitle(Run->GetReputation()));
+		DrawCentered(HubLine, Accent, 26.f, 1.2f);
+		if (Run->IsQuotaActive())
+		{
+			const FString QLine = FString::Printf(TEXT("Квота диспетчера: %d / %d ₽    (срок: смена № %d)"),
+				Run->GetQuotaPaid(), Run->GetQuotaTarget(), Run->GetQuotaDeadlineShift());
+			DrawCentered(QLine, TextDim, 50.f, 1.0f);
+		}
+	}
+
 	// Плашка-подсказка по центру с оранжевой кромкой ("[E] Поднять ...")
 	auto DrawPromptBox = [&](const FString& Prompt)
 	{
