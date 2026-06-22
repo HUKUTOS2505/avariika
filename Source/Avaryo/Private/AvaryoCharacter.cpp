@@ -962,6 +962,20 @@ APickupItem* AAvaryoCharacter::GetHeldItem() const
 	return GetItemInSlot(ActiveSlot);
 }
 
+int32 AAvaryoCharacter::GetCarriedLootValue() const
+{
+	// Слот 0 = тяжёлый, 1..N = лёгкие — итерация покрывает весь инвентарь (LOOT_ECONOMY)
+	int32 Total = 0;
+	for (int32 i = 0; i < NumSlots; ++i)
+	{
+		if (const APickupItem* It = GetItemInSlot(i))
+		{
+			Total += FMath::Max(0, It->SellValue);
+		}
+	}
+	return Total;
+}
+
 bool AAvaryoCharacter::IsWelding() const
 {
 	// Варит = идёт активный этап заварки со сварочником в руках (открытая дуга — жжёт глаза без

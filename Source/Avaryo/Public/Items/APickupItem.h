@@ -72,6 +72,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Pickup")
 	EItemSize ItemSize;
 
+	/** Стоимость при продаже, ₽ (лут). 0 — не лут (инструмент/расходник). >0 — ценность, которую можно
+	 *  вынести из дома и обналичить на выезде (см. LOOT_ECONOMY.md). Реплик. — клиент видит в HUD. */
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category="Pickup|Loot", meta=(ClampMin="0"))
+	int32 SellValue = 0;
+
 	/** Эффект при использовании (ЛКМ). */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Pickup|Use")
 	EItemEffect ItemEffect;

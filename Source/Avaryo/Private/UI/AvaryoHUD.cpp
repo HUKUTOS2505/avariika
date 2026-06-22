@@ -500,10 +500,11 @@ void AAvaryoHUD::DrawHUD()
 			// Максимумы для раздачи званий
 			int32 MaxRepairs = 0, MaxWounded = 0, MaxRevives = 0, MaxDrags = 0, MaxBotched = 0;
 			int32 MaxShoved = 0, MaxTripped = 0;
-			int32 MaxExplosions = 0, MaxShorts = 0, MaxThrows = 0, MaxCoffees = 0;
+			int32 MaxExplosions = 0, MaxShorts = 0, MaxThrows = 0, MaxCoffees = 0, MaxLoot = 0;
 			float MaxPanic = 0.f, MaxSmell = 0.f, MaxSmoke = 0.f;
 			for (const FPlayerRunStats& S : AllStats)
 			{
+				MaxLoot    = FMath::Max(MaxLoot,    S.LootValue);
 				MaxRepairs = FMath::Max(MaxRepairs, S.Repairs);
 				MaxWounded = FMath::Max(MaxWounded, S.TimesWounded);
 				MaxRevives = FMath::Max(MaxRevives, S.Revives);
@@ -556,6 +557,7 @@ void AAvaryoHUD::DrawHUD()
 				else if (S.BotchedRepairs > 0 && S.BotchedRepairs == MaxBotched) Title = TEXT("Народный умелец");
 				else if (S.SmellSeconds > 5.f && S.SmellSeconds >= MaxSmell) Title = TEXT("Амбре смены");
 				else if (S.SmokeSeconds > 8.f && S.SmokeSeconds >= MaxSmoke) Title = TEXT("Главный курильщик");
+				else if (S.LootValue >= 2000 && S.LootValue == MaxLoot) Title = TEXT("Барыга смены");
 				else if (S.ToiletVisits >= 2)                          Title = TEXT("Дисциплинированный мочевой пузырь");
 				else if (S.Repairs > 0 && S.Repairs == MaxRepairs)     Title = TEXT("Работник месяца");
 				else if (S.Revives > 0 && S.Revives == MaxRevives)     Title = TEXT("Полевой медик");
@@ -579,8 +581,8 @@ void AAvaryoHUD::DrawHUD()
 					S.TimesWounded, S.Incidents, FMath::RoundToInt(S.PanicSeconds), FMath::RoundToInt(S.SmellSeconds),
 					Balance >= 0 ? TEXT("+") : TEXT(""), Balance);
 
-				const FString Row4 = FString::Printf(TEXT("толкнул: %d   споткнулся: %d   катался по пене: %d с"),
-					S.ShovedOthers, S.TimesTripped, FMath::RoundToInt(S.SlipSeconds));
+				const FString Row4 = FString::Printf(TEXT("толкнул: %d   споткнулся: %d   катался по пене: %d с   вынес: %d ₽"),
+					S.ShovedOthers, S.TimesTripped, FMath::RoundToInt(S.SlipSeconds), S.LootValue);
 
 				DrawText(Row1, TextMain, PX + 28.f, TY, Font, 1.1f);
 				TY += ReportRowH;

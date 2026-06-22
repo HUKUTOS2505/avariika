@@ -70,6 +70,9 @@ struct FPlayerRunStats
 	UPROPERTY(BlueprintReadOnly, Category="Run")
 	int32 Coffees = 0;          // хлебал кофе из термоса
 
+	UPROPERTY(BlueprintReadOnly, Category="Run")
+	int32 LootValue = 0;        // ₽ вынесенного лута (зачёт только при выезде/победе — LOOT_ECONOMY)
+
 	// Для детекции переходов на серверном тике (реплицируются заодно — безвредно)
 	UPROPERTY()
 	bool bWasWounded = false;

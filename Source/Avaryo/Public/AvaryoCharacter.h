@@ -248,6 +248,10 @@ public:
 	UFUNCTION(BlueprintPure, Category="Avaryo|Inventory")
 	bool IsCarryingHeavy() const { return HeavySlot != nullptr; }
 
+	/** Суммарная стоимость лута на руках (лёгкие слоты + тяжёлый). Обналичивается на выезде (LOOT_ECONOMY). */
+	UFUNCTION(BlueprintPure, Category="Avaryo|Inventory")
+	int32 GetCarriedLootValue() const;
+
 	// ---------- Прочее ----------
 
 	UFUNCTION(BlueprintCallable, Category="Avaryo|Flashlight")

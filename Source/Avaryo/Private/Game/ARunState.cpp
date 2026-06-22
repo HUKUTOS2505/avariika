@@ -1017,17 +1017,20 @@ void ARunState::FinishRun(ERunPhase NewPhase)
 	}
 
 	// Бухгалтерия (§19): сумма по бригаде → итог смены, фиксируем в леджере на следующую смену
+	const bool bWon = NewPhase == ERunPhase::Won;
 	ShiftNet = 0;
 	int32 SumRepairs = 0, SumIncidents = 0, SumExplosions = 0;
-	for (const FPlayerRunStats& S : PlayerStats)
+	for (FPlayerRunStats& S : PlayerStats)
 	{
 		if (!IsValid(S.Character)) { continue; } // отключившийся игрок не учитывается — нет дабл-каунта на реконнект (CODE_AUDIT3 #8)
+		// Лут обналичивается ТОЛЬКО при выезде (победа): что вынес на руках — то продал (LOOT_ECONOMY).
+		// Помер/не вынес → лут пропал = риск жадности.
+		S.LootValue = bWon ? S.Character->GetCarriedLootValue() : 0;
 		ShiftNet += ComputePlayerBalance(S);
 		SumRepairs += S.Repairs;
 		SumIncidents += S.Incidents;
 		SumExplosions += S.ExplosionsCaused;
 	}
-	const bool bWon = NewPhase == ERunPhase::Won;
 	if (UGameInstance* GI = GetWorld()->GetGameInstance())
 	{
 		if (UCompanyLedgerSubsystem* Ledger = GI->GetSubsystem<UCompanyLedgerSubsystem>())
@@ -1054,6 +1057,7 @@ void ARunState::FinishRun(ERunPhase NewPhase)
 int32 ARunState::ComputePlayerBalance(const FPlayerRunStats& S)
 {
 	return S.Repairs * 1500 + S.Revives * 1000 + S.Drags * 500 + S.ToiletVisits * 300
+		+ S.LootValue // лут, вынесенный на выезде (LOOT_ECONOMY) — рискованный бонус к починкам
 		- S.TimesWounded * 1000 - S.Incidents * 2000 - S.BotchedRepairs * 800
 		- S.ExplosionsCaused * 5000 - S.ShortsCaused * 1500 // §19: штраф за ущерб (взрыв/замыкание)
 		- FMath::RoundToInt(S.PanicSeconds) * 10;
