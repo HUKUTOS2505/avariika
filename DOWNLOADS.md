@@ -1,4 +1,4 @@
-# АВАРИЙКА — список ассетов на скачку
+ # АВАРИЙКА — список ассетов на скачку
 
 Итог сканирования каталога unrealmonster (UI/Audio/Plugins/Characters постранично + весь фид /ue-assets/ 287 стр) + точечный поиск.
 Отмечай галочками по мере скачивания. Кидать в `Content/` (плагины — в `Plugins/`).
@@ -58,6 +58,11 @@
 - [ ] **Interior Toolkit** — быстрая обстановка интерьеров ⭐
 - [ ] Ultimate Level Art Tool (ULAT) · Blockout Tools · DrCG Assistant · Simple Spline Mesh
 - [ ] Modular Sewers & Tunnels · Modular Abandoned Factory · Post-Soviet World (окружение)
+
+## 🌍 Окружение / «жизнь вокруг дома»
+- [ ] **Procedural World Generator v1.4** (unrealmonster, **UE 5.7 ✓**) — ⭐ окружение вокруг дома: 217 моделей растительности + 350 сканов, деревья/кусты/камни, дома/дороги/ЖД/ЛЭП/заборы, landscape-слои, voxelized Nanite-листва. https://unrealmonster.com/procedural-world-generator-v1-4/
+  - ⚠️ Ставить **локально + в .gitignore** (как все паки) — НЕ коммитить в git (раздувает историю, см. чистку 2026-06-22). Лицензия — докупить к релизу (unrealmonster = плейсхолдер).
+  - Под «разруху» (юзеру нравится мусор/битые стены) — заросший/запущенный двор: бурьян, сухие деревья, поваленные заборы.
 
 ## 🧍 Персонажи (гражданские/жильцы — сейчас)
 - [ ] **Rigged NPC Creator (5.5+)** — генератор модульных NPC ⭐
