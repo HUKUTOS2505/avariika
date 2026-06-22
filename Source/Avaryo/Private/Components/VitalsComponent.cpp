@@ -117,8 +117,20 @@ void UVitalsComponent::Ignite(float Seconds)
 {
 	if (!IsVitalAuthority()) { return; }
 	if (WetRemaining > 0.f) { return; } // мокрый/только из воды — не загорается
+	const bool bWasBurning = BurnRemaining > 0.f;
 	const float Dur = (Seconds > 0.f) ? Seconds : BurnDuration;
 	BurnRemaining = FMath::Max(BurnRemaining, Dur);
+	// Диспетчер реагирует на НОВОЕ возгорание монтёра (не на повторный поджиг уже горящего)
+	if (!bWasBurning && BurnRemaining > 0.f)
+	{
+		if (AAvaryoCharacter* Char = Cast<AAvaryoCharacter>(GetOwner()))
+		{
+			if (ARunState* Run = ARunState::Get(GetWorld()))
+			{
+				Run->NotifyBurning(Char);
+			}
+		}
+	}
 }
 
 void UVitalsComponent::Extinguish()

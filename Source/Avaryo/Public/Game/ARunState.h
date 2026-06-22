@@ -182,6 +182,9 @@ public:
 	/** Шлёпнул биологический снаряд (§15). TriggeredBy — прямая жертва или null. Только сервер. */
 	void NotifyBioSplat(AAvaryoCharacter* DirectHit);
 
+	/** Монтёр загорелся (механика «Горит»). Who — горящий. Только сервер. */
+	void NotifyBurning(AAvaryoCharacter* Who);
+
 	/** Поскользнулся на пене (§18). Who — поскользнувшийся. Только сервер. */
 	void NotifySlipped(AAvaryoCharacter* Who);
 

@@ -122,6 +122,11 @@ namespace DispatcherLines
 		TEXT("Минус один: {X} отдыхает на земле. Аптечка в зубы — и работать."),
 		TEXT("{X}, лежать на смене запрещено инструкцией. Подъём."),
 	};
+	const TArray<FString> Burning = {
+		TEXT("{X} ГОРИТ! Это не премия за горячий стаж — туши! Вода, пена, в лужу его!"),
+		TEXT("Вижу открытый огонь на {X}. Напоминаю техбезопасность: НЕ ГОРЕТЬ. Совсем."),
+		TEXT("{X} пылает. Красиво, но в акте это «нарушение». Кто-нибудь, окатите коллегу!"),
+	};
 	const TArray<FString> Incident = {
 		TEXT("{X}... до биотуалета было сто метров. СТО. МЕТРОВ."),
 		TEXT("Фиксирую санитарный инцидент. {X}, химчистку вычту из зарплаты."),
@@ -134,6 +139,12 @@ namespace DispatcherLines
 	const TArray<FString> Victory = {
 		TEXT("Объект сдан. Жалоб много, премии не будет, но все живы — уже праздник."),
 		TEXT("Заявка закрыта. По домам. Завтра в то же время, и не опаздывать."),
+	};
+	// Бригада обналичила вынесенный лут на выезде («{X}» — сумма ₽). Циничный комментарий про «трофеи».
+	const TArray<FString> LootCashed = {
+		TEXT("Касса пополнилась на {X} ₽... Откуда у монтёров «трофеи»? Молчу. Контора в доле."),
+		TEXT("Сдали барахла на {X} ₽. Чините дом и выносите дом — фирменный стиль. Не попадитесь."),
+		TEXT("Плюс {X} ₽ «найденного имущества». Жильцам скажем: усушка, утруска. Хапуги."),
 	};
 	const TArray<FString> Defeat = {
 		TEXT("Бригада, приём... Приём!.. Так. Высылаю вторую бригаду. За вами."),
@@ -721,6 +732,14 @@ void ARunState::NotifyTrapTriggered(AAvaryoCharacter* TriggeredBy)
 	}
 }
 
+void ARunState::NotifyBurning(AAvaryoCharacter* Who)
+{
+	if (HasAuthority())
+	{
+		DispatcherSay(DispatcherLines::Burning, CrewName(Who), /*bImportant=*/true);
+	}
+}
+
 void ARunState::NotifyBioSplat(AAvaryoCharacter* DirectHit)
 {
 	if (!HasAuthority())
@@ -1019,13 +1038,14 @@ void ARunState::FinishRun(ERunPhase NewPhase)
 	// Бухгалтерия (§19): сумма по бригаде → итог смены, фиксируем в леджере на следующую смену
 	const bool bWon = NewPhase == ERunPhase::Won;
 	ShiftNet = 0;
-	int32 SumRepairs = 0, SumIncidents = 0, SumExplosions = 0;
+	int32 SumRepairs = 0, SumIncidents = 0, SumExplosions = 0, TotalLoot = 0;
 	for (FPlayerRunStats& S : PlayerStats)
 	{
 		if (!IsValid(S.Character)) { continue; } // отключившийся игрок не учитывается — нет дабл-каунта на реконнект (CODE_AUDIT3 #8)
 		// Лут обналичивается ТОЛЬКО при выезде (победа): что вынес на руках — то продал (LOOT_ECONOMY).
 		// Помер/не вынес → лут пропал = риск жадности.
 		S.LootValue = bWon ? S.Character->GetCarriedLootValue() : 0;
+		TotalLoot += S.LootValue;
 		ShiftNet += ComputePlayerBalance(S);
 		SumRepairs += S.Repairs;
 		SumIncidents += S.Incidents;
@@ -1052,6 +1072,11 @@ void ARunState::FinishRun(ERunPhase NewPhase)
 
 	DispatcherSay(bWon ? DispatcherLines::Victory : DispatcherLines::Defeat,
 		FString(), /*bImportant=*/true);
+	// Вынесли лут на выезде — циничный комментарий про «трофеи» (LOOT_ECONOMY)
+	if (bWon && TotalLoot > 0)
+	{
+		DispatcherSay(DispatcherLines::LootCashed, FString::FromInt(TotalLoot), /*bImportant=*/true);
+	}
 }
 
 int32 ARunState::ComputePlayerBalance(const FPlayerRunStats& S)
