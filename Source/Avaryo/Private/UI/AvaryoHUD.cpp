@@ -536,7 +536,19 @@ void AAvaryoHUD::DrawHUD()
 			TY += DrawCentered(bWon
 				? FString::Printf(TEXT("Объект сдан. Время: %02d:%02d. Заказчик недоволен, но подписал."), Elapsed / 60, Elapsed % 60)
 				: TEXT("Объект НЕ сдан: вся бригада выведена из строя. Акт подписан задним числом."),
-				bWon ? FLinearColor(0.3f, 0.9f, 0.3f) : FLinearColor(0.95f, 0.25f, 0.25f), TY, 1.1f) + 14.f;
+				bWon ? FLinearColor(0.3f, 0.9f, 0.3f) : FLinearColor(0.95f, 0.25f, 0.25f), TY, 1.1f) + 8.f;
+
+			// «Сводка» — авто-заголовок про самое запоминающееся (приманка для скрина/клипа, PLAYER_APPEAL #1/#2).
+			// Приоритет от самого зрелищного к будничному; читает уже посчитанные максимумы по бригаде.
+			FString Headline;
+			if (!bWon)                       Headline = TEXT("⚰ Сводка: бригада осталась на объекте. Навсегда.");
+			else if (MaxExplosions > 0)      Headline = TEXT("🔥 Сводка: объект чуть не спалили дотла.");
+			else if (MaxShorts > 0)          Headline = TEXT("⚡ Сводка: устроили иллюминацию на щитке.");
+			else if (MaxLoot >= 2000)        Headline = TEXT("💰 Сводка: вынесли из дома больше, чем починили.");
+			else if (MaxSmell > 5.f)         Headline = TEXT("🤢 Сводка: кто-то провонял всю смену.");
+			else if (MaxWounded == 0 && MaxBotched == 0) Headline = TEXT("✅ Сводка: чисто сдали, без потерь. Редкость!");
+			else                             Headline = TEXT("🛠 Сводка: смена как смена. Бывало и хуже.");
+			TY += DrawCentered(Headline, TextMain, TY, 1.15f) + 12.f;
 
 			int32 PlayerIndex = 0;
 			for (const FPlayerRunStats& S : AllStats)
