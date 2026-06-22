@@ -10,7 +10,11 @@
 #include "Engine/TextureRenderTarget2D.h"
 #include "EngineUtils.h"
 #include "Game/ARunState.h"
+#include "Game/AvaryoPlayerController.h"
+#include "Game/AvariikaOnlineSubsystem.h"
 #include "Game/CompanyLedgerSubsystem.h"
+#include "Blueprint/UserWidget.h"
+#include "GameFramework/PlayerController.h"
 #include "GameFramework/PlayerState.h"
 #include "Items/APickupItem.h"
 #include "World/ACallBoard.h"
@@ -30,6 +34,124 @@ namespace AvaryoHUDStyle
 	const FLinearColor TextDim(0.62f, 0.64f, 0.72f, 1.f);
 	const FLinearColor BarFill(0.2f, 0.55f, 0.95f, 1.f);       // синий прогресс применения
 	const FLinearColor BarBG(0.f, 0.f, 0.f, 0.55f);
+}
+
+void AAvaryoHUD::DrawPauseMenu()
+{
+	if (!Canvas) { return; }
+	UFont* Font = GEngine ? GEngine->GetMediumFont() : nullptr;
+	UFont* Big = GEngine ? GEngine->GetLargeFont() : nullptr;
+	if (!Font) { Font = Big; }
+	if (!Font) { return; }
+
+	const float SX = Canvas->SizeX;
+	const float SY = Canvas->SizeY;
+	const FLinearColor Orange(1.f, 0.55f, 0.15f, 1.f);
+	const FLinearColor PanelIdle(0.06f, 0.06f, 0.07f, 0.92f);
+	const FLinearColor PanelHover(0.22f, 0.11f, 0.02f, 0.95f);
+
+	DrawRect(FLinearColor(0.f, 0.f, 0.f, 0.7f), 0.f, 0.f, SX, SY); // затемнение сцены
+	DrawRect(Orange, 0.f, 0.f, SX, 4.f);                            // оранжевая кромка
+
+	const FString Title = TEXT("ПАУЗА");
+	float TW = 0.f, TH = 0.f;
+	UFont* TitleFont = Big ? Big : Font;
+	GetTextSize(Title, TW, TH, TitleFont, 2.4f);
+	DrawText(Title, Orange, SX * 0.5f - TW * 0.5f, SY * 0.22f, TitleFont, 2.4f);
+
+	const float CX = SX * 0.5f, BW = 380.f, BH = 56.f, Gap = 16.f;
+	float Y = SY * 0.42f;
+	auto Btn = [&](const FString& Label, FName Box)
+	{
+		const bool bHover = (HoveredBox == Box);
+		const float X = CX - BW * 0.5f;
+		DrawRect(bHover ? PanelHover : PanelIdle, X, Y, BW, BH);
+		DrawRect(Orange, X, Y, BW, 2.f);
+		DrawRect(Orange, X, Y + BH - 2.f, BW, 2.f);
+		DrawRect(Orange, X, Y, 2.f, BH);
+		DrawRect(Orange, X + BW - 2.f, Y, 2.f, BH);
+		float w = 0.f, h = 0.f;
+		GetTextSize(Label, w, h, Font, 1.2f);
+		DrawText(Label, bHover ? FLinearColor::White : Orange, CX - w * 0.5f, Y + (BH - h) * 0.5f, Font, 1.2f);
+		AddHitBox(FVector2D(X, Y), FVector2D(BW, BH), Box, true);
+		Y += BH + Gap;
+	};
+	Btn(TEXT("Продолжить"),   TEXT("pause_resume"));
+	Btn(TEXT("Настройки"),    TEXT("pause_settings"));
+	Btn(TEXT("Выйти в меню"), TEXT("pause_leave"));
+}
+
+void AAvaryoHUD::NotifyHitBoxClick(FName BoxName)
+{
+	Super::NotifyHitBoxClick(BoxName);
+
+	if (BoxName == TEXT("pause_resume"))
+	{
+		if (AAvaryoPlayerController* PC = Cast<AAvaryoPlayerController>(GetOwningPlayerController()))
+		{
+			PC->ClosePauseMenu();
+		}
+	}
+	else if (BoxName == TEXT("pause_settings"))
+	{
+		OpenSettings();
+	}
+	else if (BoxName == TEXT("pause_leave"))
+	{
+		if (UWorld* W = GetWorld())
+		{
+			if (UGameInstance* GI = W->GetGameInstance())
+			{
+				if (UAvariikaOnlineSubsystem* O = GI->GetSubsystem<UAvariikaOnlineSubsystem>())
+				{
+					O->LeaveGame(); // закрыть сессию
+				}
+			}
+		}
+		if (APlayerController* PC = GetOwningPlayerController())
+		{
+			PC->ClientTravel(TEXT("/Game/Avariika/Maps/L_MainMenu"), ETravelType::TRAVEL_Absolute);
+		}
+	}
+}
+
+void AAvaryoHUD::NotifyHitBoxBeginCursorOver(FName BoxName)
+{
+	Super::NotifyHitBoxBeginCursorOver(BoxName);
+	HoveredBox = BoxName;
+}
+
+void AAvaryoHUD::NotifyHitBoxEndCursorOver(FName BoxName)
+{
+	Super::NotifyHitBoxEndCursorOver(BoxName);
+	if (HoveredBox == BoxName)
+	{
+		HoveredBox = NAME_None;
+	}
+}
+
+void AAvaryoHUD::OpenSettings()
+{
+	APlayerController* PC = GetOwningPlayerController();
+	if (!PC)
+	{
+		return;
+	}
+	if (SettingsWidget.IsValid() && SettingsWidget->IsInViewport())
+	{
+		return; // уже открыто — без дублей в вьюпорте
+	}
+	UClass* WidgetClass = LoadClass<UUserWidget>(nullptr,
+		TEXT("/Game/EasyOptionsMenu/Core/WBP_EasyOptionsMenuMain.WBP_EasyOptionsMenuMain_C"));
+	if (!WidgetClass)
+	{
+		return;
+	}
+	if (UUserWidget* Widget = CreateWidget<UUserWidget>(PC, WidgetClass))
+	{
+		Widget->AddToViewport(120);
+		SettingsWidget = Widget;
+	}
 }
 
 void AAvaryoHUD::RefreshMinimapCache()
@@ -140,6 +262,13 @@ void AAvaryoHUD::DrawHUD()
 	if (bShopOpen)
 	{
 		DrawShop();
+		return;
+	}
+
+	// Внутриигровое пауза-меню (Esc) — оверлей поверх игры, остальной HUD не рисуем
+	if (bPauseMenuOpen)
+	{
+		DrawPauseMenu();
 		return;
 	}
 

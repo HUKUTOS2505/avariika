@@ -16,10 +16,24 @@ class AVARYO_API AAvaryoPlayerController : public APlayerController
 {
 	GENERATED_BODY()
 
+public:
+	/** Esc переключает внутриигровое пауза-меню (Продолжить/Настройки/Выйти в меню). */
+	void TogglePauseMenu();
+	/** Закрыть пауза-меню и вернуть игровой ввод (зовётся кнопкой «Продолжить» с HUD). */
+	void ClosePauseMenu();
+	bool IsPauseMenuOpen() const { return bPauseMenuOpen; }
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void AcknowledgePossession(APawn* P) override;
+	virtual void SetupInputComponent() override;
 
 	/** Принудительно: игровой ввод, курсор скрыт (только для локального контроллера). */
 	void ForceGameInput();
+
+	void OnEscapePressed();
+	/** Режим ввода под меню (курсор+UI-клики) или игру. */
+	void SetMenuInputMode(bool bMenu);
+
+	bool bPauseMenuOpen = false;
 };
