@@ -32,6 +32,31 @@ namespace AvaryoHUDStyle
 	const FLinearColor BarBG(0.f, 0.f, 0.f, 0.55f);
 }
 
+void AAvaryoHUD::RefreshMinimapCache()
+{
+	UWorld* W = GetWorld();
+	if (!W)
+	{
+		return;
+	}
+	const float Now = W->GetTimeSeconds();
+	if (Now - MinimapCacheStamp < 1.0f)
+	{
+		return; // статичные акторы — обновляем не чаще 1 Гц вместо TActorIterator каждый кадр (CODE_AUDIT3 #9)
+	}
+	MinimapCacheStamp = Now;
+	CachedExitZoneLocs.Reset();
+	for (TActorIterator<AExitZone> It(W); It; ++It)
+	{
+		CachedExitZoneLocs.Add(It->GetActorLocation());
+	}
+	CachedToiletLocs.Reset();
+	for (TActorIterator<AToilet> It(W); It; ++It)
+	{
+		CachedToiletLocs.Add(It->GetActorLocation());
+	}
+}
+
 void AAvaryoHUD::DrawShop()
 {
 	using namespace AvaryoHUDStyle;
@@ -635,14 +660,15 @@ void AAvaryoHUD::DrawHUD()
 			DrawRect(Color, X - Half, Y - Half, Half * 2.f, Half * 2.f);
 		};
 
-		// Зона ГАЗели и биотуалеты
-		for (TActorIterator<AExitZone> It(GetWorld()); It; ++It)
+		// Зона ГАЗели и биотуалеты — из кэша (статичные акторы, не сканируем мир каждый кадр, CODE_AUDIT3 #9)
+		RefreshMinimapCache();
+		for (const FVector& L : CachedExitZoneLocs)
 		{
-			DrawDot(It->GetActorLocation(), Accent, 5.f);
+			DrawDot(L, Accent, 5.f);
 		}
-		for (TActorIterator<AToilet> It(GetWorld()); It; ++It)
+		for (const FVector& L : CachedToiletLocs)
 		{
-			DrawDot(It->GetActorLocation(), FLinearColor(0.45f, 0.75f, 1.f), 3.f);
+			DrawDot(L, FLinearColor(0.45f, 0.75f, 1.f), 3.f);
 		}
 
 		// Задачи: сломанные красным, починенные зелёным

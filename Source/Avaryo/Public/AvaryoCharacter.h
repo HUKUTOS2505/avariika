@@ -417,6 +417,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Inventory")
 	float PickupRange;
 
+	/** Порог «смотрю примерно на объект» для overlap-фолбэка фикстур (dot обзора и направления на объект).
+	 *  Если не целишься прямо (свип промахнулся), фикстура (доска/ящик/рубильник/дверь) реагирует на E ТОЛЬКО когда
+	 *  примерно перед тобой — иначе ближайшая зона воровала приоритет (E принимал наряд вместо ящика и т.п.). Тюнится в PIE. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Inventory", meta=(ClampMin="-1.0", ClampMax="1.0"))
+	float InteractFacingDot = 0.5f;
+
 	// Скорости движения
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Movement")
 	float BaseWalkSpeed;

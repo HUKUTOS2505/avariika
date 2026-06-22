@@ -25,4 +25,12 @@ protected:
 
 	/** Модальный экран снаряжения: уровни/цены апгрейдов + баланс (читает леджер). */
 	void DrawShop();
+
+private:
+	// Кэш статичных акторов миникарты (AExitZone/AToilet не двигаются) — обновляем ≤1 Гц,
+	// а не сканируем мир TActorIterator каждый DrawHUD-кадр (CODE_AUDIT3 #9).
+	TArray<FVector> CachedExitZoneLocs;
+	TArray<FVector> CachedToiletLocs;
+	float MinimapCacheStamp = -1000.f;
+	void RefreshMinimapCache();
 };

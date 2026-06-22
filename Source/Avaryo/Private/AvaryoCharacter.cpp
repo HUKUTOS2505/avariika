@@ -1112,6 +1112,10 @@ ACallBoard* AAvaryoCharacter::FindFocusedCallBoard() const
 		{
 			continue;
 		}
+		if (FVector::DotProduct((Board->GetActorLocation() - ViewLoc).GetSafeNormal(), ViewRot.Vector()) < InteractFacingDot)
+		{
+			continue; // не смотрю на доску — не воруем приоритет E у ящика рядом (CODE_AUDIT2 #5)
+		}
 		const float DistSq = FVector::DistSquared(GetActorLocation(), Board->GetActorLocation());
 		if (DistSq < BestDistSq)
 		{
@@ -1153,6 +1157,10 @@ AToolCase* AAvaryoCharacter::FindFocusedToolCase() const
 		{
 			continue;
 		}
+		if (FVector::DotProduct((Case->GetActorLocation() - ViewLoc).GetSafeNormal(), ViewRot.Vector()) < InteractFacingDot)
+		{
+			continue; // не смотрю на ящик — не воруем приоритет (CODE_AUDIT2 #5)
+		}
 		const float DistSq = FVector::DistSquared(GetActorLocation(), Case->GetActorLocation());
 		if (DistSq < BestDistSq)
 		{
@@ -1192,6 +1200,10 @@ APowerSwitch* AAvaryoCharacter::FindFocusedPowerSwitch() const
 		{
 			continue;
 		}
+		if (FVector::DotProduct((Sw->GetActorLocation() - ViewLoc).GetSafeNormal(), ViewRot.Vector()) < InteractFacingDot)
+		{
+			continue; // не смотрю на рубильник — не воруем приоритет E у ремонта рядом (CODE_AUDIT2 #5)
+		}
 		const float DistSq = FVector::DistSquared(GetActorLocation(), Sw->GetActorLocation());
 		if (DistSq < BestDistSq)
 		{
@@ -1229,6 +1241,10 @@ ADoor* AAvaryoCharacter::FindFocusedDoor() const
 		if (!D)
 		{
 			continue;
+		}
+		if (FVector::DotProduct((D->GetActorLocation() - ViewLoc).GetSafeNormal(), ViewRot.Vector()) < InteractFacingDot)
+		{
+			continue; // не смотрю на дверь — не воруем приоритет E у лута в проёме (CODE_AUDIT2 #5)
 		}
 		const float DistSq = FVector::DistSquared(GetActorLocation(), D->GetActorLocation());
 		if (DistSq < BestDistSq)
@@ -2008,7 +2024,7 @@ float AAvaryoCharacter::GetSelfNoise01() const
 	{
 		return SelfNoiseLevel; // короткий пик-холд — даже одиночный блип (икота, батарея) видно на шумомере
 	}
-	const float Decay = FMath::Clamp(1.f - (Age - SelfNoiseHoldTime) / SelfNoiseDecayTime, 0.f, 1.f);
+	const float Decay = FMath::Clamp(1.f - (Age - SelfNoiseHoldTime) / FMath::Max(SelfNoiseDecayTime, 0.01f), 0.f, 1.f); // защита от BP-нуля → NaN в реплик. SelfNoise (CODE_AUDIT3 hardening)
 	return SelfNoiseLevel * Decay;
 }
 
