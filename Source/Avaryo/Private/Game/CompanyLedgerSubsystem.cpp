@@ -121,6 +121,7 @@ void UCompanyLedgerSubsystem::ResetCompany()
 	QuotaTarget = 0;
 	QuotaDeadlineShift = 0;
 	QuotaPaidSoFar = 0;
+	QuotaWindowShifts = 0; // свежая карьера не наследует длину окна прошлой квоты (CODE_AUDIT3 #12)
 	bQuotaFailed = false;
 	Save();
 }
@@ -167,6 +168,14 @@ int32 UCompanyLedgerSubsystem::GetEquipmentLevel(FName Tool) const
 
 bool UCompanyLedgerSubsystem::BuyUpgrade(FName Tool)
 {
+	// Валидируем инструмент ДО списания: иначе неизвестное имя (напр. "Cameras" или опечатка из AvUpgrade)
+	// проходило как Cur=1 → TrySpend списывал и сохранял, потом рефанд+сохранял — деньги дёргались зря (CODE_AUDIT3 #2/#13).
+	const bool bKnownTool = Tool == TEXT("Flashlight") || Tool == TEXT("Tester")
+		|| Tool == TEXT("Welder") || Tool == TEXT("Extinguisher") || Tool == TEXT("Radio");
+	if (!bKnownTool)
+	{
+		return false;
+	}
 	const int32 Cur = GetEquipmentLevel(Tool);
 	const int32 MaxLvl = (Tool == TEXT("Flashlight")) ? 4 : 3;
 	if (Cur >= MaxLvl)

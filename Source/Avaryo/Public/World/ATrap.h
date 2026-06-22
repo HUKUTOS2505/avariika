@@ -82,7 +82,8 @@ protected:
 	/** Сработать: шум, паника, вспышка, тряска. Только сервер. */
 	void Spring(AAvaryoCharacter* TriggeredBy);
 
-	/** Вспышка индикатора у всех машин. */
-	UFUNCTION(NetMulticast, Unreliable)
+	/** Вспышка индикатора у всех машин. Reliable: одношот-фидбэк (вспышка/тряска/щелчок), актор гибнет через 0.3с —
+	 *  Unreliable-дроп лишал клиента всей реакции ловушки без второго шанса (CODE_AUDIT3 #16). */
+	UFUNCTION(NetMulticast, Reliable)
 	void MulticastFlash();
 };

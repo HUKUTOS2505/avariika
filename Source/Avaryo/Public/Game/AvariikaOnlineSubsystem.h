@@ -54,5 +54,7 @@ protected:
 	FDelegateHandle FindHandle;
 	FDelegateHandle JoinHandle;
 
+	bool bSessionTransition = false; // идёт destroy→create: повторный HostGame игнорируем (анти-дабл-клик, CODE_AUDIT3 #14)
+
 	static const FName SessionName; // NAME_GameSession
 };

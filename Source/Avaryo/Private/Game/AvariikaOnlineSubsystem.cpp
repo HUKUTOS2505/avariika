@@ -31,12 +31,13 @@ static bool IsNullOnline()
 
 void UAvariikaOnlineSubsystem::HostGame(int32 MaxPlayers, FString MapName)
 {
-	if (!Sessions.IsValid())
+	if (!Sessions.IsValid() || bSessionTransition)
 	{
-		return;
+		return; // уже идёт destroy→create — игнорируем повторный клик «Хост» (CODE_AUDIT3 #14)
 	}
 	PendingMap = MapName;
 	PendingMaxPlayers = MaxPlayers;
+	bSessionTransition = true;
 	if (Sessions->GetNamedSession(SessionName))
 	{
 		// DestroySession асинхронен на EOS/Steam — создавать новую надо ИЗ коллбэка, иначе CreateSession
@@ -62,6 +63,7 @@ void UAvariikaOnlineSubsystem::DoCreateSession()
 {
 	if (!Sessions.IsValid())
 	{
+		bSessionTransition = false; // сорвалось — снова можно хостить
 		return;
 	}
 	const bool bLan = IsNullOnline();
@@ -88,6 +90,7 @@ void UAvariikaOnlineSubsystem::HandleCreateComplete(FName InName, bool bWasSucce
 		Sessions->ClearOnCreateSessionCompleteDelegate_Handle(CreateHandle);
 	}
 	UE_LOG(LogTemp, Display, TEXT("[Avariika] CreateSession %s success=%d"), *InName.ToString(), bWasSuccessful);
+	bSessionTransition = false; // переход завершён (успех/провал) — HostGame снова доступен (CODE_AUDIT3 #14)
 	if (bWasSuccessful)
 	{
 		if (UWorld* W = GetGameInstance() ? GetGameInstance()->GetWorld() : nullptr)

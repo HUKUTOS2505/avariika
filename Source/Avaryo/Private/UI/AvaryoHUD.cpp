@@ -508,6 +508,7 @@ void AAvaryoHUD::DrawHUD()
 			int32 PlayerIndex = 0;
 			for (const FPlayerRunStats& S : AllStats)
 			{
+				if (!IsValid(S.Character)) { continue; } // ghost-запись отключившегося не рисуем — строки сходятся с ShiftNet (CODE_AUDIT3 #8 follow-up)
 				++PlayerIndex;
 				FString Name = FString::Printf(TEXT("Монтёр №%d"), PlayerIndex);
 				if (S.Character && S.Character->GetPlayerState())

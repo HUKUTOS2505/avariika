@@ -215,6 +215,13 @@ void UFlashlightComponent::UpdateFlicker(float DeltaTime)
 		return;
 	}
 
+	// Мерцание — чистая косметика; на выделенном сервере луч не рендерится → не жжём RNG/Sin/SetIntensity (CODE_AUDIT3 #18)
+	const UWorld* W = GetWorld();
+	if (W && W->GetNetMode() == NM_DedicatedServer)
+	{
+		return;
+	}
+
 	// Принудительное отключение (перегрузка/скачок) — приоритетнее заряда и дешёвого юнита
 	if (ForcedBlackoutRemaining > 0.f)
 	{

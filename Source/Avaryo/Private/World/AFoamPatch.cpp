@@ -28,8 +28,13 @@ void AFoamPatch::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	// Диск делаем плоским и по радиусу скольжения (цилиндр в BasicShapes — 100 см диаметр, 100 высота)
-	MeshComponent->SetRelativeScale3D(FVector(SlipRadius / 50.f, SlipRadius / 50.f, 0.04f));
+	// Диск делаем плоским и по радиусу скольжения (цилиндр в BasicShapes — 100 см диаметр, 100 высота).
+	// Значение константно — переставляем только при изменении, не дёргаем transform каждый тик (CODE_AUDIT3 #7).
+	const FVector DesiredScale(SlipRadius / 50.f, SlipRadius / 50.f, 0.04f);
+	if (!MeshComponent->GetRelativeScale3D().Equals(DesiredScale))
+	{
+		MeshComponent->SetRelativeScale3D(DesiredScale);
+	}
 
 	if (!HasAuthority())
 	{

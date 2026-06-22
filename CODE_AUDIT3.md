@@ -1,9 +1,33 @@
 # CODE_AUDIT3 — 3-й глубокий проход (perf / NaN / coop-race / regression)
 
-> Автономный аудит 2026-06-22 (Workflow: 11 финдеров × 5 линз — perf/Tick · numeric/NaN/overflow · coop-race · validation · logic; затем верификация по живому коду).
-> ⚠️ **Проход НЕПОЛНЫЙ:** фон-воркфлоу упёрся в session-limit (сброс 5:30) и убил verify-фазу + 3 финдера. Успели отработать **8 из 11** финдеров.
-> **Верификацию 12 кандидатов сделал вручную по коду** (как делал бы скептик-агент): **все 12 подтверждены, 0 опровергнуто.**
-> Сведено в **11 находок** (один дубль-перф схлопнут). **Код НЕ правил — на твою отмашку** (тот же порядок, что в AUDIT1/AUDIT2).
+> Автономный аудит 2026-06-22 (Workflow: финдеры × 5 линз — perf/Tick · numeric/NaN/overflow · coop-race · validation · logic; затем верификация по живому коду).
+> Два раунда воркфлоу (оба упёрлись в session-limit на фан-ауте → verify доделан вручную по коду).
+>
+> ✅ **СТАТУС 2026-06-22: ВСЁ ИСПРАВЛЕНО** двумя коммитами + ребилдами (Build Succeeded, смоук чист).
+> Раунд 1 (коммит `b4f55ac5`): 9 фиксов (#1-#11 ниже, #9 отложен осознанно). Раунд 2 (коммит ниже): покрытие + ре-ревью.
+
+## Раунд 2 — покрытие непройденных файлов + ре-ревью своих фиксов (2026-06-22)
+
+Второй воркфлоу (5 финдеров `effort:high`: world-props, items/subsystems, numeric, coop-race + **адверсариальный ре-ревью 9 фиксов раунда 1**). 18 сырых находок; верификация по коду вручную (лимит снова убил verify-фазу).
+**Ключевой результат ре-ревью: из 9 моих фиксов 8 признаны корректными, найдена 1 регрессия (#R1).** Применено ещё **7 фиксов**, остальные отсеяны как ложные/маргинальные.
+
+| # | Файл / строки | Sev | Тип | Суть | Статус |
+|---|---|---|---|---|---|
+| R1 | `AvaryoHUD.cpp` ~509 | 🟡 low | regression | мой фикс #8 неполон: HUD «Акт» рисовал ghost-строку дисконнекта без `IsValid`, строки не сходились с `ShiftNet` | ✅ гард `IsValid(S.Character)` |
+| C1 | `CompanyLedgerSubsystem.cpp` 168 | 🟡 low | logic | `BuyUpgrade` неизвестного инструмента («Cameras»/опечатка) списывал→рефандил (2 сейва, дёрг баланса) | ✅ валидация имени до `TrySpend` |
+| C2 | `CompanyLedgerSubsystem.cpp` 113 | 🟡 low | logic | `ResetCompany` не сбрасывал `QuotaWindowShifts` (свежая карьера наследовала окно прошлой квоты) | ✅ сброс в 0 |
+| C3 | `ATrap.h` 86 | 🟡 low | coop-race | `MulticastFlash` = Unreliable: одношот-фидбэк ловушки (вспышка/тряска/звук) мог дропнуться, актор гибнет 0.3с | ✅ → Reliable |
+| C4 | `AvariikaOnlineSubsystem` 32-59 | 🟡 low | coop-race | дабл-клик «Хост» до завершения destroy перезатирал `DestroyHandle` → двойной `CreateSession` | ✅ guard `bSessionTransition` |
+| C5 | `UFlashlightComponent.cpp` 211 | 🟡 low | perf | `UpdateFlicker` жёг RNG/Sin/SetIntensity на выделенном сервере (луч не рендерится) | ✅ early-out `NM_DedicatedServer` |
+| C6 | `AFoamPatch.cpp` 32 | 🟡 low | perf | `SetRelativeScale3D` дёргал transform каждый тик константой | ✅ применять только при изменении (`Equals`) |
+
+**Отсеяно при ручной верификации (ложные/не достижимы/приемлемо):** AToilet seat-teleport (movement-репликация+`ClientSetControlYaw` уже покрывают); ACallBoard `SelectedIndex` (детерминированный `BeginPlay`-init на всех машинах, рантайм-сеттера нет); AExitZone re-fire ReadySound (ре-нотификация при повторной готовности — разумно); ABioProjectile splat-collision (клиенты кинематичны+replicated movement, overlap-only, гибнет за LingerTime); Flashlight intensity `-1` (`OnIntensity` зовётся только при non-null `AttachedLight` → `DefaultIntensity` уже реальный); APowerSwitch `RefreshVisual` O(N) (следствие фикса AUDIT1 #1, скан только на toggle/BeginPlay, кэш рискнул бы застейлить); BuyUpgrade двойной Save (второй персистит Equipment — нужен); AToilet billboard per-frame (маргинально, требует accumulator+.h ради копеек).
+
+---
+
+## Раунд 1 — 11 находок (9 исправлено в `b4f55ac5`)
+
+> Раунд 1: 8 из 11 финдеров отработали до лимита; 12 кандидатов верифицированы вручную (все подтверждены). **Код раунда 1 исправлен** в `b4f55ac5`.
 
 ## Сводка
 
@@ -83,11 +107,12 @@ HUD (1119) сверяется с `Obj->GasRadius` (статик 150). Реаль
 
 ---
 
-## Рекомендация
-**Чинить первыми:** #1 (revive-окно — ядро кооп-механики; видно и в соло у любой опасности рядом с раненым), #2 (бесконечный огнетушитель сломан — регрессия). Затем #3 (soft-lock у газа), #4 (честный варнинг), #5 (live-wire perf). Low — по ходу при следующем ребилде.
-Почти все фиксы — 1-3 строки; #1 и #3 требуют твоего решения по геймдизайну (поведение огня на лежачем / тушение сигареты в покое). Готов править по отмашке (закрыть редактор → `Build.bat` → смоук → коммит).
+## Итог (раунд 1 + раунд 2)
+**Раунд 1** — 9 фиксов в `b4f55ac5` (#1-#11, #9 миникапа отложена осознанно). Решения юзера по геймдизайну: огонь на лежачем НЕ добивает (сохраняем revive-окно), сигарету тушить можно в покое.
+**Раунд 2** — 7 фиксов покрытия + 1 регрессия моего же фикса #8 (#R1). Все собраны (Build Succeeded) + смоук чист.
+Осталось отложенным: **#9** (кэш миникарты — микро-выигрыш, риск устаревания) и **#5 из AUDIT2** (E-aim-gate — нужен PIE-тюнинг). Оба — низкий приоритет, требуют PIE/решения.
 
-## ⚠️ Покрытие неполное (session-limit)
-Из 11 финдеров до лимита дошли 8; **не отработали:** `world-props` (Toilet/Trap/BioProjectile/PowerSwitch/Door/Floodlight/FoamPatch/ExitZone/CallBoard/ToolCase), `items+subsystems` (PickupItem/BioPickup/Flashlight/CompanyLedger/OnlineSubsystem/MenuGameMode/PlayerController/SaveGame), и часть спец-проходов (numeric/coop-race/regression — двое из них вернулись пустыми, один убит). **Следующий шаг по покрытию:** дочистить эти области (отдельным мелким проходом или resume воркфлоу после сброса лимита — `resumeFromRunId: wf_7f3c2039-ff5`, кэш 8 финдеров вернётся мгновенно).
+## Покрытие
+Раунд 2 закрыл непройденные в раунде 1 области: world-props (Toilet/Trap/BioProjectile/PowerSwitch/Door/Floodlight/FoamPatch/ExitZone/CallBoard/ToolCase), items+subsystems (PickupItem/BioPickup/Flashlight/CompanyLedger/OnlineSubsystem), numeric+coop-race спец-проходы, и ре-ревью всех 9 фиксов раунда 1. **Тонко покрыто/не трогали:** ADoor, MenuGameMode, AvaryoPlayerController, AvariikaSaveGame, AvaryoCameraShakes (мелкие, низкий риск). Кооп-эффекты всех трёх аудитов — за PIE-проверкой юзера (в соло не видны).
 
 _Связано: `CODE_AUDIT.md` (1-й, репликация), `CODE_AUDIT2.md` (2-й, game-logic), WORKLOG._
