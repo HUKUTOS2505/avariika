@@ -112,7 +112,8 @@ ARepairable::ARepairable()
 	bElectricallyPowered = true; // по умолчанию запитано; рубильник снимает
 
 	// Звуки по умолчанию (можно переопределить в Blueprint)
-	static ConstructorHelpers::FObjectFinder<USoundBase> ExplosionSnd(TEXT("/Game/Audio/SFX/Hazard/Hazard_ExplosionGas_1.Hazard_ExplosionGas_1"));
+	// Курированный кинематичный взрыв газа (SOUND_MAP) вместо плейсхолдера
+	static ConstructorHelpers::FObjectFinder<USoundBase> ExplosionSnd(TEXT("/Game/Audio/Lib/door_impact/Ghosthack-E_Explosion_Gas_Real_Gas_Explosion_Close_Large_01.Ghosthack-E_Explosion_Gas_Real_Gas_Explosion_Close_Large_01"));
 	if (ExplosionSnd.Succeeded()) { ExplosionSound = ExplosionSnd.Object; }
 	static ConstructorHelpers::FObjectFinder<USoundBase> RepairSnd(TEXT("/Game/Audio/SFX/RepairDone.RepairDone"));
 	if (RepairSnd.Succeeded()) { RepairDoneSound = RepairSnd.Object; }

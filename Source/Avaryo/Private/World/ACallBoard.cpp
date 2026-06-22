@@ -52,7 +52,8 @@ ACallBoard::ACallBoard()
 	if (CyrFont.Succeeded()) { Label->SetFont(CyrFont.Object); } // рантайм-шрифт с кириллицей
 
 	// Звуки по умолчанию (переопределяемы на инстансе/в Blueprint)
-	static ConstructorHelpers::FObjectFinder<USoundBase> AcceptSnd(TEXT("/Game/Audio/SFX/RadioComm.RadioComm"));
+	// Курированная «старая рация» диспетчера (SOUND_MAP radio) вместо плейсхолдера RadioComm
+	static ConstructorHelpers::FObjectFinder<USoundBase> AcceptSnd(TEXT("/Game/Audio/Lib/radio/Ghosthack-H_Transition_Old_Radio.Ghosthack-H_Transition_Old_Radio"));
 	if (AcceptSnd.Succeeded()) { AcceptSound = AcceptSnd.Object; }
 	static ConstructorHelpers::FObjectFinder<USoundBase> EngineSnd(TEXT("/Game/Audio/SFX/EngineStart.EngineStart"));
 	if (EngineSnd.Succeeded()) { EngineStartSound = EngineSnd.Object; }

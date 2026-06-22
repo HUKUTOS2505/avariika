@@ -34,8 +34,8 @@ ADoor::ADoor()
 	Zone->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	Zone->SetCollisionResponseToAllChannels(ECR_Overlap);
 
-	// Обычная бытовая дверь (нормальный звук). В библиотеке нет идеального «дверь открылась» — ближайший household.
-	static ConstructorHelpers::FObjectFinder<USoundBase> Snd(TEXT("/Game/Audio/Lib/door_impact/Ghosthack-SF_Household_Cabinet_Cupboard_Slide_Door_Close_01.Ghosthack-SF_Household_Cabinet_Cupboard_Slide_Door_Close_01"));
+	// Большая деревянная дверь дома (SOUND_MAP ⭐ door — open) вместо лёгкого household-плейсхолдера
+	static ConstructorHelpers::FObjectFinder<USoundBase> Snd(TEXT("/Game/Audio/Lib/door_impact/Ghosthack-MFW_Gate_Wood_Large_Open.Ghosthack-MFW_Gate_Wood_Large_Open"));
 	if (Snd.Succeeded()) { OpenSound = Snd.Object; }
 }
 
