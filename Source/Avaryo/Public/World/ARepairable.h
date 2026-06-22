@@ -479,6 +479,7 @@ protected:
 
 	// Электрика — рантайм
 	float LiveWireShockCooldown; // пауза между разрядами живого провода
+	float LiveWireCheckAccum = 0.f; // троттл обхода игроков живым проводом (как GasCheckAccum) — CODE_AUDIT3 #5
 
 	/** Подано ли питание на объект (рубильник). Управляет электрификацией потопа и «живым проводом». */
 	UPROPERTY(Replicated)

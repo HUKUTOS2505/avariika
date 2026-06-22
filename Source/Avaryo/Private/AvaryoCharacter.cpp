@@ -862,14 +862,14 @@ void AAvaryoCharacter::RefreshMoveSpeed()
 	{
 		Speed *= 0.3f; // выдохся в ноль — стаггер, еле плетёшься секунду
 	}
-	if (bStumbling)
-	{
-		Speed = FMath::Min(Speed, TripSlowSpeed); // споткнулся — резко сбросил ход
-	}
 	// Адреналин: на низком HP (но ещё на ногах) — рывок скорости (паника за это растёт в Vitals)
 	if (!VitalsComponent->IsWounded() && VitalsComponent->GetHealth() < AdrenalineHealthThreshold)
 	{
 		Speed *= AdrenalineSpeedMult;
+	}
+	if (bStumbling)
+	{
+		Speed = FMath::Min(Speed, TripSlowSpeed); // споткнулся — резко сбросил ход (после адреналина — кламп авторитетен, CODE_AUDIT3 #10)
 	}
 	if (VitalsComponent->IsWounded())
 	{
@@ -2185,7 +2185,7 @@ bool AAvaryoCharacter::CanApplyEffect(APickupItem* Item) const
 	switch (Item->ItemEffect)
 	{
 	case EItemEffect::Heal:       return FindHealTarget() != nullptr;
-	case EItemEffect::Calm:       return VitalsComponent->GetPanic() > 1.f;
+	case EItemEffect::Calm:       return VitalsComponent->IsSmoking() || VitalsComponent->GetPanic() > 1.f; // куришь → всегда можно потушить (рядом газ), CODE_AUDIT3 #3
 	case EItemEffect::Extinguish: return Item->Charges != 0;
 	case EItemEffect::Recharge:   return FlashlightComponent && FlashlightComponent->GetBatteryLevel() < 99.f;
 	case EItemEffect::DeployTrap: return Item->Charges != 0;
@@ -2547,9 +2547,8 @@ void AAvaryoCharacter::TickSpray(float DeltaSeconds)
 		Item->Charges--;
 		SprayDrainAccum -= 1.f;
 	}
-	if (Item->Charges <= 0)
+	if (Item->Charges == 0) // ровно 0 = опустошён циклом; -1 (бесконечный) в цикл не входил и не трогаем (CODE_AUDIT3 #2)
 	{
-		Item->Charges = 0; // пустой баллон остаётся в руках, не исчезает
 		StopSpraying();
 		return;
 	}
@@ -2736,37 +2735,43 @@ void AAvaryoCharacter::UpdateTrip(float DeltaSeconds)
 		return;
 	}
 
-	// Споткнуться о лежащего раненого товарища прямо по курсу — гарантированно
+	// Обход акторов на спотыкание — не каждый кадр (дорого при куче хлама на полу), 10 Гц хватает — CODE_AUDIT3 #6
 	const FVector Loc = GetActorLocation();
 	const FVector Fwd = GetActorForwardVector();
-	for (TActorIterator<AAvaryoCharacter> It(GetWorld()); It; ++It)
+	TripScanAccum += DeltaSeconds;
+	if (TripScanAccum >= 0.1f)
 	{
-		if (*It == this || !It->VitalsComponent || !It->VitalsComponent->IsWounded())
+		TripScanAccum = 0.f;
+		// Споткнуться о лежащего раненого товарища прямо по курсу — гарантированно
+		for (TActorIterator<AAvaryoCharacter> It(GetWorld()); It; ++It)
 		{
-			continue;
+			if (*It == this || !It->VitalsComponent || !It->VitalsComponent->IsWounded())
+			{
+				continue;
+			}
+			const FVector To = It->GetActorLocation() - Loc;
+			if (To.SizeSquared() <= FMath::Square(120.f) && FVector::DotProduct(To.GetSafeNormal(), Fwd) > 0.2f)
+			{
+				TriggerStumble(); // влетел в лежащего — оба в осадке
+				return;
+			}
 		}
-		const FVector To = It->GetActorLocation() - Loc;
-		if (To.SizeSquared() <= FMath::Square(120.f) && FVector::DotProduct(To.GetSafeNormal(), Fwd) > 0.2f)
-		{
-			TriggerStumble(); // влетел в лежащего — оба в осадке
-			return;
-		}
-	}
 
-	// Споткнуться о брошенный на полу хлам (своя же выроненная канистра/ключ) прямо по курсу
-	for (TActorIterator<APickupItem> It(GetWorld()); It; ++It)
-	{
-		UPrimitiveComponent* Prim = Cast<UPrimitiveComponent>(It->GetRootComponent());
-		if (!Prim || !Prim->IsSimulatingPhysics()) // лежит на полу (не в руках/не закреплён)
+		// Споткнуться о брошенный на полу хлам (своя же выроненная канистра/ключ) прямо по курсу
+		for (TActorIterator<APickupItem> It(GetWorld()); It; ++It)
 		{
-			continue;
-		}
-		const FVector To = It->GetActorLocation() - Loc;
-		if (To.Z < 30.f && To.SizeSquared() <= FMath::Square(100.f)
-			&& FVector::DotProduct(To.GetSafeNormal(), Fwd) > 0.25f)
-		{
-			TriggerStumble(); // насорил — сам и влетел
-			return;
+			UPrimitiveComponent* Prim = Cast<UPrimitiveComponent>(It->GetRootComponent());
+			if (!Prim || !Prim->IsSimulatingPhysics()) // лежит на полу (не в руках/не закреплён)
+			{
+				continue;
+			}
+			const FVector To = It->GetActorLocation() - Loc;
+			if (To.Z < 30.f && To.SizeSquared() <= FMath::Square(100.f)
+				&& FVector::DotProduct(To.GetSafeNormal(), Fwd) > 0.25f)
+			{
+				TriggerStumble(); // насорил — сам и влетел
+				return;
+			}
 		}
 	}
 

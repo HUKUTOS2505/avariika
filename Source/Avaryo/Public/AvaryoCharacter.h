@@ -694,6 +694,7 @@ protected:
 	float AdrenalinePanicPerSecond; // паника растёт, пока на адреналине
 
 	float StumbleUntil;        // серверное время конца спотыкания
+	float TripScanAccum = 0.f; // троттл обхода акторов на спотыкание (не каждый кадр) — CODE_AUDIT3 #6
 
 	/** Сервер: розыгрыш спотыкания при беге (темнота/паника повышают шанс). */
 	void UpdateTrip(float DeltaSeconds);

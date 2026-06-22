@@ -1116,7 +1116,7 @@ void AAvaryoHUD::DrawHUD()
 			for (const ARepairable* Obj : GasRun->GetObjectives())
 			{
 				if (Obj && Obj->IsLeakingGas()
-					&& FVector::DistSquared(Character->GetActorLocation(), Obj->GetActorLocation()) <= FMath::Square(Obj->GasRadius))
+					&& FVector::DistSquared(Character->GetActorLocation(), Obj->GetActorLocation()) <= FMath::Square(Obj->GetCurrentGasRadius())) // выросшее облако, не статик (CODE_AUDIT3 #4)
 				{
 					Statuses.Add(TEXT("ПАХНЕТ ГАЗОМ — НЕ КУРИТЬ!"));
 					break;

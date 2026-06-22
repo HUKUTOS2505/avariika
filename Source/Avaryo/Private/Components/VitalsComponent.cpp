@@ -306,16 +306,24 @@ void UVitalsComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 		}
 		else
 		{
-			BurnRemaining = FMath::Max(0.f, BurnRemaining - DeltaTime);
-			ApplyDamage(BurnDamagePerSecond * DeltaTime);                      // DoT (сам гейтит инвул/wounded)
-			Panic = FMath::Min(100.f, Panic + BurnPanicPerSecond * DeltaTime); // мечешься в панике
-			Smell = FMath::Min(100.f, Smell + 4.f * DeltaTime);                // палёным воняет
-			BurnNoiseAccum += DeltaTime;
-			if (BurnNoiseAccum >= 0.5f)
+			BurnRemaining = FMath::Max(0.f, BurnRemaining - DeltaTime); // тлеет/догорает по времени
+			// Огонь НЕ добивает лежачего — окно подъёма (revive) сохраняется (CODE_AUDIT3 #1):
+			// ApplyDamage НЕ гейтит wounded, а на Health==0 любой DoT-тик мгновенно эскалировал бы в отруб.
+			if (!bWounded)
 			{
-				BurnNoiseAccum = 0.f;
-				Char->MakeNoise(0.7f, Char, Char->GetActorLocation()); // кричишь/мечешься — слышно
-				Char->RegisterSelfNoise(0.7f);
+				ApplyDamage(BurnDamagePerSecond * DeltaTime);                      // DoT (gated bInvulnerable; на раненом не зовём)
+				if (!bSafeZone && CVarAvNoPanic.GetValueOnGameThread() == 0)
+				{
+					Panic = FMath::Min(100.f, Panic + BurnPanicPerSecond * DeltaTime); // мечешься в панике (уважает NoPanic/hub — CODE_AUDIT3 #7)
+				}
+				Smell = FMath::Min(100.f, Smell + 4.f * DeltaTime);                // палёным воняет
+				BurnNoiseAccum += DeltaTime;
+				if (BurnNoiseAccum >= 0.5f)
+				{
+					BurnNoiseAccum = 0.f;
+					Char->MakeNoise(0.7f, Char, Char->GetActorLocation()); // кричишь/мечешься — слышно
+					Char->RegisterSelfNoise(0.7f);
+				}
 			}
 		}
 	}

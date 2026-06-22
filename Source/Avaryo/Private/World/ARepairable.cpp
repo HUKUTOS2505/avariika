@@ -664,8 +664,11 @@ void ARepairable::Tick(float DeltaSeconds)
 		// ----- Электрика: «живой провод» — пока под напряжением, бьёт током рядом стоящих -----
 		// (сухой контакт: сапоги НЕ спасают — единственный способ обезопасить - срубить рубильник)
 		LiveWireShockCooldown = FMath::Max(LiveWireShockCooldown - DeltaSeconds, 0.f);
-		if (IsLiveWireHot() && LiveWireShockCooldown <= 0.f)
+		// Троттл обхода игроков: иначе при отсутствии жертвы кулдаун не ставится → full-world скан каждый кадр (CODE_AUDIT3 #5)
+		LiveWireCheckAccum += DeltaSeconds;
+		if (IsLiveWireHot() && LiveWireShockCooldown <= 0.f && LiveWireCheckAccum >= 0.2f)
 		{
+			LiveWireCheckAccum = 0.f;
 			const float HotRadius = FMath::Max(RepairRange * 1.15f, 160.f);
 			for (TActorIterator<AAvaryoCharacter> It(GetWorld()); It; ++It)
 			{

@@ -429,11 +429,13 @@ void ARunState::RefreshCompanyMirror()
 		return;
 	}
 	CompanyBalanceLive = Ledger->GetBalance();
-	EquipWelder       = Ledger->GetEquipmentLevel(FName(TEXT("Welder")));
-	EquipTester       = Ledger->GetEquipmentLevel(FName(TEXT("Tester")));
-	EquipFlashlight   = Ledger->GetEquipmentLevel(FName(TEXT("Flashlight")));
-	EquipExtinguisher = Ledger->GetEquipmentLevel(FName(TEXT("Extinguisher")));
-	EquipRadio        = Ledger->GetEquipmentLevel(FName(TEXT("Radio")));
+	// Имена снаряжения — статические (хеш один раз), а не FName из литерала каждый тик 2 Гц (CODE_AUDIT3 #11)
+	static const FName NWelder(TEXT("Welder")), NTester(TEXT("Tester")), NFlashlight(TEXT("Flashlight")), NExtinguisher(TEXT("Extinguisher")), NRadio(TEXT("Radio"));
+	EquipWelder       = Ledger->GetEquipmentLevel(NWelder);
+	EquipTester       = Ledger->GetEquipmentLevel(NTester);
+	EquipFlashlight   = Ledger->GetEquipmentLevel(NFlashlight);
+	EquipExtinguisher = Ledger->GetEquipmentLevel(NExtinguisher);
+	EquipRadio        = Ledger->GetEquipmentLevel(NRadio);
 	const FCareerStats& C = Ledger->GetCareer();
 	CareerRepairs   = C.TotalRepairs;
 	CareerBlownUp   = C.BuildingsBlownUp;
@@ -1019,6 +1021,7 @@ void ARunState::FinishRun(ERunPhase NewPhase)
 	int32 SumRepairs = 0, SumIncidents = 0, SumExplosions = 0;
 	for (const FPlayerRunStats& S : PlayerStats)
 	{
+		if (!IsValid(S.Character)) { continue; } // отключившийся игрок не учитывается — нет дабл-каунта на реконнект (CODE_AUDIT3 #8)
 		ShiftNet += ComputePlayerBalance(S);
 		SumRepairs += S.Repairs;
 		SumIncidents += S.Incidents;
