@@ -106,6 +106,10 @@ public:
 	UFUNCTION(BlueprintPure, Category="Vitals") float GetBladder() const { return Bladder; }
 	UFUNCTION(BlueprintPure, Category="Vitals") bool IsWounded() const { return bWounded; }
 	UFUNCTION(BlueprintPure, Category="Vitals") bool IsUnconscious() const { return bUnconscious; }
+	/** Секунд до отруба (Ранен→Без сознания). 0 если не в стадии истекания. Реплик. — видно у клиента/спасателей. */
+	UFUNCTION(BlueprintPure, Category="Vitals") float GetBleedOutSeconds() const { return WoundedBleedOut; }
+	/** Доля окна подъёма 0..1 (для полоски отсчёта на HUD). */
+	UFUNCTION(BlueprintPure, Category="Vitals") float GetBleedOut01() const { return WoundedBleedOutTime > 0.f ? FMath::Clamp(WoundedBleedOut / WoundedBleedOutTime, 0.f, 1.f) : 0.f; }
 	UFUNCTION(BlueprintPure, Category="Vitals") bool IsSprinting() const { return bSprinting; }
 	UFUNCTION(BlueprintPure, Category="Vitals") bool IsPanicking() const { return Panic >= PanicThreshold; }
 	UFUNCTION(BlueprintPure, Category="Vitals") bool IsIncidentSlowed() const { return IncidentSlowRemaining > 0.f; }

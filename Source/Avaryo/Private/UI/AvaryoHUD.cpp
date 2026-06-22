@@ -265,9 +265,16 @@ void AAvaryoHUD::DrawHUD()
 			{
 				Name += TEXT(" (вы)");
 			}
-			if (Crew->VitalsComponent && Crew->VitalsComponent->IsWounded())
+			if (Crew->VitalsComponent)
 			{
-				Name += TEXT(" — РАНЕН");
+				if (Crew->VitalsComponent->IsUnconscious())
+				{
+					Name += TEXT(" — БЕЗ СОЗНАНИЯ");
+				}
+				else if (Crew->VitalsComponent->IsWounded())
+				{
+					Name += FString::Printf(TEXT(" — ИСТЕКАЕТ %dс"), FMath::CeilToInt(Crew->VitalsComponent->GetBleedOutSeconds()));
+				}
 			}
 			DrawText(Name, AvaryoHUDStyle::TextMain, TileX + 8.f, TileY + 6.f, Font, 1.0f);
 
@@ -704,10 +711,22 @@ void AAvaryoHUD::DrawHUD()
 			Accent.ToFColor(true));
 	}
 
-	// ---------- Баннер ранения ----------
-	if (Vitals && Vitals->IsWounded())
+	// ---------- Баннер ранения + обратный отсчёт bleed-out (кооп-спасение больше не вслепую) ----------
+	if (Vitals && Vitals->IsUnconscious())
 	{
-		DrawCentered(TEXT("ВЫ РАНЕНЫ — ползите к команде, вас поднимет аптечка"), FLinearColor::Red, SizeY * 0.4f, 1.6f);
+		DrawCentered(TEXT("БЕЗ СОЗНАНИЯ — только напарник поднимет вас аптечкой"), FLinearColor(0.95f, 0.2f, 0.2f), SizeY * 0.4f, 1.6f);
+	}
+	else if (Vitals && Vitals->IsWounded())
+	{
+		const int32 Secs = FMath::CeilToInt(Vitals->GetBleedOutSeconds());
+		DrawCentered(FString::Printf(TEXT("ВЫ РАНЕНЫ — отруб через %d с. Ползите к команде / нужна аптечка"), Secs),
+			FLinearColor::Red, SizeY * 0.4f, 1.6f);
+		// Полоска окна подъёма: истекает по мере приближения к отрубу
+		const float BarW = FMath::Min(420.f, SizeX * 0.4f);
+		const float BarX = (SizeX - BarW) * 0.5f;
+		const float BarY = SizeY * 0.4f + 30.f;
+		DrawRect(AvaryoHUDStyle::BarBG, BarX, BarY, BarW, 10.f);
+		DrawRect(FLinearColor(0.95f, 0.2f, 0.2f), BarX, BarY, BarW * Vitals->GetBleedOut01(), 10.f);
 	}
 
 	// ---------- Применение предмета (по центру, как в референсе) ----------
