@@ -3,7 +3,8 @@
 > 2026-06-23. Юзер: «modular worker bundle уже в проекте, давай полностью интегрировать». Сегодня юзер отдыхает (без стройки) — работаю автономно. Этот док — грунт + фазовый план; правки по ходу.
 
 ## Что за пак (факты разведки)
-- **`Content/Modular_Workers/`** — модульный «Quantum» рабочий, **874 ассета**. Male-меши (Female — только текстуры, мешей нет → пока мужской аватар).
+- **`Content/Modular_Workers/`** — модульный «Quantum» рабочий, **874 ассета**. ✅ **ЛИЦЕНЗИОННЫЙ** (юзер купил за $50 — вариант B «Modular Workers Bundle» из [[char-creator-gear-progression]], НЕ generic) → release-safe, НЕ плейсхолдер. **Заменяет пиратский CitizenNPC** как тело игрока/бригады.
+- **Только мужские меши — это by design** (юзер подтвердил: женщин-работяг не нужно). Female-текстуры в паке игнорируем. Бригада = мужики.
 - **Скелет: `SK_Male_Quantum_Character_Skeleton` = UE5-mannequin** (кости `spine_01..05`, `neck_01/02`, `upperarm_twist_01/02`, `ik_foot_root`, `ik_hand_gun`, `index_01`, `thumb_01`). + `SK_Quantuym_FaceRig` (лицо).
 - **Сборка** (`Demo/Blueprint/CBP_Male_Quantum_Character`): тело-лидер + дочерние SkeletalMesh-компоненты по слотам через `SetMasterPoseComponent` (в 5.7 = `SetLeaderPoseComponent`). Слоты в BP: **Body, Head, Hair, Helmet(+Headphones/Drops), Hat, Cap, Glasses, Gloves, Arms, Pants**.
 - **Части тела (модульно):** Head, Body_Full/Body_Bottom, Feet, Legs, FullHands/Hands, Wrist, Arms (+ варианты этничности Afro/European, тату/орнамент на руках).
@@ -15,7 +16,6 @@
 - **Материалы:** мастер `Quanum_MasterMaterial` + MI-варианты цветов (штаны/перчатки/каски и т.д.).
 - **Демо-карты:** `Maps/MegaBundle_Character_Builder`, `Preview_Assets`, `Preview_Presets`.
 - **Нет** своих AnimBP/IK-ретаргетеров → анимация через ретаргет на UE5-mann.
-- ⚠️ Лицензия — пак-плейсхолдер до релиза (см. [[asset-licensing]]); это норм для прототипа.
 
 ## Наша текущая база (факты из кода)
 - **`AAvaryoCharacter : ACharacter`** — true-FPS. Тело = `GetMesh()` (сейчас **CitizenNPC, UE4-mann**), FP-руки = `FirstPersonMeshComp` (из BP), TP-камера на пружине (`ToggleCameraMode`/V).
@@ -34,7 +34,7 @@
 - 🔑 **ПИВОТ для юзера:** подтвердить, что рабочий ЗАМЕНЯЕТ тело игрока (а не только NPC-бригаду). Я иду по «заменяет»; если юзер хочет иначе — фаза 2 разворачивается. Визуал (как смотрится в игре) **требует глаз юзера** — соберу/скомпилю/закоммичу, финальный «красиво ли» — за ним.
 
 ## Фазовый план
-**Ф0. Пре-флайт (autonomous-safe).** Проверить, что пак импортирован/реестр видит скелет+пресеты; зафиксировать слоты; решить female (пока male-only). ✅ разведка сделана.
+**Ф0. Пре-флайт (autonomous-safe).** Проверить, что пак импортирован/реестр видит скелет+пресеты; зафиксировать слоты; female не делаем (male-only by design). ✅ разведка сделана.
 
 **Ф1. Ретаргет анимаций UE4-mann → Quantum (UE5-mann).** IK Rig на Quantum + IK Retargeter (UE4→UE5, можно от Epic-шаблона) → ретаргет 7 монтажей + локомоция-клипы. Проверка смоук/Persona. (Editor, headless-скрипт; визуал-кач-во — потом с юзером.)
 
