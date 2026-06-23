@@ -38,6 +38,6 @@ try:
                 R["asset_mat_err"] = str(e)
 except Exception as e:
     R["err"] = str(e); R["tb"] = traceback.format_exc()
-with open(r"D:/unrealEngine/avariika/Scripts/manifests/_hazmat_render.json", "w") as f:
+with open(r"C:/unrealEngine/avariika/Scripts/manifests/_hazmat_render.json", "w") as f:
     json.dump(R, f, indent=1, default=str)
 unreal.log("HAZMAT_RENDER %s" % json.dumps(R, default=str))

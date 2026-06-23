@@ -24,6 +24,6 @@ for a in actors:
 R["call_boards"] = boards
 R["light_actors"] = lights
 R["player_starts"] = ps
-with open(r"D:/unrealEngine/avariika/Scripts/manifests/_verify_hub.json", "w") as f:
+with open(r"C:/unrealEngine/avariika/Scripts/manifests/_verify_hub.json", "w") as f:
     json.dump(R, f, indent=1, default=str)
 unreal.log("VERIFY_HUB %s" % json.dumps(R, default=str))

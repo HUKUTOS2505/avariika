@@ -4,7 +4,7 @@
 import os
 import unreal
 
-RAW = r'D:\unrealEngine\avariika\RawAssets\SM_Cigarettes\source'
+RAW = r'C:\unrealEngine\avariika\RawAssets\SM_Cigarettes\source'
 DEST = '/Game/Avariika/Meshes'
 NAME = 'SM_Cigarettes'
 BP = '/Game/Avariika/Items/BP_Cigarettes'
@@ -75,4 +75,4 @@ else:
 
 les.save_current_level()
 out.append('save_dirty=%s' % unreal.EditorLoadingAndSavingUtils.save_dirty_packages(True, True))
-open(r'D:\unrealEngine\avariika\Saved\import_cig.txt', 'w', encoding='utf-8').write('\n'.join(out))
+open(r'C:\unrealEngine\avariika\Saved\import_cig.txt', 'w', encoding='utf-8').write('\n'.join(out))

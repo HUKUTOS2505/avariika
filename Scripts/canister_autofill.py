@@ -22,4 +22,4 @@ for a in eas.get_all_level_actors():
 les.save_current_level()
 unreal.EditorLoadingAndSavingUtils.save_dirty_packages(True, True)
 out.append('saved')
-open(r'D:\unrealEngine\avariika\Saved\canister_autofill.txt','w',encoding='utf-8').write('\n'.join(out))
+open(r'C:\unrealEngine\avariika\Saved\canister_autofill.txt','w',encoding='utf-8').write('\n'.join(out))

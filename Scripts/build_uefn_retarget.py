@@ -1,5 +1,5 @@
 import unreal, json
-OUT = r"D:/unrealEngine/avariika/Scripts/build_uefn_retarget.json"
+OUT = r"C:/unrealEngine/avariika/Scripts/build_uefn_retarget.json"
 R = {"steps": []}
 tools = unreal.AssetToolsHelpers.get_asset_tools()
 eal = unreal.EditorAssetLibrary

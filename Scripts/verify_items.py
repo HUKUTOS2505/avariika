@@ -19,4 +19,4 @@ for lbl in targets:
     sc = a.get_actor_scale3d()
     out.append('%s: mesh=%s scale=(%.2f,%.2f,%.2f)' % (
         lbl, (sm.get_name() if sm else 'NONE'), sc.x, sc.y, sc.z))
-open(r'D:\unrealEngine\avariika\Saved\verify_items.txt', 'w', encoding='utf-8').write('\n'.join(out))
+open(r'C:\unrealEngine\avariika\Saved\verify_items.txt', 'w', encoding='utf-8').write('\n'.join(out))

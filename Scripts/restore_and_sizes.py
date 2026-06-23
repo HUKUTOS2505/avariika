@@ -7,7 +7,7 @@ out = []
 
 
 def report():
-    open(r'D:\unrealEngine\avariika\Saved\restore_and_sizes.txt', 'w', encoding='utf-8').write('\n'.join(out))
+    open(r'C:\unrealEngine\avariika\Saved\restore_and_sizes.txt', 'w', encoding='utf-8').write('\n'.join(out))
 
 
 try:

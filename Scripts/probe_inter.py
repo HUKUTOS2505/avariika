@@ -21,4 +21,4 @@ try:
     out.append('ImportAssetParameters (pipeline/automat): ' + ', '.join(sorted(x for x in dir(ip) if any(k in x.lower() for k in ('pipeline', 'automat')) and not x.startswith('__'))))
 except Exception as e:
     out.append('params fail: ' + str(e))
-open(r'D:\unrealEngine\avariika\Saved\probe_inter.txt', 'w', encoding='utf-8').write('\n'.join(out))
+open(r'C:\unrealEngine\avariika\Saved\probe_inter.txt', 'w', encoding='utf-8').write('\n'.join(out))

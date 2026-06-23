@@ -33,4 +33,4 @@ for a in eas.get_all_level_actors():
 out.append('repairables found=%d' % n)
 les.save_current_level()
 out.append('save_dirty=%s' % unreal.EditorLoadingAndSavingUtils.save_dirty_packages(True, True))
-open(r'D:\unrealEngine\avariika\Saved\slow_minigames.txt', 'w', encoding='utf-8').write('\n'.join(out))
+open(r'C:\unrealEngine\avariika\Saved\slow_minigames.txt', 'w', encoding='utf-8').write('\n'.join(out))

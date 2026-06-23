@@ -22,4 +22,4 @@ for name, dy in items:
     a.set_actor_scale3d(unreal.Vector(s, s, s))
     a.set_actor_rotation(unreal.Rotator(pitch=0.0, yaw=200.0, roll=0.0), False)
     out.append('%s placed' % name)
-open(r'D:\unrealEngine\avariika\Saved\verify_native_lineup.txt', 'w', encoding='utf-8').write('\n'.join(out))
+open(r'C:\unrealEngine\avariika\Saved\verify_native_lineup.txt', 'w', encoding='utf-8').write('\n'.join(out))

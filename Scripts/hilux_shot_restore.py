@@ -22,4 +22,4 @@ for a in list(eas.get_all_level_actors()):
 out.append('killed temp PROD_ = %d' % killed)
 les.save_current_level()
 out.append('save_dirty=%s' % unreal.EditorLoadingAndSavingUtils.save_dirty_packages(True, True))
-open(r'D:\unrealEngine\avariika\Saved\hilux_shot_restore.txt', 'w', encoding='utf-8').write('\n'.join(out))
+open(r'C:\unrealEngine\avariika\Saved\hilux_shot_restore.txt', 'w', encoding='utf-8').write('\n'.join(out))

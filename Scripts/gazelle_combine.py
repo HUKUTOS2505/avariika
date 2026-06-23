@@ -4,7 +4,7 @@
 import os
 import unreal
 
-RAW = r'D:\unrealEngine\avariika\RawAssets\SM_Gazelle'
+RAW = r'C:\unrealEngine\avariika\RawAssets\SM_Gazelle'
 DEST = '/Game/Avariika/Meshes/Gazelle'
 out = []
 
@@ -67,4 +67,4 @@ les = unreal.get_editor_subsystem(unreal.LevelEditorSubsystem)
 les.save_current_level()
 unreal.EditorLoadingAndSavingUtils.save_dirty_packages(True, True)
 out.append('saved')
-open(r'D:\unrealEngine\avariika\Saved\gazelle_combine.txt', 'w', encoding='utf-8').write('\n'.join(out))
+open(r'C:\unrealEngine\avariika\Saved\gazelle_combine.txt', 'w', encoding='utf-8').write('\n'.join(out))

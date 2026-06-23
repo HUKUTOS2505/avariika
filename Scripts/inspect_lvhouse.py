@@ -19,5 +19,5 @@ try:
                    "size":[round((maxv[0]-minv[0])/100,1),round((maxv[1]-minv[1])/100,1),round((maxv[2]-minv[2])/100,1)]}
 except Exception as e:
     R["err"]=str(e); R["tb"]=traceback.format_exc()
-with open(r"D:/unrealEngine/avariika/Scripts/manifests/_lvhouse.json","w") as f: json.dump(R,f,indent=1,default=str)
+with open(r"C:/unrealEngine/avariika/Scripts/manifests/_lvhouse.json","w") as f: json.dump(R,f,indent=1,default=str)
 unreal.log("INSPECT_LVHOUSE done")

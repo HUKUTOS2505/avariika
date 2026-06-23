@@ -4,7 +4,7 @@
 import unreal, json
 from collections import defaultdict
 
-OUT = r"D:\unrealEngine\avariika\Saved\floor1_census.json"
+OUT = r"C:\unrealEngine\avariika\Saved\floor1_census.json"
 res = {"ok": False}
 try:
     eas = unreal.get_editor_subsystem(unreal.EditorActorSubsystem)

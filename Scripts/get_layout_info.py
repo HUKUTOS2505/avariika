@@ -36,4 +36,4 @@ for a in eas.get_all_level_actors():
             out.append('%s mesh=%s pivotMinZ=%.1f extZ=%.1f scaleZ=%.2f worldH=%.0f' % (
                 a.get_actor_label(), sm.get_name(), b.origin.z - b.box_extent.z, b.box_extent.z, sc.z, b.box_extent.z*2*sc.z))
 
-open(r'D:\unrealEngine\avariika\Saved\get_layout_info.txt', 'w', encoding='utf-8').write('\n'.join(out))
+open(r'C:\unrealEngine\avariika\Saved\get_layout_info.txt', 'w', encoding='utf-8').write('\n'.join(out))

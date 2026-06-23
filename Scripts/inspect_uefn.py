@@ -1,5 +1,5 @@
 import unreal, json
-OUT = r"D:/unrealEngine/avariika/Scripts/inspect_uefn.json"
+OUT = r"C:/unrealEngine/avariika/Scripts/inspect_uefn.json"
 R = {}
 ar = unreal.AssetRegistryHelpers.get_asset_registry()
 ar.scan_paths_synchronous(["/Game/Characters/UEFN_Mannequin"], True, False)

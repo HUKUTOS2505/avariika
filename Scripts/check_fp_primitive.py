@@ -32,6 +32,6 @@ try:
             R["shot_err"] = str(e)
 except Exception as e:
     R["err"] = str(e); R["tb"] = traceback.format_exc()
-with open(r"D:/unrealEngine/avariika/Scripts/manifests/_fp_primitive.json", "w") as f:
+with open(r"C:/unrealEngine/avariika/Scripts/manifests/_fp_primitive.json", "w") as f:
     json.dump(R, f, indent=1, default=str)
 unreal.log("FP_PRIMITIVE %s" % json.dumps(R, default=str))

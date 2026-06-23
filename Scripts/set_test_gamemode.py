@@ -36,6 +36,6 @@ try:
         R["steps"].append("saved Test level=%s" % saved_lvl)
 except Exception as e:
     R["err"] = str(e); R["tb"] = traceback.format_exc()
-with open(r"D:/unrealEngine/avariika/Scripts/manifests/_set_test_gamemode.json", "w") as f:
+with open(r"C:/unrealEngine/avariika/Scripts/manifests/_set_test_gamemode.json", "w") as f:
     json.dump(R, f, indent=1, default=str)
 unreal.log("SET_TEST_GAMEMODE %s" % json.dumps(R, default=str))

@@ -1,7 +1,7 @@
 import unreal
 import traceback
 
-path = "D:/unrealEngine/avariika/Saved/casttime_dump.txt"
+path = "C:/unrealEngine/avariika/Saved/casttime_dump.txt"
 lines = ["probe start"]
 
 

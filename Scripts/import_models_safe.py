@@ -13,7 +13,7 @@ assert CurrentApplication.IsValid() (проверено — даже legacy-им
 import os
 import unreal
 
-RAW = r'D:\unrealEngine\avariika\RawAssets'
+RAW = r'C:\unrealEngine\avariika\RawAssets'
 DEST = '/Game/Avariika/Meshes'
 
 # folder -> (target, target max-dim cm). target:
@@ -185,4 +185,4 @@ les.save_current_level()
 unreal.EditorLoadingAndSavingUtils.save_dirty_packages(True, True)
 out.append('сохранено')
 
-open(r'D:\unrealEngine\avariika\Saved\import_models_safe.txt', 'w', encoding='utf-8').write('\n'.join(out))
+open(r'C:\unrealEngine\avariika\Saved\import_models_safe.txt', 'w', encoding='utf-8').write('\n'.join(out))

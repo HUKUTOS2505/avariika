@@ -36,4 +36,4 @@ s.set_editor_property('auto_exposure_bias', 11.0)
 ppv.set_editor_property('settings', s)
 out.append('temp PPV manual exposure')
 
-open(r'D:\unrealEngine\avariika\Saved\product_light_fix.txt', 'w', encoding='utf-8').write('\n'.join(out))
+open(r'C:\unrealEngine\avariika\Saved\product_light_fix.txt', 'w', encoding='utf-8').write('\n'.join(out))

@@ -4,7 +4,7 @@
 import os
 import unreal
 
-RAW = r'D:\unrealEngine\avariika\RawAssets\SM_Fuse'
+RAW = r'C:\unrealEngine\avariika\RawAssets\SM_Fuse'
 DEST = '/Game/Avariika/Meshes'
 NAME = 'SM_Fuse'
 BP = '/Game/Avariika/Items/BP_Fuse'
@@ -146,4 +146,4 @@ out.append('scale=%.3f instances=%d' % (scale, n))
 
 les.save_current_level()
 out.append('save_dirty=%s' % unreal.EditorLoadingAndSavingUtils.save_dirty_packages(True, True))
-open(r'D:\unrealEngine\avariika\Saved\import_fuse.txt', 'w', encoding='utf-8').write('\n'.join(out))
+open(r'C:\unrealEngine\avariika\Saved\import_fuse.txt', 'w', encoding='utf-8').write('\n'.join(out))

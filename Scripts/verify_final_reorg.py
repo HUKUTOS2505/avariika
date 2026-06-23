@@ -34,6 +34,6 @@ try:
             except Exception: pass
 except Exception as e:
     R["err"] = str(e); R["tb"] = traceback.format_exc()
-with open(r"D:/unrealEngine/avariika/Scripts/manifests/_verify_final.json", "w", encoding="utf-8") as f:
+with open(r"C:/unrealEngine/avariika/Scripts/manifests/_verify_final.json", "w", encoding="utf-8") as f:
     json.dump(R, f, indent=1, ensure_ascii=False)
 unreal.log("VERIFY_FINAL %s" % json.dumps(R, default=str))

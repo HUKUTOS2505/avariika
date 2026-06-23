@@ -29,4 +29,4 @@ else:
 les = unreal.get_editor_subsystem(unreal.LevelEditorSubsystem)
 les.save_current_level()
 unreal.EditorLoadingAndSavingUtils.save_dirty_packages(True, True)
-open(r'D:\unrealEngine\avariika\Saved\gazelle_verify.txt', 'w', encoding='utf-8').write('\n'.join(out))
+open(r'C:\unrealEngine\avariika\Saved\gazelle_verify.txt', 'w', encoding='utf-8').write('\n'.join(out))

@@ -54,4 +54,4 @@ for lbl in ['Repairable_Generator', 'Repairable_GasPipe', 'Repairable_Breaker']:
 
 les.save_current_level()
 out.append('save_dirty=%s' % unreal.EditorLoadingAndSavingUtils.save_dirty_packages(True, True))
-open(r'D:\unrealEngine\avariika\Saved\config_stage_modes.txt', 'w', encoding='utf-8').write('\n'.join(out))
+open(r'C:\unrealEngine\avariika\Saved\config_stage_modes.txt', 'w', encoding='utf-8').write('\n'.join(out))

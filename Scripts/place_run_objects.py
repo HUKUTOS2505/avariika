@@ -56,7 +56,7 @@ unreal.log('OK ExitZone_Gazelle')
 if not les.save_current_level():
     raise RuntimeError('Уровень не сохранился')
 
-with open(r'D:\unrealEngine\avariika\Saved\place_result.txt', 'w', encoding='utf-8') as f:
+with open(r'C:\unrealEngine\avariika\Saved\place_result.txt', 'w', encoding='utf-8') as f:
     f.write('saved ok\n')
     for a in eas.get_all_level_actors():
         if isinstance(a, (unreal.Repairable, unreal.ExitZone)):

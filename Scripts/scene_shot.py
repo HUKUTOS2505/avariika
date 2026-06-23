@@ -1,5 +1,5 @@
 import unreal, json
-OUT = r"D:/unrealEngine/avariika/Scripts/manifests/_scene_shot.json"
+OUT = r"C:/unrealEngine/avariika/Scripts/manifests/_scene_shot.json"
 R = {"steps": [], "err": None}
 try:
     PAIRS = [
@@ -35,7 +35,7 @@ try:
     except Exception as e: R["steps"].append("capsrc " + str(e))
     cc.capture_scene()
     R["steps"].append("captured")
-    ok = unreal.RenderingLibrary.export_render_target(world, rt, r"D:/unrealEngine/avariika/Saved/Screenshots", "scene_cmp.png")
+    ok = unreal.RenderingLibrary.export_render_target(world, rt, r"C:/unrealEngine/avariika/Saved/Screenshots", "scene_cmp.png")
     R["export"] = str(ok)
     for a in eas.get_all_level_actors():
         try:

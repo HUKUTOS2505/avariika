@@ -42,4 +42,4 @@ if mesh:
 else:
     out.append('SM_Hilux НЕ найден')
 
-open(r'D:\unrealEngine\avariika\Saved\inspect_light_glass.txt', 'w', encoding='utf-8').write('\n'.join(out))
+open(r'C:\unrealEngine\avariika\Saved\inspect_light_glass.txt', 'w', encoding='utf-8').write('\n'.join(out))

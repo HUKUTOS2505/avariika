@@ -1,5 +1,5 @@
 import unreal, json
-OUT = r"D:/unrealEngine/avariika/Scripts/make_cues_result.json"
+OUT = r"C:/unrealEngine/avariika/Scripts/make_cues_result.json"
 tools = unreal.AssetToolsHelpers.get_asset_tools()
 eal = unreal.EditorAssetLibrary
 

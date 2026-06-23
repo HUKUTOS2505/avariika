@@ -27,4 +27,4 @@ for a in assets:
         out.append('ERR %s: %s' % (a.split('/')[-1], e))
 
 out.append('textures capped: %d' % changed)
-open(r'D:\unrealEngine\avariika\Saved\cap_textures.txt', 'w', encoding='utf-8').write('\n'.join(out))
+open(r'C:\unrealEngine\avariika\Saved\cap_textures.txt', 'w', encoding='utf-8').write('\n'.join(out))

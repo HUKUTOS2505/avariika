@@ -15,6 +15,6 @@ try:
     R["ok"] = (after == False)
 except Exception as e:
     R["err"] = str(e)
-with open(r"D:/unrealEngine/avariika/Scripts/manifests/_throttle.json", "w", encoding="utf-8") as f:
+with open(r"C:/unrealEngine/avariika/Scripts/manifests/_throttle.json", "w", encoding="utf-8") as f:
     json.dump(R, f, indent=1, default=str, ensure_ascii=False)
 unreal.log("THROTTLE %s" % json.dumps(R, default=str))

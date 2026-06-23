@@ -1,5 +1,5 @@
 import unreal, json
-JOB = r"D:/unrealEngine/avariika/Scripts/preview_job.json"
+JOB = r"C:/unrealEngine/avariika/Scripts/preview_job.json"
 with open(JOB) as fp: J = json.load(fp)
 anim_path = J["anim"]; t = float(J.get("time", 0.5))
 eas = unreal.get_editor_subsystem(unreal.EditorActorSubsystem)

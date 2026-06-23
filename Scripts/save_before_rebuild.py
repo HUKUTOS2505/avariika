@@ -10,4 +10,4 @@ try:
     res["dirty"] = bool(unreal.EditorLoadingAndSavingUtils.save_dirty_packages(True, True))
 except Exception as e:
     res["dirty_err"] = str(e)
-open(r"D:\unrealEngine\avariika\Saved\save_before_rebuild.json", "w").write(json.dumps(res))
+open(r"C:\unrealEngine\avariika\Saved\save_before_rebuild.json", "w").write(json.dumps(res))

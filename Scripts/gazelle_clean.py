@@ -4,7 +4,7 @@
 import os
 import unreal
 
-RAW = r'D:\unrealEngine\avariika\RawAssets\SM_Gazelle'
+RAW = r'C:\unrealEngine\avariika\RawAssets\SM_Gazelle'
 DEST = '/Game/Avariika/Meshes'
 out = []
 
@@ -46,4 +46,4 @@ for a in list(unreal.EditorAssetLibrary.list_assets(DEST, recursive=False)):
             out.append('del? ' + nm + ' ' + str(e))
 out.append('deleted junk materials = %d' % deleted)
 unreal.EditorLoadingAndSavingUtils.save_dirty_packages(True, True)
-open(r'D:\unrealEngine\avariika\Saved\gazelle_clean.txt', 'w', encoding='utf-8').write('\n'.join(out))
+open(r'C:\unrealEngine\avariika\Saved\gazelle_clean.txt', 'w', encoding='utf-8').write('\n'.join(out))

@@ -1,5 +1,5 @@
 import unreal, json, os
-OUTDIR = r"D:/unrealEngine/avariika/Scripts/manifests"
+OUTDIR = r"C:/unrealEngine/avariika/Scripts/manifests"
 ar = unreal.AssetRegistryHelpers.get_asset_registry()
 MODS = {
     "zombie": "/Game/ZombieAnimationPack",

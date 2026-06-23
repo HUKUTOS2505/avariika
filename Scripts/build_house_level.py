@@ -1,6 +1,6 @@
 import unreal, json
 DST = "/Game/Avariika/Maps/L_House01"
-OUT = r"D:/unrealEngine/avariika/Scripts/build_house_level.json"
+OUT = r"C:/unrealEngine/avariika/Scripts/build_house_level.json"
 R = {"steps": [], "placed": [], "err": None}
 les = unreal.get_editor_subsystem(unreal.LevelEditorSubsystem)
 eas = unreal.get_editor_subsystem(unreal.EditorActorSubsystem)

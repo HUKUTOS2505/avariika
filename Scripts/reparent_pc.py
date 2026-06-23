@@ -1,7 +1,7 @@
 import unreal
 import traceback
 
-out = "D:/unrealEngine/avariika/Saved/reparent_pc.txt"
+out = "C:/unrealEngine/avariika/Saved/reparent_pc.txt"
 lines = []
 
 

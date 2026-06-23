@@ -63,4 +63,4 @@ out.append('instances cleared = %d' % n)
 
 les.save_current_level()
 out.append('save_dirty=%s' % unreal.EditorLoadingAndSavingUtils.save_dirty_packages(True, True))
-open(r'D:\unrealEngine\avariika\Saved\fix_clear_overrides.txt', 'w', encoding='utf-8').write('\n'.join(out))
+open(r'C:\unrealEngine\avariika\Saved\fix_clear_overrides.txt', 'w', encoding='utf-8').write('\n'.join(out))

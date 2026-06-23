@@ -38,6 +38,6 @@ try:
         }
 except Exception as e:
     R["err"] = str(e); R["tb"] = traceback.format_exc()
-with open(r"D:/unrealEngine/avariika/Scripts/manifests/_leftovers.json", "w", encoding="utf-8") as f:
+with open(r"C:/unrealEngine/avariika/Scripts/manifests/_leftovers.json", "w", encoding="utf-8") as f:
     json.dump(R, f, indent=1, ensure_ascii=False)
 unreal.log("DIAGNOSE_LEFTOVERS done")

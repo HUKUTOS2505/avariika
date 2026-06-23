@@ -1,7 +1,7 @@
 import unreal, os, json
-STAGE_ANIM = r"D:/unrealEngine/avariika/RawAssets/_char_stage/anims"
+STAGE_ANIM = r"C:/unrealEngine/avariika/RawAssets/_char_stage/anims"
 DEST_ANIM = "/Game/Characters/Operator/Anims"
-OUT = r"D:/unrealEngine/avariika/Scripts/reimport_anims.json"
+OUT = r"C:/unrealEngine/avariika/Scripts/reimport_anims.json"
 tools = unreal.AssetToolsHelpers.get_asset_tools()
 R = {"by_class": {}, "ok_anim": 0, "fail": [], "errors": []}
 

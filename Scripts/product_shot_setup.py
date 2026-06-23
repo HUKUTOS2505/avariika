@@ -46,4 +46,4 @@ try:
 except Exception as e:
     out.append('light FAIL %s' % e)
 
-open(r'D:\unrealEngine\avariika\Saved\product_shot.txt', 'w', encoding='utf-8').write('\n'.join(out))
+open(r'C:\unrealEngine\avariika\Saved\product_shot.txt', 'w', encoding='utf-8').write('\n'.join(out))

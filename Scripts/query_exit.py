@@ -20,6 +20,6 @@ for a in eas.get_all_level_actors():
         R["playerstarts"].append({"label": a.get_actor_label(), "loc": s(a.get_actor_location())})
     elif c == "Repairable":
         R["repairables"].append({"label": a.get_actor_label(), "loc": s(a.get_actor_location())})
-with open(r"D:/unrealEngine/avariika/Scripts/manifests/_query_exit.json", "w") as f:
+with open(r"C:/unrealEngine/avariika/Scripts/manifests/_query_exit.json", "w") as f:
     json.dump(R, f, indent=1, default=str)
 unreal.log("QUERY_EXIT %s" % json.dumps(R, default=str))

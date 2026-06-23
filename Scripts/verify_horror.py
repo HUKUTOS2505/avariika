@@ -27,4 +27,4 @@ if wall:
             m.get_name(), b.x*2, b.y*2, b.z*2, m.get_num_triangles(0), m0.get_name() if m0 else 'None'))
 # уровень
 out.append('L_Horror_Hospital exists=%s' % unreal.EditorAssetLibrary.does_asset_exist('/Game/Horror_Hospital/Levels/L_Horror_Hospital'))
-open(r'D:\unrealEngine\avariika\Saved\verify_horror.txt', 'w', encoding='utf-8').write('\n'.join(out))
+open(r'C:\unrealEngine\avariika\Saved\verify_horror.txt', 'w', encoding='utf-8').write('\n'.join(out))

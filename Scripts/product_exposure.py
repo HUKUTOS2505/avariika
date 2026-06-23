@@ -18,4 +18,4 @@ if p:
     s.set_editor_property('auto_exposure_bias', 5.5)
     p.set_editor_property('settings', s)
     out.append('exposure 5.5')
-open(r'D:\unrealEngine\avariika\Saved\product_exposure.txt', 'w', encoding='utf-8').write('\n'.join(out))
+open(r'C:\unrealEngine\avariika\Saved\product_exposure.txt', 'w', encoding='utf-8').write('\n'.join(out))

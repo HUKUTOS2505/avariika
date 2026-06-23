@@ -3,8 +3,8 @@
 # Run from the editor (Claudius editor.run_python_script).
 import unreal, wave, os, json
 
-STAGE = r"D:/unrealEngine/avariika/RawAssets/_audio_stage"
-RESULT = r"D:/unrealEngine/avariika/Scripts/import_audio_result.json"
+STAGE = r"C:/unrealEngine/avariika/RawAssets/_audio_stage"
+RESULT = r"C:/unrealEngine/avariika/Scripts/import_audio_result.json"
 tools = unreal.AssetToolsHelpers.get_asset_tools()
 eal = unreal.EditorAssetLibrary
 

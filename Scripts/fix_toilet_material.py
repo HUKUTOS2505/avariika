@@ -18,5 +18,5 @@ if mesh and mat:
 else:
     out.append('меш или материал не найдены: mesh=%s mat=%s' % (bool(mesh), bool(mat)))
 
-with open(r'D:\unrealEngine\avariika\Saved\fix_toilet_mat_result.txt', 'w', encoding='utf-8') as f:
+with open(r'C:\unrealEngine\avariika\Saved\fix_toilet_mat_result.txt', 'w', encoding='utf-8') as f:
     f.write('\n'.join(out))

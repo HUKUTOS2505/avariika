@@ -12,8 +12,8 @@ PACKS = [
     "KnockedDown", "MCO_Mocap_Basics", "MC_Sample", "ResourcePack",
     "ScifiWorkerAnimset", "Survival_Horror_Props_Pack", "WorkAnimations", "ZombieAnimationPack",
 ]
-LOG = r"D:/unrealEngine/avariika/Scripts/manifests/_reorg_progress.txt"
-RES = r"D:/unrealEngine/avariika/Scripts/manifests/_reorg_free.json"
+LOG = r"C:/unrealEngine/avariika/Scripts/manifests/_reorg_progress.txt"
+RES = r"C:/unrealEngine/avariika/Scripts/manifests/_reorg_free.json"
 
 def logline(s):
     with open(LOG, "a", encoding="utf-8") as f:

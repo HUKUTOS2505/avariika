@@ -17,4 +17,4 @@ for p in PATHS:
         by[cn] = by.get(cn, 0) + 1
     summary = ', '.join('%s:%d' % (k, by[k]) for k in sorted(by, key=lambda k: -by[k])[:8])
     out.append('%s -> %d assets [%s]' % (p, len(datas), summary))
-open(r'D:\unrealEngine\avariika\Saved\scan_imports.txt', 'w', encoding='utf-8').write('\n'.join(out))
+open(r'C:\unrealEngine\avariika\Saved\scan_imports.txt', 'w', encoding='utf-8').write('\n'.join(out))

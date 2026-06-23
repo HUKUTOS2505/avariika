@@ -16,6 +16,6 @@ names = sorted(str(a.asset_name) for a in wm if "anager" in str(a.asset_name) or
 out.append("  key: " + ", ".join(names[:12]))
 
 text = "\n".join(out)
-with open("D:/unrealEngine/avariika/Saved/scan_new_packs.txt", "w", encoding="utf-8") as f:
+with open("C:/unrealEngine/avariika/Saved/scan_new_packs.txt", "w", encoding="utf-8") as f:
     f.write(text)
 print(text)

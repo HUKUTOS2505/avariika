@@ -1,6 +1,6 @@
 import unreal, json
 eal = unreal.EditorAssetLibrary
-OUT = r"D:/unrealEngine/avariika/Scripts/set_audio_looping_result.json"
+OUT = r"C:/unrealEngine/avariika/Scripts/set_audio_looping_result.json"
 
 # The editor's asset registry doesn't auto-pick up Python-written .uasset files;
 # force a synchronous rescan so load_asset can find them.

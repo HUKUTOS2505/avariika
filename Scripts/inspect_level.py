@@ -14,5 +14,5 @@ for a in eas.get_all_level_actors():
         a.get_actor_label(), a.get_class().get_name(),
         loc.x, loc.y, loc.z, extent.x, extent.y, extent.z))
 
-with open(r'D:\unrealEngine\avariika\Saved\level_actors.txt', 'w', encoding='utf-8') as f:
+with open(r'C:\unrealEngine\avariika\Saved\level_actors.txt', 'w', encoding='utf-8') as f:
     f.write('\n'.join(lines))

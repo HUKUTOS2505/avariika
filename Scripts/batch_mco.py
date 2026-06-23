@@ -1,5 +1,5 @@
 import unreal, json
-OUT = r"D:/unrealEngine/avariika/Scripts/batch_mco.json"
+OUT = r"C:/unrealEngine/avariika/Scripts/batch_mco.json"
 R = {"steps": [], "retargeted": []}
 eal = unreal.EditorAssetLibrary
 DEST = "/Game/Characters/Operator/Anims_Retarget"

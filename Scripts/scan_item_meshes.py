@@ -46,4 +46,4 @@ for a in eas.get_all_level_actors():
     out.append('%-22s %-26s mesh=%-22s %s' % (key, cn, nm, status))
 
 out.sort()
-open(r'D:\unrealEngine\avariika\Saved\scan_item_meshes.txt', 'w', encoding='utf-8').write('\n'.join(out))
+open(r'C:\unrealEngine\avariika\Saved\scan_item_meshes.txt', 'w', encoding='utf-8').write('\n'.join(out))

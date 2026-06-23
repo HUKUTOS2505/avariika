@@ -29,4 +29,4 @@ for a in eas.get_all_level_actors():
         out.append('%-18s [%s] %s' % (lbl, cn, loc(a)))
 
 out.sort()
-open(r'D:\unrealEngine\avariika\Saved\report_repairables.txt', 'w', encoding='utf-8').write('\n'.join(out))
+open(r'C:\unrealEngine\avariika\Saved\report_repairables.txt', 'w', encoding='utf-8').write('\n'.join(out))

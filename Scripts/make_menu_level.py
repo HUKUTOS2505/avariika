@@ -1,7 +1,7 @@
 import unreal
 import traceback
 
-out = "D:/unrealEngine/avariika/Saved/make_menu_level.txt"
+out = "C:/unrealEngine/avariika/Saved/make_menu_level.txt"
 log = []
 
 

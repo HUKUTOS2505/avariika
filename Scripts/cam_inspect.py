@@ -14,6 +14,6 @@ if gw:
             R["cameras"].append({"name": c.get_name(), "active": c.is_active()})
         try: R["bFindCamWhenVT"] = pawn.get_editor_property("find_camera_component_when_view_target")
         except Exception as e: R["fc_err"] = str(e)
-with open(r"D:/unrealEngine/avariika/Scripts/manifests/_cam_inspect.json", "w") as f:
+with open(r"C:/unrealEngine/avariika/Scripts/manifests/_cam_inspect.json", "w") as f:
     json.dump(R, f, indent=1, default=str)
 unreal.log("CAM_INSPECT %s" % json.dumps(R, default=str))

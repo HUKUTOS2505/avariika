@@ -13,4 +13,4 @@ if p:
     s = p.get_editor_property('settings')
     s.set_editor_property('auto_exposure_bias', 6.0)
     p.set_editor_property('settings', s)
-open(r'D:\unrealEngine\avariika\Saved\product_balance.txt', 'w', encoding='utf-8').write('ok')
+open(r'C:\unrealEngine\avariika\Saved\product_balance.txt', 'w', encoding='utf-8').write('ok')

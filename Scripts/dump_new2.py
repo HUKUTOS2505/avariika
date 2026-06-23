@@ -1,5 +1,5 @@
 import unreal, json
-JOUT = r"D:/unrealEngine/avariika/Scripts/manifests/_new2.json"
+JOUT = r"C:/unrealEngine/avariika/Scripts/manifests/_new2.json"
 ar = unreal.AssetRegistryHelpers.get_asset_registry()
 ar.scan_paths_synchronous(["/Game/Attaku", "/Game/ActorCore_Sample_Motions"], True, False)
 R = {}

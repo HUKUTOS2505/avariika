@@ -1,5 +1,5 @@
 import unreal, json
-OUT = r"D:/unrealEngine/avariika/Scripts/manifests/_build_ue5manny.json"
+OUT = r"C:/unrealEngine/avariika/Scripts/manifests/_build_ue5manny.json"
 R = {"steps": []}
 tools = unreal.AssetToolsHelpers.get_asset_tools()
 eal = unreal.EditorAssetLibrary

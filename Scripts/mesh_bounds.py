@@ -13,5 +13,5 @@ for n in names:
         ext=b.box_extent; org=b.origin
         R[n]={"size_cm":[round(ext.x*2,1),round(ext.y*2,1),round(ext.z*2,1)],"origin":[round(org.x,1),round(org.y,1),round(org.z,1)]}
     except Exception as e: R[n]="err "+str(e)
-with open(r"D:/unrealEngine/avariika/Scripts/manifests/_mesh_bounds.json","w") as f: json.dump(R,f,indent=1)
+with open(r"C:/unrealEngine/avariika/Scripts/manifests/_mesh_bounds.json","w") as f: json.dump(R,f,indent=1)
 unreal.log("MESH_BOUNDS done")

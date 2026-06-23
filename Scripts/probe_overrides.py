@@ -45,4 +45,4 @@ for a in eas.get_all_level_actors():
         ov = 'err %s' % e
     out.append('%s [%s]: mesh=%s mesh_mat=%s comp_mats=%s override_materials=%s' % (
         cn, a.get_actor_label(), sm.get_name() if sm else 'None', mesh_mat, comp_mats, ov))
-open(r'D:\unrealEngine\avariika\Saved\probe_overrides.txt', 'w', encoding='utf-8').write('\n'.join(out))
+open(r'C:\unrealEngine\avariika\Saved\probe_overrides.txt', 'w', encoding='utf-8').write('\n'.join(out))

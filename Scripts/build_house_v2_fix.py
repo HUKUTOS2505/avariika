@@ -58,6 +58,6 @@ try:
     les.save_current_level(); R["saved"] = True
 except Exception as e:
     R["err"] = str(e); R["tb"] = traceback.format_exc()
-with open(r"D:/unrealEngine/avariika/Scripts/manifests/_house_fix.json", "w", encoding="utf-8") as f:
+with open(r"C:/unrealEngine/avariika/Scripts/manifests/_house_fix.json", "w", encoding="utf-8") as f:
     json.dump(R, f, indent=1, default=str, ensure_ascii=False)
 unreal.log("HOUSEFIX DONE %s" % json.dumps(R, default=str))

@@ -1,5 +1,5 @@
 import unreal, json
-OUT=r"D:/unrealEngine/avariika/Scripts/manifests/_tp_set.json"
+OUT=r"C:/unrealEngine/avariika/Scripts/manifests/_tp_set.json"
 ar=unreal.AssetRegistryHelpers.get_asset_registry()
 R={}
 for base in ["/Game/Hospital/Free_Content_Epic_Games/Mannequin","/Game/AnimX/_Common/Demo/ThirdPersonBP/Mannequin"]:

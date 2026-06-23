@@ -11,5 +11,5 @@ R["hazmat_mesh_skel"]={}
 for a in sm:
     try: R["hazmat_mesh_skel"][str(a.asset_name)]=str(a.get_tag_value("Skeleton"))
     except Exception: pass
-with open(r"D:/unrealEngine/avariika/Scripts/manifests/_hazmat.json","w") as f: json.dump(R,f,indent=1)
+with open(r"C:/unrealEngine/avariika/Scripts/manifests/_hazmat.json","w") as f: json.dump(R,f,indent=1)
 unreal.log("INSPECT_HAZMAT done")

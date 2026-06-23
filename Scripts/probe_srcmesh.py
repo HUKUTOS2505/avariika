@@ -1,5 +1,5 @@
 import unreal, json
-OUT = r"D:/unrealEngine/avariika/Scripts/manifests/_srcmesh.json"
+OUT = r"C:/unrealEngine/avariika/Scripts/manifests/_srcmesh.json"
 ar = unreal.AssetRegistryHelpers.get_asset_registry()
 R = {}
 def find_src(root):

@@ -31,4 +31,4 @@ for a in eas.get_all_level_actors():
         cap = a.get_component_by_class(unreal.CapsuleComponent)
         hh = cap.get_unscaled_capsule_half_height() if cap else -1
         out.append('PlayerStart z=%.0f capsuleHalfH=%.1f -> feet~%.0f' % (l.z, hh, l.z - (hh if hh > 0 else 0)))
-open(r'D:\unrealEngine\avariika\Saved\find_floor.txt', 'w', encoding='utf-8').write('\n'.join(out))
+open(r'C:\unrealEngine\avariika\Saved\find_floor.txt', 'w', encoding='utf-8').write('\n'.join(out))

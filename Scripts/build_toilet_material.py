@@ -44,5 +44,5 @@ else:
     unreal.EditorAssetLibrary.save_loaded_asset(mesh)
     out.append('M_Toilet создан (base color Image_0, roughness 0.25), назначен на SM_Toilet x%d' % n)
 
-with open(r'D:\unrealEngine\avariika\Saved\build_mat_result.txt', 'w', encoding='utf-8') as f:
+with open(r'C:\unrealEngine\avariika\Saved\build_mat_result.txt', 'w', encoding='utf-8') as f:
     f.write('\n'.join(out))

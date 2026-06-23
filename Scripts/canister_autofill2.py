@@ -32,4 +32,4 @@ else:
     out.append('GENERATOR NOT FOUND')
 les.save_current_level()
 unreal.EditorLoadingAndSavingUtils.save_dirty_packages(True, True)
-open(r'D:\unrealEngine\avariika\Saved\canister_autofill2.txt', 'w', encoding='utf-8').write('\n'.join(out))
+open(r'C:\unrealEngine\avariika\Saved\canister_autofill2.txt', 'w', encoding='utf-8').write('\n'.join(out))

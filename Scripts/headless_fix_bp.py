@@ -73,5 +73,5 @@ for bppath, cls, meshpath, target in CFG:
 les.save_current_level()
 saved = unreal.EditorLoadingAndSavingUtils.save_dirty_packages(True, True)
 out.append('save_dirty=%s' % saved)
-open(r'D:\unrealEngine\avariika\Saved\headless_fix_bp.txt', 'w', encoding='utf-8').write('\n'.join(out))
+open(r'C:\unrealEngine\avariika\Saved\headless_fix_bp.txt', 'w', encoding='utf-8').write('\n'.join(out))
 print('HEADLESS_FIX_BP_DONE')

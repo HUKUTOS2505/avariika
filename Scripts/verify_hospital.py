@@ -31,4 +31,4 @@ if sample_mesh:
         m0 = m.get_material(0)
         out.append('  mat0=%s' % (m0.get_name() if m0 else 'None'))
 
-open(r'D:\unrealEngine\avariika\Saved\verify_hospital.txt', 'w', encoding='utf-8').write('\n'.join(out))
+open(r'C:\unrealEngine\avariika\Saved\verify_hospital.txt', 'w', encoding='utf-8').write('\n'.join(out))

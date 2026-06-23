@@ -48,4 +48,4 @@ for lbl, (mname, md) in JOBS.items():
 les.save_current_level()
 saved = unreal.EditorLoadingAndSavingUtils.save_dirty_packages(True, True)
 out.append('save_dirty=%s' % saved)
-open(r'D:\unrealEngine\avariika\Saved\assign_repairables.txt', 'w', encoding='utf-8').write('\n'.join(out))
+open(r'C:\unrealEngine\avariika\Saved\assign_repairables.txt', 'w', encoding='utf-8').write('\n'.join(out))

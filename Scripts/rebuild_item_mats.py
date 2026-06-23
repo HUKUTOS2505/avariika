@@ -51,4 +51,4 @@ for folder in ['SM_FireExtinguisher', 'SM_Battery', 'SM_Radio', 'SM_FirstAidKit'
         unreal.EditorAssetLibrary.save_loaded_asset(mesh)
     out.append('%s rebuilt (base+normal+rough, no metallic)' % folder)
 
-open(r'D:\unrealEngine\avariika\Saved\rebuild_item_mats.txt', 'w', encoding='utf-8').write('\n'.join(out))
+open(r'C:\unrealEngine\avariika\Saved\rebuild_item_mats.txt', 'w', encoding='utf-8').write('\n'.join(out))

@@ -74,5 +74,5 @@ if not les.save_current_level():
     raise RuntimeError('Уровень не сохранился')
 out.append('saved ok')
 
-with open(r'D:\unrealEngine\avariika\Saved\setup_items_result.txt', 'w', encoding='utf-8') as f:
+with open(r'C:\unrealEngine\avariika\Saved\setup_items_result.txt', 'w', encoding='utf-8') as f:
     f.write('\n'.join(out))

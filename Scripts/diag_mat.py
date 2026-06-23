@@ -38,4 +38,4 @@ for tn in ['SM_FireExtinguisher_BaseColor', 'SM_Radio_BaseColor']:
             t.blueprint_get_size_y() if hasattr(t, 'blueprint_get_size_y') else '?',
             t.get_editor_property('compression_settings')))
 
-open(r'D:\unrealEngine\avariika\Saved\diag_mat.txt', 'w', encoding='utf-8').write('\n'.join(out))
+open(r'C:\unrealEngine\avariika\Saved\diag_mat.txt', 'w', encoding='utf-8').write('\n'.join(out))

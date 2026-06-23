@@ -11,6 +11,6 @@ for p in ["/Engine/EngineFonts/Roboto", "/Engine/EngineFonts/RobotoDistanceField
         R[p] = info
     else:
         R[p] = "NOT FOUND"
-with open(r"D:/unrealEngine/avariika/Scripts/manifests/_font_check.json", "w") as f:
+with open(r"C:/unrealEngine/avariika/Scripts/manifests/_font_check.json", "w") as f:
     json.dump(R, f, indent=1, default=str)
 unreal.log("FONT_CHECK %s" % json.dumps(R, default=str))

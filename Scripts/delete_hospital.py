@@ -15,4 +15,4 @@ if unreal.EditorAssetLibrary.does_directory_exist('/Game/Hospital'):
 else:
     out.append('/Game/Hospital уже нет')
 
-open(r'D:\unrealEngine\avariika\Saved\delete_hospital.txt', 'w', encoding='utf-8').write('\n'.join(out))
+open(r'C:\unrealEngine\avariika\Saved\delete_hospital.txt', 'w', encoding='utf-8').write('\n'.join(out))

@@ -1,7 +1,7 @@
 import unreal
 import traceback
 
-out = "D:/unrealEngine/avariika/Saved/inspect_gamemode.txt"
+out = "C:/unrealEngine/avariika/Saved/inspect_gamemode.txt"
 lines = []
 
 

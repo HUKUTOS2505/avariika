@@ -38,4 +38,4 @@ if ppv:
 
 les.save_current_level()
 out.append('save_dirty=%s' % unreal.EditorLoadingAndSavingUtils.save_dirty_packages(True, True))
-open(r'D:\unrealEngine\avariika\Saved\daylight_tune.txt', 'w', encoding='utf-8').write('\n'.join(out))
+open(r'C:\unrealEngine\avariika\Saved\daylight_tune.txt', 'w', encoding='utf-8').write('\n'.join(out))

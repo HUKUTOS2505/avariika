@@ -5,4 +5,4 @@ for n,loop in [("EngineStart",False),("ElectricZap",False),("DrinkGlug",False),(
     if sw:
         if loop: sw.set_editor_property("looping", True)
         unreal.EditorAssetLibrary.save_asset(p, only_if_is_dirty=False)
-open("D:/unrealEngine/avariika/Saved/save_ind.txt","w").write("saved")
+open("C:/unrealEngine/avariika/Saved/save_ind.txt","w").write("saved")

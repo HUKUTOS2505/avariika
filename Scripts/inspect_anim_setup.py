@@ -1,5 +1,5 @@
 import unreal, json
-OUT = r"D:/unrealEngine/avariika/Scripts/manifests/_anim_setup.json"
+OUT = r"C:/unrealEngine/avariika/Scripts/manifests/_anim_setup.json"
 ar = unreal.AssetRegistryHelpers.get_asset_registry()
 R = {"anim_bps": [], "char_bps": [], "op_skeleton": "", "blendspaces": [], "operator_assets": []}
 

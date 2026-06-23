@@ -1,5 +1,5 @@
 import unreal, json
-OUT = r"D:/unrealEngine/avariika/Scripts/cleanup_test_operator.json"
+OUT = r"C:/unrealEngine/avariika/Scripts/cleanup_test_operator.json"
 R = {"removed": [], "level": None, "err": None}
 try:
     R["level"] = str(unreal.EditorLevelLibrary.get_editor_world().get_name())

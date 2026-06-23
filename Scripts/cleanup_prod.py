@@ -16,4 +16,4 @@ out.append('killed PROD_ = %d' % killed)
 # проверка
 left = [a.get_actor_label() for a in eas.get_all_level_actors() if a.get_actor_label().startswith('PROD_')]
 out.append('left = %s' % left)
-open(r'D:\unrealEngine\avariika\Saved\cleanup_prod.txt', 'w', encoding='utf-8').write('\n'.join(out))
+open(r'C:\unrealEngine\avariika\Saved\cleanup_prod.txt', 'w', encoding='utf-8').write('\n'.join(out))

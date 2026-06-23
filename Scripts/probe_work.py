@@ -1,5 +1,5 @@
 import unreal, json
-OUT = r"D:/unrealEngine/avariika/Scripts/manifests/_probe_work.json"
+OUT = r"C:/unrealEngine/avariika/Scripts/manifests/_probe_work.json"
 ar = unreal.AssetRegistryHelpers.get_asset_registry()
 R = {}
 def probe(root, want_substr):

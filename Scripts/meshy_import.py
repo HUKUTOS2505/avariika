@@ -10,7 +10,7 @@ load_level here (in-editor it spawns a detached world that never saves).
 import os
 import unreal
 
-RAW = r'D:\unrealEngine\avariika\RawAssets'
+RAW = r'C:\unrealEngine\avariika\RawAssets'
 DEST = '/Game/Avariika/Meshes'
 
 # folder -> (actor label, target max-dim cm)
@@ -124,5 +124,5 @@ les.save_current_level()
 saved = unreal.EditorLoadingAndSavingUtils.save_dirty_packages(True, True)
 out.append('save_dirty_packages=%s' % saved)
 
-with open(r'D:\unrealEngine\avariika\Saved\meshy_import_result.txt', 'w', encoding='utf-8') as f:
+with open(r'C:\unrealEngine\avariika\Saved\meshy_import_result.txt', 'w', encoding='utf-8') as f:
     f.write('\n'.join(out))

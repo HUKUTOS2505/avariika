@@ -27,5 +27,5 @@ for path in candidates:
 if not out:
     out.append('нормал-текстура не найдена по ожидаемым путям')
 
-with open(r'D:\unrealEngine\avariika\Saved\fix_toilet_result.txt', 'w', encoding='utf-8') as f:
+with open(r'C:\unrealEngine\avariika\Saved\fix_toilet_result.txt', 'w', encoding='utf-8') as f:
     f.write('\n'.join(out))

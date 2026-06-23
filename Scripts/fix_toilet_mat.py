@@ -16,4 +16,4 @@ if mat and mesh:
     cur = mesh.get_material(0)
     out.append('SM_Toilet mat[0] = %s' % (cur.get_name() if cur else 'None'))
 unreal.EditorLoadingAndSavingUtils.save_dirty_packages(True, True)
-open(r'D:\unrealEngine\avariika\Saved\fix_toilet_mat.txt', 'w', encoding='utf-8').write('\n'.join(out))
+open(r'C:\unrealEngine\avariika\Saved\fix_toilet_mat.txt', 'w', encoding='utf-8').write('\n'.join(out))

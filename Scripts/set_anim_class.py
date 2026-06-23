@@ -24,5 +24,5 @@ try:
     unreal.EditorAssetLibrary.save_loaded_asset(bp, False); R["steps"].append("saved bp")
 except Exception as e:
     R["err"]=str(e); R["tb"]=traceback.format_exc()
-with open(r"D:/unrealEngine/avariika/Scripts/manifests/_set_anim_class.json","w") as f: json.dump(R,f,indent=1)
+with open(r"C:/unrealEngine/avariika/Scripts/manifests/_set_anim_class.json","w") as f: json.dump(R,f,indent=1)
 unreal.log("SET_ANIM_CLASS done")

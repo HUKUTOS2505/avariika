@@ -13,6 +13,6 @@ try:
     R["saved"] = bool(unreal.EditorAssetLibrary.save_asset(path, only_if_is_dirty=False))
 except Exception as e:
     R["err"] = str(e); R["tb"] = traceback.format_exc()
-with open(r"D:/unrealEngine/avariika/Scripts/manifests/_compile_char.json", "w", encoding="utf-8") as f:
+with open(r"C:/unrealEngine/avariika/Scripts/manifests/_compile_char.json", "w", encoding="utf-8") as f:
     json.dump(R, f, indent=1, default=str)
 unreal.log("COMPILE_CHAR %s" % json.dumps(R, default=str))

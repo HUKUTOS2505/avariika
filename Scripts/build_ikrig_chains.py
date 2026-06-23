@@ -1,5 +1,5 @@
 import unreal, json
-OUT = r"D:/unrealEngine/avariika/Scripts/build_ikrig_chains.json"
+OUT = r"C:/unrealEngine/avariika/Scripts/build_ikrig_chains.json"
 R = {"op": {}, "src": {}, "err": None}
 
 def setup(rig_path, root, chains):

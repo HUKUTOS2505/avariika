@@ -8,8 +8,8 @@
 import unreal, json, traceback
 eal = unreal.EditorAssetLibrary
 ar = unreal.AssetRegistryHelpers.get_asset_registry()
-LOG = r"D:/unrealEngine/avariika/Scripts/manifests/_consolidate_progress.txt"
-RES = r"D:/unrealEngine/avariika/Scripts/manifests/_consolidate.json"
+LOG = r"C:/unrealEngine/avariika/Scripts/manifests/_consolidate_progress.txt"
+RES = r"C:/unrealEngine/avariika/Scripts/manifests/_consolidate.json"
 
 def logline(s):
     with open(LOG, "a", encoding="utf-8") as f: f.write(s + "\n")

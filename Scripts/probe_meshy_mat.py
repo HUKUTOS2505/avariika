@@ -9,7 +9,7 @@ out = []
 unreal.SystemLibrary.execute_console_command(None, 'Interchange.FeatureFlags.Import.FBX 0')
 
 FBX = None
-RAW = r'D:\unrealEngine\avariika\RawAssets\SM_FireExtinguisher'
+RAW = r'C:\unrealEngine\avariika\RawAssets\SM_FireExtinguisher'
 for f in sorted(os.listdir(RAW)):
     if f.lower().endswith('.fbx'):
         FBX = os.path.join(RAW, f); break
@@ -58,4 +58,4 @@ out.append('--- assets in _test ---')
 for a in unreal.EditorAssetLibrary.list_assets(DEST, recursive=False):
     out.append('  ' + a.split('/')[-1])
 
-open(r'D:\unrealEngine\avariika\Saved\probe_meshy_mat.txt', 'w', encoding='utf-8').write('\n'.join(out))
+open(r'C:\unrealEngine\avariika\Saved\probe_meshy_mat.txt', 'w', encoding='utf-8').write('\n'.join(out))

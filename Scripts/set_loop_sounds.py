@@ -1,6 +1,6 @@
 import unreal
 
-out = "D:/unrealEngine/avariika/Saved/set_loop_sounds.txt"
+out = "C:/unrealEngine/avariika/Saved/set_loop_sounds.txt"
 lines = []
 for name in ["Ambient_Boiler", "Heartbeat"]:
     path = "/Game/Audio/SFX/%s" % name

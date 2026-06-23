@@ -31,4 +31,4 @@ except Exception as e:
 
 les.save_current_level()
 unreal.EditorLoadingAndSavingUtils.save_dirty_packages(True, True)
-open(r'D:\unrealEngine\avariika\Saved\fix_radio_rot_verify_spot.txt', 'w', encoding='utf-8').write('\n'.join(out))
+open(r'C:\unrealEngine\avariika\Saved\fix_radio_rot_verify_spot.txt', 'w', encoding='utf-8').write('\n'.join(out))

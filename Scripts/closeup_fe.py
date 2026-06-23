@@ -15,4 +15,4 @@ mx = max(b.x, b.y, b.z) * 2.0
 s = 55.0 / mx if mx > 0 else 1.0
 a.set_actor_scale3d(unreal.Vector(s, s, s))
 a.set_actor_rotation(unreal.Rotator(pitch=0.0, yaw=200.0, roll=0.0), False)
-open(r'D:\unrealEngine\avariika\Saved\closeup_fe.txt', 'w', encoding='utf-8').write('ok scale %.3f' % s)
+open(r'C:\unrealEngine\avariika\Saved\closeup_fe.txt', 'w', encoding='utf-8').write('ok scale %.3f' % s)

@@ -4,7 +4,7 @@
 import os
 import unreal
 
-RAWROOT = r'D:\unrealEngine\avariika\RawAssets'
+RAWROOT = r'C:\unrealEngine\avariika\RawAssets'
 DEST = '/Game/Avariika/Meshes'
 tools = unreal.AssetToolsHelpers.get_asset_tools()
 mel = unreal.MaterialEditingLibrary
@@ -159,4 +159,4 @@ for folder, name, label, bp, cls, target in CONFIGS:
 
 les.save_current_level()
 out.append('save_dirty=%s' % unreal.EditorLoadingAndSavingUtils.save_dirty_packages(True, True))
-open(r'D:\unrealEngine\avariika\Saved\import_meshy_batch.txt', 'w', encoding='utf-8').write('\n'.join(out))
+open(r'C:\unrealEngine\avariika\Saved\import_meshy_batch.txt', 'w', encoding='utf-8').write('\n'.join(out))

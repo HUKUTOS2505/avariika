@@ -34,6 +34,6 @@ try:
 except Exception as e:
     R["err"] = str(e); R["tb"] = traceback.format_exc()
 tag = "crouched" if R.get("bIsCrouched") else "standing"
-with open(r"D:/unrealEngine/avariika/Scripts/manifests/_crouch_%s.json" % tag, "w") as f:
+with open(r"C:/unrealEngine/avariika/Scripts/manifests/_crouch_%s.json" % tag, "w") as f:
     json.dump(R, f, indent=1, default=str)
 unreal.log("MEASURE_CROUCH %s" % json.dumps(R, default=str))

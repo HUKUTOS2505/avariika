@@ -1,6 +1,6 @@
 import unreal, json
-OUT = r"D:/unrealEngine/avariika/Scripts/manifests/mod_charemotes.txt"
-JOUT = r"D:/unrealEngine/avariika/Scripts/manifests/_charemotes.json"
+OUT = r"C:/unrealEngine/avariika/Scripts/manifests/mod_charemotes.txt"
+JOUT = r"C:/unrealEngine/avariika/Scripts/manifests/_charemotes.json"
 ar = unreal.AssetRegistryHelpers.get_asset_registry()
 ar.scan_paths_synchronous(["/Game/CharacterEmotes"], True, False)
 R = {"anims": [], "skeletons": {}, "meshes": [], "other": {}}

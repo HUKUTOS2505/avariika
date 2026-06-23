@@ -14,4 +14,4 @@ for lbl in labels:
     if a:
         l = a.get_actor_location()
         out.append('%s: (%.0f,%.0f,%.0f)' % (lbl, l.x, l.y, l.z))
-open(r'D:\unrealEngine\avariika\Saved\loc_report.txt', 'w', encoding='utf-8').write('\n'.join(out))
+open(r'C:\unrealEngine\avariika\Saved\loc_report.txt', 'w', encoding='utf-8').write('\n'.join(out))

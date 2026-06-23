@@ -25,4 +25,4 @@ for lbl in ['Cable', 'FuelCanister', 'WeldingMachine', 'Fuse']:
         lbl, str(a.get_editor_property('ItemSize')).split('.')[-1],
         a.get_editor_property('ToolTag'), a.get_editor_property('Charges')))
 
-open(r'D:\unrealEngine\avariika\Saved\verify_stages.txt', 'w', encoding='utf-8').write('\n'.join(out))
+open(r'C:\unrealEngine\avariika\Saved\verify_stages.txt', 'w', encoding='utf-8').write('\n'.join(out))

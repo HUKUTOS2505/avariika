@@ -15,5 +15,5 @@ try:
     out.append('\nAEM ENUM: ' + ', '.join(aem))
 except Exception as e:
     out.append('aem fail: ' + str(e))
-open(r'D:\unrealEngine\avariika\Saved\ppv_props.txt', 'w', encoding='utf-8').write('\n'.join(out))
+open(r'C:\unrealEngine\avariika\Saved\ppv_props.txt', 'w', encoding='utf-8').write('\n'.join(out))
 print('\n'.join(out))

@@ -1,5 +1,5 @@
 import unreal, json
-OUT = r"D:/unrealEngine/avariika/Scripts/list_ops.json"
+OUT = r"C:/unrealEngine/avariika/Scripts/list_ops.json"
 rt = unreal.load_asset("/Game/Characters/Operator/Rig/RTG_MCO_to_Operator.RTG_MCO_to_Operator")
 ctrl = unreal.IKRetargeterController.get_controller(rt)
 R = {"ops": []}

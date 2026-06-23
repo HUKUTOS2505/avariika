@@ -1,5 +1,5 @@
 import unreal, json
-OUT = r"D:/unrealEngine/avariika/Scripts/make_operator_ikrig.json"
+OUT = r"C:/unrealEngine/avariika/Scripts/make_operator_ikrig.json"
 R = {"steps": [], "op_bones": [], "src_bones": [], "err": None}
 tools = unreal.AssetToolsHelpers.get_asset_tools()
 

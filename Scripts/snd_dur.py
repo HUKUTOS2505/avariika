@@ -10,4 +10,4 @@ for n in ["Movement/Walk_stone","Movement/Jog_stone","Movement/Run_stone","Movem
         except Exception: lp="?"
         out.append("%-22s dur=%.2fs looping=%s"%(n.split('/')[-1], d, lp))
     else: out.append("%s NOTFOUND"%n)
-open("D:/unrealEngine/avariika/Saved/snd_dur.txt","w").write("\n".join(out))
+open("C:/unrealEngine/avariika/Saved/snd_dur.txt","w").write("\n".join(out))

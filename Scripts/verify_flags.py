@@ -1,6 +1,6 @@
 # verify_flags.py — read-only проверка флагов FLOOR1_DESIGN: просели ли двери коридора, под полом ли PlayerStart.
 import unreal, json
-OUT = r"D:\unrealEngine\avariika\Saved\verify_flags.json"
+OUT = r"C:\unrealEngine\avariika\Saved\verify_flags.json"
 res = {"ok": False}
 try:
     eas = unreal.get_editor_subsystem(unreal.EditorActorSubsystem)

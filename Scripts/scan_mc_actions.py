@@ -1,5 +1,5 @@
 import unreal, json
-OUT = r"D:/unrealEngine/avariika/Scripts/scan_mc_actions.json"
+OUT = r"C:/unrealEngine/avariika/Scripts/scan_mc_actions.json"
 R = {}
 ar = unreal.AssetRegistryHelpers.get_asset_registry()
 f = unreal.ARFilter(class_names=["AnimSequence"], package_paths=["/Game/MC_Sample"], recursive_paths=True)

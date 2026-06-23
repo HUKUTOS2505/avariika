@@ -56,6 +56,6 @@ try:
                         R["in_frame_estimate"] = ang < (fov*0.5)  # грубо: половина горизонт. FOV
 except Exception as e:
     R["err"] = str(e); R["tb"] = traceback.format_exc()
-with open(r"D:/unrealEngine/avariika/Scripts/manifests/_decisive_tp.json", "w") as f:
+with open(r"C:/unrealEngine/avariika/Scripts/manifests/_decisive_tp.json", "w") as f:
     json.dump(R, f, indent=1, default=str)
 unreal.log("DECISIVE_TP %s" % json.dumps(R, default=str))

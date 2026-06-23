@@ -4,7 +4,7 @@
 под длину пикапа (~530см), положить флэтом у ExitZone_Gazelle. Nanite для тяжёлого меша."""
 import unreal
 
-FBX = r'D:\unrealEngine\avariika\RawAssets\SM_Gazelle\source\hilux\hilux\hilux.fbx'
+FBX = r'C:\unrealEngine\avariika\RawAssets\SM_Gazelle\source\hilux\hilux\hilux.fbx'
 SUB = '/Game/Avariika/Meshes/Hilux'
 NAME = 'SM_Hilux'
 LENGTH = 530.0
@@ -73,4 +73,4 @@ else:
 
 les.save_current_level()
 out.append('save_dirty=%s' % unreal.EditorLoadingAndSavingUtils.save_dirty_packages(True, True))
-open(r'D:\unrealEngine\avariika\Saved\import_hilux.txt', 'w', encoding='utf-8').write('\n'.join(out))
+open(r'C:\unrealEngine\avariika\Saved\import_hilux.txt', 'w', encoding='utf-8').write('\n'.join(out))

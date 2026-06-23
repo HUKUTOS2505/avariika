@@ -1,5 +1,5 @@
 import unreal, json
-OUT = r"D:/unrealEngine/avariika/Scripts/fix_spine_chain.json"
+OUT = r"C:/unrealEngine/avariika/Scripts/fix_spine_chain.json"
 R = {"steps": []}
 eal = unreal.EditorAssetLibrary
 

@@ -9,7 +9,7 @@ unreal.SystemLibrary.execute_console_command(None, 'Interchange.FeatureFlags.Imp
 MESHES = '/Game/Avariika/Meshes'
 JOBS = ['SM_BioBlob', 'SM_Floodlight', 'SM_Trap']
 for folder in JOBS:
-    d = os.path.join(r'D:\unrealEngine\avariika\RawAssets', folder)
+    d = os.path.join(r'C:\unrealEngine\avariika\RawAssets', folder)
     fbx = None
     for f in sorted(os.listdir(d)):
         if f.lower().endswith('.fbx'):
@@ -43,4 +43,4 @@ for folder in JOBS:
         pass
     out.append('%s: maxdim=%.1fсм sect=%d path=%s' % (folder, mx, m.get_num_sections(0), obj))
 unreal.EditorLoadingAndSavingUtils.save_dirty_packages(True, True)
-open(r'D:\unrealEngine\avariika\Saved\import_deployed_native.txt', 'w', encoding='utf-8').write('\n'.join(out))
+open(r'C:\unrealEngine\avariika\Saved\import_deployed_native.txt', 'w', encoding='utf-8').write('\n'.join(out))

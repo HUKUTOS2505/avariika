@@ -6,7 +6,7 @@ import unreal
 
 ROOT = '/Game/Avariika/Meshes'
 SUB = '/Game/Avariika/Meshes/Cigarettes'
-RAW = r'D:\unrealEngine\avariika\RawAssets\SM_Cigarettes\source'
+RAW = r'C:\unrealEngine\avariika\RawAssets\SM_Cigarettes\source'
 BP = '/Game/Avariika/Items/BP_Cigarettes'
 CLS = 'BP_Cigarettes_C'
 MAX_DIM = 11.0
@@ -87,4 +87,4 @@ out.append('root cig leftover = %d' % len(leftover))
 
 les.save_current_level()
 out.append('save_dirty=%s' % unreal.EditorLoadingAndSavingUtils.save_dirty_packages(True, True))
-open(r'D:\unrealEngine\avariika\Saved\reimport_cig_clean.txt', 'w', encoding='utf-8').write('\n'.join(out))
+open(r'C:\unrealEngine\avariika\Saved\reimport_cig_clean.txt', 'w', encoding='utf-8').write('\n'.join(out))

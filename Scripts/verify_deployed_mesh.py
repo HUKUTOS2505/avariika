@@ -20,4 +20,4 @@ for cls_path, expect in JOBS:
     out.append('%s -> mesh=%s scale=(%.2f,%.2f,%.2f) [ожидался %s]' % (
         cls_path.split('.')[-1], sm.get_name() if sm else 'NONE', sc.x, sc.y, sc.z, expect))
     eas.destroy_actor(a)
-open(r'D:\unrealEngine\avariika\Saved\verify_deployed_mesh.txt', 'w', encoding='utf-8').write('\n'.join(out))
+open(r'C:\unrealEngine\avariika\Saved\verify_deployed_mesh.txt', 'w', encoding='utf-8').write('\n'.join(out))

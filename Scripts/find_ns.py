@@ -12,4 +12,4 @@ for base in ["/Game/NiagaraExamples","/Game/Fire_EXP_Vol01_Free"]:
                 if k in low: tag=k; break
             if tag: out.append("%-10s %s" % (tag, pn))
 out=sorted(set(out))
-open("D:/unrealEngine/avariika/Saved/find_ns.txt","w",encoding="utf-8").write("\n".join(out))
+open("C:/unrealEngine/avariika/Saved/find_ns.txt","w",encoding="utf-8").write("\n".join(out))

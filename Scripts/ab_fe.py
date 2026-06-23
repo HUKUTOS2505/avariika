@@ -23,4 +23,4 @@ for lbl, path, dy in PAIRS:
     a.set_actor_scale3d(unreal.Vector(s, s, s))
     a.set_actor_rotation(unreal.Rotator(pitch=0.0, yaw=200.0, roll=0.0), False)
     out.append('%s placed (dy=%.0f)' % (lbl, dy))
-open(r'D:\unrealEngine\avariika\Saved\ab_fe.txt', 'w', encoding='utf-8').write('\n'.join(out))
+open(r'C:\unrealEngine\avariika\Saved\ab_fe.txt', 'w', encoding='utf-8').write('\n'.join(out))

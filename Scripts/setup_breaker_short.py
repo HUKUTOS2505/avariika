@@ -43,7 +43,7 @@ try:
     les.save_current_level(); R["steps"].append("saved")
 except Exception as e:
     R["err"] = str(e); R["tb"] = traceback.format_exc()
-os.makedirs(r"D:/unrealEngine/avariika/Scripts/manifests", exist_ok=True)
-with open(r"D:/unrealEngine/avariika/Scripts/manifests/_breaker_short.json", "w") as f:
+os.makedirs(r"C:/unrealEngine/avariika/Scripts/manifests", exist_ok=True)
+with open(r"C:/unrealEngine/avariika/Scripts/manifests/_breaker_short.json", "w") as f:
     json.dump(R, f, indent=1, default=str, ensure_ascii=False)
 unreal.log("SETUP_BREAKER_SHORT %s" % json.dumps(R, default=str, ensure_ascii=False))

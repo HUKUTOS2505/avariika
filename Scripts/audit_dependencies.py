@@ -66,6 +66,6 @@ try:
     R["free_to_move"] = sorted([t for t in all_tops if t not in used and not t.startswith("__")])
 except Exception as e:
     R["err"] = str(e); R["tb"] = traceback.format_exc()
-with open(r"D:/unrealEngine/avariika/Scripts/manifests/_dep_audit.json", "w") as f:
+with open(r"C:/unrealEngine/avariika/Scripts/manifests/_dep_audit.json", "w") as f:
     json.dump(R, f, indent=1, default=str)
 unreal.log("DEP_AUDIT %s" % json.dumps(R, default=str))

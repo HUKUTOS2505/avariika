@@ -32,6 +32,6 @@ try:
             R["kept_referenced"].append({"name": name, "held": held})
 except Exception as e:
     R["err"] = str(e); R["tb"] = traceback.format_exc()
-with open(r"D:/unrealEngine/avariika/Scripts/manifests/_del_leftovers.json", "w", encoding="utf-8") as f:
+with open(r"C:/unrealEngine/avariika/Scripts/manifests/_del_leftovers.json", "w", encoding="utf-8") as f:
     json.dump(R, f, indent=1, ensure_ascii=False)
 unreal.log("DEL_LEFTOVERS done deleted=%d kept=%d" % (len(R["deleted"]), len(R["kept_referenced"])))

@@ -1,5 +1,5 @@
 import unreal, json
-OUT = r"D:/unrealEngine/avariika/Scripts/inventory_asp.json"
+OUT = r"C:/unrealEngine/avariika/Scripts/inventory_asp.json"
 R = {"asp_anims": [], "asp_skeletons": {}, "retarget_count": 0, "retarget_list": [],
      "rigs": [], "retargeters": [], "asp_paths": []}
 ar = unreal.AssetRegistryHelpers.get_asset_registry()

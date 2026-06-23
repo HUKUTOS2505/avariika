@@ -85,4 +85,4 @@ if pipe:
 
 les.save_current_level()
 out.append('save_dirty=%s' % unreal.EditorLoadingAndSavingUtils.save_dirty_packages(True, True))
-open(r'D:\unrealEngine\avariika\Saved\config_repair_v2.txt', 'w', encoding='utf-8').write('\n'.join(out))
+open(r'C:\unrealEngine\avariika\Saved\config_repair_v2.txt', 'w', encoding='utf-8').write('\n'.join(out))

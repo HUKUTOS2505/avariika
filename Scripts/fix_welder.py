@@ -38,4 +38,4 @@ les.save_current_level()
 saved = unreal.EditorLoadingAndSavingUtils.save_dirty_packages(True, True)
 out.append('save_dirty_packages = ' + str(saved))
 
-open(r'D:\unrealEngine\avariika\Saved\fix_welder.txt', 'w', encoding='utf-8').write('\n'.join(out))
+open(r'C:\unrealEngine\avariika\Saved\fix_welder.txt', 'w', encoding='utf-8').write('\n'.join(out))

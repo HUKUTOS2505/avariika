@@ -56,4 +56,4 @@ place('Fuse', 470.0, 400.0, FLOOR + 40.0, 0.0)                     # предо�
 
 les.save_current_level()
 out.append('save_dirty=%s' % unreal.EditorLoadingAndSavingUtils.save_dirty_packages(True, True))
-open(r'D:\unrealEngine\avariika\Saved\place_repair_test.txt', 'w', encoding='utf-8').write('\n'.join(out))
+open(r'C:\unrealEngine\avariika\Saved\place_repair_test.txt', 'w', encoding='utf-8').write('\n'.join(out))

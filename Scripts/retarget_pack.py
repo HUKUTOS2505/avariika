@@ -1,6 +1,6 @@
 import unreal, json
-JOB = r"D:/unrealEngine/avariika/Scripts/retarget_job.json"
-OUT = r"D:/unrealEngine/avariika/Scripts/manifests/_retarget_result.json"
+JOB = r"C:/unrealEngine/avariika/Scripts/retarget_job.json"
+OUT = r"C:/unrealEngine/avariika/Scripts/manifests/_retarget_result.json"
 with open(JOB) as fp: SPEC = json.load(fp)
 JOBS = SPEC if isinstance(SPEC, list) else [SPEC]
 eal = unreal.EditorAssetLibrary

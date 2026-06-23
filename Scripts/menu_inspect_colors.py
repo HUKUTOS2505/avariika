@@ -2,7 +2,7 @@ import unreal
 import traceback
 
 path = "/Game/OGMainMenu/UI/CoreUI/Text/CTS_Large_Color"
-out = "D:/unrealEngine/avariika/Saved/menu_colors.txt"
+out = "C:/unrealEngine/avariika/Saved/menu_colors.txt"
 lines = []
 
 try:

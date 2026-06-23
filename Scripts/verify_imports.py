@@ -1,5 +1,5 @@
 import unreal, json
-OUT = r"D:/unrealEngine/avariika/Scripts/manifests/_verify_imports.json"
+OUT = r"C:/unrealEngine/avariika/Scripts/manifests/_verify_imports.json"
 ar = unreal.AssetRegistryHelpers.get_asset_registry()
 ROOTS = ["/Game/AnimX", "/Game/JKMotion_HitReaction", "/Game/KnockedDown",
          "/Game/InteractionKitVol1", "/Game/ScifiWorkerAnimset", "/Game/WorkAnimations",

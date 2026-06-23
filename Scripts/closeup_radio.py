@@ -17,4 +17,4 @@ for a in eas.get_all_level_actors():
         a.set_actor_rotation(unreal.Rotator(pitch=0.0, yaw=180.0, roll=0.0), False)
     else:
         a.set_actor_location(unreal.Vector(72.0, 4000.0, 372.0), False, True)
-open(r'D:\unrealEngine\avariika\Saved\closeup_radio.txt', 'w', encoding='utf-8').write('ok')
+open(r'C:\unrealEngine\avariika\Saved\closeup_radio.txt', 'w', encoding='utf-8').write('ok')

@@ -1,5 +1,5 @@
 import unreal, json
-OUT = r"D:/unrealEngine/avariika/Scripts/delete_wrong_anims.json"
+OUT = r"C:/unrealEngine/avariika/Scripts/delete_wrong_anims.json"
 eal = unreal.EditorAssetLibrary
 ar = unreal.AssetRegistryHelpers.get_asset_registry()
 ar.scan_paths_synchronous(["/Game/Characters/Operator"], True, False)

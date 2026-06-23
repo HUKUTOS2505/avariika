@@ -61,4 +61,4 @@ try:
     out.append('instances=%d save_dirty=%s' % (n, unreal.EditorLoadingAndSavingUtils.save_dirty_packages(True, True)))
 except Exception as e:
     out.append('FATAL %s' % e)
-open(r'D:\unrealEngine\avariika\Saved\fix_item_collision.txt', 'w', encoding='utf-8').write('\n'.join(out))
+open(r'C:\unrealEngine\avariika\Saved\fix_item_collision.txt', 'w', encoding='utf-8').write('\n'.join(out))

@@ -1,7 +1,7 @@
 import unreal, os, json
-STAGE = r"D:/unrealEngine/avariika/RawAssets/_char_stage/mesh"
+STAGE = r"C:/unrealEngine/avariika/RawAssets/_char_stage/mesh"
 DEST = "/Game/Characters/Operator"
-OUT = r"D:/unrealEngine/avariika/Scripts/build_operator_material.json"
+OUT = r"C:/unrealEngine/avariika/Scripts/build_operator_material.json"
 tools = unreal.AssetToolsHelpers.get_asset_tools()
 mel = unreal.MaterialEditingLibrary
 eal = unreal.EditorAssetLibrary

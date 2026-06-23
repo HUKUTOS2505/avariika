@@ -8,7 +8,7 @@ les = unreal.get_editor_subsystem(unreal.LevelEditorSubsystem)
 out = []
 unreal.SystemLibrary.execute_console_command(None, 'Interchange.FeatureFlags.Import.FBX 0')
 
-RAW = r'D:\unrealEngine\avariika\RawAssets\SM_LightKit_Folded'
+RAW = r'C:\unrealEngine\avariika\RawAssets\SM_LightKit_Folded'
 fbx = None
 for f in sorted(os.listdir(RAW)):
     if f.lower().endswith('.fbx'):
@@ -41,4 +41,4 @@ else:
     out.append('FAIL')
 les.save_current_level()
 out.append('save_dirty=%s' % unreal.EditorLoadingAndSavingUtils.save_dirty_packages(True, True))
-open(r'D:\unrealEngine\avariika\Saved\import_lightkit_native.txt', 'w', encoding='utf-8').write('\n'.join(out))
+open(r'C:\unrealEngine\avariika\Saved\import_lightkit_native.txt', 'w', encoding='utf-8').write('\n'.join(out))

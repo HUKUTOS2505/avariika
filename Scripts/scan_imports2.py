@@ -11,4 +11,4 @@ for p in PATHS:
     datas = ar.get_assets_by_path(p, recursive=True)
     sm = sum(1 for d in datas if str(getattr(d, 'asset_class_path', d).asset_name) == 'StaticMesh')
     out.append('%s -> %d ассетов (мешей: %d)' % (p, len(datas), sm))
-open(r'D:\unrealEngine\avariika\Saved\scan_imports2.txt', 'w', encoding='utf-8').write('\n'.join(out))
+open(r'C:\unrealEngine\avariika\Saved\scan_imports2.txt', 'w', encoding='utf-8').write('\n'.join(out))

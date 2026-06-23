@@ -20,4 +20,4 @@ if sk:
         out.append('loaded OK: %s' % (sk[0] if m else 'NULL'))
     except Exception as e:
         out.append('LOAD ERR: %s' % e)
-open(r'D:\unrealEngine\avariika\Saved\scan_sarah.txt', 'w', encoding='utf-8').write('\n'.join(out))
+open(r'C:\unrealEngine\avariika\Saved\scan_sarah.txt', 'w', encoding='utf-8').write('\n'.join(out))

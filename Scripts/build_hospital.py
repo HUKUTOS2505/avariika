@@ -416,5 +416,5 @@ saved = unreal.EditorLoadingAndSavingUtils.save_dirty_packages(True, True)
 out.append('save_dirty_packages = ' + str(saved))
 out.append('total actors now = ' + str(len(eas.get_all_level_actors())))
 
-open(r'D:\unrealEngine\avariika\Saved\build_hospital.txt', 'w', encoding='utf-8').write('\n'.join(out))
+open(r'C:\unrealEngine\avariika\Saved\build_hospital.txt', 'w', encoding='utf-8').write('\n'.join(out))
 print('\n'.join(out))

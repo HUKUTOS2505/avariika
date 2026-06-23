@@ -24,6 +24,6 @@ jumps=[]
 for a in ar.get_assets(unreal.ARFilter(class_names=["AnimSequence"], package_paths=["/Game/Characters/Operator/Anims"], recursive_paths=True)):
     nm=str(a.asset_name)
     if "jump" in nm.lower() or "fall" in nm.lower(): jumps.append(nm)
-with open(r"D:/unrealEngine/avariika/Scripts/manifests/_cleanup2.json","w") as f:
+with open(r"C:/unrealEngine/avariika/Scripts/manifests/_cleanup2.json","w") as f:
     json.dump({"removed":gone,"count_now":len(names),"meshy_jumps":jumps}, f, indent=1)
 unreal.log("CLEANUP2 removed %d now %d" % (len(gone), len(names)))

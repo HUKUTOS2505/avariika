@@ -17,4 +17,4 @@ if p:
     s.set_editor_property('override_bloom_intensity', True)
     s.set_editor_property('bloom_intensity', 0.1)
     p.set_editor_property('settings', s)
-open(r'D:\unrealEngine\avariika\Saved\product_calib.txt', 'w', encoding='utf-8').write('ok')
+open(r'C:\unrealEngine\avariika\Saved\product_calib.txt', 'w', encoding='utf-8').write('ok')

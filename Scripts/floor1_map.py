@@ -2,8 +2,8 @@
 # Заполняем по bounds (clip клетки), не точечно — тонкие стены иначе проскакивают.
 # Слой пола: SM_Floor* c z-центром в [150,280]. Слой стен: bounds пересекает z=300, центр z<500.
 import unreal, json
-OUT_TXT = r"D:\unrealEngine\avariika\Saved\floor1_map.txt"
-OUT_JSON = r"D:\unrealEngine\avariika\Saved\floor1_map.json"
+OUT_TXT = r"C:\unrealEngine\avariika\Saved\floor1_map.txt"
+OUT_JSON = r"C:\unrealEngine\avariika\Saved\floor1_map.json"
 
 CELL = 100.0
 X0, X1 = -2700.0, 5100.0

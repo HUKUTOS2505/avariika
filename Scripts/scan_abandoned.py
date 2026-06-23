@@ -18,4 +18,4 @@ for cn in sorted(by_class, key=lambda k: -by_class[k]):
 maps = [str(d.package_name) for d in datas if str(getattr(d, 'asset_class_path', d).asset_name if hasattr(d, 'asset_class_path') else '') == 'World']
 out.append('maps: ' + (', '.join(maps) if maps else 'none'))
 
-open(r'D:\unrealEngine\avariika\Saved\scan_abandoned.txt', 'w', encoding='utf-8').write('\n'.join(out))
+open(r'C:\unrealEngine\avariika\Saved\scan_abandoned.txt', 'w', encoding='utf-8').write('\n'.join(out))

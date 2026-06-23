@@ -24,4 +24,4 @@ left = [x.split('/')[-1].split('.')[0] for x in unreal.EditorAssetLibrary.list_a
 out.append('root now (%d): %s' % (len(left), ', '.join(sorted(set(left)))))
 out.append('killed list: ' + ', '.join(killed[:40]))
 unreal.EditorLoadingAndSavingUtils.save_dirty_packages(True, True)
-open(r'D:\unrealEngine\avariika\Saved\root_clean.txt', 'w', encoding='utf-8').write('\n'.join(out))
+open(r'C:\unrealEngine\avariika\Saved\root_clean.txt', 'w', encoding='utf-8').write('\n'.join(out))

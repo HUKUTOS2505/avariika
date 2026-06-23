@@ -19,4 +19,4 @@ try:
         out.append('pawn loc=(%.1f,%.1f,%.1f)' % (pl.x, pl.y, pl.z))
 except Exception as e:
     out.append('ERR %s' % e)
-open(r'D:\unrealEngine\avariika\Saved\pie_cam.txt', 'w', encoding='utf-8').write('\n'.join(out))
+open(r'C:\unrealEngine\avariika\Saved\pie_cam.txt', 'w', encoding='utf-8').write('\n'.join(out))

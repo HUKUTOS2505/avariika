@@ -39,4 +39,4 @@ if p:
     p.set_editor_property('settings', s)
     out.append('exposure 8.5')
 
-open(r'D:\unrealEngine\avariika\Saved\product_shot_aim.txt', 'w', encoding='utf-8').write('\n'.join(out))
+open(r'C:\unrealEngine\avariika\Saved\product_shot_aim.txt', 'w', encoding='utf-8').write('\n'.join(out))

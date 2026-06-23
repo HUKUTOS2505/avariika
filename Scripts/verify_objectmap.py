@@ -17,6 +17,6 @@ R["exit_labels"] = labels_exit
 R["interesting"] = {k: v for k, v in cnt.items()
                     if k in ("ExitZone", "Repairable", "CallBoard", "ToolCase", "PlayerStart")
                     or "azelle" in k or "Truck" in k}
-with open(r"D:/unrealEngine/avariika/Scripts/manifests/_verify_obj.json", "w") as f:
+with open(r"C:/unrealEngine/avariika/Scripts/manifests/_verify_obj.json", "w") as f:
     json.dump(R, f, indent=1, default=str)
 unreal.log("VERIFY_OBJ %s" % json.dumps(R, default=str))

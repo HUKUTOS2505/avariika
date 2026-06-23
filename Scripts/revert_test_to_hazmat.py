@@ -27,6 +27,6 @@ try:
     R["steps"].append("вернулся на Lvl_FirstPerson")
 except Exception as e:
     R["err"] = str(e); R["tb"] = traceback.format_exc()
-with open(r"D:/unrealEngine/avariika/Scripts/manifests/_revert_test.json", "w", encoding="utf-8") as f:
+with open(r"C:/unrealEngine/avariika/Scripts/manifests/_revert_test.json", "w", encoding="utf-8") as f:
     json.dump(R, f, indent=1, ensure_ascii=False)
 unreal.log("REVERT_TEST %s" % json.dumps(R, default=str))

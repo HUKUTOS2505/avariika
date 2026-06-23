@@ -1,5 +1,5 @@
 import unreal, json
-OUT = r"D:/unrealEngine/avariika/Scripts/build_anim_test_map.json"
+OUT = r"C:/unrealEngine/avariika/Scripts/build_anim_test_map.json"
 MAP = "/Game/Avariika/Maps/L_AnimTest"
 R = {"steps": [], "err": None}
 

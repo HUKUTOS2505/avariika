@@ -10,7 +10,7 @@ import_textures=False → меш без авто-текстур и без про
 import os
 import unreal
 
-RAW = r'D:\unrealEngine\avariika\RawAssets\SM_Tester'
+RAW = r'C:\unrealEngine\avariika\RawAssets\SM_Tester'
 DEST = '/Game/Avariika/Meshes'
 NAME = 'SM_Tester'
 ACTOR = 'Tester'
@@ -128,4 +128,4 @@ les.save_current_level()
 unreal.EditorLoadingAndSavingUtils.save_dirty_packages(True, True)
 out.append('сохранено')
 
-open(r'D:\unrealEngine\avariika\Saved\import_tester.txt', 'w', encoding='utf-8').write('\n'.join(out))
+open(r'C:\unrealEngine\avariika\Saved\import_tester.txt', 'w', encoding='utf-8').write('\n'.join(out))

@@ -29,4 +29,4 @@ for d in datas:
         out.append('ERR %s: %s' % (path.split('/')[-1], e))
 
 out.append('textures checked=%d capped=%d' % (checked, changed))
-open(r'D:\unrealEngine\avariika\Saved\cap_textures2.txt', 'w', encoding='utf-8').write('\n'.join(out))
+open(r'C:\unrealEngine\avariika\Saved\cap_textures2.txt', 'w', encoding='utf-8').write('\n'.join(out))

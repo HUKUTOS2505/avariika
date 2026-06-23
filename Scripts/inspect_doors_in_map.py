@@ -34,6 +34,6 @@ try:
     R["door_count"] = len(R["doors"])
 except Exception as e:
     R["err"] = str(e); R["tb"] = traceback.format_exc()
-with open(r"D:/unrealEngine/avariika/Scripts/manifests/_doors_in_map.json", "w", encoding="utf-8") as f:
+with open(r"C:/unrealEngine/avariika/Scripts/manifests/_doors_in_map.json", "w", encoding="utf-8") as f:
     json.dump(R, f, indent=1, default=str, ensure_ascii=False)
 unreal.log("INSPECT_DOORS %s" % json.dumps(R, default=str))

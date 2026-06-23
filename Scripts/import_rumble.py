@@ -1,6 +1,6 @@
 import unreal, wave, os, json
-STAGE = r"D:/unrealEngine/avariika/RawAssets/_audio_stage"
-OUT = r"D:/unrealEngine/avariika/Scripts/import_rumble_result.json"
+STAGE = r"C:/unrealEngine/avariika/RawAssets/_audio_stage"
+OUT = r"C:/unrealEngine/avariika/Scripts/import_rumble_result.json"
 tools = unreal.AssetToolsHelpers.get_asset_tools()
 
 def trim_wav(src, dst, seconds):

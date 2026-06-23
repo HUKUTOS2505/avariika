@@ -45,4 +45,4 @@ for a in eas.get_all_level_actors():
         lbl, world[0], world[1], world[2], max(world), s.x, s.y, s.z, REAL[lbl], flag))
 
 out.sort()
-open(r'D:\unrealEngine\avariika\Saved\audit_sizes.txt', 'w', encoding='utf-8').write('\n'.join(out))
+open(r'C:\unrealEngine\avariika\Saved\audit_sizes.txt', 'w', encoding='utf-8').write('\n'.join(out))

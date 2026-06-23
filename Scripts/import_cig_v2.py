@@ -10,7 +10,7 @@ out = []
 unreal.SystemLibrary.execute_console_command(None, 'Interchange.FeatureFlags.Import.FBX 0')
 
 SUB = '/Game/Avariika/Meshes/Cigarettes'
-RAW = r'D:\unrealEngine\avariika\RawAssets\SM_Cigarettes'
+RAW = r'C:\unrealEngine\avariika\RawAssets\SM_Cigarettes'
 fbx = None
 for f in sorted(os.listdir(RAW)):
     if f.lower().endswith('.fbx'):
@@ -57,4 +57,4 @@ else:
 
 les.save_current_level()
 out.append('save_dirty=%s' % unreal.EditorLoadingAndSavingUtils.save_dirty_packages(True, True))
-open(r'D:\unrealEngine\avariika\Saved\import_cig_v2.txt', 'w', encoding='utf-8').write('\n'.join(out))
+open(r'C:\unrealEngine\avariika\Saved\import_cig_v2.txt', 'w', encoding='utf-8').write('\n'.join(out))

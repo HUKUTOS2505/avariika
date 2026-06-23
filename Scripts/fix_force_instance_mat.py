@@ -40,4 +40,4 @@ for a in eas.get_all_level_actors():
 
 les.save_current_level()
 out.append('instances=%d save_dirty=%s' % (n, unreal.EditorLoadingAndSavingUtils.save_dirty_packages(True, True)))
-open(r'D:\unrealEngine\avariika\Saved\fix_force_instance_mat.txt', 'w', encoding='utf-8').write('\n'.join(out))
+open(r'C:\unrealEngine\avariika\Saved\fix_force_instance_mat.txt', 'w', encoding='utf-8').write('\n'.join(out))

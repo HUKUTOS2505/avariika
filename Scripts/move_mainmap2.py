@@ -27,6 +27,6 @@ try:
         R["match"] = (R["actor_count_after"] == R["expected_actors"])
 except Exception as e:
     R["err"] = str(e); R["tb"] = traceback.format_exc()
-with open(r"D:/unrealEngine/avariika/Scripts/manifests/_move_mainmap2.json", "w") as f:
+with open(r"C:/unrealEngine/avariika/Scripts/manifests/_move_mainmap2.json", "w") as f:
     json.dump(R, f, indent=1, default=str)
 unreal.log("MOVE_MAINMAP2 %s" % json.dumps(R, default=str))

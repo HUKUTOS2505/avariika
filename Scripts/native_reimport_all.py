@@ -6,7 +6,7 @@
 import os
 import unreal
 
-RAWROOT = r'D:\unrealEngine\avariika\RawAssets'
+RAWROOT = r'C:\unrealEngine\avariika\RawAssets'
 MESHES = '/Game/Avariika/Meshes'
 tools = unreal.AssetToolsHelpers.get_asset_tools()
 eas = unreal.get_editor_subsystem(unreal.EditorActorSubsystem)
@@ -119,4 +119,4 @@ for folder, kind, target in CFG:
 
 les.save_current_level()
 out.append('save_dirty=%s' % unreal.EditorLoadingAndSavingUtils.save_dirty_packages(True, True))
-open(r'D:\unrealEngine\avariika\Saved\native_reimport_all.txt', 'w', encoding='utf-8').write('\n'.join(out))
+open(r'C:\unrealEngine\avariika\Saved\native_reimport_all.txt', 'w', encoding='utf-8').write('\n'.join(out))

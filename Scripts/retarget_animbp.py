@@ -1,5 +1,5 @@
 import unreal, json, traceback
-OUT = r"D:/unrealEngine/avariika/Scripts/manifests/_retarget_animbp.json"
+OUT = r"C:/unrealEngine/avariika/Scripts/manifests/_retarget_animbp.json"
 R = {"steps": [], "created": [], "err": None}
 try:
     eal = unreal.EditorAssetLibrary

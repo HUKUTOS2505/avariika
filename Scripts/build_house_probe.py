@@ -1,7 +1,7 @@
 import unreal, json
 SRC = "/Game/PostApocalypticHouse/Maps/LV_Horror_Light"
 DST = "/Game/Avariika/Maps/L_House01"
-OUT = r"D:/unrealEngine/avariika/Scripts/build_house_probe.json"
+OUT = r"C:/unrealEngine/avariika/Scripts/build_house_probe.json"
 R = {"steps": [], "err": None}
 eal = unreal.EditorAssetLibrary
 les = unreal.get_editor_subsystem(unreal.LevelEditorSubsystem)

@@ -19,6 +19,6 @@ try:
     R["ok"] = bool(w and "Lvl_FirstPerson" in w.get_name())
 except Exception as e:
     R["err"] = str(e)
-with open(r"D:/unrealEngine/avariika/Scripts/manifests/_move_off.json", "w", encoding="utf-8") as f:
+with open(r"C:/unrealEngine/avariika/Scripts/manifests/_move_off.json", "w", encoding="utf-8") as f:
     json.dump(R, f, indent=1, default=str, ensure_ascii=False)
 unreal.log("MOVE_OFF %s" % json.dumps(R, default=str))

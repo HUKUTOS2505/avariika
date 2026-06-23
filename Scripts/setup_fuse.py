@@ -40,7 +40,7 @@ try:
     les.save_current_level(); R["steps"].append("saved")
 except Exception as e:
     R["err"] = str(e); R["tb"] = traceback.format_exc()
-os.makedirs(r"D:/unrealEngine/avariika/Scripts/manifests", exist_ok=True)
-with open(r"D:/unrealEngine/avariika/Scripts/manifests/_fuse.json", "w") as f:
+os.makedirs(r"C:/unrealEngine/avariika/Scripts/manifests", exist_ok=True)
+with open(r"C:/unrealEngine/avariika/Scripts/manifests/_fuse.json", "w") as f:
     json.dump(R, f, indent=1, default=str)
 unreal.log("SETUP_FUSE %s" % json.dumps(R, default=str))

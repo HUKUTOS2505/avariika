@@ -87,5 +87,5 @@ try:
     les.save_current_level(); R["steps"].append("saved big house+basement+garage")
 except Exception as e:
     R["err"]=str(e); R["tb"]=traceback.format_exc()
-with open(r"D:/unrealEngine/avariika/Scripts/manifests/_big.json","w") as f: json.dump(R,f,indent=1,default=str)
+with open(r"C:/unrealEngine/avariika/Scripts/manifests/_big.json","w") as f: json.dump(R,f,indent=1,default=str)
 unreal.log("BUILD_DOM_BIG done boxes=%d"%R["boxes"])

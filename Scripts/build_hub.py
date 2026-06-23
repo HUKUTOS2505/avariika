@@ -6,7 +6,7 @@
 # (см. DOM_BUILD_GUIDE.md) или готовым пак-окружением. Геймплей-петля уже работает.
 #
 # Запуск (редактор ЗАКРЫТ):
-#   UnrealEditor-Cmd.exe <uproject> -run=pythonscript -script="D:\unrealEngine\avariika\Scripts\build_hub.py"
+#   UnrealEditor-Cmd.exe <uproject> -run=pythonscript -script="C:\unrealEngine\avariika\Scripts\build_hub.py"
 # Идемпотентно: каждый прогон пересоздаёт уровень свежим.
 import unreal, json, traceback
 
@@ -172,6 +172,6 @@ try:
 except Exception as e:
     R["err"] = str(e); R["tb"] = traceback.format_exc()
 
-with open(r"D:/unrealEngine/avariika/Scripts/manifests/_hub.json", "w") as f:
+with open(r"C:/unrealEngine/avariika/Scripts/manifests/_hub.json", "w") as f:
     json.dump(R, f, indent=1, default=str)
 unreal.log("BUILD_HUB done actors=%d err=%s" % (R["actors"], R["err"]))

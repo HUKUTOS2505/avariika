@@ -14,6 +14,6 @@ try:
         R[tag+"_dir_exists"] = eal.does_directory_exist(path)
 except Exception as e:
     R["err"] = str(e); R["tb"] = traceback.format_exc()
-with open(r"D:/unrealEngine/avariika/Scripts/manifests/_house_state.json", "w", encoding="utf-8") as f:
+with open(r"C:/unrealEngine/avariika/Scripts/manifests/_house_state.json", "w", encoding="utf-8") as f:
     json.dump(R, f, indent=1, ensure_ascii=False)
 unreal.log("CHECK_HOUSE_STATE %s" % json.dumps(R, default=str))

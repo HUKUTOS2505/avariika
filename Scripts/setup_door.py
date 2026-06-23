@@ -54,6 +54,6 @@ try:
     les.save_current_level(); R["steps"].append("saved")
 except Exception as e:
     R["err"] = str(e); R["tb"] = traceback.format_exc()
-os.makedirs(r"D:/unrealEngine/avariika/Scripts/manifests", exist_ok=True)
-open(r"D:/unrealEngine/avariika/Scripts/manifests/_door.json", "w").write(json.dumps(R, indent=1, default=str))
+os.makedirs(r"C:/unrealEngine/avariika/Scripts/manifests", exist_ok=True)
+open(r"C:/unrealEngine/avariika/Scripts/manifests/_door.json", "w").write(json.dumps(R, indent=1, default=str))
 unreal.log("SETUP_DOOR %s" % json.dumps(R, default=str))

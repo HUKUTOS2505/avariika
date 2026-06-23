@@ -23,4 +23,4 @@ for n in NAMES:
         except Exception as e:
             base = 'ERR %s' % e
     out.append('%s: mat0=%s base=%s' % (n, m0.get_name() if m0 else 'None', base))
-open(r'D:\unrealEngine\avariika\Saved\probe4.txt', 'w', encoding='utf-8').write('\n'.join(out))
+open(r'C:\unrealEngine\avariika\Saved\probe4.txt', 'w', encoding='utf-8').write('\n'.join(out))

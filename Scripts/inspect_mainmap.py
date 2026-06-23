@@ -26,6 +26,6 @@ try:
     R["sample_labels"] = names[:40]
 except Exception as e:
     R["err"] = str(e); R["tb"] = traceback.format_exc()
-with open(r"D:/unrealEngine/avariika/Scripts/manifests/_mainmap_before.json", "w") as f:
+with open(r"C:/unrealEngine/avariika/Scripts/manifests/_mainmap_before.json", "w") as f:
     json.dump(R, f, indent=1, default=str)
 unreal.log("MAINMAP_BEFORE %s" % json.dumps(R, default=str))

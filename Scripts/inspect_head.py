@@ -1,5 +1,5 @@
 import unreal, json, math
-OUT = r"D:/unrealEngine/avariika/Scripts/inspect_head.json"
+OUT = r"C:/unrealEngine/avariika/Scripts/inspect_head.json"
 R = {}
 
 # parents via transient component

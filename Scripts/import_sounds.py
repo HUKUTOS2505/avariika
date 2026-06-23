@@ -1,7 +1,7 @@
 import unreal, json, traceback
 R={"by_cat":{}, "imported":0, "err":None}
 try:
-    with open(r"D:/unrealEngine/avariika/Scripts/manifests/_snd_import.json") as f:
+    with open(r"C:/unrealEngine/avariika/Scripts/manifests/_snd_import.json") as f:
         jobs=json.load(f)
     tools=unreal.AssetToolsHelpers.get_asset_tools()
     tasks=[]
@@ -26,5 +26,5 @@ try:
     R["task_count"]=len(tasks)
 except Exception as e:
     R["err"]=str(e); R["tb"]=traceback.format_exc()
-with open(r"D:/unrealEngine/avariika/Scripts/manifests/_snd_import_result.json","w") as f: json.dump(R,f,indent=1)
+with open(r"C:/unrealEngine/avariika/Scripts/manifests/_snd_import_result.json","w") as f: json.dump(R,f,indent=1)
 unreal.log("IMPORT_SOUNDS done %d" % R["imported"])

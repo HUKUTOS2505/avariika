@@ -26,5 +26,5 @@ les.save_current_level()
 saved = unreal.EditorLoadingAndSavingUtils.save_dirty_packages(True, True)
 out.append('save_current_level + save_dirty_packages=%s' % saved)
 
-with open(r'D:\unrealEngine\avariika\Saved\assign_result.txt', 'w', encoding='utf-8') as f:
+with open(r'C:\unrealEngine\avariika\Saved\assign_result.txt', 'w', encoding='utf-8') as f:
     f.write('\n'.join(out))

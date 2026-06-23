@@ -1,5 +1,5 @@
 import unreal, json
-OUT = r"D:/unrealEngine/avariika/Scripts/fix_operator_color.json"
+OUT = r"C:/unrealEngine/avariika/Scripts/fix_operator_color.json"
 mel = unreal.MaterialEditingLibrary
 eal = unreal.EditorAssetLibrary
 R = {"steps": [], "err": None}

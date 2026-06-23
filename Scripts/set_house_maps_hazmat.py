@@ -5,7 +5,7 @@ import unreal, json, traceback
 les = unreal.get_editor_subsystem(unreal.LevelEditorSubsystem)
 ues = unreal.get_editor_subsystem(unreal.UnrealEditorSubsystem)
 avaryo = unreal.load_object(None, "/Game/Avariika/Blueprints/BP_AvaryoGameMode.BP_AvaryoGameMode_C")
-LOG = r"D:/unrealEngine/avariika/Scripts/manifests/_house_gm_progress.txt"
+LOG = r"C:/unrealEngine/avariika/Scripts/manifests/_house_gm_progress.txt"
 def L(s):
     with open(LOG, "a", encoding="utf-8") as f: f.write(s+"\n")
 MAPS = ["LV_Main", "LV_House", "LV_Horror_Light", "LV_Cinematic", "LV_Sunset_Light"]
@@ -29,6 +29,6 @@ try:
     L("вернулся на Lvl_FirstPerson")
 except Exception as e:
     R["err"] = str(e); R["tb"] = traceback.format_exc(); L("EXC %s" % e)
-with open(r"D:/unrealEngine/avariika/Scripts/manifests/_house_gm.json", "w", encoding="utf-8") as f:
+with open(r"C:/unrealEngine/avariika/Scripts/manifests/_house_gm.json", "w", encoding="utf-8") as f:
     json.dump(R, f, indent=1, ensure_ascii=False)
 unreal.log("SET_HOUSE_GM done")

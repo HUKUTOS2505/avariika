@@ -16,5 +16,5 @@ try:
     R["avaryo_skeletal_components"]=[c.get_name() for c in cdo.get_components_by_class(unreal.SkeletalMeshComponent)]
 except Exception as e:
     R["err"]=str(e); R["tb"]=traceback.format_exc()
-with open(r"D:/unrealEngine/avariika/Scripts/manifests/_pawns.json","w") as f: json.dump(R,f,indent=1,default=str)
+with open(r"C:/unrealEngine/avariika/Scripts/manifests/_pawns.json","w") as f: json.dump(R,f,indent=1,default=str)
 unreal.log("CHECK_PAWNS2 done")

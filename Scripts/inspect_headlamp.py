@@ -31,6 +31,6 @@ finally:
     try:
         if spawned: unreal.get_editor_subsystem(unreal.EditorActorSubsystem).destroy_actor(spawned)
     except Exception: pass
-with open(r"D:/unrealEngine/avariika/Scripts/manifests/_headlamp.json", "w", encoding="utf-8") as f:
+with open(r"C:/unrealEngine/avariika/Scripts/manifests/_headlamp.json", "w", encoding="utf-8") as f:
     json.dump(R, f, indent=1, default=str, ensure_ascii=False)
 unreal.log("INSPECT_HEADLAMP %s" % json.dumps(R, default=str))

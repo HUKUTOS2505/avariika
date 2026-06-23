@@ -19,4 +19,4 @@ for a in assets:
         shown += 1
         if shown >= 8:
             break
-open(r'D:\unrealEngine\avariika\Saved\probe_tex_type.txt', 'w', encoding='utf-8').write('\n'.join(out))
+open(r'C:\unrealEngine\avariika\Saved\probe_tex_type.txt', 'w', encoding='utf-8').write('\n'.join(out))

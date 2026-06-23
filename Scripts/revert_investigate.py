@@ -36,5 +36,5 @@ try:
     R["avaryo_char_mesh"]=str(mesh.get_editor_property("skeletal_mesh"))
 except Exception as e:
     R["err"]=str(e); R["tb"]=traceback.format_exc()
-with open(r"D:/unrealEngine/avariika/Scripts/manifests/_revert_investigate.json","w") as f: json.dump(R,f,indent=1)
+with open(r"C:/unrealEngine/avariika/Scripts/manifests/_revert_investigate.json","w") as f: json.dump(R,f,indent=1)
 unreal.log("REVERT_INVESTIGATE done")

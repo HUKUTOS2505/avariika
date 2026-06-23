@@ -1,5 +1,5 @@
 import unreal, json
-OUT = r"D:/unrealEngine/avariika/Scripts/assign_ops.json"
+OUT = r"C:/unrealEngine/avariika/Scripts/assign_ops.json"
 R = {"steps": []}
 rt = unreal.load_asset("/Game/Characters/Operator/Rig/RTG_MC_to_Operator.RTG_MC_to_Operator")
 tgt = unreal.load_asset("/Game/Characters/Operator/Rig/IK_Operator.IK_Operator")

@@ -58,4 +58,4 @@ for n in NAMES:
 for n, p in SUB.items():
     report_mesh(n, p)
 
-open(r'D:\unrealEngine\avariika\Saved\diag_all_mats.txt', 'w', encoding='utf-8').write('\n'.join(out))
+open(r'C:\unrealEngine\avariika\Saved\diag_all_mats.txt', 'w', encoding='utf-8').write('\n'.join(out))

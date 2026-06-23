@@ -22,4 +22,4 @@ out.append('killed root orphans = %d' % killed)
 left = [x.split('/')[-1].split('.')[0] for x in unreal.EditorAssetLibrary.list_assets(ROOT, recursive=False)]
 out.append('root now (%d): %s' % (len(left), ', '.join(sorted(set(left)))))
 unreal.EditorLoadingAndSavingUtils.save_dirty_packages(True, True)
-open(r'D:\unrealEngine\avariika\Saved\cleanup_old_root.txt', 'w', encoding='utf-8').write('\n'.join(out))
+open(r'C:\unrealEngine\avariika\Saved\cleanup_old_root.txt', 'w', encoding='utf-8').write('\n'.join(out))

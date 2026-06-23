@@ -3,11 +3,11 @@
 # place a test actor on Lvl_FirstPerson. Run via UnrealEditor-Cmd -run=pythonscript.
 import unreal, os, json
 
-STAGE_MESH = r"D:/unrealEngine/avariika/RawAssets/_char_stage/mesh"
-STAGE_ANIM = r"D:/unrealEngine/avariika/RawAssets/_char_stage/anims"
+STAGE_MESH = r"C:/unrealEngine/avariika/RawAssets/_char_stage/mesh"
+STAGE_ANIM = r"C:/unrealEngine/avariika/RawAssets/_char_stage/anims"
 DEST = "/Game/Characters/Operator"
 DEST_ANIM = DEST + "/Anims"
-OUT = r"D:/unrealEngine/avariika/Scripts/import_character_result.json"
+OUT = r"C:/unrealEngine/avariika/Scripts/import_character_result.json"
 
 DO_PLACE = False  # placement uses the editor world/Slate -> crashes in -unattended commandlet; do it in GUI later
 

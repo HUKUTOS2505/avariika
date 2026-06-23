@@ -1,7 +1,7 @@
 import unreal
 import traceback
 
-out = "D:/unrealEngine/avariika/Saved/cleanup_packs.txt"
+out = "C:/unrealEngine/avariika/Saved/cleanup_packs.txt"
 log = []
 def flush():
     with open(out, "w", encoding="utf-8") as f:

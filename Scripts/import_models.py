@@ -11,7 +11,7 @@
 import os
 import unreal
 
-RAW_DIR = r'D:\unrealEngine\avariika\RawAssets'
+RAW_DIR = r'C:\unrealEngine\avariika\RawAssets'
 DEST = '/Game/Avariika/Meshes'
 out = []
 
@@ -190,5 +190,5 @@ if level_dirty:
     les.save_current_level()
     out.append('сохранено dirty-пакетов: ' + str(saved))
 
-with open(r'D:\unrealEngine\avariika\Saved\import_result.txt', 'w', encoding='utf-8') as f:
+with open(r'C:\unrealEngine\avariika\Saved\import_result.txt', 'w', encoding='utf-8') as f:
     f.write('\n'.join(out) if out else 'нечего импортировать')

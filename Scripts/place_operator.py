@@ -1,5 +1,5 @@
 import unreal, json
-OUT = r"D:/unrealEngine/avariika/Scripts/place_operator_result.json"
+OUT = r"C:/unrealEngine/avariika/Scripts/place_operator_result.json"
 R = {"ok": False, "err": None, "loc": None}
 try:
     sk = unreal.load_asset("/Game/Characters/Operator/SK_Operator.SK_Operator")

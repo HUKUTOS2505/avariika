@@ -11,7 +11,7 @@ param(
     [switch]$AllMaps   # also download normal/metallic/roughness (off by default: meshy normal crashes UE)
 )
 $ErrorActionPreference = 'Stop'
-$root = 'D:\unrealEngine\avariika'
+$root = 'C:\unrealEngine\avariika'
 $key = (Get-Content "$root\.meshy_key" -Raw).Trim()
 $base = 'https://api.meshy.ai/openapi/v2/text-to-3d'
 $headers = @{ Authorization = "Bearer $key" }

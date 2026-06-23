@@ -1,5 +1,5 @@
 import unreal, json
-OUT = r"D:/unrealEngine/avariika/Scripts/diag_color.json"
+OUT = r"C:/unrealEngine/avariika/Scripts/diag_color.json"
 mel = unreal.MaterialEditingLibrary
 info = {}
 

@@ -49,6 +49,6 @@ finally:
             R["destroyed"] = True
     except Exception as e:
         R["destroy_err"] = str(e)
-with open(r"D:/unrealEngine/avariika/Scripts/manifests/_bp_hierarchy.json", "w") as f:
+with open(r"C:/unrealEngine/avariika/Scripts/manifests/_bp_hierarchy.json", "w") as f:
     json.dump(R, f, indent=1, default=str)
 unreal.log("BP_HIERARCHY %s" % json.dumps(R, default=str))

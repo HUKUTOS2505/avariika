@@ -21,6 +21,6 @@ import unreal as u
 ar = u.AssetRegistryHelpers.get_asset_registry()
 ar.scan_paths_synchronous([D[:-1]], True, False)
 names = sorted(str(a.asset_name) for a in ar.get_assets(u.ARFilter(class_names=["AnimSequence"], package_paths=[D[:-1]], recursive_paths=True)))
-with open(r"D:/unrealEngine/avariika/Scripts/manifests/_op_list.txt","w") as f: f.write("\n".join(names))
-with open(r"D:/unrealEngine/avariika/Scripts/manifests/_cleanup.json","w") as f: json.dump({"removed":gone,"count_now":len(names)}, f, indent=1)
+with open(r"C:/unrealEngine/avariika/Scripts/manifests/_op_list.txt","w") as f: f.write("\n".join(names))
+with open(r"C:/unrealEngine/avariika/Scripts/manifests/_cleanup.json","w") as f: json.dump({"removed":gone,"count_now":len(names)}, f, indent=1)
 u.log("CLEANUP removed %d, now %d" % (len(gone), len(names)))

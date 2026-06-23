@@ -9,4 +9,4 @@ for n in ['SM_Floodlight', 'SM_LightKit']:
     # min/max Z относительно пивота (0)
     out.append('%s: origin=(%.1f,%.1f,%.1f) ext=(%.1f,%.1f,%.1f) minZ=%.1f maxZ=%.1f height=%.1f' % (
         n, o.x, o.y, o.z, e.x, e.y, e.z, o.z - e.z, o.z + e.z, e.z * 2))
-open(r'D:\unrealEngine\avariika\Saved\probe_flood_pivot.txt','w',encoding='utf-8').write('\n'.join(out))
+open(r'C:\unrealEngine\avariika\Saved\probe_flood_pivot.txt','w',encoding='utf-8').write('\n'.join(out))

@@ -11,7 +11,7 @@ OPT = unreal.AssetRegistryDependencyOptions(include_hard_package_references=True
                                             include_soft_package_references=True)
 STR = ["ActorCore_Sample_Motions","Construction_Pit","Hyper","GoreAndHorrorMegapack",
        "JKMotion_HitReaction","ResourcePack"]
-LOG = r"D:/unrealEngine/avariika/Scripts/manifests/_stragglers_progress.txt"
+LOG = r"C:/unrealEngine/avariika/Scripts/manifests/_stragglers_progress.txt"
 def L(s):
     with open(LOG, "a", encoding="utf-8") as f: f.write(s+"\n")
 R = {"deleted_folders": [], "left_folders": [], "err": None}
@@ -54,6 +54,6 @@ try:
     L("=== DONE ===")
 except Exception as e:
     R["err"]=str(e); R["tb"]=traceback.format_exc(); L("EXC %s"%e)
-with open(r"D:/unrealEngine/avariika/Scripts/manifests/_stragglers.json","w",encoding="utf-8") as f:
+with open(r"C:/unrealEngine/avariika/Scripts/manifests/_stragglers.json","w",encoding="utf-8") as f:
     json.dump(R,f,indent=1,ensure_ascii=False)
 unreal.log("FINISH_STRAGGLERS done")

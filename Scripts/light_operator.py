@@ -1,5 +1,5 @@
 import unreal, json
-OUT = r"D:/unrealEngine/avariika/Scripts/light_operator.json"
+OUT = r"C:/unrealEngine/avariika/Scripts/light_operator.json"
 R = {"ok": False, "op_loc": None, "err": None}
 try:
     sub = unreal.get_editor_subsystem(unreal.EditorActorSubsystem)

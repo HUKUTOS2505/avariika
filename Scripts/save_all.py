@@ -5,4 +5,4 @@ try:
 except Exception:
     pass
 unreal.EditorLoadingAndSavingUtils.save_dirty_packages(True, True)
-open(r'D:\unrealEngine\avariika\Saved\save_all.txt', 'w').write('saved')
+open(r'C:\unrealEngine\avariika\Saved\save_all.txt', 'w').write('saved')
