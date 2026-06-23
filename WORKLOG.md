@@ -17,6 +17,16 @@
 - Перед «релизом» вернуть Health=100, Panic=0 в `VitalsComponent.cpp` (сейчас 50/50 для тестов).
 - 3D-модели делает пользователь в **meshy.ai** по промптам Claude; анимации делает пользователь. Импорт моделей — `Scripts/` + `asset.import` или `set_static_mesh` по метке актора.
 
+## СЕССИЯ 2026-06-23 (автоном, юзер спит) — ИГРОВОЕ МЕНЮ + НАСТРОЙКИ + ЛОКАЛИЗАЦИЯ RU/EN
+
+Юзер: «можешь поделать игровое меню, где звук/язык; плагин есть» → потом «давай лока локализация, я ещё сплю». Сделано/собрано/смоук-чисто/запушено:
+- **Внутриигровое Esc-меню паузы** (`3839f9f`): `AAvaryoPlayerController` ловит Escape (`SetupInputComponent`/`OnEscapePressed`) → `AvaryoHUD::DrawPauseMenu` (Canvas, хитбоксы): **Продолжить / Настройки / Выйти в меню**. Пауза только в `NM_Standalone` (в кооп-сети pause не ставим — десинк). `SetMenuInputMode` переключает курсор/`FInputModeGameAndUI` ↔ `ForceGameInput`.
+- **Настройки** (готовый плагин **EasyOptionsMenu**): `OpenSettings()` грузит `/Game/EasyOptionsMenu/Core/WBP_EasyOptionsMenuMain` (звук/графика/язык — UMG). Гард от дублей в вьюпорте (была утечка стака виджетов — лечил и в MenuHUD). Вызывается и из главного меню, и из паузы.
+- **Локализация RU/EN** (`ef4d3e8`, `LOCALIZATION.md`): прагматичный слой `FAvLoc::T(TEXT("рус"),TEXT("eng"))` (`Source/Avaryo/Public/AvariikaLoc.h`) под Canvas-HUD (DrawText берёт FString, не FText). Локализованы **главное меню** (MenuHUD: заголовок/кнопки/экран поиска) + **пауза-меню**. Дев-команда **`AvLang en`/`AvLang ru`** (exec на AAvaryoCharacter) переключает язык на лету.
+  - ⚠️ Готчи сборки UE5.7: `FCulture` неполный тип → нужен `#include "Internationalization/Culture.h"`; `FString::Printf` НЕ берёт рантайм-формат (checked-format) → строки с числом собирать конкатенацией (`+ FString::FromInt(n)`).
+  - **НЕ локализовано (большой батч на потом):** реплики диспетчера (~35 пулов), статусы/подсказки HUD (горит/мокрый/[E]…), «Акт», сам EasyOptionsMenu (UMG — через свои String Tables). Путь на полную локализацию (FText+gather+.locres) описан в `LOCALIZATION.md`. EasyOptionsMenu-дропдаун языка покажет EN только после supported-cultures/.locres — пока тестить через `AvLang`.
+- Цикл: правки → save level (MCP) → close → **Build Succeeded** (2 ошибки выше пофикшены, пересборка зелёная) → смоук чист (Engine initialized; ensure LocalizableMessage на килле — шатдаун-артефакт, не наш код) → коммит → push (`GIT_SSH_COMMAND` BatchMode, exit 0) → reopen editor.
+
 ## АВТОНОМ 2026-06-22 (remote-control, ultracode) — 3-Й ГЛУБОКИЙ АУДИТ (CODE_AUDIT3.md)
 
 Юзер: «продолжаем работу» (ultracode + remote-control). Документированный след.шаг из прошлой сессии = более глубокий/широкий аудит (perf/Tick, numeric/NaN, coop-race, validation, непокрытые файлы, ре-ревью фиксов). Запустил Workflow на 11 финдеров × 5 линз + adversarial-verify + синтез.
