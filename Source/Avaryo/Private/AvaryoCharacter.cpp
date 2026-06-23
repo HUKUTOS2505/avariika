@@ -17,6 +17,7 @@
 #include "Engine/TextureRenderTarget2D.h"
 #include "World/AExitZone.h"
 #include "Components/VitalsComponent.h"
+#include "Components/WorkerAppearanceComponent.h"
 #include "Components/InputComponent.h"
 #include "Components/PrimitiveComponent.h"
 #include "Engine/DamageEvents.h"
@@ -57,6 +58,9 @@ AAvaryoCharacter::AAvaryoCharacter()
 
 	// Шкалы игрока
 	VitalsComponent = CreateDefaultSubobject<UVitalsComponent>(TEXT("Vitals"));
+
+	// Модульная внешность рабочего (дормантна — собирается дев-командой AvWorkerPreview / позже Ф4; тело игрока не трогает)
+	WorkerAppearance = CreateDefaultSubobject<UWorkerAppearanceComponent>(TEXT("WorkerAppearance"));
 
 	// Нагрудная камера для монитора оператора. Захват выключен,
 	// включается локально только пока кто-то смотрит монитор (Tab в зоне ГАЗели)
@@ -1592,6 +1596,24 @@ void AAvaryoCharacter::AvGod()
 	}
 }
 void AAvaryoCharacter::ServerAvGod_Implementation() { AvGod(); }
+
+void AAvaryoCharacter::AvWorkerPreview()
+{
+	if (!HasAuthority()) { ServerAvWorkerPreview(); return; }
+	if (WorkerAppearance)
+	{
+		WorkerAppearance->ApplyDefaultPreset();
+		WorkerAppearance->ApplyEquipmentFlags(true, true, true); // демо: показать каску+респиратор+перчатки
+	}
+}
+void AAvaryoCharacter::ServerAvWorkerPreview_Implementation() { AvWorkerPreview(); }
+
+void AAvaryoCharacter::AvWorkerClear()
+{
+	if (!HasAuthority()) { ServerAvWorkerClear(); return; }
+	if (WorkerAppearance) { WorkerAppearance->ClearAll(); }
+}
+void AAvaryoCharacter::ServerAvWorkerClear_Implementation() { AvWorkerClear(); }
 
 void AAvaryoCharacter::AvGive(const FString& What)
 {

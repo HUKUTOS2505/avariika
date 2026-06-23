@@ -20,6 +20,7 @@ class USoundBase;
 class USceneCaptureComponent2D;
 class UTextureRenderTarget2D;
 class UVitalsComponent;
+class UWorkerAppearanceComponent;
 class UAnimMontage;
 
 /**
@@ -416,6 +417,10 @@ public:
 	/** Шкалы: HP, паника, выносливость, туалет. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Avaryo")
 	TObjectPtr<UVitalsComponent> VitalsComponent;
+
+	/** Модульная внешность рабочего (Modular Workers/Quantum). Дормантна: тело игрока не подменяет (это Ф2 — свап под глаза юзера). */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Avaryo")
+	TObjectPtr<UWorkerAppearanceComponent> WorkerAppearance;
 
 	/** Дальность подбора (трейс из камеры), см. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Inventory")
@@ -979,6 +984,11 @@ protected:
 	/** Выйти/закрыть сессию. */
 	UFUNCTION(Exec) void AvLeave();
 
+	/** Дев: собрать превью модульного рабочего на персонаже (тело+одежда+полное снаряжение). Тест Ф3 Modular Workers. */
+	UFUNCTION(Exec) void AvWorkerPreview();
+	/** Дев: снять собранного рабочего. */
+	UFUNCTION(Exec) void AvWorkerClear();
+
 	UFUNCTION(Server, Reliable)
 	void ServerAvVital(const FString& Which, float Value);
 
@@ -999,6 +1009,12 @@ protected:
 
 	UFUNCTION(Server, Reliable)
 	void ServerAvGod();
+
+	UFUNCTION(Server, Reliable)
+	void ServerAvWorkerPreview();
+
+	UFUNCTION(Server, Reliable)
+	void ServerAvWorkerClear();
 
 	UFUNCTION(Server, Reliable)
 	void ServerAvGive(const FString& What);

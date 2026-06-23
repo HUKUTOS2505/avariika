@@ -1,0 +1,135 @@
+#pragma once
+
+#include "CoreMinimal.h"
+#include "Components/ActorComponent.h"
+#include "WorkerAppearanceComponent.generated.h"
+
+class USkeletalMeshComponent;
+class USkeletalMesh;
+
+/**
+ * Слоты модульного рабочего (пак Modular Workers / Quantum, скелет UE5-mann).
+ * Body — ведущий меш: остальные части копируют его позу через SetLeaderPoseComponent.
+ * См. MODULAR_WORKER_PLAN.md (Ф3) и память [[modular-worker-integration]].
+ */
+UENUM(BlueprintType)
+enum class EWorkerSlot : uint8
+{
+	Body      UMETA(DisplayName="Тело (ведущий)"),
+	Head      UMETA(DisplayName="Голова"),
+	Hair      UMETA(DisplayName="Волосы"),
+	Beard     UMETA(DisplayName="Борода"),
+	Torso     UMETA(DisplayName="Верх (одежда)"),
+	Legs      UMETA(DisplayName="Низ (штаны)"),
+	Feet      UMETA(DisplayName="Обувь/ступни"),
+	Gloves    UMETA(DisplayName="Перчатки"),
+	Headgear  UMETA(DisplayName="Каска/головной убор"),
+	FaceMask  UMETA(DisplayName="Маска/респиратор"),
+	Glasses   UMETA(DisplayName="Очки"),
+	Vest      UMETA(DisplayName="Жилет")
+};
+
+/** Один слот: какой меш в какой слот. Софт-ссылка — грузится по требованию. */
+USTRUCT(BlueprintType)
+struct FWorkerSlotMesh
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Worker")
+	EWorkerSlot Slot = EWorkerSlot::Body;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Worker")
+	TSoftObjectPtr<USkeletalMesh> Mesh;
+
+	FWorkerSlotMesh() {}
+	FWorkerSlotMesh(EWorkerSlot InSlot, const TSoftObjectPtr<USkeletalMesh>& InMesh)
+		: Slot(InSlot), Mesh(InMesh) {}
+};
+
+/**
+ * Полная внешность рабочего. Реплицируется (косметику видит вся бригада) и
+ * сериализуема (TSoftObjectPtr → путь) → готова к сейву (Ф4).
+ */
+USTRUCT(BlueprintType)
+struct FWorkerAppearance
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Worker")
+	TArray<FWorkerSlotMesh> Slots;
+
+	/** Назначить/заменить слот (пустой меш = удалить слот). */
+	void Set(EWorkerSlot Slot, const TSoftObjectPtr<USkeletalMesh>& Mesh);
+	void Clear(EWorkerSlot Slot);
+	TSoftObjectPtr<USkeletalMesh> Get(EWorkerSlot Slot) const;
+};
+
+/**
+ * Собирает модульного рабочего из частей-мешей по слотам (тело-лидер + дочерние
+ * SkeletalMeshComponent на общей позе). Внешность реплицируется; визуал клиенты
+ * строят локально по OnRep. Тело ИГРОКА не подменяет — это Ф2 (свап под глаза юзера);
+ * здесь только инфраструктура (build-верифицируемо).
+ */
+UCLASS(ClassGroup=(Avaryo), meta=(BlueprintSpawnableComponent))
+class AVARYO_API UWorkerAppearanceComponent : public UActorComponent
+{
+	GENERATED_BODY()
+
+public:
+	UWorkerAppearanceComponent();
+
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+	/** Назначить меш слота. Только сервер (реплицируется бригаде). */
+	UFUNCTION(BlueprintCallable, Category="Worker")
+	void SetSlotMesh(EWorkerSlot Slot, USkeletalMesh* Mesh);
+
+	/** Снять меш со слота. Только сервер. */
+	UFUNCTION(BlueprintCallable, Category="Worker")
+	void ClearSlot(EWorkerSlot Slot);
+
+	/** Применить внешность целиком. Только сервер. */
+	UFUNCTION(BlueprintCallable, Category="Worker")
+	void ApplyAppearance(const FWorkerAppearance& NewAppearance);
+
+	/** Базовый «бомж»: тело/голова/волосы + тишка + джинсы + ступни. Только сервер. */
+	UFUNCTION(BlueprintCallable, Category="Worker")
+	void ApplyDefaultPreset();
+
+	/** Драйв слотов снаряжения от флагов (косметика=функция): каска/респиратор/перчатки. Только сервер. */
+	UFUNCTION(BlueprintCallable, Category="Worker")
+	void ApplyEquipmentFlags(bool bHelmet, bool bGasMask, bool bGloves);
+
+	/** Снять весь собранный рабочий (вернуть к пустому). Только сервер. */
+	UFUNCTION(BlueprintCallable, Category="Worker")
+	void ClearAll();
+
+	const FWorkerAppearance& GetAppearance() const { return Appearance; }
+
+	/** Ведущий компонент тела (leader pose). null пока не собран. */
+	UFUNCTION(BlueprintPure, Category="Worker")
+	USkeletalMeshComponent* GetBodyComponent() const;
+
+protected:
+	virtual void BeginPlay() override;
+
+	/** Реплицируемая внешность; на клиентах OnRep пересобирает визуал. */
+	UPROPERTY(ReplicatedUsing=OnRep_Appearance)
+	FWorkerAppearance Appearance;
+
+	UFUNCTION()
+	void OnRep_Appearance();
+
+	/** Пересобрать дочерние меши под Appearance (Body — лидер). */
+	void RebuildVisuals();
+
+	/** Найти/создать дочерний SkeletalMeshComponent под слот. */
+	USkeletalMeshComponent* GetOrCreateSlotComp(EWorkerSlot Slot);
+
+	/** Прицепить часть к телу и копировать его позу (общий скелет → кости 1:1). */
+	void AttachAsLeaderFollower(USkeletalMeshComponent* Part, USkeletalMeshComponent* Body);
+
+	/** Рантайм-карта слот→компонент. Строится локально, не реплицируется. */
+	UPROPERTY(Transient)
+	TMap<EWorkerSlot, TObjectPtr<USkeletalMeshComponent>> SlotComps;
+};

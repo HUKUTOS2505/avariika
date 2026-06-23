@@ -17,6 +17,23 @@
 - Перед «релизом» вернуть Health=100, Panic=0 в `VitalsComponent.cpp` (сейчас 50/50 для тестов).
 - 3D-модели делает пользователь в **meshy.ai** по промптам Claude; анимации делает пользователь. Импорт моделей — `Scripts/` + `asset.import` или `set_static_mesh` по метке актора.
 
+## СЕССИЯ 2026-06-23 (вечер, автоном на ГЕНЕРАТОРЕ — частые отключения) — ДИСК-РЕОРГ + Ф3 WORKER BUNDLE
+Юзер на генераторе (свет моргает: «Свет отключился продолжаем» → потом «генератор выключаю, сохрани важные данные, вернусь — продолжим»). Всё важное закоммичено+запушено перед отключением.
+
+**1) ДИСК (обсудили; ПЕРЕНОС ОТЛОЖЕН юзером):**
+- Один физ. SSD **Samsung 980 1ТБ** = разделы **C: 749ГБ (своб ~386)** + **D: 181ГБ (своб ~52)**. Проект на D:. D: и C: — НЕ виртуальные, а разделы одного диска.
+- 🔑 **D: ФИЗИЧЕСКИ ПЕРЕД C:** (offset: D:@0.1 → C:@180.7) → «удалить D: и расширить C:» средствами Windows **НЕВОЗМОЖНО** (Extend тянет только ВПРАВО; настоящее слияние = сторонняя утилита двигает раздел C: на 749ГБ, риск при сбое питания). 
+- **РЕШЕНИЕ юзера:** НЕ сливать. План: перенести **дев-проект D:→C:** (там 386 своб), а **игры → D:** (RE7 37.8 + Steam Marathon 28.4). Перенос **НЕ начат** (отложен: «я пока качаю плагины», потом «перенос позже»).
+- Чистка C: — сделана только безопасная (Temp+корзина **+22ГБ**, сейчас своб ~386). Бэкап `C:\_avariika_backup` (25.7ГБ) НЕ удалён (страж корневых путей блокирует — юзер сам: `rmdir /s /q`).
+- ⚠️ **При переносе (на будущее):** copy (robocopy), оригинал D: держать до проверки; фикс абс.путей (CLAUDE.md/WORKLOG Build.bat/.idea/.mcp.json/Claudius/.claude settings.local); **миграция ключа памяти Claude** `C:\Users\admin\.claude\projects\D--unrealEngine-avariika` → `C--...`; затем юзер перезапускает Claude из C:.
+- **`DISK_C_SCAN.md`** (корень репо) — полный скан C: для разбора: RE7+Marathon→D: (−66ГБ), `_avariika_backup` 25.7, Epic VaultCache 16.9, `AppData\Local\UnrealEngine` 10.9, ❓`Desktop\data.bin` 12.5 (юзер опознаёт).
+
+**2) Ф3 MODULAR WORKERS (Worker Bundle) — КОД НАПИСАН, ⚠️ НЕ СОБРАН (питание):**
+- Новый **`UWorkerAppearanceComponent`** (`Source/Avaryo/{Public,Private}/Components/WorkerAppearanceComponent.{h,cpp}`): enum `EWorkerSlot` (Body/Head/Hair/Beard/Torso/Legs/Feet/Gloves/Headgear/FaceMask/Glasses/Vest); `FWorkerAppearance`=TArray<FWorkerSlotMesh> (`ReplicatedUsing=OnRep_Appearance`, софт-ссылки → сериализуемо под сейв Ф4); сборка дочерних SkeletalMeshComponent с `SetLeaderPoseComponent(Body)`; API `SetSlotMesh/ApplyAppearance/ApplyDefaultPreset/ApplyEquipmentFlags/ClearAll`; OnRep→RebuildVisuals; скип визуала на dedicated server. Курированные `/Game/Modular_Workers/...` пути зашиты (разведка Explore — карта слот→путь, «бомж»=тишка+джинсы; снаряжение: каска оранж/респиратор/перчатки).
+- Вживлён в **`AAvaryoCharacter` ДОРМАНТНО** (тело игрока НЕ подменяет — это Ф2, ждёт глаз юзера): член `WorkerAppearance` + CreateDefaultSubobject + дев-команды `AvWorkerPreview`/`AvWorkerClear` (Server-RPC authority-routing, как AvGod).
+- ⚠️ **ПЕРВОЕ ДЕЛО ПО ВОЗВРАТУ:** закрыть редактор → `Build.bat` → если зелено: смоук → коммит «собрано» → reopen → PIE `AvWorkerPreview` (визуал-ревью — глаза юзера). Коммит этой сессии = **WIP, код НЕ компилировался** (могут быть ошибки сборки — чинить первым делом).
+- Дальше по плану: Ф1 ретаргет UE4→UE5, Ф2 свап тела, Ф4 снаряжение→визуал из `FEquipmentLevels`, Ф5 билдер. Save в `AvariikaSaveGame` НЕ трогал (per-player vs company-save — дизайн-решение юзера).
+
 ## СЕССИЯ 2026-06-23 (автоном, юзер спит) — ИГРОВОЕ МЕНЮ + НАСТРОЙКИ + ЛОКАЛИЗАЦИЯ RU/EN
 
 Юзер: «можешь поделать игровое меню, где звук/язык; плагин есть» → потом «давай лока локализация, я ещё сплю». Сделано/собрано/смоук-чисто/запушено:
