@@ -1,28 +1,17 @@
 # -*- coding: utf-8 -*-
 # Заполняет переводы в .archive локализации (UTF-16 JSON) по карте key->text для namespace.
-# Использование: редактируем TRANS ниже, запускаем; затем GatherText перекомпилит .locres.
+# Источник EN-переводов — Scripts/loc_en.json (генерится migrate_loc.py из вторых аргументов
+# FAvLoc::T(ru,en); включает меню + HUD). Использование: запустить ПОСЛЕ GatherText
+# (он добавил ключи в архивы), затем GatherText ещё раз — перекомпилит .locres с этими переводами.
 import json, sys, os
 
 ARCH = "Content/Localization/Game/en/Game.archive"
+ENJSON = "Scripts/loc_en.json"
 NS = "AvariikaUI"
 
-# key -> английский перевод (RU = источник в CSV; тут только EN)
-TRANS = {
-    "menu_title": "AVARIYKA",
-    "menu_subtitle": "emergency repair crew",
-    "menu_host": "Host Game",
-    "menu_find": "Find Game",
-    "menu_settings": "Settings",
-    "menu_quit": "Quit",
-    "menu_browse_header": "Find Network Games",
-    "menu_searching": "Searching...",
-    "menu_no_games": "No games found",
-    "menu_game_prefix": "Game ",
-    "menu_join_suffix": "   [Join]",
-    "menu_refresh": "Refresh",
-    "menu_back": "Back",
-    "menu_hint": "v0.1 — co-op LAN/EOS",
-}
+# key -> английский перевод (RU = источник в CSV). Грузим из loc_en.json.
+with open(ENJSON, encoding="utf-8") as f:
+    TRANS = json.load(f)
 
 def fill_children(children, trans, stats):
     for e in children:

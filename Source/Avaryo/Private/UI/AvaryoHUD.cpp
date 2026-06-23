@@ -54,7 +54,7 @@ void AAvaryoHUD::DrawPauseMenu()
 	DrawRect(FLinearColor(0.f, 0.f, 0.f, 0.7f), 0.f, 0.f, SX, SY); // затемнение сцены
 	DrawRect(Orange, 0.f, 0.f, SX, 4.f);                            // оранжевая кромка
 
-	const FString Title = FAvLoc::T(TEXT("ПАУЗА"), TEXT("PAUSE"));
+	const FString Title = FAvLoc::S(TEXT("ui_001"));
 	float TW = 0.f, TH = 0.f;
 	UFont* TitleFont = Big ? Big : Font;
 	GetTextSize(Title, TW, TH, TitleFont, 2.4f);
@@ -77,9 +77,9 @@ void AAvaryoHUD::DrawPauseMenu()
 		AddHitBox(FVector2D(X, Y), FVector2D(BW, BH), Box, true);
 		Y += BH + Gap;
 	};
-	Btn(FAvLoc::T(TEXT("Продолжить"),   TEXT("Resume")),        TEXT("pause_resume"));
-	Btn(FAvLoc::T(TEXT("Настройки"),    TEXT("Settings")),      TEXT("pause_settings"));
-	Btn(FAvLoc::T(TEXT("Выйти в меню"), TEXT("Leave to Menu")), TEXT("pause_leave"));
+	Btn(FAvLoc::S(TEXT("ui_002")),        TEXT("pause_resume"));
+	Btn(FAvLoc::S(TEXT("ui_003")),      TEXT("pause_settings"));
+	Btn(FAvLoc::S(TEXT("ui_004")), TEXT("pause_leave"));
 }
 
 void AAvaryoHUD::NotifyHitBoxClick(FName BoxName)
@@ -208,9 +208,9 @@ void AAvaryoHUD::DrawShop()
 	DrawRect(Accent, PX, TY, W, 4.f);
 	TY += 16.f;
 
-	DrawText(FAvLoc::T(TEXT("СНАРЯЖЕНИЕ — склад бригады"), TEXT("EQUIPMENT — crew stash")), Accent, PX + 22.f, TY, Font, 1.3f);
+	DrawText(FAvLoc::S(TEXT("ui_005")), Accent, PX + 22.f, TY, Font, 1.3f);
 	TY += 36.f;
-	DrawText(FString::Printf(TEXT("%s: %d ₽"), *FAvLoc::T(TEXT("Касса конторы"), TEXT("Company funds")), Balance), TextMain, PX + 22.f, TY, Font, 1.0f);
+	DrawText(FString::Printf(TEXT("%s: %d ₽"), *FAvLoc::S(TEXT("ui_006")), Balance), TextMain, PX + 22.f, TY, Font, 1.0f);
 	TY += 32.f;
 
 	struct FShopRow { const TCHAR* Cat; const TCHAR* Name; const TCHAR* NameEn; int32 MaxLevel; };
@@ -229,20 +229,20 @@ void AAvaryoHUD::DrawShop()
 		FLinearColor Col;
 		if (Lvl >= R.MaxLevel)
 		{
-			Line = FString::Printf(TEXT("%s — %s %d  (%s)"), RName, *FAvLoc::T(TEXT("ур."), TEXT("lvl")), Lvl, *FAvLoc::T(TEXT("МАКС"), TEXT("MAX")));
+			Line = FString::Printf(TEXT("%s — %s %d  (%s)"), RName, *FAvLoc::S(TEXT("ui_007")), Lvl, *FAvLoc::S(TEXT("ui_008")));
 			Col = TextDim;
 		}
 		else
 		{
 			const int32 Price = 3000 * Lvl;
-			Line = FString::Printf(TEXT("%s — %s %d → %d:  %d ₽   [AvUpgrade %s]"), RName, *FAvLoc::T(TEXT("ур."), TEXT("lvl")), Lvl, Lvl + 1, Price, R.Cat);
+			Line = FString::Printf(TEXT("%s — %s %d → %d:  %d ₽   [AvUpgrade %s]"), RName, *FAvLoc::S(TEXT("ui_007")), Lvl, Lvl + 1, Price, R.Cat);
 			Col = (Balance >= Price) ? TextMain : FLinearColor(0.85f, 0.42f, 0.3f);
 		}
 		DrawText(Line, Col, PX + 26.f, TY, Font, 0.95f);
 		TY += 28.f;
 	}
 	TY += 12.f;
-	DrawText(FAvLoc::T(TEXT("Покупка: AvUpgrade <англ. название>.   Закрыть: AvShop"), TEXT("Buy: AvUpgrade <name>.   Close: AvShop")), TextDim, PX + 22.f, TY, Font, 0.85f);
+	DrawText(FAvLoc::S(TEXT("ui_009")), TextDim, PX + 22.f, TY, Font, 0.85f);
 }
 
 void AAvaryoHUD::DrawHUD()
@@ -350,7 +350,7 @@ void AAvaryoHUD::DrawHUD()
 		const float Flick = 0.55f + 0.45f * FMath::Abs(FMath::Sin(Time * 37.f)); // рваное мерцание дуги
 		const FLinearColor Arc(0.78f, 0.86f, 1.0f, 0.58f * Flick);
 		DrawRect(Arc, 0.f, 0.f, SizeX, SizeY);
-		DrawText(FAvLoc::T(TEXT("ГЛАЗА! Нужна сварочная маска"), TEXT("YOUR EYES! Put on the welding mask")), FLinearColor(0.05f, 0.05f, 0.08f),
+		DrawText(FAvLoc::S(TEXT("ui_010")), FLinearColor(0.05f, 0.05f, 0.08f),
 			SizeX * 0.5f - 150.f, SizeY * 0.30f, Font, 1.0f);
 	}
 
@@ -362,7 +362,7 @@ void AAvaryoHUD::DrawHUD()
 		const float BX = (SizeX - BW) * 0.5f, BY = SizeY * 0.60f;
 		DrawRect(BarBG, BX, BY, BW, BH);
 		DrawRect(A >= 1.f ? FLinearColor(0.95f, 0.85f, 0.2f) : Accent, BX, BY, BW * A, BH);
-		DrawText(A >= 1.f ? FAvLoc::T(TEXT("БРОСОК заряжен — отпусти G"), TEXT("THROW charged — release G")) : FAvLoc::T(TEXT("Зарядка броска... (отпусти G)"), TEXT("Charging throw... (release G)")),
+		DrawText(A >= 1.f ? FAvLoc::S(TEXT("ui_011")) : FAvLoc::S(TEXT("ui_012")),
 			TextMain, BX, BY - 18.f, Font, 0.85f);
 	}
 
@@ -370,7 +370,7 @@ void AAvaryoHUD::DrawHUD()
 	if (Character->IsMonitorOpen())
 	{
 		DrawRect(FLinearColor(0.01f, 0.012f, 0.02f, 0.97f), 0.f, 0.f, SizeX, SizeY);
-		DrawText(FAvLoc::T(TEXT("КАМЕРЫ БРИГАДЫ — [Tab] закрыть"), TEXT("CREW CAMERAS — [Tab] close")), AvaryoHUDStyle::Accent, 30.f, 24.f, Font, 1.5f);
+		DrawText(FAvLoc::S(TEXT("ui_013")), AvaryoHUDStyle::Accent, 30.f, 24.f, Font, 1.5f);
 
 		// Плитки 16:9 в две колонки
 		const float TileW = FMath::Min(SizeX * 0.42f, 560.f);
@@ -391,22 +391,22 @@ void AAvaryoHUD::DrawHUD()
 			}
 
 			// Подпись: имя + состояние
-			FString Name = Crew->GetPlayerState() ? Crew->GetPlayerState()->GetPlayerName() : FAvLoc::T(TEXT("Монтёр"), TEXT("Worker"));
+			FString Name = Crew->GetPlayerState() ? Crew->GetPlayerState()->GetPlayerName() : FAvLoc::S(TEXT("ui_014"));
 			if (Crew == Character)
 			{
-				Name += FAvLoc::T(TEXT(" (вы)"), TEXT(" (you)"));
+				Name += FAvLoc::S(TEXT("ui_015"));
 			}
 			if (Crew->VitalsComponent)
 			{
 				if (Crew->VitalsComponent->IsUnconscious())
 				{
-					Name += FAvLoc::T(TEXT(" — БЕЗ СОЗНАНИЯ"), TEXT(" — UNCONSCIOUS"));
+					Name += FAvLoc::S(TEXT("ui_016"));
 				}
 				else if (Crew->VitalsComponent->IsWounded())
 				{
-					Name += FAvLoc::T(TEXT(" — ИСТЕКАЕТ "), TEXT(" — BLEEDING OUT "))
+					Name += FAvLoc::S(TEXT("ui_017"))
 						+ FString::FromInt(FMath::CeilToInt(Crew->VitalsComponent->GetBleedOutSeconds()))
-						+ FAvLoc::T(TEXT("с"), TEXT("s"));
+						+ FAvLoc::S(TEXT("ui_018"));
 				}
 			}
 			DrawText(Name, AvaryoHUDStyle::TextMain, TileX + 8.f, TileY + 6.f, Font, 1.0f);
@@ -505,11 +505,11 @@ void AAvaryoHUD::DrawHUD()
 		};
 
 		float Y = 30.f;
-		DrawBar(FAvLoc::T(TEXT("Здоровье"),     TEXT("Health")),  Vitals->GetHealth(),  FLinearColor(0.8f, 0.12f, 0.12f), Y); Y += 22.f;
-		DrawBar(FAvLoc::T(TEXT("Выносливость"), TEXT("Stamina")), Vitals->GetStamina(), FLinearColor(0.2f, 0.7f, 0.25f),  Y); Y += 22.f;
-		DrawBar(FAvLoc::T(TEXT("Паника"),       TEXT("Panic")),   Vitals->GetPanic(),   FLinearColor(0.25f, 0.7f, 0.85f), Y); Y += 22.f;
-		DrawBar(FAvLoc::T(TEXT("Туалет"),       TEXT("Bladder")), Vitals->GetBladder(), FLinearColor(0.8f, 0.6f, 0.12f),  Y); Y += 22.f;
-		DrawBar(FAvLoc::T(TEXT("Амбре"),        TEXT("Stench")),  Vitals->GetSmell(),   FLinearColor(0.5f, 0.45f, 0.12f), Y); Y += 22.f;
+		DrawBar(FAvLoc::S(TEXT("ui_019")),  Vitals->GetHealth(),  FLinearColor(0.8f, 0.12f, 0.12f), Y); Y += 22.f;
+		DrawBar(FAvLoc::S(TEXT("ui_020")), Vitals->GetStamina(), FLinearColor(0.2f, 0.7f, 0.25f),  Y); Y += 22.f;
+		DrawBar(FAvLoc::S(TEXT("ui_021")),   Vitals->GetPanic(),   FLinearColor(0.25f, 0.7f, 0.85f), Y); Y += 22.f;
+		DrawBar(FAvLoc::S(TEXT("ui_022")), Vitals->GetBladder(), FLinearColor(0.8f, 0.6f, 0.12f),  Y); Y += 22.f;
+		DrawBar(FAvLoc::S(TEXT("ui_023")),  Vitals->GetSmell(),   FLinearColor(0.5f, 0.45f, 0.12f), Y); Y += 22.f;
 
 		// Шум: насколько ты сейчас слышен — задел под монстра-слухача.
 		// Движение (бег/присед) + события MakeNoise (кашель, икота, отдышка, бросок, починка…).
@@ -526,14 +526,14 @@ void AAvaryoHUD::DrawHUD()
 			}
 		}
 		Noise01 = FMath::Max(Noise01, Character->GetSelfNoise01()); // всплески от событий шума
-		DrawBar(FAvLoc::T(TEXT("Шум"), TEXT("Noise")), Noise01 * 100.f, FLinearColor(1.f, 0.55f, 0.2f), Y);
+		DrawBar(FAvLoc::S(TEXT("ui_024")), Noise01 * 100.f, FLinearColor(1.f, 0.55f, 0.2f), Y);
 
 		// Батарея налобного фонаря: ярко-жёлтая когда включён, тусклая когда выключен
 		if (UFlashlightComponent* Flashlight = Character->FlashlightComponent)
 		{
 			Y += 22.f;
 			const bool bOn = Flashlight->IsOn();
-			DrawBar(bOn ? FAvLoc::T(TEXT("Фонарь [F] вкл"), TEXT("Headlamp [F] on")) : FAvLoc::T(TEXT("Фонарь [F]"), TEXT("Headlamp [F]")),
+			DrawBar(bOn ? FAvLoc::S(TEXT("ui_025")) : FAvLoc::S(TEXT("ui_026")),
 				Flashlight->GetBatteryLevel(),
 				bOn ? FLinearColor(0.95f, 0.85f, 0.25f) : FLinearColor(0.45f, 0.42f, 0.2f), Y);
 		}
@@ -545,7 +545,7 @@ void AAvaryoHUD::DrawHUD()
 			Y += 22.f;
 			const float Gas = FMath::Clamp(Character->GetGasReading(), 0.f, 1.f);
 			const FLinearColor GasColor = FMath::Lerp(FLinearColor(0.2f, 0.8f, 0.3f), FLinearColor(0.9f, 0.15f, 0.1f), Gas);
-			DrawBar(Gas > 0.6f ? FAvLoc::T(TEXT("ГАЗ — ОПАСНО!"), TEXT("GAS — DANGER!")) : (Gas > 0.05f ? FAvLoc::T(TEXT("Газоанализатор: газ"), TEXT("Gas meter: gas")) : FAvLoc::T(TEXT("Газоанализатор: чисто"), TEXT("Gas meter: clear"))),
+			DrawBar(Gas > 0.6f ? FAvLoc::S(TEXT("ui_027")) : (Gas > 0.05f ? FAvLoc::S(TEXT("ui_028")) : FAvLoc::S(TEXT("ui_029"))),
 				Gas * 100.f, GasColor, Y);
 		}
 	}
@@ -591,7 +591,7 @@ void AAvaryoHUD::DrawHUD()
 	{
 		const int32 Elapsed = FMath::FloorToInt(Run->GetElapsedSeconds());
 		const FString Header = FString::Printf(TEXT("%s %d/%d   %02d:%02d"),
-			*FAvLoc::T(TEXT("ЗАДАЧИ"), TEXT("TASKS")),
+			*FAvLoc::S(TEXT("ui_030")),
 			Run->GetRepairedCount(), Run->GetTotalObjectives(), Elapsed / 60, Elapsed % 60);
 
 		float HeaderW = 0.f, HeaderH = 0.f;
@@ -801,7 +801,7 @@ void AAvaryoHUD::DrawHUD()
 		}
 		else if (Run->AreAllObjectivesComplete() && Run->GetTotalObjectives() > 0)
 		{
-			DrawCentered(FAvLoc::T(TEXT("Всё починено — вся бригада к ГАЗели!"), TEXT("All fixed — whole crew to the van!")), Accent, SizeY * 0.34f, 1.3f);
+			DrawCentered(FAvLoc::S(TEXT("ui_031")), Accent, SizeY * 0.34f, 1.3f);
 		}
 	}
 
@@ -877,14 +877,14 @@ void AAvaryoHUD::DrawHUD()
 	// ---------- Баннер ранения + обратный отсчёт bleed-out (кооп-спасение больше не вслепую) ----------
 	if (Vitals && Vitals->IsUnconscious())
 	{
-		DrawCentered(FAvLoc::T(TEXT("БЕЗ СОЗНАНИЯ — только напарник поднимет вас аптечкой"), TEXT("UNCONSCIOUS — only a teammate can revive you with a medkit")), FLinearColor(0.95f, 0.2f, 0.2f), SizeY * 0.4f, 1.6f);
+		DrawCentered(FAvLoc::S(TEXT("ui_032")), FLinearColor(0.95f, 0.2f, 0.2f), SizeY * 0.4f, 1.6f);
 	}
 	else if (Vitals && Vitals->IsWounded())
 	{
 		const int32 Secs = FMath::CeilToInt(Vitals->GetBleedOutSeconds());
-		DrawCentered(FAvLoc::T(TEXT("ВЫ РАНЕНЫ — отруб через "), TEXT("YOU'RE WOUNDED — blackout in "))
+		DrawCentered(FAvLoc::S(TEXT("ui_033"))
 			+ FString::FromInt(Secs)
-			+ FAvLoc::T(TEXT(" с. Ползите к команде / нужна аптечка"), TEXT("s. Crawl to your crew / need a medkit")),
+			+ FAvLoc::S(TEXT("ui_034")),
 			FLinearColor::Red, SizeY * 0.4f, 1.6f);
 		// Полоска окна подъёма: истекает по мере приближения к отрубу
 		const float BarW = FMath::Min(420.f, SizeX * 0.4f);
@@ -911,7 +911,7 @@ void AAvaryoHUD::DrawHUD()
 		const float BoxX = (SizeX - BarW) * 0.5f;
 		float BoxY = SizeY * 0.42f;
 
-		const FString Label = FString::Printf(TEXT("%s %d%%"), *FAvLoc::T(TEXT("Процесс... осталось"), TEXT("In progress... remaining")), FMath::RoundToInt(Vitals->GetBladder()));
+		const FString Label = FString::Printf(TEXT("%s %d%%"), *FAvLoc::S(TEXT("ui_035")), FMath::RoundToInt(Vitals->GetBladder()));
 		float LabelW = 0.f, LabelH = 0.f;
 		GetTextSize(Label, LabelW, LabelH, Font, 1.1f);
 
@@ -936,7 +936,7 @@ void AAvaryoHUD::DrawHUD()
 		DrawRect(FLinearColor(0.25f, 0.8f, 0.25f), BoxX + GreenL * BarW, BoxY + 2.f, (GreenR - GreenL) * BarW, BarH);
 		DrawRect(TextMain, BoxX + T->GetCursorPos() * BarW - 2.f, BoxY - 2.f, 4.f, BarH + 8.f);
 
-		DrawText(FAvLoc::T(TEXT("[E] — жми в зелёной (или жёлтой) зоне!  [G] — встать"), TEXT("[E] — tap in the green (or yellow) zone!  [G] — stand up")), TextDim, BoxX, BoxY + BarH + 8.f, Font, 0.9f);
+		DrawText(FAvLoc::S(TEXT("ui_036")), TextDim, BoxX, BoxY + BarH + 8.f, Font, 0.9f);
 	}
 	// ---------- Мини-игры починки (щиток/вентиль/стартер) — только когда все подготовительные этапы пройдены ----------
 	else if (Character->IsRepairing() && Character->GetCurrentRepairable()
@@ -984,7 +984,7 @@ void AAvaryoHUD::DrawHUD()
 			DrawRect(BarBG, BoxX, BoxY + 2.f, BarW, BarH);
 			DrawRect(Ready >= 1.f ? FLinearColor(0.25f, 0.8f, 0.25f) : FLinearColor(0.55f, 0.12f, 0.1f),
 				BoxX, BoxY + 2.f, BarW * Ready, BarH);
-			DrawText(FAvLoc::T(TEXT("[E] — докручивай РАЗМЕРЕННО: зелёная полоска = можно. Частить = срыв резьбы!  [G] — отойти"), TEXT("[E] — turn it STEADILY: green bar = go. Spamming strips the thread!  [G] — step away")),
+			DrawText(FAvLoc::S(TEXT("ui_037")),
 				TextDim, BoxX, BoxY + BarH + 8.f, Font, 0.9f);
 		}
 		else if (R->GetMinigameType() == ERepairMinigameType::Starter)
@@ -1000,8 +1000,8 @@ void AAvaryoHUD::DrawHUD()
 			DrawRect(FLinearColor(0.9f, 0.9f, 0.9f), BoxX, BoxY + 4.f, BarW * Tension, BarH - 4.f);
 			DrawRect(TextMain, BoxX + Tension * BarW - 2.f, BoxY - 2.f, 4.f, BarH + 8.f);
 			DrawText(R->IsStarterPulling()
-				? FAvLoc::T(TEXT("Тяни шнур... отпусти E в ЗЕЛЁНОМ окне! Перетянешь — ударит.  [G] — отойти"), TEXT("Pull the cord... release E in the GREEN window! Overpull and it kicks back.  [G] — step away"))
-				: FAvLoc::T(TEXT("[E] (держать) — дёрнуть стартер. Нужно 3 удачных рывка.  [G] — отойти"), TEXT("[E] (hold) — pull the starter. Need 3 good pulls.  [G] — step away")),
+				? FAvLoc::S(TEXT("ui_038"))
+				: FAvLoc::S(TEXT("ui_039")),
 				TextDim, BoxX, BoxY + BarH + 8.f, Font, 0.9f);
 		}
 		else
@@ -1014,7 +1014,7 @@ void AAvaryoHUD::DrawHUD()
 			const float GreenR = FMath::Clamp(Green + HalfW, 0.f, 1.f);
 			DrawRect(FLinearColor(0.25f, 0.8f, 0.25f), BoxX + GreenL * BarW, BoxY + 2.f, (GreenR - GreenL) * BarW, BarH);
 			DrawRect(TextMain, BoxX + R->GetCursorPos() * BarW - 2.f, BoxY - 2.f, 4.f, BarH + 8.f);
-			DrawText(FAvLoc::T(TEXT("[E] — жми в зелёной! Промах бьёт током, 3 промаха — замыкание.  [G] — отойти"), TEXT("[E] — tap in the green! A miss shocks you, 3 misses — short circuit.  [G] — step away")), TextDim, BoxX, BoxY + BarH + 8.f, Font, 0.9f);
+			DrawText(FAvLoc::S(TEXT("ui_040")), TextDim, BoxX, BoxY + BarH + 8.f, Font, 0.9f);
 		}
 	}
 	// ---------- Подготовительная мини-игра (заварка / починка руками — курсор с откатом) ----------
@@ -1043,7 +1043,7 @@ void AAvaryoHUD::DrawHUD()
 		const float GreenR = FMath::Clamp(Green + HalfW, 0.f, 1.f);
 		DrawRect(FLinearColor(0.25f, 0.8f, 0.25f), BoxX + GreenL * BarW, BoxY + 2.f, (GreenR - GreenL) * BarW, BarH);
 		DrawRect(TextMain, BoxX + R->GetCursorPos() * BarW - 2.f, BoxY - 2.f, 4.f, BarH + 8.f);
-		DrawText(FAvLoc::T(TEXT("[E] — жми в зелёной! Промах — откат прогресса."), TEXT("[E] — tap in the green! A miss rolls back progress.")), TextDim, BoxX, BoxY + BarH + 8.f, Font, 0.9f);
+		DrawText(FAvLoc::S(TEXT("ui_041")), TextDim, BoxX, BoxY + BarH + 8.f, Font, 0.9f);
 	}
 	// ---------- Подготовительный этап: держать E (починка руками) или AutoFill (установка кабеля) ----------
 	else if (Character->IsRepairing() && Character->GetCurrentRepairable()
@@ -1073,7 +1073,7 @@ void AAvaryoHUD::DrawHUD()
 		}
 		else if (Character->GetFocusedToolCase())
 		{
-			DrawPromptBox(FAvLoc::T(TEXT("[E] Собрать ящик инструмента"), TEXT("[E] Pack up the tool case")));
+			DrawPromptBox(FAvLoc::S(TEXT("ui_042")));
 		}
 		else if (APickupItem* Focused = Character->GetFocusedItem())
 	{
@@ -1160,15 +1160,15 @@ void AAvaryoHUD::DrawHUD()
 		FString ToiletPrompt;
 		if (Toilet->IsOccupied() && Toilet->GetOccupant() != Character)
 		{
-			ToiletPrompt = FAvLoc::T(TEXT("Биотуалет: ЗАНЯТО"), TEXT("Porta-potty: OCCUPIED"));
+			ToiletPrompt = FAvLoc::S(TEXT("ui_043"));
 		}
 		else if (Toilet->CanUseBy(Character))
 		{
-			ToiletPrompt = FAvLoc::T(TEXT("[E] Облегчиться (мини-игра, не двигаться)"), TEXT("[E] Relieve yourself (minigame, don't move)"));
+			ToiletPrompt = FAvLoc::S(TEXT("ui_044"));
 		}
 		else
 		{
-			ToiletPrompt = FAvLoc::T(TEXT("Биотуалет: пока не хочется"), TEXT("Porta-potty: don't need it yet"));
+			ToiletPrompt = FAvLoc::S(TEXT("ui_045"));
 		}
 		DrawPromptBox(ToiletPrompt);
 	}
@@ -1176,8 +1176,8 @@ void AAvaryoHUD::DrawHUD()
 	else if (Character->GetFocusedWounded() && !Character->IsDragging())
 	{
 		DrawPromptBox(Character->IsCarryingHeavy()
-			? FAvLoc::T(TEXT("Поставьте тяжёлое (G), чтобы тащить раненого"), TEXT("Put down the heavy item (G) to drag the wounded"))
-			: FAvLoc::T(TEXT("[E] Тащить раненого"), TEXT("[E] Drag the wounded")));
+			? FAvLoc::S(TEXT("ui_046"))
+			: FAvLoc::S(TEXT("ui_047")));
 	}
 
 	// ---------- Подсказки использования / передачи ----------
@@ -1186,9 +1186,9 @@ void AAvaryoHUD::DrawHUD()
 		if (Character->IsOffering())
 		{
 			APickupItem* Held = Character->GetHeldItem();
-			const FString OfferText = FAvLoc::T(TEXT("Передаёте: "), TEXT("Handing over: "))
+			const FString OfferText = FAvLoc::S(TEXT("ui_048"))
 				+ (Held ? Held->DisplayName.ToString() : FString(TEXT("...")))
-				+ FAvLoc::T(TEXT(" — тиммейт может забрать [E]"), TEXT(" — teammate can take it [E]"));
+				+ FAvLoc::S(TEXT("ui_049"));
 			DrawCentered(OfferText, Accent, SizeY * 0.62f, 1.15f);
 		}
 		else if (APickupItem* Held = Character->GetHeldItem())
@@ -1196,33 +1196,33 @@ void AAvaryoHUD::DrawHUD()
 			FString Hint;
 			if (Held->ItemEffect == EItemEffect::Extinguish)
 			{
-				Hint = FAvLoc::T(TEXT("[ЛКМ] Распылять (держать)  •  [ПКМ] Передать"), TEXT("[LMB] Spray (hold)  •  [RMB] Hand over"));
+				Hint = FAvLoc::S(TEXT("ui_050"));
 			}
 			else if (Held->ItemEffect == EItemEffect::Radio)
 			{
 				Hint = Held->IsToggledOn()
-					? FAvLoc::T(TEXT("[ЛКМ] Выключить рацию — она шумит!"), TEXT("[LMB] Turn off radio — it's noisy!"))
-					: FAvLoc::T(TEXT("[ЛКМ] Включить рацию  •  [ПКМ] Передать"), TEXT("[LMB] Turn on radio  •  [RMB] Hand over"));
+					? FAvLoc::S(TEXT("ui_051"))
+					: FAvLoc::S(TEXT("ui_052"));
 			}
 			else if (Held->ItemEffect == EItemEffect::DeployTrap)
 			{
-				Hint = FAvLoc::T(TEXT("[ЛКМ] Поставить растяжку (взведётся через пару секунд!)  •  [ПКМ] Передать"), TEXT("[LMB] Set a tripwire (arms in a couple seconds!)  •  [RMB] Hand over"));
+				Hint = FAvLoc::S(TEXT("ui_053"));
 			}
 			else if (Held->ItemEffect == EItemEffect::ThrowBio)
 			{
-				Hint = FAvLoc::T(TEXT("[ЛКМ] Метнуть комок (осторожно — зацепишь своих!)  •  [ПКМ] Передать"), TEXT("[LMB] Throw a glob (careful — you'll hit your own!)  •  [RMB] Hand over"));
+				Hint = FAvLoc::S(TEXT("ui_054"));
 			}
 			else if (Held->ItemEffect == EItemEffect::DeployLight)
 			{
-				Hint = FAvLoc::T(TEXT("[ЛКМ] Поставить прожектор (светит и успокаивает, но гудит)  •  [ПКМ] Передать"), TEXT("[LMB] Place a floodlight (lights and calms, but hums)  •  [RMB] Hand over"));
+				Hint = FAvLoc::S(TEXT("ui_055"));
 			}
 			else if (Held->ItemEffect != EItemEffect::None)
 			{
-				Hint = FAvLoc::T(TEXT("[ЛКМ] Применить (держать)  •  [ПКМ] Передать"), TEXT("[LMB] Use (hold)  •  [RMB] Hand over"));
+				Hint = FAvLoc::S(TEXT("ui_056"));
 			}
 			else
 			{
-				Hint = FAvLoc::T(TEXT("[ПКМ] Передать (держать)"), TEXT("[RMB] Hand over (hold)"));
+				Hint = FAvLoc::S(TEXT("ui_057"));
 			}
 			DrawCentered(Hint, TextDim, SizeY * 0.66f, 0.95f);
 		}
@@ -1269,7 +1269,7 @@ void AAvaryoHUD::DrawHUD()
 			}
 			else if (Item->IsToggledOn())
 			{
-				DrawText(FAvLoc::T(TEXT("ВКЛ"), TEXT("ON")), Accent, CellX + CellW - 38.f, PanelY + 4.f, Font, 0.7f);
+				DrawText(FAvLoc::S(TEXT("ui_058")), Accent, CellX + CellW - 38.f, PanelY + 4.f, Font, 0.7f);
 			}
 		}
 		else
@@ -1284,16 +1284,16 @@ void AAvaryoHUD::DrawHUD()
 				}
 				if (Item->IsToggledOn())
 				{
-					ItemName += FAvLoc::T(TEXT(" [ВКЛ]"), TEXT(" [ON]"));
+					ItemName += FAvLoc::S(TEXT("ui_059"));
 				}
 			}
 			else
 			{
-				ItemName = SlotIndex == 0 ? FAvLoc::T(TEXT("Нет"), TEXT("None")) : FAvLoc::T(TEXT("Пусто"), TEXT("Empty"));
+				ItemName = SlotIndex == 0 ? FAvLoc::S(TEXT("ui_060")) : FAvLoc::S(TEXT("ui_061"));
 			}
 
 			const FString Label = SlotIndex == 0
-				? FString::Printf(TEXT("[1] %s: %s"), *FAvLoc::T(TEXT("Тяж"), TEXT("Heavy")), *ItemName)
+				? FString::Printf(TEXT("[1] %s: %s"), *FAvLoc::S(TEXT("ui_062")), *ItemName)
 				: FString::Printf(TEXT("[%d] %s"), SlotIndex + 1, *ItemName);
 
 			float W = 0.f, H = 0.f;
@@ -1307,20 +1307,20 @@ void AAvaryoHUD::DrawHUD()
 	if (Vitals)
 	{
 		TArray<FString> Statuses;
-		if (Vitals->IsUnconscious())      Statuses.Add(FAvLoc::T(TEXT("БЕЗ СОЗНАНИЯ"), TEXT("UNCONSCIOUS")));
-		else if (Vitals->IsWounded())     Statuses.Add(FAvLoc::T(TEXT("Ранен"), TEXT("Wounded")));
-		if (Vitals->IsSmoking())          Statuses.Add(FAvLoc::T(TEXT("Курит"), TEXT("Smoking")));
-		if (Vitals->IsPanicking())        Statuses.Add(FAvLoc::T(TEXT("Паникует"), TEXT("Panicking")));
-		if (Vitals->GetBladder() > 70.f)  Statuses.Add(FAvLoc::T(TEXT("Хочет в туалет"), TEXT("Needs a toilet")));
-		if (Vitals->GetStamina() < 20.f)  Statuses.Add(FAvLoc::T(TEXT("Устал"), TEXT("Exhausted")));
-		if (Character->IsCarryingHeavy()) Statuses.Add(FAvLoc::T(TEXT("Несёт тяжёлое"), TEXT("Carrying heavy")));
-		if (Character->IsDragging())      Statuses.Add(FAvLoc::T(TEXT("Тащит раненого ([E] отпустить)"), TEXT("Dragging wounded ([E] release)")));
-		if (Character->GetDraggedBy())    Statuses.Add(FAvLoc::T(TEXT("Вас тащат"), TEXT("Being dragged")));
-		if (Vitals->IsIncidentSlowed())   Statuses.Add(FAvLoc::T(TEXT("Санитарный инцидент!"), TEXT("Sanitary incident!")));
-		else if (Vitals->IsSoiled())      Statuses.Add(FAvLoc::T(TEXT("Испачкан"), TEXT("Soiled")));
-		if (Vitals->IsWet())              Statuses.Add(FAvLoc::T(TEXT("Промок"), TEXT("Soaked")));
-		if (Vitals->IsBurning())          Statuses.Add(FAvLoc::T(TEXT("ГОРИТ! [вода/огнетушитель]"), TEXT("ON FIRE! [water/extinguisher]")));
-		if (Vitals->IsSmelly())           Statuses.Add(FAvLoc::T(TEXT("Воняет"), TEXT("Stinks")));
+		if (Vitals->IsUnconscious())      Statuses.Add(FAvLoc::S(TEXT("ui_063")));
+		else if (Vitals->IsWounded())     Statuses.Add(FAvLoc::S(TEXT("ui_064")));
+		if (Vitals->IsSmoking())          Statuses.Add(FAvLoc::S(TEXT("ui_065")));
+		if (Vitals->IsPanicking())        Statuses.Add(FAvLoc::S(TEXT("ui_066")));
+		if (Vitals->GetBladder() > 70.f)  Statuses.Add(FAvLoc::S(TEXT("ui_067")));
+		if (Vitals->GetStamina() < 20.f)  Statuses.Add(FAvLoc::S(TEXT("ui_068")));
+		if (Character->IsCarryingHeavy()) Statuses.Add(FAvLoc::S(TEXT("ui_069")));
+		if (Character->IsDragging())      Statuses.Add(FAvLoc::S(TEXT("ui_070")));
+		if (Character->GetDraggedBy())    Statuses.Add(FAvLoc::S(TEXT("ui_071")));
+		if (Vitals->IsIncidentSlowed())   Statuses.Add(FAvLoc::S(TEXT("ui_072")));
+		else if (Vitals->IsSoiled())      Statuses.Add(FAvLoc::S(TEXT("ui_073")));
+		if (Vitals->IsWet())              Statuses.Add(FAvLoc::S(TEXT("ui_074")));
+		if (Vitals->IsBurning())          Statuses.Add(FAvLoc::S(TEXT("ui_075")));
+		if (Vitals->IsSmelly())           Statuses.Add(FAvLoc::S(TEXT("ui_076")));
 
 		// В газовом облаке — не курить! (берём из кэша задач RunState, без обхода всех акторов каждый кадр)
 		if (ARunState* GasRun = Run)
@@ -1330,7 +1330,7 @@ void AAvaryoHUD::DrawHUD()
 				if (Obj && Obj->IsLeakingGas()
 					&& FVector::DistSquared(Character->GetActorLocation(), Obj->GetActorLocation()) <= FMath::Square(Obj->GetCurrentGasRadius())) // выросшее облако, не статик (CODE_AUDIT3 #4)
 				{
-					Statuses.Add(FAvLoc::T(TEXT("ПАХНЕТ ГАЗОМ — НЕ КУРИТЬ!"), TEXT("SMELLS OF GAS — DON'T SMOKE!")));
+					Statuses.Add(FAvLoc::S(TEXT("ui_077")));
 					break;
 				}
 			}
