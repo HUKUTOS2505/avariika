@@ -241,6 +241,8 @@ void AAvaryoCharacter::BeginPlay()
 		if (!ReviveMontage)  ReviveMontage  = LoadM(TEXT("/Game/Avariika/Anim/Montages/M_Revive.M_Revive"));
 		if (!BandageMontage) BandageMontage = LoadM(TEXT("/Game/Avariika/Anim/Montages/M_Bandage.M_Bandage"));
 		if (!DrinkMontage)   DrinkMontage   = LoadM(TEXT("/Game/Avariika/Anim/Montages/M_Drink.M_Drink"));
+		// Рабочий монтаж ремонта (новый воркер Quantum — SK_Mannequin-совместимый, в отличие от UE4-mann M_Fix).
+		if (!FixingWorkMontage) FixingWorkMontage = LoadM(TEXT("/Game/Avariika/Anim/Work/M_Work_Fixing.M_Work_Fixing"));
 	}
 
 	// Реакции ранения/подъёма привязываем на сервере (там считается витал и шлётся мультикаст всем).
@@ -378,6 +380,9 @@ void AAvaryoCharacter::Tick(float DeltaSeconds)
 
 	// Присед: плавно опускаем «глаз» (FP-меш с камерой) — локально у владельца.
 	UpdateCrouchEye(DeltaSeconds);
+
+	// Рабочая анимация ремонта: пока чиним — крутим Fixing-монтаж (локально, по реплиц. IsRepairing()).
+	UpdateRepairAnim();
 
 	// Сварка без маски → «зайчики» сварщика (arc eye): глаза жжёт. НЕ урон по HP — в реале это
 	// боль/временная слепота, а не рана (как и газ). Сервер копит панику варящему; слепящую
@@ -788,6 +793,31 @@ void AAvaryoCharacter::MulticastPlayMontage_Implementation(UAnimMontage* Montage
 			// реакции-монтажи не проигрываем. Вернуть — раскомментить строку ниже.
 			// AnimInst->Montage_Play(Montage);
 		}
+	}
+}
+
+void AAvaryoCharacter::UpdateRepairAnim()
+{
+	// Визуал не нужен на dedicated server; монтаж локальный (каждая машина ведёт его по реплиц. IsRepairing()).
+	if (GetNetMode() == NM_DedicatedServer || !FixingWorkMontage)
+	{
+		return;
+	}
+	USkeletalMeshComponent* BodyMesh = GetMesh();
+	UAnimInstance* AnimInst = BodyMesh ? BodyMesh->GetAnimInstance() : nullptr;
+	if (!AnimInst)
+	{
+		return;
+	}
+	const bool bShouldPlay = IsRepairing();
+	const bool bPlaying = AnimInst->Montage_IsPlaying(FixingWorkMontage);
+	if (bShouldPlay && !bPlaying)
+	{
+		AnimInst->Montage_Play(FixingWorkMontage); // закончится сам — Tick перезапустит (цикл), пока чиним
+	}
+	else if (!bShouldPlay && bPlaying)
+	{
+		AnimInst->Montage_Stop(0.25f, FixingWorkMontage);
 	}
 }
 

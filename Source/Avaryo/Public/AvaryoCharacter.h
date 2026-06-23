@@ -399,6 +399,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Anim") TObjectPtr<UAnimMontage> BandageMontage;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Anim") TObjectPtr<UAnimMontage> DrinkMontage;
 
+	/** Рабочий монтаж ремонта (WorkAnimations/SK_Mannequin → совместим с Quantum-скелетом). Крутится пока IsRepairing(). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Anim") TObjectPtr<UAnimMontage> FixingWorkMontage;
+
+	/** Локально на каждой машине синхронит рабочую анимацию ремонта с реплиц. IsRepairing(). Зовётся из Tick. */
+	void UpdateRepairAnim();
+
 	/** Проиграть монтаж на теле (GetMesh) у ВСЕХ игроков (кооп). Зовёт сервер. */
 	UFUNCTION(NetMulticast, Unreliable)
 	void MulticastPlayMontage(UAnimMontage* Montage);
