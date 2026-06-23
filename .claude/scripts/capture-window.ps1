@@ -1,6 +1,6 @@
 param(
     [string]$Title = "",          # partial window-title match; empty = whole virtual desktop (all monitors)
-    [string]$Out   = "D:\unrealEngine\avariika\Saved\_cap.png"
+    [string]$Out   = "C:\unrealEngine\avariika\Saved\_cap.png"
 )
 
 Add-Type -AssemblyName System.Drawing

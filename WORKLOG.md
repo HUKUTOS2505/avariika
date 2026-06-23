@@ -8,7 +8,8 @@
 
 - **Работаем по модулям**: один модуль за раз, доделываем до конца (код + сборка + смоук + размещение + доки + пуш), только потом следующий.
 - **Редактор пользователя не открывать.** Сборка только при закрытом редакторе:
-  `"C:\Program Files\Epic Games\UE_5.7\Engine\Build\BatchFiles\Build.bat" avariikaEditor Win64 Development -project="D:\unrealEngine\avariika\avariika.uproject" -WaitMutex`
+  `"C:\Program Files\Epic Games\UE_5.7\Engine\Build\BatchFiles\Build.bat" avariikaEditor Win64 Development -project="C:\unrealEngine\avariika\avariika.uproject" -WaitMutex`
+  (🔑 проект ПЕРЕЕХАЛ D:→C: 2026-06-23 — старый `D:\unrealEngine\avariika` УДАЛЁН; все пути теперь на `C:`.)
 - Ассеты/уровень — headless-скриптами: `UnrealEditor-Cmd.exe <uproject> -run=pythonscript -script=<py>` (скрипты в `Scripts/`, все идемпотентны).
 - Смоук-тест после каждого блока: `UnrealEditor-Cmd.exe <uproject> -game -nullrhi -nosound -unattended -log` ~40 c, лог `Saved/Logs/avariika.log` на `Fatal|Ensure|: Error:`.
 - Коммит + пуш (GitHub `HUKUTOS2505/avariika`, ветка `main`) после каждого рабочего куска.
@@ -28,11 +29,14 @@
 - ⚠️ **При переносе (на будущее):** copy (robocopy), оригинал D: держать до проверки; фикс абс.путей (CLAUDE.md/WORKLOG Build.bat/.idea/.mcp.json/Claudius/.claude settings.local); **миграция ключа памяти Claude** `C:\Users\admin\.claude\projects\D--unrealEngine-avariika` → `C--...`; затем юзер перезапускает Claude из C:.
 - **`DISK_C_SCAN.md`** (корень репо) — полный скан C: для разбора: RE7+Marathon→D: (−66ГБ), `_avariika_backup` 25.7, Epic VaultCache 16.9, `AppData\Local\UnrealEngine` 10.9, ❓`Desktop\data.bin` 12.5 (юзер опознаёт).
 
-**2) Ф3 MODULAR WORKERS (Worker Bundle) — КОД НАПИСАН, ⚠️ НЕ СОБРАН (питание):**
+**2) Ф3 MODULAR WORKERS (Worker Bundle) — ✅ СОБРАНО 2026-06-23 (после возврата питания):**
 - Новый **`UWorkerAppearanceComponent`** (`Source/Avaryo/{Public,Private}/Components/WorkerAppearanceComponent.{h,cpp}`): enum `EWorkerSlot` (Body/Head/Hair/Beard/Torso/Legs/Feet/Gloves/Headgear/FaceMask/Glasses/Vest); `FWorkerAppearance`=TArray<FWorkerSlotMesh> (`ReplicatedUsing=OnRep_Appearance`, софт-ссылки → сериализуемо под сейв Ф4); сборка дочерних SkeletalMeshComponent с `SetLeaderPoseComponent(Body)`; API `SetSlotMesh/ApplyAppearance/ApplyDefaultPreset/ApplyEquipmentFlags/ClearAll`; OnRep→RebuildVisuals; скип визуала на dedicated server. Курированные `/Game/Modular_Workers/...` пути зашиты (разведка Explore — карта слот→путь, «бомж»=тишка+джинсы; снаряжение: каска оранж/респиратор/перчатки).
 - Вживлён в **`AAvaryoCharacter` ДОРМАНТНО** (тело игрока НЕ подменяет — это Ф2, ждёт глаз юзера): член `WorkerAppearance` + CreateDefaultSubobject + дев-команды `AvWorkerPreview`/`AvWorkerClear` (Server-RPC authority-routing, как AvGod).
 - ⚠️ **ПЕРВОЕ ДЕЛО ПО ВОЗВРАТУ:** закрыть редактор → `Build.bat` → если зелено: смоук → коммит «собрано» → reopen → PIE `AvWorkerPreview` (визуал-ревью — глаза юзера). Коммит этой сессии = **WIP, код НЕ компилировался** (могут быть ошибки сборки — чинить первым делом).
 - Дальше по плану: Ф1 ретаргет UE4→UE5, Ф2 свап тела, Ф4 снаряжение→визуал из `FEquipmentLevels`, Ф5 билдер. Save в `AvariikaSaveGame` НЕ трогал (per-player vs company-save — дизайн-решение юзера).
+- ✅ **ВОЗВРАТ 2026-06-23 («продолжаем»):** редактор закрыт (сохранил уровень MCP save_all) → **Build Succeeded 151с** (avariikaEditor, C:-путь; `Module.Avaryo.*` пересобран → `UnrealEditor-Avaryo.dll`, 0 ошибок компиляции/линковки; WIP-код Ф3 скомпилировался без правок). Смоук (`-game -nullrhi -nosound` 45с) **чист**: `Engine is initialized`, мир L_MainMenu поднят, краша нет. Единственные Error в логе — известный движковый handled-ensure про деприкейт-cvar `r.TranslucencyLightingVolumeDim` + USD/Automation-шум (не наш код). **Осталось (глаза юзера): reopen → PIE `AvWorkerPreview`** — визуал собранного рабочего (тело+одежда+каска/респиратор/перчатки).
+- 🔑 **МИГРАЦИЯ D:→C: ВЫПОЛНЕНА** (была отложена — юзер сделал между сессиями): рабочий проект теперь `C:\unrealEngine\avariika`, старый `D:\unrealEngine\avariika` УДАЛЁН (проверено: нет). Пофикшены крит. абс.пути D→C: WORKLOG/README Build.bat, `.claude/scripts/{claudius,capture-window}.ps1`. ⚠️ **Остаётся хвост:** ~40 одноразовых `Scripts/*.py` всё ещё пишут вывод в `D:\...\Saved`/`D:/.../Scripts/manifests` (сломаны на C:, но это идемпотентные разовые хелперы — массовый sweep D→C ждёт отмашки).
+- ⚠️ **НАХОДКА (не наш код):** битый ассет `Content/Loot_Anim_Set/Animations/Paired_Loot/Paired_Loot_FlipOverCorpse_GrabItem_Vic2.uasset` — **73 байта** (соседи 230–287КБ), «Invalid PACKAGE_FILE_TAG»; mtime 15.06 (битый ещё ДО переноса). Gitignored (пак Loot_Anim_Set), нашим Source/контентом не используется, git не восстановит. Один такой файл — миграция массово контент НЕ побила. Фикс: переустановить пак с Fab ИЛИ удалить заглушку (ждёт решения юзера).
 
 ## СЕССИЯ 2026-06-23 (автоном, юзер спит) — ИГРОВОЕ МЕНЮ + НАСТРОЙКИ + ЛОКАЛИЗАЦИЯ RU/EN
 

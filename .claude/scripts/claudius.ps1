@@ -1,5 +1,5 @@
 # Single round-trip to the Claudius UE plugin. HTTP first (port 8080), file mode as fallback.
-# Usage: & D:\unrealEngine\avariika\.claude\scripts\claudius.ps1 -Category level -Command spawn_actor -ParametersJson '{"name":"Foo"}'
+# Usage: & C:\unrealEngine\avariika\.claude\scripts\claudius.ps1 -Category level -Command spawn_actor -ParametersJson '{"name":"Foo"}'
 param(
     [Parameter(Mandatory = $true)][string]$Category,
     [Parameter(Mandatory = $true)][string]$Command,
@@ -30,7 +30,7 @@ try {
 }
 
 # --- File mode (fallback) ---
-$dir = 'D:\unrealEngine\avariika\Plugins\Claudius'
+$dir = 'C:\unrealEngine\avariika\Plugins\Claudius'
 # UTF-8 without BOM (PS 5.1 Out-File would write a BOM)
 [System.IO.File]::WriteAllText("$dir\claudius_request.json", $json, (New-Object System.Text.UTF8Encoding $false))
 

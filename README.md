@@ -60,7 +60,7 @@
 Закрыть редактор (Live Coding блокирует UBT), затем:
 
 ```
-"C:\Program Files\Epic Games\UE_5.7\Engine\Build\BatchFiles\Build.bat" avariikaEditor Win64 Development -project="D:\unrealEngine\avariika\avariika.uproject" -WaitMutex
+"C:\Program Files\Epic Games\UE_5.7\Engine\Build\BatchFiles\Build.bat" avariikaEditor Win64 Development -project="C:\unrealEngine\avariika\avariika.uproject" -WaitMutex
 ```
 
 ## Дальше по плану
