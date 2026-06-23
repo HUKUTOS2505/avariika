@@ -241,8 +241,11 @@ void AAvaryoCharacter::BeginPlay()
 		if (!ReviveMontage)  ReviveMontage  = LoadM(TEXT("/Game/Avariika/Anim/Montages/M_Revive.M_Revive"));
 		if (!BandageMontage) BandageMontage = LoadM(TEXT("/Game/Avariika/Anim/Montages/M_Bandage.M_Bandage"));
 		if (!DrinkMontage)   DrinkMontage   = LoadM(TEXT("/Game/Avariika/Anim/Montages/M_Drink.M_Drink"));
-		// Рабочий монтаж ремонта (новый воркер Quantum — SK_Mannequin-совместимый, в отличие от UE4-mann M_Fix).
+		// Рабочие монтажи действий (новый воркер Quantum — SK_Mannequin-совместимы, в отличие от UE4-mann M_Fix). Плейсхолдеры под мокап.
 		if (!FixingWorkMontage) FixingWorkMontage = LoadM(TEXT("/Game/Avariika/Anim/Work/M_Work_Fixing.M_Work_Fixing"));
+		if (!SprayWorkMontage)  SprayWorkMontage  = LoadM(TEXT("/Game/Avariika/Anim/Work/M_Work_Spray.M_Work_Spray"));
+		if (!CarryWorkMontage)  CarryWorkMontage  = LoadM(TEXT("/Game/Avariika/Anim/Work/M_Work_CarryBag.M_Work_CarryBag"));
+		if (!TiredWorkMontage)  TiredWorkMontage  = LoadM(TEXT("/Game/Avariika/Anim/Work/M_Work_Tired.M_Work_Tired"));
 	}
 
 	// Реакции ранения/подъёма привязываем на сервере (там считается витал и шлётся мультикаст всем).
@@ -381,8 +384,8 @@ void AAvaryoCharacter::Tick(float DeltaSeconds)
 	// Присед: плавно опускаем «глаз» (FP-меш с камерой) — локально у владельца.
 	UpdateCrouchEye(DeltaSeconds);
 
-	// Рабочая анимация ремонта: пока чиним — крутим Fixing-монтаж (локально, по реплиц. IsRepairing()).
-	UpdateRepairAnim();
+	// Рабочие анимации действий (ремонт/спрей/тяжёлое/выдох) — локально на каждой машине по реплиц. состоянию.
+	UpdateWorkAnim();
 
 	// Сварка без маски → «зайчики» сварщика (arc eye): глаза жжёт. НЕ урон по HP — в реале это
 	// боль/временная слепота, а не рана (как и газ). Сервер копит панику варящему; слепящую
@@ -796,10 +799,25 @@ void AAvaryoCharacter::MulticastPlayMontage_Implementation(UAnimMontage* Montage
 	}
 }
 
-void AAvaryoCharacter::UpdateRepairAnim()
+UAnimMontage* AAvaryoCharacter::PickWorkMontage() const
 {
-	// Визуал не нужен на dedicated server; монтаж локальный (каждая машина ведёт его по реплиц. IsRepairing()).
-	if (GetNetMode() == NM_DedicatedServer || !FixingWorkMontage)
+	// Приоритет: ремонт > спрей-огнетушитель > таскать тяжёлое > выдохся-стоя. Плейсхолдеры (свап на мокап позже).
+	if (IsRepairing())     return FixingWorkMontage;
+	if (bSprayingHeld)     return SprayWorkMontage;
+	if (IsCarryingHeavy()) return CarryWorkMontage;
+	// Выдохся: только СТОЯ (иначе full-body монтаж ломает локомоцию ходьбы).
+	if (TiredWorkMontage && VitalsComponent && VitalsComponent->GetStamina() <= 10.f
+		&& GetVelocity().SizeSquared2D() < 100.f)
+	{
+		return TiredWorkMontage;
+	}
+	return nullptr;
+}
+
+void AAvaryoCharacter::UpdateWorkAnim()
+{
+	// Визуал не нужен на dedicated server; монтаж локальный — каждая машина ведёт его по реплиц. состоянию.
+	if (GetNetMode() == NM_DedicatedServer)
 	{
 		return;
 	}
@@ -809,15 +827,23 @@ void AAvaryoCharacter::UpdateRepairAnim()
 	{
 		return;
 	}
-	const bool bShouldPlay = IsRepairing();
-	const bool bPlaying = AnimInst->Montage_IsPlaying(FixingWorkMontage);
-	if (bShouldPlay && !bPlaying)
+	UAnimMontage* Want = PickWorkMontage();
+	if (Want != CurrentWorkMontage)
 	{
-		AnimInst->Montage_Play(FixingWorkMontage); // закончится сам — Tick перезапустит (цикл), пока чиним
+		// Состояние сменилось: гасим прежний, запускаем новый (или просто гасим, если Want=null).
+		if (CurrentWorkMontage && AnimInst->Montage_IsPlaying(CurrentWorkMontage))
+		{
+			AnimInst->Montage_Stop(0.25f, CurrentWorkMontage);
+		}
+		if (Want)
+		{
+			AnimInst->Montage_Play(Want);
+		}
+		CurrentWorkMontage = Want;
 	}
-	else if (!bShouldPlay && bPlaying)
+	else if (Want && !AnimInst->Montage_IsPlaying(Want))
 	{
-		AnimInst->Montage_Stop(0.25f, FixingWorkMontage);
+		AnimInst->Montage_Play(Want); // зациклить, пока состояние держится
 	}
 }
 

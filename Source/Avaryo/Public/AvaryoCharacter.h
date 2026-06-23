@@ -399,11 +399,20 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Anim") TObjectPtr<UAnimMontage> BandageMontage;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Anim") TObjectPtr<UAnimMontage> DrinkMontage;
 
-	/** Рабочий монтаж ремонта (WorkAnimations/SK_Mannequin → совместим с Quantum-скелетом). Крутится пока IsRepairing(). */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Anim") TObjectPtr<UAnimMontage> FixingWorkMontage;
+	// Рабочие монтажи действий (WorkAnimations/SK_Mannequin → совместимы с Quantum). Плейсхолдеры под кастом-мокап (свапаются позже).
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Anim") TObjectPtr<UAnimMontage> FixingWorkMontage;  // ремонт
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Anim") TObjectPtr<UAnimMontage> SprayWorkMontage;   // огнетушитель
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Anim") TObjectPtr<UAnimMontage> CarryWorkMontage;   // тяжёлый предмет
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Anim") TObjectPtr<UAnimMontage> TiredWorkMontage;   // выдохся (стоя)
 
-	/** Локально на каждой машине синхронит рабочую анимацию ремонта с реплиц. IsRepairing(). Зовётся из Tick. */
-	void UpdateRepairAnim();
+	/** Сейчас играемый рабочий монтаж (трекер смены/стопа). Не реплиц. — у каждого свой по общему состоянию. */
+	UPROPERTY(Transient) TObjectPtr<UAnimMontage> CurrentWorkMontage;
+
+	/** Выбрать рабочий монтаж по приоритету состояния (ремонт > спрей > тяжёлое > выдох-стоя). nullptr = ничего. */
+	UAnimMontage* PickWorkMontage() const;
+
+	/** Локально на каждой машине ведёт рабочую анимацию действия по реплиц. состоянию. Зовётся из Tick. */
+	void UpdateWorkAnim();
 
 	/** Проиграть монтаж на теле (GetMesh) у ВСЕХ игроков (кооп). Зовёт сервер. */
 	UFUNCTION(NetMulticast, Unreliable)
