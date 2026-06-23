@@ -27,8 +27,11 @@ DrawText(FAvLoc::T(TEXT("Продолжить"), TEXT("Resume")), ...);
 
 ## Движковый таргет локализации (.locres) — ✅ НАСТРОЕН (2026-06-23)
 Заведён стандартный localization target **Game** — это оживляет родной дропдаун EOM и кладёт фундамент под перевод FText-слоя (DisplayName/«Акт»/UMG).
-- **`Config/Localization/Game.ini`** — конфиг гэйзера: `NativeCulture=ru`, `CulturesToGenerate=ru,en`; собирает из `Source/*` (LOCTEXT/NSLOCTEXT) и `Content/Avariika/*` (FText в ассетах/BP).
-- **`Config/DefaultGame.ini`** — `[/Script/UnrealEd.ProjectPackagingSettings] +CulturesToStage=ru/en` (попадут в собранный билд).
+- **13 культур** (Steam-матрица): `ru, en, fr, it, de, es, ja, ko, pl, pt-BR, zh-Hans, es-419, zh-Hant`. Проверено: `get_localized_cultures()` возвращает все 13, дропдаун покажет родные имена (русский/English/français/Deutsch/日本語/한국어/中文（简体）…).
+- ⚠️ **Реально переведён пока только нативный `ru`.** Английский «хром» меню/HUD даёт **FAvLoc** (он знает только ru/en). Все 12 НЕ-нативных культур по FText-слою (DisplayName/«Акт»/EOM) пусты → фоллбэк на русский. То есть фундамент/список готов, **перевод — отдельная работа** (см. ниже про FText-миграцию хрома и заполнение архивов).
+- **`Config/Localization/Game.ini`** — конфиг гэйзера: `NativeCulture=ru`, `CulturesToGenerate=` все 13; собирает из `Source/*` (LOCTEXT/NSLOCTEXT) и `Content/Avariika/*` (FText в ассетах/BP).
+- **`Config/DefaultGame.ini`** — `[/Script/UnrealEd.ProjectPackagingSettings] +CulturesToStage=` все 13 (попадут в собранный билд).
+- 🔑 **С 13 языками подход FAvLoc (инлайн ru/en) исчерпан** — нельзя вписать 13 строк в код. Чтобы хром меню/HUD реально переводился на все 13, его надо перевести на FText-конвейер: либо `LOCTEXT` в коде, либо **String Table**-ассет (удобнее переводчикам — правят в редакторе). Тогда строки попадут в архивы всех культур и переведутся вместе с DisplayName/«Актом». Это следующий большой шаг.
 - **Сгенерено:** `Content/Localization/Game/{Game.manifest, Game.locmeta, ru/Game.{archive,locres}, en/Game.{archive,locres}}`. Трекаются в git (мелкие, source-of-truth перевода); генерёжные `*.csv/*_Conflicts.txt/*.po` — в gitignore.
 - **Проверено в редакторе** (`InternationalizationLibrary`): `get_localized_cultures() == ["en","ru"]`, имена `русский`/`английский`, `set_current_language('en'/'ru')` переключает корректно.
 - **Перегенерировать после изменений текста** (редактор ЗАКРЫТЬ):
