@@ -1,5 +1,6 @@
 #include "AvaryoCharacter.h"
 
+#include "Internationalization/Internationalization.h"
 #include "Camera/CameraComponent.h"
 #include "Components/AudioComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -1699,6 +1700,13 @@ void AAvaryoCharacter::AvHost()  { if (UAvariikaOnlineSubsystem* O = GetOnline(t
 void AAvaryoCharacter::AvFind()  { if (UAvariikaOnlineSubsystem* O = GetOnline(this)) { O->FindGames(); } }
 void AAvaryoCharacter::AvJoin(int32 Index) { if (UAvariikaOnlineSubsystem* O = GetOnline(this)) { O->JoinGameByIndex(Index); } }
 void AAvaryoCharacter::AvLeave() { if (UAvariikaOnlineSubsystem* O = GetOnline(this)) { O->LeaveGame(); } }
+
+void AAvaryoCharacter::AvLang(const FString& Lang)
+{
+	// Переключить язык UI (RU/EN). FAvLoc читает текущий язык. `AvLang en` / `AvLang ru`.
+	const FString L = Lang.IsEmpty() ? TEXT("ru") : Lang.ToLower();
+	FInternationalization::Get().SetCurrentLanguage(L);
+}
 
 // ---------- Оператор: нагрудные камеры ----------
 

@@ -1,5 +1,6 @@
 #include "UI/AvaryoHUD.h"
 
+#include "AvariikaLoc.h"
 #include "AvaryoCharacter.h"
 #include "Components/UFlashlightComponent.h"
 #include "Components/VitalsComponent.h"
@@ -53,7 +54,7 @@ void AAvaryoHUD::DrawPauseMenu()
 	DrawRect(FLinearColor(0.f, 0.f, 0.f, 0.7f), 0.f, 0.f, SX, SY); // затемнение сцены
 	DrawRect(Orange, 0.f, 0.f, SX, 4.f);                            // оранжевая кромка
 
-	const FString Title = TEXT("ПАУЗА");
+	const FString Title = FAvLoc::T(TEXT("ПАУЗА"), TEXT("PAUSE"));
 	float TW = 0.f, TH = 0.f;
 	UFont* TitleFont = Big ? Big : Font;
 	GetTextSize(Title, TW, TH, TitleFont, 2.4f);
@@ -76,9 +77,9 @@ void AAvaryoHUD::DrawPauseMenu()
 		AddHitBox(FVector2D(X, Y), FVector2D(BW, BH), Box, true);
 		Y += BH + Gap;
 	};
-	Btn(TEXT("Продолжить"),   TEXT("pause_resume"));
-	Btn(TEXT("Настройки"),    TEXT("pause_settings"));
-	Btn(TEXT("Выйти в меню"), TEXT("pause_leave"));
+	Btn(FAvLoc::T(TEXT("Продолжить"),   TEXT("Resume")),        TEXT("pause_resume"));
+	Btn(FAvLoc::T(TEXT("Настройки"),    TEXT("Settings")),      TEXT("pause_settings"));
+	Btn(FAvLoc::T(TEXT("Выйти в меню"), TEXT("Leave to Menu")), TEXT("pause_leave"));
 }
 
 void AAvaryoHUD::NotifyHitBoxClick(FName BoxName)

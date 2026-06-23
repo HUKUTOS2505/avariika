@@ -941,6 +941,10 @@ protected:
 	UFUNCTION(Exec)
 	void AvShop();
 
+	/** Дев: переключить язык интерфейса: `AvLang en` / `AvLang ru` (тест RU/EN локализации меню). */
+	UFUNCTION(Exec)
+	void AvLang(const FString& Lang);
+
 	/** Дев-режим: вкл/выкл неуязвимость (для тестов — не умереть). Доливает здоровье при включении. */
 	UFUNCTION(Exec)
 	void AvGod();

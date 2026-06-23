@@ -6,6 +6,7 @@
 #include "Engine/GameInstance.h"
 #include "Blueprint/UserWidget.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "AvariikaLoc.h"
 
 namespace
 {
@@ -67,12 +68,12 @@ void AMenuHUD::DrawHUD()
 	DrawRect(Orange, 0.f, 0.f, SX, 4.f);
 
 	// Заголовок
-	const FString Title = TEXT("АВАРИЙКА");
+	const FString Title = FAvLoc::T(TEXT("АВАРИЙКА"), TEXT("AVARIYKA"));
 	float TW = 0.f, TH = 0.f;
 	GetTextSize(Title, TW, TH, Big, 3.0f);
 	DrawText(Title, Orange, SX * 0.5f - TW * 0.5f, SY * 0.16f, Big, 3.0f);
 
-	const FString Sub = TEXT("аварийная бригада");
+	const FString Sub = FAvLoc::T(TEXT("аварийная бригада"), TEXT("emergency repair crew"));
 	GetTextSize(Sub, TW, TH, Med, 1.1f);
 	DrawText(Sub, Grey, SX * 0.5f - TW * 0.5f, SY * 0.16f + 64.f, Med, 1.1f);
 
@@ -89,14 +90,14 @@ void AMenuHUD::DrawHUD()
 
 	if (Screen == EMenuScreen::Main)
 	{
-		DrawButton(TEXT("Создать игру"), CX, Y, BW, BH, TEXT("host"), Med);     Y += BH + Gap;
-		DrawButton(TEXT("Найти игру"),   CX, Y, BW, BH, TEXT("find"), Med);     Y += BH + Gap;
-		DrawButton(TEXT("Настройки"),    CX, Y, BW, BH, TEXT("settings"), Med); Y += BH + Gap;
-		DrawButton(TEXT("Выход"),        CX, Y, BW, BH, TEXT("quit"), Med);
+		DrawButton(FAvLoc::T(TEXT("Создать игру"), TEXT("Host Game")), CX, Y, BW, BH, TEXT("host"), Med);     Y += BH + Gap;
+		DrawButton(FAvLoc::T(TEXT("Найти игру"),   TEXT("Find Game")), CX, Y, BW, BH, TEXT("find"), Med);     Y += BH + Gap;
+		DrawButton(FAvLoc::T(TEXT("Настройки"),    TEXT("Settings")),  CX, Y, BW, BH, TEXT("settings"), Med); Y += BH + Gap;
+		DrawButton(FAvLoc::T(TEXT("Выход"),        TEXT("Quit")),      CX, Y, BW, BH, TEXT("quit"), Med);
 	}
 	else // Browse
 	{
-		const FString Hdr = TEXT("Поиск игр в сети");
+		const FString Hdr = FAvLoc::T(TEXT("Поиск игр в сети"), TEXT("Find Network Games"));
 		GetTextSize(Hdr, TW, TH, Med, 1.3f);
 		DrawText(Hdr, Orange, CX - TW * 0.5f, Y - 50.f, Med, 1.3f);
 
@@ -111,7 +112,7 @@ void AMenuHUD::DrawHUD()
 
 		if (Num <= 0)
 		{
-			const FString Msg = bSearching ? TEXT("Поиск...") : TEXT("Игр не найдено");
+			const FString Msg = bSearching ? FAvLoc::T(TEXT("Поиск..."), TEXT("Searching...")) : FAvLoc::T(TEXT("Игр не найдено"), TEXT("No games found"));
 			GetTextSize(Msg, TW, TH, Med, 1.1f);
 			DrawText(Msg, Grey, CX - TW * 0.5f, Y + 8.f, Med, 1.1f);
 			Y += 50.f;
@@ -120,19 +121,20 @@ void AMenuHUD::DrawHUD()
 		{
 			for (int32 i = 0; i < Num; ++i)
 			{
-				const FString Label = FString::Printf(TEXT("Игра %d   [Подключиться]"), i + 1);
+				const FString Label = FAvLoc::T(TEXT("Игра "), TEXT("Game ")) + FString::FromInt(i + 1)
+					+ FAvLoc::T(TEXT("   [Подключиться]"), TEXT("   [Join]"));
 				DrawButton(Label, CX, Y, BW, BH, FName(*FString::Printf(TEXT("join_%d"), i)), Med);
 				Y += BH + Gap;
 			}
 		}
 
 		Y += Gap;
-		DrawButton(TEXT("Обновить"), CX, Y, BW, BH, TEXT("refresh"), Med); Y += BH + Gap;
-		DrawButton(TEXT("Назад"),    CX, Y, BW, BH, TEXT("back"), Med);
+		DrawButton(FAvLoc::T(TEXT("Обновить"), TEXT("Refresh")), CX, Y, BW, BH, TEXT("refresh"), Med); Y += BH + Gap;
+		DrawButton(FAvLoc::T(TEXT("Назад"),    TEXT("Back")),    CX, Y, BW, BH, TEXT("back"), Med);
 	}
 
 	// Подсказка снизу
-	const FString Hint = TEXT("v0.1 — кооп LAN/EOS");
+	const FString Hint = FAvLoc::T(TEXT("v0.1 — кооп LAN/EOS"), TEXT("v0.1 — co-op LAN/EOS"));
 	GetTextSize(Hint, TW, TH, Med, 0.9f);
 	DrawText(Hint, FLinearColor(0.4f, 0.4f, 0.42f, 1.f), SX - TW - 16.f, SY - TH - 12.f, Med, 0.9f);
 }
