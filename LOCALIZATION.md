@@ -23,7 +23,20 @@ DrawText(FAvLoc::T(TEXT("Продолжить"), TEXT("Resume")), ...);
 
 ## Как проверить
 Дев-команда: **`AvLang en`** → текст меню/паузы на английском; **`AvLang ru`** → обратно. (`AvLang` = `AAvaryoCharacter`, exec.)
-EasyOptionsMenu-дропдаун языка может НЕ показывать EN, пока нет supported-cultures/.locres — поэтому для теста проще `AvLang`. Интеграцию дропдаута допилить отдельно (см. ниже).
+Дропдаун языка в EasyOptionsMenu теперь показывает **Русский / English** (движковый таргет настроен, см. ниже) — выбор переключает культуру движка, на которой сидит и FAvLoc.
+
+## Движковый таргет локализации (.locres) — ✅ НАСТРОЕН (2026-06-23)
+Заведён стандартный localization target **Game** — это оживляет родной дропдаун EOM и кладёт фундамент под перевод FText-слоя (DisplayName/«Акт»/UMG).
+- **`Config/Localization/Game.ini`** — конфиг гэйзера: `NativeCulture=ru`, `CulturesToGenerate=ru,en`; собирает из `Source/*` (LOCTEXT/NSLOCTEXT) и `Content/Avariika/*` (FText в ассетах/BP).
+- **`Config/DefaultGame.ini`** — `[/Script/UnrealEd.ProjectPackagingSettings] +CulturesToStage=ru/en` (попадут в собранный билд).
+- **Сгенерено:** `Content/Localization/Game/{Game.manifest, Game.locmeta, ru/Game.{archive,locres}, en/Game.{archive,locres}}`. Трекаются в git (мелкие, source-of-truth перевода); генерёжные `*.csv/*_Conflicts.txt/*.po` — в gitignore.
+- **Проверено в редакторе** (`InternationalizationLibrary`): `get_localized_cultures() == ["en","ru"]`, имена `русский`/`английский`, `set_current_language('en'/'ru')` переключает корректно.
+- **Перегенерировать после изменений текста** (редактор ЗАКРЫТЬ):
+  ```
+  UnrealEditor-Cmd.exe avariika.uproject -run=GatherText -config="Config/Localization/Game.ini" -unattended -nopause
+  ```
+- **Чтобы реально ПЕРЕВЕСТИ FText** (DisplayName предметов/починок, «Акт», тексты EOM): заполнить английские строки в `Content/Localization/Game/en/Game.archive` (вручную или через **Localization Dashboard** в редакторе), затем перегенерить (команда выше скомпилит `.locres`). До перевода EN-игрок видит англ. «хром» (FAvLoc) + русские DisplayName (фоллбэк на нативную `ru`).
+- ⚠️ Был осиротевший мусор `OGMainMenu` (en+de-DE .po от удалённого пака) в gitignore-папке — вычищен; таргет чистый ru/en.
 
 ## Как добавить перевод новой строки
 Оборачивай в `#include "AvariikaLoc.h"` + `FAvLoc::T(TEXT("рус"), TEXT("eng"))`. Формат с числом — собирай конкатенацией (UE5.7 `FString::Printf` не берёт рантайм-формат): `FAvLoc::T(TEXT("Игра "),TEXT("Game ")) + FString::FromInt(n)`.
