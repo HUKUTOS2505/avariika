@@ -38,6 +38,14 @@
 - **Осталось на String Table** (тем же паттерном): DisplayName предметов/починок (контент-FText в ассетах — главный блокер игровой локализации), «Акт» (творческая адаптация тона), реплики диспетчера (~35 пулов), сам EasyOptionsMenu (свои String Tables). 11 не-ru/en культур ждут реального перевода (сейчас фоллбэк на ru; en залит).
 - Цикл: правки → save level (MCP) → close → **Build Succeeded** (2 ошибки выше пофикшены, пересборка зелёная) → смоук чист (Engine initialized; ensure LocalizableMessage на килле — шатдаун-артефакт, не наш код) → коммит → push (`GIT_SSH_COMMAND` BatchMode, exit 0) → reopen editor.
 
+## СЕССИЯ 2026-06-23 (продолжение, юзер отдыхает — автоном) — MODULAR WORKERS (Quantum) как аватар
+Юзер: «modular worker bundle уже в проекте, давай полностью интегрировать; после языка; сегодня отдыхаю без стройки, работаешь только ты». Разведка + план (`MODULAR_WORKER_PLAN.md`, память [[modular-worker-integration]]):
+- **Пак `Content/Modular_Workers/`** — модульный Quantum-рабочий, 874 ассета, **скелет UE5-mann** (`SK_Male_Quantum_Character_Skeleton`, spine_01..05). Сборка `SetMasterPoseComponent` (тело-лидер + дочерние по слотам: Body/Head/Hair/Helmet/Hat/Cap/Glasses/Gloves/Arms/Pants). 20+ пресетов `SKM_Worker_Male_N`, демо `MegaBundle_Character_Builder`. Респиратор/каска/жилет/перчатки/ботинки/комбезы — всё под вижн косметика=функция. Female — только текстуры (male-only пока).
+- **Наша база:** `AAvaryoCharacter` true-FPS, тело=CitizenNPC (**UE4-mann**), снаряжение-функция инвентарное/невидимое (`HasGasMask/HasWeldingMask/HasRubberBoots`). Сейв уже хранит `FEquipmentLevels{bHelmet,bGloves,bGasMask}`+`Cosmetics` → дать им визуал.
+- **Стержень:** UE4-mann (наши анимы) ↔ UE5-mann (Quantum) → **ретаргет UE4→UE5** ([[ik-retarget-python]]).
+- **Решение (по вижну, фиксирую):** рабочий = аватар игрока (TP/кооп — собранный рабочий + надетое снаряжение; FP — Quantum-руки). 🔑 ПИВОТ «заменяет тело игрока» ждёт подтверждения юзера; визуал-качество (свап/ретаргет/билдер) — за глазами юзера, я собираю/коммичу.
+- **Фазы:** Ф1 ретаргет анимов→Quantum; Ф2 свап тела (осторожно с FP-камерой/приседом [[character-camera-crouch]]); Ф3 C++ `UWorkerAppearanceComponent` (слоты+leader-pose+репликация+сейв, build-верифицируемо); Ф4 снаряжение→визуал; Ф5 UI-билдер; Ф6 кооп+LOD/перф.
+
 ## АВТОНОМ 2026-06-22 (remote-control, ultracode) — 3-Й ГЛУБОКИЙ АУДИТ (CODE_AUDIT3.md)
 
 Юзер: «продолжаем работу» (ultracode + remote-control). Документированный след.шаг из прошлой сессии = более глубокий/широкий аудит (perf/Tick, numeric/NaN, coop-race, validation, непокрытые файлы, ре-ревью фиксов). Запустил Workflow на 11 финдеров × 5 линз + adversarial-verify + синтез.
