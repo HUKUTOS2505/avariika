@@ -25,4 +25,14 @@ struct FAvLoc
 	{
 		return IsEnglish() ? En : Ru;
 	}
+
+	/**
+	 * Локализованная строка из String Table "AvariikaUI" по ключу (исходник — Content/Avariika/Localization/AvariikaUI.csv).
+	 * Возвращает текст текущей культуры (перевод из .locres) либо исходный русский (фоллбэк).
+	 * Это путь на 13 языков — постепенно вытесняет FAvLoc::T (инлайн ru/en).
+	 */
+	static FString S(const TCHAR* Key)
+	{
+		return FText::FromStringTable(TEXT("AvariikaUI"), Key).ToString();
+	}
 };

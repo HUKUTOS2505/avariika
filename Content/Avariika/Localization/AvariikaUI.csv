@@ -1,0 +1,15 @@
+Key,SourceString
+menu_title,АВАРИЙКА
+menu_subtitle,аварийная бригада
+menu_host,Создать игру
+menu_find,Найти игру
+menu_settings,Настройки
+menu_quit,Выход
+menu_browse_header,Поиск игр в сети
+menu_searching,Поиск...
+menu_no_games,Игр не найдено
+menu_game_prefix,"Игра "
+menu_join_suffix,"   [Подключиться]"
+menu_refresh,Обновить
+menu_back,Назад
+menu_hint,v0.1 — кооп LAN/EOS
