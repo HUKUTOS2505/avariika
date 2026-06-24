@@ -59,7 +59,8 @@
 		},
 		{
 			"Name": "EOSCore",
-			"Enabled": true
+			"Enabled": true,
+			"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/content/af157f773f084ca89036cd7bc03fb416"
 		},
 		{
 			"Name": "UnrealMonsterAssetInstaller",
@@ -74,11 +75,85 @@
 		},
 		{
 			"Name": "TickOptToolkit",
-			"Enabled": true
+			"Enabled": true,
+			"MarketplaceURL": "https://www.fab.com/listings/de8d1c17-cb95-4f41-9a15-6d3e57ea214e"
 		},
 		{
 			"Name": "Imperfecter",
+			"Enabled": true,
+			"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/product/f79321e3c3474d20b993e260eda55935"
+		},
+		{
+			"Name": "DLSS",
 			"Enabled": true
+		},
+		{
+			"Name": "NIS",
+			"Enabled": true
+		},
+		{
+			"Name": "StreamlineCore",
+			"Enabled": true
+		},
+		{
+			"Name": "StreamlineNGXCommon",
+			"Enabled": true
+		},
+		{
+			"Name": "StreamlineDLSSG",
+			"Enabled": true
+		},
+		{
+			"Name": "StreamlineReflex",
+			"Enabled": true
+		},
+		{
+			"Name": "StreamlineDeepDVC",
+			"Enabled": true
+		},
+		{
+			"Name": "RuntimeAudioImporter",
+			"Enabled": true
+		},
+		{
+			"Name": "RuntimeSpeechRecognizer",
+			"Enabled": true
+		},
+		{
+			"Name": "RuntimeTextToSpeech",
+			"Enabled": true
+		},
+		{
+			"Name": "UltimateLevelArtTool",
+			"Enabled": true,
+			"TargetAllowList": [
+				"Editor"
+			]
+		},
+		{
+			"Name": "BlockoutToolsPlugin",
+			"Enabled": true
+		},
+		{
+			"Name": "TriangleCountViewMode",
+			"Enabled": true,
+			"TargetAllowList": [
+				"Editor"
+			]
+		},
+		{
+			"Name": "AudioCapture",
+			"Enabled": true
+		},
+		{
+			"Name": "UniversalVoiceChatPro",
+			"Enabled": true,
+			"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/product/eda7d893311147d1b7a6e8084be096c4"
+		},
+		{
+			"Name": "Narrative",
+			"Enabled": true,
+			"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/product/b03174e0a1cc4de4b17dcfb2a0ba6884"
 		}
 	]
 }
