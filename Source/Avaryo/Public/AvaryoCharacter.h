@@ -454,6 +454,32 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Movement")
 	float SprintSpeed;
 
+	/** Turn-in-place: стоя тело держится, пока угол «камера−тело» меньше этого порога (голова доворачивает аим-оффсетом).
+	 *  Перевалил — тело начинает доворачиваться. Тюнится в PIE. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Movement")
+	float TurnInPlaceStartAngle = 80.f;
+
+	/** Плавность доворота тела стоя (скорость RInterpTo — меньше = медленнее и мягче, как в жизни). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Movement")
+	float TurnInPlaceStandInterpSpeed = 2.5f;
+
+	/** Скорость доворота тела в движении (град/с) — встаём по камере быстро. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Movement")
+	float TurnInPlaceMoveRate = 720.f;
+
+	/** Играет ли сейчас turn-in-place монтаж (стоя): его root-motion разворачивает тело с шагами.
+	 *  Пока активен — ручной доворот не трогаем, ждём конца. */
+	bool bTurnMontageActive = false;
+
+	/** Прошлый yaw камеры — для оценки «камера остановилась»: поворот тела пускаем только когда
+	 *  обзор успокоился (иначе при непрерывном вращении монтаж пере-триггерится и заикается). */
+	float LastControlYaw = 0.f;
+	bool bHasLastControlYaw = false;
+
+	/** Время, когда оборвать turn-монтаж (поворот корпуса уже завершён). Клипы пака после поворота ещё
+	 *  ~1.4с стоят на месте — этот хвост даёт лаг/«пробку»; обрываем сразу после доворота (blend-out в idle). */
+	float TurnMontageEndTime = 0.f;
+
 	/** Множитель скорости с тяжёлым предметом. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Movement")
 	float HeavyCarryMultiplier;
@@ -609,6 +635,41 @@ protected:
 
 	/** Плавно ведёт высоту FP-меша по состоянию присяда (камера опускается «как реально»). */
 	void UpdateCrouchEye(float DeltaSeconds);
+
+	// ---------- Foot IK (заземление ступней; ПОКА активен только в приседе) ----------
+	// C++ трейсит пол под ступнями и считает смещения; анимграф (Two Bone IK + ModifyBone таза)
+	// читает эти члены. Вне приседа все смещения = 0 → IK-ноды no-op (стоячую локомоцию не трогаем).
+
+	/** Z-смещение левой/правой ступни к полу (component-space, см). Кормит Two Bone IK. */
+	UPROPERTY(BlueprintReadOnly, Category="Avaryo|FootIK")
+	float FootIKOffsetL = 0.f;
+	UPROPERTY(BlueprintReadOnly, Category="Avaryo|FootIK")
+	float FootIKOffsetR = 0.f;
+
+	/** Подъём таза в приседе (+вверх, см). Кормит ModifyBone(pelvis). */
+	UPROPERTY(BlueprintReadOnly, Category="Avaryo|FootIK")
+	float PelvisIKOffset = 0.f;
+
+	/** Подъём таза в приседе. 0 = ВЫКЛ (band-aid отложен): глубину приседа берём с мокапа,
+	 *  а Foot-IK заземления добьём отдельной террейн-фичей (склоны/лестницы). См. WORKLOG.
+	 *  Инфраструктура (трейс UpdateFootIK + фид в ABP + нода таза) остаётся — поднять >0 чтобы включить. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|FootIK")
+	float CrouchPelvisRaise = 0.f;
+
+	/** Дальность трейса вниз от ступни до пола, см. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|FootIK")
+	float FootIKTraceDist = 60.f;
+
+	/** Кламп смещения ступни, см (защита от выбросов). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|FootIK")
+	float FootIKMaxOffset = 45.f;
+
+	/** Скорость сглаживания смещений (FInterpTo). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|FootIK")
+	float FootIKInterpSpeed = 14.f;
+
+	/** Трейсит пол под foot_l/foot_r, считает смещения ступней + подъём таза, сглаживает. */
+	void UpdateFootIK(float DeltaSeconds);
 
 	/** Был ли ранен в прошлый кадр (для авто-сброса тяжёлого при ранении). */
 	bool bWasWounded;
@@ -871,6 +932,14 @@ protected:
 	/** Пересчитать скорость движения из состояния (тяжесть, бег, ранение, дебафы). */
 	void RefreshMoveSpeed();
 
+	/** Turn-in-place: стоя смотрим головой (aim-offset) свободно; когда угол «камера−тело»
+	 *  переваливает порог — тело доворачивается за камерой (AimYaw сам падает → голова возвращается).
+	 *  В движении тело быстро встаёт по камере (вперёд = куда смотришь). */
+	void UpdateTurnInPlace(float DeltaSeconds);
+
+	/** Выбрать МОНТАЖ поворота стоя по углу (право — M_Turn_R_90/135/180 с root-motion; лево пока nullptr). */
+	class UAnimMontage* PickTurnClip(float DeltaYaw) const;
+
 	// Обёртки для биндов клавиш 1-5
 	void EquipSlot1() { EquipSlot(0); }
 	void EquipSlot2() { EquipSlot(1); }
@@ -1003,6 +1072,14 @@ protected:
 	UFUNCTION(Exec) void AvWorkerPreview();
 	/** Дев: снять собранного рабочего. */
 	UFUNCTION(Exec) void AvWorkerClear();
+	/** Дев: сменить часть одежды/волос. `AvWear hair long`, `AvWear torso jacket`, `AvWear head helmet`, `AvWear face respirator`, `AvWear legs jumpsuit`, `AvWear glasses aviator`, `AvWear beard 2`, `AvWear gloves brown`, `AvWear vest orange`. Вариант `none` — снять. */
+	UFUNCTION(Exec) void AvWear(const FString& SlotName, const FString& Option);
+	/** Дев: список вариантов для слота: `AvWearList hair`. */
+	UFUNCTION(Exec) void AvWearList(const FString& SlotName);
+	/** Дев: перекрасить слот (тинт через материал). `AvColor torso 1 0 0` = красный торс (0..1 RGB). Локально (репликация — позже). */
+	UFUNCTION(Exec) void AvColor(const FString& SlotName, float R, float G, float B);
+	/** Открыть/закрыть экран кастомизации (одежда/волосы, клики мышью). */
+	UFUNCTION(Exec) void AvCustomize();
 
 	UFUNCTION(Server, Reliable)
 	void ServerAvVital(const FString& Which, float Value);
@@ -1030,6 +1107,9 @@ protected:
 
 	UFUNCTION(Server, Reliable)
 	void ServerAvWorkerClear();
+
+	UFUNCTION(Server, Reliable)
+	void ServerAvWear(const FString& SlotName, const FString& Option);
 
 	UFUNCTION(Server, Reliable)
 	void ServerAvGive(const FString& What);

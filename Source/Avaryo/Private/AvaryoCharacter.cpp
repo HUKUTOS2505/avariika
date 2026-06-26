@@ -12,12 +12,14 @@
 #include "Sound/SoundBase.h"
 #include "Animation/AnimMontage.h"
 #include "Animation/AnimInstance.h"
+#include "Animation/AnimSequence.h"
 #include "Engine/SkeletalMesh.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Engine/TextureRenderTarget2D.h"
 #include "World/AExitZone.h"
 #include "Components/VitalsComponent.h"
 #include "Components/WorkerAppearanceComponent.h"
+#include "Game/AvaryoPlayerController.h"
 #include "Components/InputComponent.h"
 #include "Components/PrimitiveComponent.h"
 #include "Engine/DamageEvents.h"
@@ -384,6 +386,16 @@ void AAvaryoCharacter::Tick(float DeltaSeconds)
 	// Присед: плавно опускаем «глаз» (FP-меш с камерой) — локально у владельца.
 	UpdateCrouchEye(DeltaSeconds);
 
+	// Скорость пересчитываем каждый кадр: бег (Shift) активен ТОЛЬКО при движении вперёд,
+	// а направление меняется на лету (гейт в RefreshMoveSpeed по ускорению vs «вперёд»).
+	RefreshMoveSpeed();
+
+	// Turn-in-place: тело само доворачивается за камерой (голова-аим закрывает до порога).
+	UpdateTurnInPlace(DeltaSeconds);
+
+	// Foot IK: трейс пола под ступнями → смещения для Two Bone IK (пока активно только в приседе).
+	UpdateFootIK(DeltaSeconds);
+
 	// Рабочие анимации действий (ремонт/спрей/тяжёлое/выдох) ВРЕМЕННО ВЫКЛ — анимы пака не подходят:
 	// предмет спереди, «чешет ногу», скольжение при ходьбе (full-body монтаж ломает локомоцию).
 	// Юзер: пока только движение. Вернуть — раскомментить (ждём кастом-мокап / upper-body слот).
@@ -411,7 +423,9 @@ void AAvaryoCharacter::Tick(float DeltaSeconds)
 			&& GetVelocity().Size2D() > 10.f && (!VitalsComponent || !VitalsComponent->IsWounded());
 		if (bMoving)
 		{
-			const bool bRun = VitalsComponent && VitalsComponent->IsSprinting();
+			// «Бег» для звука — по ФАКТИЧЕСКОЙ скорости, не по намерению IsSprinting():
+			// иначе Shift вбок/назад (скорость гейтится до ходьбы) всё равно давал звук бега.
+			const bool bRun = GetVelocity().Size2D() > (BaseWalkSpeed + SprintSpeed) * 0.5f;
 			USoundBase* Want = (bRun && FootstepRunSound) ? FootstepRunSound : FootstepWalkSound;
 			if (FootstepAudio->Sound != Want)
 			{
@@ -692,6 +706,9 @@ void AAvaryoCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	// Монитор оператора (только в зоне ГАЗели)
 	PlayerInputComponent->BindKey(EKeys::Tab, IE_Pressed, this, &AAvaryoCharacter::ToggleMonitor);
 
+	// Экран кастомизации (смена одежды/волос/маски и т.д.) — открыть/закрыть. Раньше только команда AvCustomize.
+	PlayerInputComponent->BindKey(EKeys::B, IE_Pressed, this, &AAvaryoCharacter::AvCustomize);
+
 	// Слоты инвентаря: 1 — тяжёлый, 2-5 — лёгкие
 	PlayerInputComponent->BindKey(EKeys::One, IE_Pressed, this, &AAvaryoCharacter::EquipSlot1);
 	PlayerInputComponent->BindKey(EKeys::Two, IE_Pressed, this, &AAvaryoCharacter::EquipSlot2);
@@ -887,6 +904,97 @@ void AAvaryoCharacter::Landed(const FHitResult& Hit)
 
 // ---------- Движение ----------
 
+void AAvaryoCharacter::UpdateTurnInPlace(float DeltaSeconds)
+{
+	// Поворот тела ведёт ТОЛЬКО владелец пешки; остальным он приходит репликацией трансформа.
+	// (На симах ControlRotation — низкочастотная реплика, крутить по ней нельзя.)
+	AController* C = GetController();
+	if (!C || !IsLocallyControlled())
+	{
+		return;
+	}
+
+	const float DesiredYaw = C->GetControlRotation().Yaw;     // куда смотрит камера
+	const float CurrentYaw = GetActorRotation().Yaw;          // куда стоит тело
+	const float Delta = FMath::FindDeltaAngleDegrees(CurrentYaw, DesiredYaw); // [-180,180]
+
+	// Скорость поворота камеры (град/с) — доворот тела пускаем ТОЛЬКО когда обзор успокоился,
+	// иначе при непрерывном вращении монтаж пере-триггерится каждый кадр и тело «заикается».
+	const float YawRate = bHasLastControlYaw
+		? FMath::Abs(FMath::FindDeltaAngleDegrees(LastControlYaw, DesiredYaw)) / FMath::Max(DeltaSeconds, 0.001f)
+		: 0.f;
+	LastControlYaw = DesiredYaw;
+	bHasLastControlYaw = true;
+
+	UAnimInstance* AnimInst = GetMesh() ? GetMesh()->GetAnimInstance() : nullptr;
+
+	// В движении тело быстро встаёт по камере: «вперёд = куда смотришь», 8-way блендспейс остаётся корректным.
+	// Любой turn-монтаж при начале ходьбы прерываем (его root-motion больше не нужен).
+	if (GetVelocity().Size2D() > 10.f)
+	{
+		if (bTurnMontageActive && AnimInst)
+		{
+			AnimInst->StopAllMontages(0.1f);
+			bTurnMontageActive = false;
+		}
+		const float NewYaw = FMath::FixedTurn(CurrentYaw, DesiredYaw, TurnInPlaceMoveRate * DeltaSeconds);
+		SetActorRotation(FRotator(0.f, NewYaw, 0.f));
+		return;
+	}
+
+	// Стоя и монтаж поворота играет: его ROOT-MOTION крутит капсулу с шагами — руками НЕ трогаем.
+	// Обрываем монтаж сразу после доворота (TurnMontageEndTime), не дожидаясь ~1.4с «стоячего» хвоста клипа.
+	if (bTurnMontageActive)
+	{
+		const float Now = GetWorld() ? GetWorld()->GetTimeSeconds() : 0.f;
+		if (!AnimInst || !AnimInst->IsAnyMontagePlaying() || Now >= TurnMontageEndTime)
+		{
+			if (AnimInst && AnimInst->IsAnyMontagePlaying())
+			{
+				AnimInst->StopAllMontages(0.3f); // мягкий blend-out в idle вместо стоячего хвоста
+			}
+			bTurnMontageActive = false;
+		}
+		return;
+	}
+
+	// Стоя: угол «камера−тело» перевалил порог → играем шагающий turn-монтаж (root-motion развернёт тело).
+	// Голова-аим (Modify Bone neck_01 по AimYaw) держит взгляд до порога; за порогом тело доворачивается
+	// анимацией с переступанием ног, AimYaw сам падает → голова в центр. Каскад «голова → тело», как в жизни.
+	// Триггерим доворот тела только когда камера успокоилась (YawRate низкий) — иначе заикание.
+	if (AnimInst && FMath::Abs(Delta) > TurnInPlaceStartAngle && YawRate < 150.f)
+	{
+		UAnimMontage* Montage = PickTurnClip(Delta);
+		if (Montage)
+		{
+			// PlayAnimMontage на Character → его root-motion (поворот) применяет CharacterMovement к капсуле.
+			PlayAnimMontage(Montage, 1.f);
+			bTurnMontageActive = true;
+			// Длительность фактического доворота по углу (после неё — обрываем, см. блок выше). Замерено по root-кривой.
+			const int32 Mag = FMath::RoundToInt(FMath::Abs(Delta));
+			const float TurnDur = (Mag >= 157) ? 2.6f : (Mag >= 112) ? 2.4f : 1.95f;
+			TurnMontageEndTime = (GetWorld() ? GetWorld()->GetTimeSeconds() : 0.f) + TurnDur;
+		}
+	}
+}
+
+UAnimMontage* AAvaryoCharacter::PickTurnClip(float DeltaYaw) const
+{
+	// ЛЕВЫЕ повороты (DeltaYaw<0) — пока нет зеркальных монтажей: тело не доворачиваем (голова держит).
+	if (DeltaYaw < 0.f)
+	{
+		return nullptr; // TODO: зеркальные L_* монтажи
+	}
+	// Монтаж по величине угла; порог срабатывания 80° → минимальный монтаж 90°. Голова закрывает разницу шага и точного угла.
+	const int32 Mag = FMath::RoundToInt(FMath::Abs(DeltaYaw));
+	const TCHAR* Name =
+		(Mag >= 157) ? TEXT("R_180") :
+		(Mag >= 112) ? TEXT("R_135") :
+		               TEXT("R_90");
+	const FString Path = FString::Printf(TEXT("/Game/M_Turn_%s.M_Turn_%s"), Name, Name);
+	return LoadObject<UAnimMontage>(nullptr, *Path);
+}
+
 void AAvaryoCharacter::RefreshMoveSpeed()
 {
 	UCharacterMovementComponent* Move = GetCharacterMovement();
@@ -897,7 +1005,20 @@ void AAvaryoCharacter::RefreshMoveSpeed()
 
 	// Во время применения бег запрещён, скорость зависит от предмета
 	const bool bCastingUse = IsUsingItem();
-	float Speed = (VitalsComponent->IsSprinting() && !bCastingUse) ? SprintSpeed : BaseWalkSpeed;
+
+	// Бег (Shift) — ТОЛЬКО когда движемся вперёд (не вбок/назад): спринт боком/спиной
+	// выглядит неестественно. Сравниваем желаемое направление (ускорение) с «вперёд» тела.
+	bool bSprintForward = false;
+	if (VitalsComponent->IsSprinting() && !bCastingUse)
+	{
+		const FVector Accel = Move->GetCurrentAcceleration();
+		if (!Accel.IsNearlyZero())
+		{
+			const float FwdDot = FVector::DotProduct(Accel.GetSafeNormal2D(), GetActorForwardVector().GetSafeNormal2D());
+			bSprintForward = FwdDot > 0.64f; // конус ~±50° вокруг «вперёд»
+		}
+	}
+	float Speed = bSprintForward ? SprintSpeed : BaseWalkSpeed;
 
 	if (bCastingUse)
 	{
@@ -1672,6 +1793,72 @@ void AAvaryoCharacter::AvWorkerClear()
 	if (WorkerAppearance) { WorkerAppearance->ClearAll(); }
 }
 void AAvaryoCharacter::ServerAvWorkerClear_Implementation() { AvWorkerClear(); }
+
+// Имя слота из консоли -> EWorkerSlot.
+static bool AvParseSlot(const FString& S, EWorkerSlot& Out)
+{
+	const FString L = S.ToLower();
+	if (L == TEXT("hair")) Out = EWorkerSlot::Hair;
+	else if (L == TEXT("beard")) Out = EWorkerSlot::Beard;
+	else if (L == TEXT("torso") || L == TEXT("shirt") || L == TEXT("jacket") || L == TEXT("top") || L == TEXT("clothes")) Out = EWorkerSlot::Torso;
+	else if (L == TEXT("legs") || L == TEXT("pants") || L == TEXT("jeans")) Out = EWorkerSlot::Legs;
+	else if (L == TEXT("feet") || L == TEXT("boots") || L == TEXT("shoes")) Out = EWorkerSlot::Feet;
+	else if (L == TEXT("gloves")) Out = EWorkerSlot::Gloves;
+	else if (L == TEXT("head") || L == TEXT("headgear") || L == TEXT("helmet") || L == TEXT("hat") || L == TEXT("cap")) Out = EWorkerSlot::Headgear;
+	else if (L == TEXT("face") || L == TEXT("mask") || L == TEXT("respirator")) Out = EWorkerSlot::FaceMask;
+	else if (L == TEXT("glasses")) Out = EWorkerSlot::Glasses;
+	else if (L == TEXT("vest")) Out = EWorkerSlot::Vest;
+	else if (L == TEXT("body")) Out = EWorkerSlot::Body;
+	else return false;
+	return true;
+}
+
+void AAvaryoCharacter::AvWear(const FString& SlotName, const FString& Option)
+{
+	if (!HasAuthority()) { ServerAvWear(SlotName, Option); return; }
+	if (!WorkerAppearance) return;
+	EWorkerSlot Slot;
+	if (!AvParseSlot(SlotName, Slot))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[AvWear] неизвестный слот '%s'. Доступно: hair/beard/torso/legs/feet/gloves/head/face/glasses/vest"), *SlotName);
+		return;
+	}
+	const bool bOK = WorkerAppearance->SetSlotByKey(Slot, Option);
+	UE_LOG(LogTemp, Warning, TEXT("[AvWear] %s = '%s' -> %s"), *SlotName, *Option, bOK ? TEXT("OK") : TEXT("не найдено (см. AvWearList)"));
+}
+void AAvaryoCharacter::ServerAvWear_Implementation(const FString& SlotName, const FString& Option) { AvWear(SlotName, Option); }
+
+void AAvaryoCharacter::AvColor(const FString& SlotName, float R, float G, float B)
+{
+	if (!WorkerAppearance) return;
+	EWorkerSlot Slot;
+	if (!AvParseSlot(SlotName, Slot))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[AvColor] неизвестный слот '%s'. Доступно: hair/beard/torso/legs/feet/gloves/head/face/glasses/vest/body"), *SlotName);
+		return;
+	}
+	// Локальный перекрас (динамик-материал «Color Correction»). Репликация бригаде — follow-up.
+	WorkerAppearance->SetSlotColor(Slot, FLinearColor(R, G, B, 1.f));
+	UE_LOG(LogTemp, Warning, TEXT("[AvColor] %s = (%.2f, %.2f, %.2f)"), *SlotName, R, G, B);
+}
+
+void AAvaryoCharacter::AvWearList(const FString& SlotName)
+{
+	if (!WorkerAppearance) return;
+	EWorkerSlot Slot;
+	if (!AvParseSlot(SlotName, Slot)) { UE_LOG(LogTemp, Warning, TEXT("[AvWearList] неизвестный слот '%s'"), *SlotName); return; }
+	const TArray<FString> Opts = WorkerAppearance->GetOptionsForSlot(Slot);
+	UE_LOG(LogTemp, Warning, TEXT("[AvWearList] %s — %d вариантов:"), *SlotName, Opts.Num());
+	for (const FString& O : Opts) { UE_LOG(LogTemp, Warning, TEXT("    %s"), *O); }
+}
+
+void AAvaryoCharacter::AvCustomize()
+{
+	if (AAvaryoPlayerController* PC = Cast<AAvaryoPlayerController>(GetController()))
+	{
+		PC->ToggleCustomize();
+	}
+}
 
 void AAvaryoCharacter::AvGive(const FString& What)
 {
@@ -3114,6 +3301,55 @@ void AAvaryoCharacter::UpdateCrouchEye(float DeltaSeconds)
 	FVector RL = FirstPersonMeshComp->GetRelativeLocation();
 	RL.Z = FPMeshStandingZ + CrouchEyeOffset;
 	FirstPersonMeshComp->SetRelativeLocation(RL);
+}
+
+void AAvaryoCharacter::UpdateFootIK(float DeltaSeconds)
+{
+	USkeletalMeshComponent* M = GetMesh();
+	UCapsuleComponent* Cap = GetCapsuleComponent();
+	UWorld* W = GetWorld();
+	if (!M || !Cap || !W)
+	{
+		return;
+	}
+
+	const bool bAir = GetCharacterMovement() && GetCharacterMovement()->IsFalling();
+	// Пока заземляем ТОЛЬКО в приседе: стоячая локомоция со свингом ног — отдельный заход.
+	const bool bActive = bIsCrouched && !bAir;
+
+	float TgtPelvis = 0.f, TgtL = 0.f, TgtR = 0.f;
+	if (bActive)
+	{
+		TgtPelvis = CrouchPelvisRaise; // поднять таз (присед перестаёт быть «глубоким сквотом»)
+
+		const float Half = Cap->GetScaledCapsuleHalfHeight();
+		const FVector C = GetActorLocation();   // центр капсулы (корень = капсула)
+		const float FloorBase = C.Z - Half;     // низ капсулы = ожидаемый пол
+
+		// Дельта по Z: на сколько подвинуть ступню, чтобы она села на РЕАЛЬНЫЙ пол.
+		// + = поднять (ступня провалилась ниже пола), - = опустить (ступня выше — напр. от подъёма таза).
+		auto FootGround = [&](const FName Bone) -> float
+		{
+			const FVector F = M->GetSocketLocation(Bone);
+			const FVector Start(F.X, F.Y, C.Z + Half);
+			const FVector End(F.X, F.Y, FloorBase - FootIKTraceDist);
+			FHitResult Hit;
+			FCollisionQueryParams P(FName(TEXT("FootIK")), false, this);
+			if (W->LineTraceSingleByChannel(Hit, Start, End, ECC_Visibility, P))
+			{
+				return Hit.ImpactPoint.Z - F.Z;
+			}
+			return 0.f;
+		};
+
+		TgtL = FMath::Clamp(FootGround(TEXT("foot_l")), -FootIKMaxOffset, FootIKMaxOffset);
+		TgtR = FMath::Clamp(FootGround(TEXT("foot_r")), -FootIKMaxOffset, FootIKMaxOffset);
+	}
+
+	const float S = FMath::Max(0.1f, FootIKInterpSpeed);
+	PelvisIKOffset = FMath::FInterpTo(PelvisIKOffset, TgtPelvis, DeltaSeconds, S);
+	FootIKOffsetL  = FMath::FInterpTo(FootIKOffsetL,  TgtL,      DeltaSeconds, S);
+	FootIKOffsetR  = FMath::FInterpTo(FootIKOffsetR,  TgtR,      DeltaSeconds, S);
 }
 
 bool AAvaryoCharacter::IsHoldingGasDetector() const
