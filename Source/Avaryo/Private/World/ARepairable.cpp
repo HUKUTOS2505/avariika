@@ -123,17 +123,16 @@ ARepairable::ARepairable()
 	// VFX взрыва: новый пак NiagaraExplosion01 (наземный взрыв со вспышками-молниями), с фолбэком
 	// на движковый пример (пак тяжёлый/локальный, на свежем клоне его нет).
 	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> ExpFXNew(TEXT("/Game/NiagaraExplosion01/Niagaras/Ground/N_ExplosionGround_001.N_ExplosionGround_001"));
-	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> ExpFXOld(TEXT("/Game/NiagaraExamples/FX_Explosions/NS_Explosion.NS_Explosion"));
 	if (ExpFXNew.Succeeded()) { ExplosionFX = ExpFXNew.Object; }
-	else if (ExpFXOld.Succeeded()) { ExplosionFX = ExpFXOld.Object; }
+	// NiagaraExamples-фолбэк NS_Explosion УДАЛЁН (краш): его эмиттер NE_PostProcess force-грузился в CDO-конструкции
+	// и валил редактор (ensure typed-element registry через CameraShakeSourceComponent). Новый пак выше его заменяет.
 	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> SpkFX(TEXT("/Game/NiagaraExamples/FX_Sparks/NS_Spark_Burst.NS_Spark_Burst"));
 	if (SpkFX.Succeeded()) { SparkFX = SpkFX.Object; }
 	// Утечка газа = ТОКСИЧНАЯ туча (кислотный дым). Фолбэк на лёгкий дымок — пак локальный (gitignore),
 	// на свежем клоне его нет (как у взрыва выше).
 	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> GasFXNew(TEXT("/Game/Realistic_Starter_VFX_Pack_Niagara_Vol2/Niagara/Smoke/NS_Smoke_7_acid.NS_Smoke_7_acid"));
-	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> GasFXOld(TEXT("/Game/NiagaraExamples/Utilities/SpriteGeneration/SmokePuffLight/NS_SmokePuffLight.NS_SmokePuffLight"));
 	if (GasFXNew.Succeeded()) { GasLeakFX = GasFXNew.Object; }
-	else if (GasFXOld.Succeeded()) { GasLeakFX = GasFXOld.Object; }
+	// NiagaraExamples-фолбэк NS_SmokePuffLight УДАЛЁН: тянул несмонтированный плагин NiagaraFluids (битая зависимость).
 	// Пламя горящего объекта (после взрыва). Фолбэк-цепочка — паки локальные (gitignore);
 	// если ни одного нет, FireFX останется null → статус «Горит» работает, но без визуала огня.
 	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> FireFXA(TEXT("/Game/IndustrialFactory/Effects/Fire_01/ns_Fire_01_01.ns_Fire_01_01"));
