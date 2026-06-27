@@ -165,3 +165,52 @@ Config/DefaultEditorPerProjectUserSettings.ini
 /filtered_hits.json
 /FINAL_REPORT.txt
 /Content/Avariika/Maps/_GENERATED/
+
+# Local Python environments and caches
+.venv/
+__pycache__/
+*.pyc
+
+# Local AI/editor state
+.mcp.json
+.claude/settings.local.json
+.claude/scheduled_tasks.lock
+.claude/**/*.log
+.claude/**/__pycache__/
+.claude/**/*.pyc
+
+# Generated script outputs
+Scripts/*.txt
+Scripts/*_out.txt
+Scripts/*_result.txt
+Scripts/*result.txt
+Scripts/ag_now*.json
+Scripts/eg_now*.json
+Scripts/*_out.json
+Scripts/*_result.json
+
+# Claudius local automation runtime cache
+Claudius/**/__pycache__/
+Claudius/**/*.pyc
+Claudius/**/*.log
+
+# Raw/source animation packs kept outside source control
+анимации/
+
+# Unreviewed third-party/imported content packs.
+# Move outside repo, or track selected shipping assets through Git LFS after review.
+Content/MetaCode/
+Content/Mobility_01/
+Content/Modular_Workers/
+Content/Foley_Props_Sounds/
+Content/SFX/
+Content/FreeAnimationLibrary/
+Content/Sundries/
+Content/Flashlight/
+Content/Sewer/
+Content/Decals_Rusty_metal_Vol_7/
+Content/UltimateFirePackVol1/
+Content/DEKO_HorrorAndDecay5/
+Content/Bags_Backpack_Survival_Kit/
+Content/ElectricPack/
+Content/Poison_Magic/
