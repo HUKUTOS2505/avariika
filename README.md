@@ -1,68 +1,75 @@
-# Аварийка
+# Avariika
 
-Кооп-хоррор-комедия (1-6 игроков) про ночную аварийную бригаду. UE 5.7, C++.
-Полный концепт — `промт.docx`. Репозиторий: https://github.com/HUKUTOS2505/avariika
+## Start Here
 
-## Управление (прототип)
+- [PROJECT_BRAIN.md](PROJECT_BRAIN.md) - canonical project source of truth.
+- [AGENTS.md](AGENTS.md) - operational manual for AI and human engineering agents.
+- [PROJECT_STATE.md](PROJECT_STATE.md) - current subsystem status.
+- [ROADMAP.md](ROADMAP.md) - milestone plan.
+- [TASKS.md](TASKS.md) - prioritized backlog.
+- [KNOWN_ISSUES.md](KNOWN_ISSUES.md) - known risks and limitations.
+- [DECISIONS.md](DECISIONS.md) - architectural decisions.
+- [CHANGELOG.md](CHANGELOG.md) - project history.
 
-| Клавиша | Действие |
-|---|---|
-| WASD / мышь | Движение / обзор |
-| Shift | Бег (тратит выносливость) |
-| Ctrl / C | Присесть |
-| F | Налобный фонарик (батарея садится, <15% мигает) |
-| E | Поднять предмет / **чинить (держать)** / **мини-игры (тык или держать-отпустить)** / **тащить раненого (повторное E — отпустить)** |
-| G | Бросить / поставить (тяжёлый — аккуратно) / **выйти из мини-игры** |
-| Q | **Толкнуть** того, на кого смотришь (в газ, на пену, с края — кооп-хаос) |
-| T | **Метнуть** предмет из рук по прицелу (передать через провал / запулить) |
-| 1 | Тяжёлый слот (сварочник) |
-| 2-5 | Лёгкие слоты |
-| ЛКМ / R (держать) | Применить: аптечка 6 с, сигарета 2 с; огнетушитель — распыление; **рация — тумблер** |
-| ПКМ (держать) | Передать предмет: вытянуть вперёд, тиммейт забирает по E |
-| Tab | Монитор оператора (только стоя в зоне ГАЗели): нагрудные камеры всей бригады |
+## Documentation
 
-## Механики
+- [Docs/Architecture/CODE_MAP.md](Docs/Architecture/CODE_MAP.md)
+- [Docs/Architecture/CLASS_INDEX.md](Docs/Architecture/CLASS_INDEX.md)
+- [Docs/Architecture/MODULE_DEPENDENCIES.md](Docs/Architecture/MODULE_DEPENDENCIES.md)
+- [Docs/Architecture/SUBSYSTEMS.md](Docs/Architecture/SUBSYSTEMS.md)
+- [Docs/Architecture/COMPONENTS.md](Docs/Architecture/COMPONENTS.md)
+- [Docs/Architecture/GAME_FLOW.md](Docs/Architecture/GAME_FLOW.md)
+- [Docs/Architecture/BUILD_PIPELINE.md](Docs/Architecture/BUILD_PIPELINE.md)
+- [Docs/Architecture/MCP_CAPABILITIES.md](Docs/Architecture/MCP_CAPABILITIES.md)
+- [Docs/Architecture/REPOSITORY_STRUCTURE.md](Docs/Architecture/REPOSITORY_STRUCTURE.md)
+- [Docs/Gameplay/GAMEPLAY_SYSTEMS.md](Docs/Gameplay/GAMEPLAY_SYSTEMS.md)
+- [Docs/Animation/ANIMATION_AND_LOCOMOTION.md](Docs/Animation/ANIMATION_AND_LOCOMOTION.md)
+- [Docs/Audio/AUDIO_VFX_KNOWLEDGE.md](Docs/Audio/AUDIO_VFX_KNOWLEDGE.md)
+- [Docs/World/WORLD_AND_MAPS.md](Docs/World/WORLD_AND_MAPS.md)
+- [Docs/Concepts/GAME_CONCEPTS.md](Docs/Concepts/GAME_CONCEPTS.md)
+- [Docs/Audits/CODE_AUDITS.md](Docs/Audits/CODE_AUDITS.md)
+- [Docs/Audits/ASSET_AND_PACK_AUDITS.md](Docs/Audits/ASSET_AND_PACK_AUDITS.md)
+- [Docs/Audits/REPOSITORY_ANALYSIS.md](Docs/Audits/REPOSITORY_ANALYSIS.md)
+- [Docs/Worklogs/DEVELOPMENT_WORKLOG.md](Docs/Worklogs/DEVELOPMENT_WORKLOG.md)
+- [Docs/Worklogs/WORKLOG.md](Docs/Worklogs/WORKLOG.md)
+- [Docs/REORGANIZATION_REPORT.md](Docs/REORGANIZATION_REPORT.md)
 
-- Инвентарь: 1 тяжёлый (занимает руки, замедляет, в рюкзак не убирается) + 4 лёгких.
-- Шкалы: HP, паника (темнота/одиночество ↑, свет/тиммейт/курение ↓), выносливость, туалет (на 100% — «санитарный инцидент»).
-- HP=0 → ранен: ползает, не прыгает, тяжёлое выпадает; поднимается аптечкой (своей или тиммейта) или его тащат по E.
-- **Цикл забега**: на старте ломается случайный набор объектов (щиток, труба, генератор). Всё починено + вся бригада в зоне «ГАЗель — выход» = победа. Вся бригада ранена = поражение.
-- **Мини-игры починки** (движение и камера заблокированы, выход — G, прогресс сохраняется):
-  - **Щиток** (нужен тестер): E по бегающему курсору в зелёной зоне — 4 попадания. Промах бьёт током (−15 HP), 3 промаха — дуга по всем в радиусе и «ЗАМКНУЛО» на 60 с.
-  - **Труба — вентиль** (без инструмента): каждый тык E докручивает на 12%, но чаще раза в ~0.7 с — «срыв резьбы»: −20% прогресса и громкое шипение. HUD показывает полоску ритма: зелёная = можно тыкать.
-  - **Генератор — стартер** (нужен сварочник): держать E — натяжение шнура растёт, отпустить в зелёном окне 70–90% = удачный рывок, нужно 3. Рано отпустил или дотянул до упора — обратный удар: −5 HP, +5 паники, шум.
-- **Газ**: сломанная труба травит газ; перекур в облаке = взрыв (урон, паника, грохот, прогресс починки сгорает). HUD предупреждает «ПАХНЕТ ГАЗОМ».
-- **Рация**: тумблер по ЛКМ; включённая шипит каждые 2 с даже из кармана — приманка для будущего монстра-слухача.
-- **Биотуалет** в дальнем углу карты: E — облегчиться, шкала туалета в ноль (иначе на 100% будет «санитарный инцидент»). Процесс слышно.
-- **Оператор**: Tab в зоне ГАЗели открывает монитор — нагрудные камеры всех монтёров (320×180, ~7 к/с) с именами и мини-шкалами HP/паники. Вышел из зоны или ранен — монитор закрывается.
-- **Ночная смена**: на карте темно (луна + туман, автоэкспозиция зажата PPV_Night), сломанные объекты пульсируют красной аварийной лампой. Фонарь — не роскошь.
-- **Миникарта** под шкалами: задачи (красные/зелёные), ГАЗель (оранжевая), биотуалет (синий), бригада (белые, раненые красные), ты — оранжевый со стрелкой взгляда.
-- **Тряска камеры**: дрожь при панике выше порога (растёт с паникой), жёсткий толчок при взрыве газа рядом.
-- **Туалет — мини-игра**: E садит, шкала уходит сама понемногу; жми E, когда бегающий курсор в зелёной зоне (−30) или жёлтой (−12), промах — −2 и громкий конфуз на всю карту. Зоны переезжают, курсор ускоряется. Движение срывает; занято — жди. Визиты идут в «Акт» (+300 ₽, звание за дисциплину).
-- **Диспетчер**: комментирует смену по рации (плашки сверху экрана): приветствие с числом поломок, починки, «все в ГАЗель», взрыв газа («КТО КУРИЛ НА ГАЗОВОЙ ЗАЯВКЕ?!»), замыкание щитка, ранения, санитарные инциденты, победа/поражение. Неважные реплики глотаются, если эфир занят (анти-спам 6 с).
-- **Панические крики**: монтёр в панике сам орёт в эфир каждые ~12–25 с («Мужики, я не пойду туда!», «Я слышал шаги!») — вся бригада видит в ленте рации, а крик шумит через MakeNoise (приманка для монстра).
-- **Совместный перекур**: курящий рядом тиммейт снижает панику и тебе (вполовину слабее).
-- **Лут по углам**: батарейки/аптечка/сигареты/предохранитель разбросаны по тёмным краям карты.
-- **R на экране «Акта»** — перезапуск смены (новый случайный набор поломок).
-- **«Акт выполненных работ»**: после победы/поражения — отчёт со статистикой, мемными званиями и бухгалтерией в рублях (итог часто минусовый).
-- Шумят: бег, падение предметов, распыление, починка, волочение раненого, рация, инцидент, взрыв — всё через `MakeNoise`, под монстра-слухача.
-- Старт 50 HP / 50 паники — временно, для тестов (вернуть 100/0 в `VitalsComponent.cpp`).
+## AI Agent Guides
 
-## Структура
+- [Docs/AI/BuildRules.md](Docs/AI/BuildRules.md)
+- [Docs/AI/CodingRules.md](Docs/AI/CodingRules.md)
+- [Docs/AI/Workflow.md](Docs/AI/Workflow.md)
+- [Docs/AI/CurrentMission.md](Docs/AI/CurrentMission.md)
+- [Docs/AI/CurrentFocus.md](Docs/AI/CurrentFocus.md)
+- [Docs/AI/NamingConvention.md](Docs/AI/NamingConvention.md)
+- [Docs/AI/ReplicationRules.md](Docs/AI/ReplicationRules.md)
+- [Docs/AI/AnimationRules.md](Docs/AI/AnimationRules.md)
+- [Docs/AI/MCPGuide.md](Docs/AI/MCPGuide.md)
 
-- `Source/Avaryo/` — C++: `AvaryoCharacter`, `FlashlightComponent`, `VitalsComponent`, `APickupItem`, `AvaryoHUD` (Canvas), `World/ARepairable`, `World/AExitZone`, `Game/ARunState` (+ спавнящая его `URunStateSubsystem` — BP GameMode не тронут).
-- `Content/Avariika/` — Blueprint'ы: персонаж, GameMode, предметы (`Items/`), материалы.
-- `Scripts/` — headless-скрипты редактора (запускать при закрытом редакторе): `place_run_objects.py` (расстановка), `setup_items.py` (донастройка), `inspect_level.py` (дамп акторов).
-- Уровень: `Content/FirstPerson/Lvl_FirstPerson` (GameMode переопределён в World Settings).
+## Developer Workflow Prompts
 
-## Сборка
+- [Prompts/Continue.md](Prompts/Continue.md)
+- [Prompts/Feature.md](Prompts/Feature.md)
+- [Prompts/BugFix.md](Prompts/BugFix.md)
+- [Prompts/Review.md](Prompts/Review.md)
+- [Prompts/Build.md](Prompts/Build.md)
+- [Prompts/SmokeTest.md](Prompts/SmokeTest.md)
+- [Prompts/DocsUpdate.md](Prompts/DocsUpdate.md)
+- [Prompts/Commit.md](Prompts/Commit.md)
 
-Закрыть редактор (Live Coding блокирует UBT), затем:
+Original pre-reorganization notes are preserved under `Docs/Archive/Originals/`.
 
-```
+## Unreal Project
+
+- Project file: `avariika.uproject`
+- Runtime module: `Source/Avaryo`
+- Main content root: `Content/Avariika`
+- Active map observed through MCP: `/Game/Avariika/Maps/Lvl_FirstPerson`
+
+## Build
+
+Close Unreal Editor before a full C++ build when Live Coding may interfere:
+
+```powershell
 "C:\Program Files\Epic Games\UE_5.7\Engine\Build\BatchFiles\Build.bat" avariikaEditor Win64 Development -project="C:\unrealEngine\avariika\avariika.uproject" -WaitMutex
 ```
-
-## Дальше по плану
-
-Монстр-слепой слухач (вся шумовая база готова), огнетушитель слепит/замедляет монстра, оператор с камерами в ГАЗели, полировка зоны выхода (модель машины).

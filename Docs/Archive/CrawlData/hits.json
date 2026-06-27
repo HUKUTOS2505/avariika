@@ -1,0 +1,4697 @@
+﻿[
+    {
+        "name":  "AudioToolkit Pro v1.2 (5.5-5.7)",
+        "bucket":  "plugin",
+        "why":  "Professional audio toolkit for horror ambient design and dynamic sound control in UE 5.7"
+    },
+    {
+        "name":  "Stage Zero вЂ“ Shader Pre-Compile Plugin 3.3.1 (5.3-5.7)",
+        "bucket":  "plugin",
+        "why":  "Performance optimization tool reducing load times for factory/interior environments"
+    },
+    {
+        "name":  "Xandra Character Creator (5.5-5.7)",
+        "bucket":  "plugin",
+        "why":  "Character customization system for creating diverse civilian NPCs and responders"
+    },
+    {
+        "name":  "EasyFog (5.7+)",
+        "bucket":  "vfx",
+        "why":  "Atmospheric fog system for horror ambience in abandoned/industrial settings"
+    },
+    {
+        "name":  "Public Service NPC вЂ” Metahuman",
+        "bucket":  "character",
+        "why":  "Realistic civilian character model for emergency workers and ordinary residents"
+    },
+    {
+        "name":  "Dismemberment Gore System",
+        "bucket":  "plugin",
+        "why":  "Horror-comedy gore mechanics for environmental destruction and creature encounters"
+    },
+    {
+        "name":  "Zombie Mutant Bundle",
+        "bucket":  "monster",
+        "why":  "Horror creature collection for emergency scenarios and encounters (deferred for iteration)"
+    },
+    {
+        "name":  "EP Master Materials",
+        "bucket":  "material",
+        "why":  "Comprehensive material library for creating decayed/industrial surfaces"
+    },
+    {
+        "name":  "Materialize VFX",
+        "bucket":  "vfx",
+        "why":  "Particle system for smoke, dust, and atmospheric effects in destruction sequences"
+    },
+    {
+        "name":  "Gothic Texture Pack",
+        "bucket":  "material",
+        "why":  "Dark industrial textures for horror-aesthetic house and factory environments"
+    },
+    {
+        "name":  "Black Eye Camera вЂ” Powerful Procedural Camera System 2.0.1 (5.1-5.7)",
+        "bucket":  "plugin",
+        "why":  "Advanced camera system for cinematic emergency response cutscenes and cinematic horror moments"
+    },
+    {
+        "name":  "glTFRuntime (5.5-5.7)",
+        "bucket":  "plugin",
+        "why":  "Asset loading system for dynamic content and model streaming"
+    },
+    {
+        "name":  "Industrial Rust \u0026 Corrosion Vol. 7 вЂ“ 53 Photoscanned Decals",
+        "bucket":  "material",
+        "why":  "Photoscanned industrial decay materials perfect for factory/hospital/abandoned building aesthetic"
+    },
+    {
+        "name":  "Boom Library вЂ” Armageddon (Designed)",
+        "bucket":  "audio",
+        "why":  "Sound effects library providing explosions, impacts, and environmental audio for emergency scenarios"
+    },
+    {
+        "name":  "Little Girl Thalassa Children Student NPC Female Character VRHC",
+        "bucket":  "character",
+        "why":  "Realistic civilian child model for rescue/emergency scenarios with ordinary people"
+    },
+    {
+        "name":  "EnGore: Procedural Dismemberment v.1.3.3 (5.2-5.7)",
+        "bucket":  "plugin",
+        "why":  "Procedural destruction and gore system for horror-comedy horror effects"
+    },
+    {
+        "name":  "TV head Monster",
+        "bucket":  "monster",
+        "why":  "Surreal horror creature for encounters and environmental storytelling (deferred consideration)"
+    },
+    {
+        "name":  "Horror Mansion вЂ” Low Poly 3D Models Pack",
+        "bucket":  "prop",
+        "why":  "Game-ready horror props and decorative models suitable for house interior environments"
+    },
+    {
+        "name":  "Horror Mansion вЂ” Low Poly 3D Models Pack",
+        "bucket":  "prop",
+        "why":  "Game-ready horror assets for house environments with low-poly meshes"
+    },
+    {
+        "name":  "Hyper Multiplayer Survival Template Pro [MST] v4.04 (5.7)",
+        "bucket":  "plugin",
+        "why":  "Multiplayer co-op framework and session management for UE 5.7"
+    },
+    {
+        "name":  "SKELOT вЂ” Instanced Skeletal Mesh Rendering v3.0 (5.2-5.7)",
+        "bucket":  "plugin",
+        "why":  "Performance optimization for character rendering in multiplayer"
+    },
+    {
+        "name":  "Dialogue Plugin 1.5 (4.26-5.7)",
+        "bucket":  "plugin",
+        "why":  "Dialogue and quest system for NPC conversations with team"
+    },
+    {
+        "name":  "Multi window (4.25-5.7)",
+        "bucket":  "ui",
+        "why":  "Multiple window support for HUD elements and menus"
+    },
+    {
+        "name":  "Horizon UI Plugin (DialogueMsgTextBlock and Flipbook) (5.3-5.7)",
+        "bucket":  "ui",
+        "why":  "UI components for dialogue messages and notifications in multiplayer"
+    },
+    {
+        "name":  "Conversation2D Plugin (5.5-5.7)",
+        "bucket":  "ui",
+        "why":  "2D conversation interface UI for dialogue interactions"
+    },
+    {
+        "name":  "Dragon IK Plugin вЂ” Universal IK System 2.7.2 (4.26-5.7)",
+        "bucket":  "plugin",
+        "why":  "Character animation rigging system for human movement"
+    },
+    {
+        "name":  "Cinematographer PRO (4.26-5.7)",
+        "bucket":  "plugin",
+        "why":  "Camera system and post-effects for horror atmosphere and cinematic moments"
+    },
+    {
+        "name":  "Simple Spline Mesh (Tool/Modular System) (5.7)",
+        "bucket":  "leveltool",
+        "why":  "Modular tool for manual level construction with spline-based meshes"
+    },
+    {
+        "name":  "Gestures MoCap Collection",
+        "bucket":  "character",
+        "why":  "Motion capture gestures for realistic civilian emergency workers"
+    },
+    {
+        "name":  "Office Meeting вЂ” MoCap Pack",
+        "bucket":  "character",
+        "why":  "MoCap animations for ordinary people in professional/civilian interactions"
+    },
+    {
+        "name":  "Office Desk вЂ” MoCap Pack",
+        "bucket":  "character",
+        "why":  "MoCap animations for civilian character desk interactions and movements"
+    },
+    {
+        "name":  "Tick Optimization Toolkit 1.5.0 (5.3-5.7)",
+        "bucket":  "plugin",
+        "why":  "Performance optimization for multiplayer co-op tick management"
+    },
+    {
+        "name":  "Defender: Animated Dialogue System (5.7+)",
+        "bucket":  "plugin",
+        "why":  "Dialogue system with character animations optimized for UE 5.7"
+    },
+    {
+        "name":  "Instance Damage System (5.3-5.7)",
+        "bucket":  "plugin",
+        "why":  "Damage system for destructible environment objects and NPC interactions"
+    },
+    {
+        "name":  "Significance Optimizer вЂ” Game Thread/CPU Optimization 9.0 (5.6-5.7)",
+        "bucket":  "plugin",
+        "why":  "CPU optimization for smooth multiplayer performance in co-op"
+    },
+    {
+        "name":  "Savior Auto-Save Plugin v5.2.0 (4.26-5.7)",
+        "bucket":  "plugin",
+        "why":  "Save and checkpoint system for co-op game sessions and progression"
+    },
+    {
+        "name":  "Ultra Dynamic Sky 9.5 (4.25-5.7)",
+        "bucket":  "vfx",
+        "why":  "Dynamic sky and weather effects for environmental horror atmosphere"
+    },
+    {
+        "name":  "IMPERFECTER вЂ” Post Process Toolkit 1.3.1 (5.6-5.7)",
+        "bucket":  "plugin",
+        "why":  "Post-processing effects for horror visual atmosphere and cinematic look"
+    },
+    {
+        "name":  "World Director NPC вЂ” PRO",
+        "bucket":  "plugin",
+        "why":  "AI/behavior СЃРёСЃС‚РµРјР° РґР»СЏ СѓРїСЂР°РІР»РµРЅРёСЏ NPC Р¶РёС‚РµР»СЏРјРё, СЂР°Р±РѕС‡РёРјРё, РєРѕРјРјСѓРЅР°Р»СЊС‰РёРєР°РјРё РІ СЃС†РµРЅР°СЂРёСЏС…"
+    },
+    {
+        "name":  "Black Girl Zahira African Female Character NPC",
+        "bucket":  "character",
+        "why":  "Р РµР°Р»РёСЃС‚РёС‡РЅС‹Р№ РіСЂР°Р¶РґР°РЅСЃРєРёР№ РїРµСЂСЃРѕРЅР°Р¶ РґР»СЏ РјРѕРґСѓР»СЊРЅРѕРіРѕ СЃРѕСЃС‚Р°РІР° РєРѕРјР°РЅРґС‹"
+    },
+    {
+        "name":  "ModuFusion: Character Customization Unleashed",
+        "bucket":  "plugin",
+        "why":  "РњРѕРґСѓР»СЊРЅР°СЏ РєР°СЃС‚РѕРјРёР·Р°С†РёСЏ РїРµСЂСЃРѕРЅР°Р¶РµР№ РґР»СЏ РѕР±С‹С‡РЅС‹С… Р»СЋРґРµР№ СЂР°Р·РЅРѕРіРѕ С‚РёРїР°"
+    },
+    {
+        "name":  "Real Action Camera PRO",
+        "bucket":  "plugin",
+        "why":  "РЎРёСЃС‚РµРјР° РєР°РјРµСЂС‹ РґР»СЏ РєРѕРѕРїРµСЂР°С‚РёРІРЅРѕР№ РёРіСЂС‹ СЃ СѓРїСЂР°РІР»РµРЅРёРµРј РІРёРґРѕРј"
+    },
+    {
+        "name":  "OverCrowd вЂ” Massive Crowd Simulation",
+        "bucket":  "plugin",
+        "why":  "РўРѕР»РїР° Р¶РёС‚РµР»РµР№ Рё РѕСЃС‚Р°Р»СЊРЅС‹С… Р»СЋРґРµР№ РґР»СЏ СЃРѕР·РґР°РЅРёСЏ Р°С‚РјРѕСЃС„РµСЂС‹ СЃС†РµРЅР°СЂРёРµРІ"
+    },
+    {
+        "name":  "Tempest Inventory System",
+        "bucket":  "plugin",
+        "why":  "UI РёРЅРІРµРЅС‚Р°СЂСЊ РґР»СЏ РёРЅСЃС‚СЂСѓРјРµРЅС‚РѕРІ, СЃРїРµС†СЃРЅР°СЂСЏР¶РµРЅРёСЏ, Р°РїС‚РµС‡РµРє Р°РІР°СЂРёР№РЅРѕР№ Р±СЂРёРіР°РґС‹"
+    },
+    {
+        "name":  "SteamCore (Legacy)",
+        "bucket":  "plugin",
+        "why":  "РЎРµС‚СЊ/Steam РёРЅС‚РµРіСЂР°С†РёСЏ РґР»СЏ РјСѓР»СЊС‚РёРїР»РµРµСЂР° Рё РєРѕРѕРїР°"
+    },
+    {
+        "name":  "Narrative Tales вЂ” Node Based Quests and Dialogue",
+        "bucket":  "plugin",
+        "why":  "Р”РёР°Р»РѕРіРё Рё РєРІРµСЃС‚С‹ РґР»СЏ РєРѕРјРµРґРёР№РЅРѕРіРѕ СЃС†РµРЅР°СЂРёСЏ Рё РІР·Р°РёРјРѕРґРµР№СЃС‚РІРёСЏ СЃ NPC"
+    },
+    {
+        "name":  "Keypad Door Puzzle System",
+        "bucket":  "plugin",
+        "why":  "РРЅС‚РµСЂР°РєС‚-СЃРёСЃС‚РµРјС‹ РґР»СЏ РІР·Р°РёРјРѕРґРµР№СЃС‚РІРёСЏ СЃ РґРІРµСЂСЏРјРё, Р·Р°РјРєР°РјРё, РѕР±СЉРµРєС‚Р°РјРё РІ Р»РѕРєР°С†РёСЏС…"
+    },
+    {
+        "name":  "Post-Soviet World",
+        "bucket":  "prop",
+        "why":  "РћРєСЂСѓР¶РµРЅРёРµ РґРѕРј/Р·Р°РІРѕРґ/Р±РѕР»СЊРЅРёС†Р° РІ РїРѕСЃС‚СЃРѕРІРµС‚СЃРєРѕРј СЃС‚РёР»Рµ СЃ РјР°С‚РµСЂРёР°Р»Р°РјРё Рё РїСЂРѕРїСЃР°РјРё"
+    },
+    {
+        "name":  "UMG Cinematics",
+        "bucket":  "ui",
+        "why":  "UI/HUD system for menus, notifications, status indicators"
+    },
+    {
+        "name":  "Inventory System X",
+        "bucket":  "plugin",
+        "why":  "Equipment/tool management for emergency gear"
+    },
+    {
+        "name":  "Narrative Pro 2 вЂ” Complete Game Framework",
+        "bucket":  "plugin",
+        "why":  "Dialogue/quest system for horror-comedy narrative"
+    },
+    {
+        "name":  "Spline Mesh Tool вЂ“ Modular Path Builder",
+        "bucket":  "leveltool",
+        "why":  "Modular path and level construction for house/factory/hospital layouts"
+    },
+    {
+        "name":  "Ninja Input",
+        "bucket":  "plugin",
+        "why":  "Interaction system for doors, tools, environment objects"
+    },
+    {
+        "name":  "Oceanology Legacy",
+        "bucket":  "plugin",
+        "why":  "Water/liquid effects for industrial/factory environments (pipes, flooding)"
+    },
+    {
+        "name":  "Object Distribution Tool",
+        "bucket":  "plugin",
+        "why":  "Level asset placement and distribution for level design"
+    },
+    {
+        "name":  "Rooibos Save System 2.0",
+        "bucket":  "plugin",
+        "why":  "Save/checkpoint system critical for multiplayer coop gameplay"
+    },
+    {
+        "name":  "Animation Tools Bundle",
+        "bucket":  "plugin",
+        "why":  "Character animation tools for realistic emergency crew"
+    },
+    {
+        "name":  "NWIRO вЂ” AI Integration Kit",
+        "bucket":  "plugin",
+        "why":  "NPC AI, behavior trees, perception for crew and hostile entities"
+    },
+    {
+        "name":  "Buildings VOL.8 вЂ” Commercial Doors",
+        "bucket":  "prop",
+        "why":  "Game-ready interactive doors essential for emergency scenarios"
+    },
+    {
+        "name":  "Objective Path Locator вЂ“ Waypoint System",
+        "bucket":  "plugin",
+        "why":  "AI navigation/waypoint system for crew member pathfinding"
+    },
+    {
+        "name":  "Spline Path System вЂ“ Movement Framework",
+        "bucket":  "plugin",
+        "why":  "Movement/pathfinding framework for NPC crew movement"
+    },
+    {
+        "name":  "Global World Optimization Framework PRO MAX",
+        "bucket":  "plugin",
+        "why":  "Performance optimization with multiplayer support"
+    },
+    {
+        "name":  "Smooth Sync 1.48",
+        "bucket":  "plugin",
+        "why":  "Multiplayer synchronization critical for coop sessions"
+    },
+    {
+        "name":  "Line Of Sight. Dynamic mesh",
+        "bucket":  "plugin",
+        "why":  "AI perception system for detection and horror mechanics"
+    },
+    {
+        "name":  "R2 вЂ” REALISTIC HOUSE PACK",
+        "bucket":  "prop",
+        "why":  "Game-ready realistic household props for residential setting"
+    },
+    {
+        "name":  "Agent Integration Kit (NeoStack AI) 1.0.74 (5.4-5.7)",
+        "bucket":  "plugin",
+        "why":  "AI/behavior/perception system РґР»СЏ РІСЂР°РіРѕРІ Рё РёРЅС‚РµСЂР°РєС‚РёРІРЅС‹С… СЌР»РµРјРµРЅС‚РѕРІ СЃ Р»РѕРіРёРєРѕР№ РІРѕСЃРїСЂРёСЏС‚РёСЏ"
+    },
+    {
+        "name":  "ObjectDeliverer 1.8.0 (5.6-5.7)",
+        "bucket":  "plugin",
+        "why":  "Networking plugin (TCP/UDP/WebSocket) РґР»СЏ РєРѕРѕРї-РјСѓР»СЊС‚РёРїР»РµРµСЂР° Рё СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёРё СЃРµСЃСЃРёР№"
+    },
+    {
+        "name":  "[Blueprint] Socket Helper (TCP-UDP Client-Server) (4.25-5.7)",
+        "bucket":  "plugin",
+        "why":  "РќРёР·РєРѕСѓСЂРѕРІРЅРµРІР°СЏ СЃРµС‚РµРІР°СЏ РєРѕРјРјСѓРЅРёРєР°С†РёСЏ РґР»СЏ TCP/UDP РІР·Р°РёРјРѕРґРµР№СЃС‚РІРёСЏ РІ РєРѕРѕРї-СЂРµР¶РёРјРµ"
+    },
+    {
+        "name":  "Speech Generation System 1.1.6 (5.7)",
+        "bucket":  "plugin",
+        "why":  "РЎРёСЃС‚РµРјР° РґРёР°Р»РѕРіРѕРІ Рё СЂРµС‡Рё РґР»СЏ РќРџРЎ (Р¶РёР»СЊС†С‹, СЂР°Р±РѕС‡РёРµ, РєРѕРјРјСѓРЅР°Р»СЊС‰РёРєРё)"
+    },
+    {
+        "name":  "Flex Partition вЂ” Optimization System 1.8.3 (5.3-5.7)",
+        "bucket":  "plugin",
+        "why":  "Performance/profiling РёРЅСЃС‚СЂСѓРјРµРЅС‚ РґР»СЏ РѕРїС‚РёРјРёР·Р°С†РёРё СѓСЂРѕРІРЅРµР№ (РґРѕРј/Р·Р°РІРѕРґ/Р±РѕР»СЊРЅРёС†Р°)"
+    },
+    {
+        "name":  "Decal Forge v1.0 вЂ” Procedural Decal Generator",
+        "bucket":  "plugin",
+        "why":  "РџСЂРѕС†РµРґСѓСЂРЅР°СЏ РіРµРЅРµСЂР°С†РёСЏ РґРµРєР°Р»РµР№ РґР»СЏ СЃРѕР·РґР°РЅРёСЏ РіСЂСЏР·Рё, СЂР¶Р°РІС‡РёРЅС‹, РїРѕРІСЂРµР¶РґРµРЅРёР№ РЅР° РёРЅРґР°СЃС‚СЂРёР°Р»-РїРѕРІРµСЂС…РЅРѕСЃС‚СЏС…"
+    },
+    {
+        "name":  "EasySky Multiplayer Ready Dynamic Day / Night Cycle v2.5 (5.7)",
+        "bucket":  "plugin",
+        "why":  "Р”РёРЅР°РјРёС‡РµСЃРєРѕРµ РѕСЃРІРµС‰РµРЅРёРµ Рё С†РёРєР» РґРµРЅСЊ/РЅРѕС‡СЊ РґР»СЏ Р°С‚РјРѕСЃС„РµСЂРЅРѕРіРѕ РїРѕСЃС‚-СЌС„С„РµРєС‚Р° РІ Р·Р°РєСЂС‹С‚С‹С… Р»РѕРєР°С†РёСЏС…"
+    },
+    {
+        "name":  "Character Appearance and Dissolve",
+        "bucket":  "vfx",
+        "why":  "Р­С„С„РµРєС‚ СЂР°СЃС‚РІРѕСЂРµРЅРёСЏ РґР»СЏ С…РѕСЂСЂРѕСЂ-СЃС†РµРЅР°СЂРёРµРІ Рё СЌР»РµРјРµРЅС‚РѕРІ СЌРєСЂР°РЅРѕРІ РїРµСЂСЃРѕРЅР°Р¶РµР№"
+    },
+    {
+        "name":  "Flexible Directional Menu",
+        "bucket":  "ui",
+        "why":  "UI СЃРёСЃС‚РµРјР° РјРµРЅСЋ РґР»СЏ РєРѕРѕРї-РІР·Р°РёРјРѕРґРµР№СЃС‚РІРёСЏ, РїСЂРµРґРјРµС‚РѕРІ Рё РёРЅС‚РµСЂС„РµР№СЃР° Р°РІР°СЂРёР№РЅРѕР№ Р±СЂРёРіР°РґС‹"
+    },
+    {
+        "name":  "NPC Optimizator v1.6.6",
+        "bucket":  "plugin",
+        "why":  "AI optimization for crowds of civilians/workers in emergency scenarios"
+    },
+    {
+        "name":  "Procedural NPC Crowds Pro v3.1",
+        "bucket":  "plugin",
+        "why":  "Mass spawning of ordinary people (residents, workers) for inhabited indoor settings"
+    },
+    {
+        "name":  "Radial Menu (Wheel)",
+        "bucket":  "ui",
+        "why":  "Radial menu UI for emergency team equipment/action wheel"
+    },
+    {
+        "name":  "Story Framework 5.2 вЂ” Interactive Template",
+        "bucket":  "plugin",
+        "why":  "Dialogue and quest framework for comedy/horror narrative moments"
+    },
+    {
+        "name":  "Journeyman\u0027s Minimap 1.2",
+        "bucket":  "ui",
+        "why":  "Minimap for navigating interconnected indoor environments (house/factory/hospital)"
+    },
+    {
+        "name":  "Waterline PRO 6.4",
+        "bucket":  "plugin",
+        "why":  "Water physics and effects for flooding/leaking scenarios in horror settings"
+    },
+    {
+        "name":  "Advanced Fade Objects PRO v1.4.1",
+        "bucket":  "plugin",
+        "why":  "Post-process effects and object dissolution for atmospheric horror moments"
+    },
+    {
+        "name":  "Old Lady Anims",
+        "bucket":  "character",
+        "why":  "Ordinary civilian animations for residents/NPCs in inhabited spaces"
+    },
+    {
+        "name":  "Nuclear Bomb Shelter",
+        "bucket":  "prop",
+        "why":  "Industrial/bunker props fitting claustrophobic horror environments"
+    },
+    {
+        "name":  "Boiling Liquid",
+        "bucket":  "vfx",
+        "why":  "Hazardous liquid VFX for dangerous emergency repair scenarios"
+    },
+    {
+        "name":  "Apocalyptic Office Props Vol1",
+        "bucket":  "prop",
+        "why":  "Worn office/interior props for deteriorated domestic/commercial spaces"
+    },
+    {
+        "name":  "Apartment Complex",
+        "bucket":  "prop",
+        "why":  "Residential interior props matching \u0027house\u0027 setting requirements"
+    },
+    {
+        "name":  "Lighting Cinematic Tool вЂ“ UE5 Lumen System",
+        "bucket":  "plugin",
+        "why":  "Cinematic lighting control for horror atmosphere and visual storytelling"
+    },
+    {
+        "name":  "37 Blacksmith NPC Mocap Animations",
+        "bucket":  "character",
+        "why":  "Worker/craftsperson animations for ordinary utility repair team members"
+    },
+    {
+        "name":  "Rino\u0027s Diner Environment",
+        "bucket":  "prop",
+        "why":  "Interior prop set for social/commercial indoor locations"
+    },
+    {
+        "name":  "Conveyor System",
+        "bucket":  "prop",
+        "why":  "Industrial equipment props for factory/manufacturing facility setting"
+    },
+    {
+        "name":  "Substrate Glass Material",
+        "bucket":  "material",
+        "why":  "Realistic glass surfaces for indoor environments (windows, doors, hazards)"
+    },
+    {
+        "name":  "Stylized Countryside House Interior",
+        "bucket":  "prop",
+        "why":  "Domestic interior props and layout for residential emergency scenarios"
+    },
+    {
+        "name":  "Substrate Water Material",
+        "bucket":  "material",
+        "why":  "Water material for flooded/wet emergency scenes"
+    },
+    {
+        "name":  "Substrate Essentials",
+        "bucket":  "material",
+        "why":  "Foundation materials (concrete, metal, rust) for industrial/deteriorated spaces"
+    },
+    {
+        "name":  "Hyper Procedural Spline Toolkit v4",
+        "bucket":  "plugin",
+        "why":  "Procedural level construction system for designing environments procedurally"
+    },
+    {
+        "name":  "North Terrain Brushes",
+        "bucket":  "leveltool",
+        "why":  "Terrain sculpting and brush tools for environmental landscape building"
+    },
+    {
+        "name":  "Clouds Generator вЂ” Niagara Fluids",
+        "bucket":  "vfx",
+        "why":  "Atmospheric Niagara effects for horror ambience and environmental mood"
+    },
+    {
+        "name":  "Hyper Auto Landscape Material v4",
+        "bucket":  "material",
+        "why":  "Industrial and weathered surface materials for mundane decay aesthetics"
+    },
+    {
+        "name":  "Survivor\u0027s Safe House",
+        "bucket":  "prop",
+        "why":  "Residential structure and prop pack for house-based emergency scenarios"
+    },
+    {
+        "name":  "Leather Leggings вЂ” MH Clothing",
+        "bucket":  "character",
+        "why":  "Modular civilian clothing for ordinary NPC emergency responders"
+    },
+    {
+        "name":  "Blueprint Command Center 1.0.7",
+        "bucket":  "plugin",
+        "why":  "UI coordination system fitting emergency crew management and team communication"
+    },
+    {
+        "name":  "Plug and Play AI Bundle",
+        "bucket":  "plugin",
+        "why":  "NPC behavior and perception systems for teammate and civilian AI"
+    },
+    {
+        "name":  "Interior Toolkit",
+        "bucket":  "leveltool",
+        "why":  "Interior space construction tool for houses, factories, and hospitals"
+    },
+    {
+        "name":  "Dark GUI / UI / Main Menu Pro KIT",
+        "bucket":  "ui",
+        "why":  "HUD, menu, and interface kit with horror-appropriate dark aesthetic"
+    },
+    {
+        "name":  "Cross-Platform Voice Chat Pro 1.0V2P13",
+        "bucket":  "plugin",
+        "why":  "Multiplayer voice chat and network session system for cooperative gameplay"
+    },
+    {
+        "name":  "Suburb Neighborhood House Pack",
+        "bucket":  "prop",
+        "why":  "Residential props and fixtures for home-based emergency response scenarios"
+    },
+    {
+        "name":  "American Gas Station",
+        "bucket":  "prop",
+        "why":  "Industrial and mundane commercial props for ordinary environment detail"
+    },
+    {
+        "name":  "Cute UI \u0026 Interact Sound Effects Pack",
+        "bucket":  "audio",
+        "why":  "UI feedback and object interaction sound effects for game events"
+    },
+    {
+        "name":  "Ghost Town VOL.1 вЂ” Old Cabins",
+        "bucket":  "prop",
+        "why":  "Abandoned building structures for horror atmosphere and environmental storytelling"
+    },
+    {
+        "name":  "Atmospheric House (Modular)",
+        "bucket":  "prop",
+        "why":  "Modular residential house environment pieces for indoor emergency crew setting"
+    },
+    {
+        "name":  "Abandoned Factory",
+        "bucket":  "prop",
+        "why":  "Industrial factory environment with modular construction blocks for level building"
+    },
+    {
+        "name":  "Citizens Pack",
+        "bucket":  "character",
+        "why":  "Realistic civilian character models matching ordinary people crew requirements"
+    },
+    {
+        "name":  "40 Pcs Professional Blood Decal Bundle",
+        "bucket":  "material",
+        "why":  "Blood and gore decals for horror-comedy visual aesthetic"
+    },
+    {
+        "name":  "Survival Horror Inventory Props Pack",
+        "bucket":  "prop",
+        "why":  "Horror props collection with inventory system integration"
+    },
+    {
+        "name":  "Big Zombie",
+        "bucket":  "monster",
+        "why":  "Zombie creature character for horror-comedy encounters"
+    },
+    {
+        "name":  "Body Cam Effects",
+        "bucket":  "plugin",
+        "why":  "Camera effects system for body-worn equipment perspective simulation"
+    },
+    {
+        "name":  "Industrial Smoke FX VDB",
+        "bucket":  "vfx",
+        "why":  "Smoke effects for horror atmosphere and environmental hazards"
+    },
+    {
+        "name":  "Riverology",
+        "bucket":  "vfx",
+        "why":  "Water/fluid effects for flooded areas and environmental atmosphere"
+    },
+    {
+        "name":  "Easy 360 Camera",
+        "bucket":  "plugin",
+        "why":  "Camera system plugin for flexible gameplay viewing mechanics"
+    },
+    {
+        "name":  "Modular Haunted House",
+        "bucket":  "prop",
+        "why":  "Modular horror-themed building components for level construction"
+    },
+    {
+        "name":  "Loop Smoke Niagara 02",
+        "bucket":  "vfx",
+        "why":  "Looping smoke effect for persistent horror atmosphere"
+    },
+    {
+        "name":  "Pack of Old \u0026 Damaged Mattresses",
+        "bucket":  "prop",
+        "why":  "Game-ready household props for realistic indoor environments"
+    },
+    {
+        "name":  "Drips Surface Material",
+        "bucket":  "material",
+        "why":  "Surface material for horror weathering, drips, and decay effects"
+    },
+    {
+        "name":  "Monster Dog",
+        "bucket":  "monster",
+        "why":  "Creature asset for enemy encounters (reference for later use)"
+    },
+    {
+        "name":  "Savage Werewolf",
+        "bucket":  "monster",
+        "why":  "Monster creature for horror encounters (reference for later use)"
+    },
+    {
+        "name":  "Wood 01 вЂ” Scanned Photogrammetry Materials",
+        "bucket":  "material",
+        "why":  "Realistic wood surface material for industrial/building interiors"
+    },
+    {
+        "name":  "Hospital Environment",
+        "bucket":  "prop",
+        "why":  "Game-ready Р±РѕР»СЊРЅРёС‡РЅРѕРµ РѕРєСЂСѓР¶РµРЅРёРµ вЂ” РѕСЃРЅРѕРІРЅРѕР№ СЃРµС‚С‚РёРЅРі РґР»СЏ Р°РІР°СЂРёР№РЅРѕР№ Р±СЂРёРіР°РґС‹"
+    },
+    {
+        "name":  "Fire Alarms + Commercial Kitchen | Environment Collection",
+        "bucket":  "prop",
+        "why":  "РРЅРґР°СЃС‚СЂРёР°Р» РїСЂРѕРїСЃС‹ (РїРѕР¶Р°СЂРЅР°СЏ СЃРёРіРЅР°Р»РёР·Р°С†РёСЏ, РєСѓС…РЅСЏ) РґР»СЏ Р·Р°РІРѕРґРѕРІ Рё Р±РѕР»СЊРЅРёС†"
+    },
+    {
+        "name":  "Abandoned / Post-Apocalyptic Hospital Environment + ULAT",
+        "bucket":  "prop",
+        "why":  "Р‘РѕР»СЊРЅРёС‡РЅРѕРµ РѕРєСЂСѓР¶РµРЅРёРµ РІ РїРѕРІСЂРµР¶РґРµРЅРЅРѕРј СЃРѕСЃС‚РѕСЏРЅРёРё СЃ РёРЅСЃС‚СЂСѓРјРµРЅС‚Р°РјРё СѓСЂРѕРІРЅСЏ"
+    },
+    {
+        "name":  "Post Soviet Medicine",
+        "bucket":  "prop",
+        "why":  "РњРµРґРёС†РёРЅСЃРєРѕРµ РѕР±РѕСЂСѓРґРѕРІР°РЅРёРµ Рё РёРЅСЃС‚СЂСѓРјРµРЅС‚С‹ (СЃРїРµС†СЃРЅР°СЂСЏР¶РµРЅРёРµ РґР»СЏ Р°РІР°СЂРёР№РЅРѕР№ Р±СЂРёРіР°РґС‹)"
+    },
+    {
+        "name":  "EOS Integration Kit 4.86",
+        "bucket":  "plugin",
+        "why":  "РЎРµС‚РµРІР°СЏ РёРЅС‚РµРіСЂР°С†РёСЏ EOS РґР»СЏ РєРѕРѕРї-РјСѓР»СЊС‚РёРїР»РµРµСЂР° Рё СЃРµСЃСЃРёР№ (UE 5.2-5.7)"
+    },
+    {
+        "name":  "City MODULAR HOSPITAL v.2",
+        "bucket":  "prop",
+        "why":  "Modular hospital building components matching core setting"
+    },
+    {
+        "name":  "Old Wooden planks poles and beams 26 pieces",
+        "bucket":  "prop",
+        "why":  "Industrial/construction materials for interior decay and structure"
+    },
+    {
+        "name":  "Abandoned Buildings",
+        "bucket":  "prop",
+        "why":  "Modular abandoned building components for horror aesthetic"
+    },
+    {
+        "name":  "Ruined Modern Buildings Pack",
+        "bucket":  "prop",
+        "why":  "Ruined modern structures for decayed factory/residential environments"
+    },
+    {
+        "name":  "Crowd Animation Loops",
+        "bucket":  "character",
+        "why":  "Civilian NPC animation sequences for residents/workers"
+    },
+    {
+        "name":  "HAZMAT SUIT",
+        "bucket":  "character",
+        "why":  "Protective gear outfit for emergency responder team members"
+    },
+    {
+        "name":  "FXMASTER",
+        "bucket":  "plugin",
+        "why":  "Environmental and atmospheric VFX system for horror effects"
+    },
+    {
+        "name":  "Item \u0026 Consumable Animations",
+        "bucket":  "plugin",
+        "why":  "Character interaction animations with medical/rescue equipment"
+    },
+    {
+        "name":  "Animated Traps Pack",
+        "bucket":  "plugin",
+        "why":  "Interactive game mechanics and environmental hazards"
+    },
+    {
+        "name":  "Spline Waypoint System V1",
+        "bucket":  "plugin",
+        "why":  "AI waypoint/navigation system for NPC movement"
+    },
+    {
+        "name":  "Enhanced AI Movement 1.7.2 (5.3-5.7)",
+        "bucket":  "plugin",
+        "why":  "Advanced character movement AI for realistic NPC behavior"
+    },
+    {
+        "name":  "LXR вЂ” Light Detection (4.27-5.7)",
+        "bucket":  "plugin",
+        "why":  "AI perception system using light/shadow for environmental awareness"
+    },
+    {
+        "name":  "AI Integration Toolkit (AIITK) (5.6-5.7)",
+        "bucket":  "plugin",
+        "why":  "Comprehensive AI behavior framework for crew and NPCs"
+    },
+    {
+        "name":  "AmbientCG Material Importer (5.4-5.7)",
+        "bucket":  "plugin",
+        "why":  "Material/texture import system for industrial and decay surfaces"
+    },
+    {
+        "name":  "rdSplineTools 1.3.3 (5.3-5.7)",
+        "bucket":  "leveltool",
+        "why":  "Spline-based level building and construction tools"
+    },
+    {
+        "name":  "Good FX : UI Icon Trail",
+        "bucket":  "ui",
+        "why":  "Visual effects for HUD/menu UI elements"
+    },
+    {
+        "name":  "22 Zombie Walk Motion Pack by JKMotion",
+        "bucket":  "monster",
+        "why":  "Zombie creature animation library for horror elements"
+    },
+    {
+        "name":  "Cinematic Smoke VFX PACK",
+        "bucket":  "vfx",
+        "why":  "Р”С‹Рј Рё РґС‹РјРѕРІС‹Рµ СЌС„С„РµРєС‚С‹ РґР»СЏ С…РѕСЂСЂРѕСЂ-Р°С‚РјРѕСЃС„РµСЂС‹ РІ РїРѕРјРµС‰РµРЅРёСЏС… (РґРѕРј/Р·Р°РІРѕРґ/Р±РѕР»СЊРЅРёС†Р°)"
+    },
+    {
+        "name":  "Input Prompts Pack 1500+",
+        "bucket":  "ui",
+        "why":  "РРєРѕРЅРєРё Рё РіСЂР°С„РёС‡РµСЃРєРёРµ РїРѕРґСЃРєР°Р·РєРё РґР»СЏ HUD/РјРµРЅСЋ РёРЅС‚РµСЂС„РµР№СЃР° Р°РІР°СЂРёР№РЅРѕР№ Р±СЂРёРіР°РґС‹"
+    },
+    {
+        "name":  "Advanced Lens Distortion",
+        "bucket":  "plugin",
+        "why":  "РџРѕСЃС‚СЌС„С„РµРєС‚ РєР°РјРµСЂС‹ РґР»СЏ РґРёРЅР°РјРёС‡РµСЃРєРёС… РІРёР·СѓР°Р»СЊРЅС‹С… СЌС„С„РµРєС‚РѕРІ РїСЂРё РёРЅС‚РµСЂР°РєС†РёСЏС…"
+    },
+    {
+        "name":  "HTTP Blueprint WebCommunication 2.18",
+        "bucket":  "plugin",
+        "why":  "РЎРµС‚РµРІРѕР№ РїР»Р°РіРёРЅ РґР»СЏ РєРѕРѕРї-С„СѓРЅРєС†РёРѕРЅР°Р»Р° Рё СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёРё СЃРµСЃСЃРёР№ РјРµР¶РґСѓ РёРіСЂРѕРєР°РјРё"
+    },
+    {
+        "name":  "Modular Brutalist Pack",
+        "bucket":  "prop",
+        "why":  "РРЅРґР°СЃС‚СЂРёР°Р»СЊРЅС‹Рµ РїСЂРѕРїСЃС‹ Рё Р°СЂС…РёС‚РµРєС‚СѓСЂРЅС‹Рµ СЌР»РµРјРµРЅС‚С‹ РґР»СЏ Р·Р°РІРѕРґР°/Р±РѕР»СЊРЅРёС†С‹/С‚РµС…РЅРёС‡РµСЃРєРёС… РїРѕРјРµС‰РµРЅРёР№"
+    },
+    {
+        "name":  "Abstraction Generator вЂ” Niagara Fluids",
+        "bucket":  "vfx",
+        "why":  "Р–РёРґРєРёРµ VFX СЌС„С„РµРєС‚С‹ (РІРѕРґР°, СѓС‚РµС‡РєРё) РґР»СЏ С…РѕСЂСЂРѕСЂ-СЃС†РµРЅР°СЂРёРµРІ РІ РїСЂРѕРјС‹С€Р»РµРЅРЅС‹С… Р·РґР°РЅРёСЏС…"
+    },
+    {
+        "name":  "FlexPath вЂ“ Smooth Navigation",
+        "bucket":  "plugin",
+        "why":  "РџР»Р°РіРёРЅ РЅР°РІРёРіР°С†РёРё РґР»СЏ AI РІСЂР°РіРѕРІ/NPC СЃ РіР»Р°РґРєРёРј РїР°С‚С„Р°Р№РЅРґРёРЅРіРѕРј РІ РїРѕРјРµС‰РµРЅРёСЏС…"
+    },
+    {
+        "name":  "Voxy вЂ” A Voxel Plugin 0.9.6.3",
+        "bucket":  "plugin",
+        "why":  "РРЅСЃС‚СЂСѓРјРµРЅС‚ РїСЂРѕС†РµРґСѓСЂРЅРѕР№ РіРµРЅРµСЂР°С†РёРё/СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРёСЏ СѓСЂРѕРІРЅРµР№ РґР»СЏ СЂР°Р·РЅРѕРѕР±СЂР°Р·РёСЏ Р»Р°СѓС‚РѕРІ Р·РґР°РЅРёР№"
+    },
+    {
+        "name":  "Save Game Assets Editor",
+        "bucket":  "plugin",
+        "why":  "РЎРёСЃС‚РµРјР° СѓРїСЂР°РІР»РµРЅРёСЏ СЃРѕС…СЂР°РЅРµРЅРёСЏРјРё РґР»СЏ РїСЂРѕРіСЂРµСЃСЃР° РєРѕРѕРї-СЃРµСЃСЃРёР№ Р°РІР°СЂРёР№РЅРѕР№ Р±СЂРёРіР°РґС‹"
+    },
+    {
+        "name":  "Simple Guide Effects",
+        "bucket":  "vfx",
+        "why":  "РЈРЅРёРІРµСЂСЃР°Р»СЊРЅС‹Рµ VFX СЌС„С„РµРєС‚С‹ (Niagara/Cascade) РґР»СЏ Р°С‚РјРѕСЃС„РµСЂРЅС‹С… Рё С…РѕСЂСЂРѕСЂ-СЌС„С„РµРєС‚РѕРІ"
+    },
+    {
+        "name":  "Hardware Monitor Plugin",
+        "bucket":  "plugin",
+        "why":  "РџСЂРѕС„Р°Р№Р»РёРЅРі Рё РјРѕРЅРёС‚РѕСЂРёРЅРі РїСЂРѕРёР·РІРѕРґРёС‚РµР»СЊРЅРѕСЃС‚Рё РґР»СЏ РѕРїС‚РёРјРёР·Р°С†РёРё РІ РєРѕРѕРї-СЃРµР°РЅСЃР°С…"
+    },
+    {
+        "name":  "HQ Dried Flower Vases Vol. 1",
+        "bucket":  "prop",
+        "why":  "РРЅС‚РµСЂСЊРµСЂРЅС‹Рµ РґРµРєРѕСЂР°С‚РёРІРЅС‹Рµ РїСЂРѕРїСЃС‹ РґР»СЏ РѕР±Р¶РёС‚С‹С… РїРѕРјРµС‰РµРЅРёР№ (РґРѕРјР°, Р±РѕР»СЊРЅРёС†С‹, РѕС„РёСЃС‹)"
+    },
+    {
+        "name":  "Modular Haunted House",
+        "bucket":  "prop",
+        "why":  "РњРѕРґСѓР»СЊРЅС‹Рµ РёРіСЂРѕРІС‹Рµ РєРѕРјРїРѕРЅРµРЅС‚С‹ РґРѕРјР° РґР»СЏ С…РѕСЂСЂРѕСЂ-СЃРµС‚С‚РёРЅРіР°, РѕСЃРЅРѕРІРЅРѕР№ Р»РѕРєР°С†РёРё РїСЂРѕ Р°РІР°СЂРёР№РЅСѓСЋ Р±СЂРёРіР°РґСѓ"
+    },
+    {
+        "name":  "Abandoned Industrial Tunnel",
+        "bucket":  "prop",
+        "why":  "РРЅРґР°СЃС‚СЂРёР°Р»СЊРЅРѕРµ РѕРєСЂСѓР¶РµРЅРёРµ РґР»СЏ СЃРµС‚С‚РёРЅРіР° Р·Р°РІРѕРґР°/РїРѕРґР·РµРјРµР»СЊСЏ РІ РёРіСЂРµ РїСЂРѕ Р°РІР°СЂРёР№РЅСѓСЋ Р±СЂРёРіР°РґСѓ"
+    },
+    {
+        "name":  "Ultimate Water Shader",
+        "bucket":  "plugin",
+        "why":  "Р РµР°Р»РёСЃС‚РёС‡РЅС‹Рµ С€РµР№РґРµСЂС‹ РІРѕРґС‹ РґР»СЏ РёРЅРґР°СЃС‚СЂРёР°Р»СЊРЅС‹С… Р»РѕРєР°С†РёР№ (Р·Р°РІРѕРґ, Р±РѕР»СЊРЅРёС†Р° СЃ РІРѕРґРѕРїСЂРѕРІРѕРґРѕРј)"
+    },
+    {
+        "name":  "Horror And Tension Music",
+        "bucket":  "audio",
+        "why":  "РҐРѕСЂСЂРѕСЂ-СЌРјР±РёРµРЅС‚ Рё Р°С‚РјРѕСЃС„РµСЂРЅС‹Рµ Р·РІСѓРєРё РґР»СЏ СЃРѕР·РґР°РЅРёСЏ РЅР°РїСЂСЏР¶РµРЅРёСЏ РІ РёРіСЂРµ"
+    },
+    {
+        "name":  "Niagara Metamorphoses",
+        "bucket":  "vfx",
+        "why":  "РЎРёСЃС‚РµРјР° Niagara-РїР°СЂС‚РёРєР»РµР№ РґР»СЏ С…РѕСЂСЂРѕСЂ-СЌС„С„РµРєС‚РѕРІ (РґС‹Рј, РїР°СЂ РІ РёРЅРґР°СЃС‚СЂРёР°Р»СЊРЅРѕР№ СЃСЂРµРґРµ)"
+    },
+    {
+        "name":  "Health Packs",
+        "bucket":  "prop",
+        "why":  "Medical emergency supplies for emergency crew kit"
+    },
+    {
+        "name":  "TCP UDP Socket Server Plugin 1.62",
+        "bucket":  "plugin",
+        "why":  "Co-op multiplayer networking layer for distributed emergency crew sessions"
+    },
+    {
+        "name":  "The Flashlight Toolkit v2.0",
+        "bucket":  "prop",
+        "why":  "Essential first-responder emergency equipment and lighting tool"
+    },
+    {
+        "name":  "Tether вЂ” Procedural Cable / Rope Tool",
+        "bucket":  "leveltool",
+        "why":  "Procedural placement of industrial hazards and environmental ropes in factory/building interiors"
+    },
+    {
+        "name":  "NiagaraExplosion01",
+        "bucket":  "vfx",
+        "why":  "Fire and explosion effects for emergency disaster scenarios"
+    },
+    {
+        "name":  "Skinned Decal Component 3",
+        "bucket":  "plugin",
+        "why":  "Damage and gore decal system for horror atmosphere and injury visualization"
+    },
+    {
+        "name":  "Procedural Mesh Blueprint v2",
+        "bucket":  "plugin",
+        "why":  "Procedural generation for environmental destruction and level variety in buildings"
+    },
+    {
+        "name":  "Morbid Horror Pack V1",
+        "bucket":  "monster",
+        "why":  "Horror creatures and entities for game atmosphere"
+    },
+    {
+        "name":  "Stylized Water and Liquid VFX",
+        "bucket":  "vfx",
+        "why":  "Water and flooding effects for emergency disaster scenarios in houses/factories"
+    },
+    {
+        "name":  "Waterfall 3D VDB Pack",
+        "bucket":  "vfx",
+        "why":  "Advanced water effects for environmental storytelling and disaster atmosphere"
+    },
+    {
+        "name":  "Mega Candles Pack",
+        "bucket":  "vfx",
+        "why":  "Fire and dynamic light effects for horror ambient atmosphere"
+    },
+    {
+        "name":  "UI HUD",
+        "bucket":  "ui",
+        "why":  "HUD and game interface elements"
+    },
+    {
+        "name":  "Dirt Track \u0026 General Dirt Decals",
+        "bucket":  "material",
+        "why":  "Dirt/rust textures for industrial horror surfaces"
+    },
+    {
+        "name":  "Mission \u0026 Objectives 1.5 (5.6-5.7)",
+        "bucket":  "plugin",
+        "why":  "Co-op mission and quest system for emergency response gameplay"
+    },
+    {
+        "name":  "Runtime MetaHuman Lip Sync (5.0-5.7)",
+        "bucket":  "plugin",
+        "why":  "NPC dialogue and character lip-sync animation"
+    },
+    {
+        "name":  "Reactive Fog System",
+        "bucket":  "vfx",
+        "why":  "Atmospheric horror fog and environmental ambience effects"
+    },
+    {
+        "name":  "EOSCore вЂ” Epic Online Services 1.9.8.2 (4.27-5.7)",
+        "bucket":  "plugin",
+        "why":  "Co-op multiplayer and EOS network session management"
+    },
+    {
+        "name":  "Universal Locomotion 2.0",
+        "bucket":  "plugin",
+        "why":  "Civilian character movement and realistic people animation system"
+    },
+    {
+        "name":  "Casual Guy",
+        "bucket":  "character",
+        "why":  "Realistic ordinary person character model for civilians"
+    },
+    {
+        "name":  "Workbenches and tools pack",
+        "bucket":  "prop",
+        "why":  "Game-ready emergency response tools and equipment meshes"
+    },
+    {
+        "name":  "Modular Limb Damage System (5.7)",
+        "bucket":  "plugin",
+        "why":  "Damage system for horror mechanics and gameplay hazards"
+    },
+    {
+        "name":  "Replicated Cursor",
+        "bucket":  "ui",
+        "why":  "UI cursor element for HUD"
+    },
+    {
+        "name":  "Realistic Fire VFX",
+        "bucket":  "vfx",
+        "why":  "Fire/destruction visual effects for horror scenarios"
+    },
+    {
+        "name":  "CCTV Camera System",
+        "bucket":  "plugin",
+        "why":  "Camera system for monitoring gameplay"
+    },
+    {
+        "name":  "VHS Component",
+        "bucket":  "plugin",
+        "why":  "Post-effect for retro/distorted camera aesthetic"
+    },
+    {
+        "name":  "Gravity Scatter Tool",
+        "bucket":  "leveltool",
+        "why":  "Tool for rapid prop placement during level design"
+    },
+    {
+        "name":  "Level design assistant 2",
+        "bucket":  "leveltool",
+        "why":  "Workflow assistant for manual level construction"
+    },
+    {
+        "name":  "Underground Tunnels",
+        "bucket":  "prop",
+        "why":  "Industrial location environment prop structures"
+    },
+    {
+        "name":  "4K Fabric Material Pack",
+        "bucket":  "material",
+        "why":  "Realistic surface textures for industrial/concrete surfaces"
+    },
+    {
+        "name":  "Advanced BodyCam / VHS",
+        "bucket":  "plugin",
+        "why":  "First-person camera post-effect system"
+    },
+    {
+        "name":  "Ambient Fx in Unreal Engine",
+        "bucket":  "vfx",
+        "why":  "Ambient horror/atmospheric visual effects"
+    },
+    {
+        "name":  "DFT Fabric Material Series",
+        "bucket":  "material",
+        "why":  "Industrial/practical surface textures for environments"
+    },
+    {
+        "name":  "Various Interactive Clock",
+        "bucket":  "prop",
+        "why":  "Interactive civilian game object"
+    },
+    {
+        "name":  "General AI Framework",
+        "bucket":  "plugin",
+        "why":  "NPC behavior and perception system"
+    },
+    {
+        "name":  "Grocery VOL.3",
+        "bucket":  "prop",
+        "why":  "Civilian supplies and everyday household props"
+    },
+    {
+        "name":  "Ultimate Level Art Tool",
+        "bucket":  "leveltool",
+        "why":  "Advanced level layout and design workflow tool"
+    },
+    {
+        "name":  "Textual Physical Effect",
+        "bucket":  "vfx",
+        "why":  "Particle and visual effects for gameplay"
+    },
+    {
+        "name":  "Meat\u0026Cheese MEGAPACK",
+        "bucket":  "prop",
+        "why":  "Food and civilian props for realistic environments"
+    },
+    {
+        "name":  "50 Male Animations",
+        "bucket":  "character",
+        "why":  "Civilian NPC animation set for regular workers"
+    },
+    {
+        "name":  "Horror Engine SE 3",
+        "bucket":  "plugin",
+        "why":  "Horror audio and atmospheric effects system"
+    },
+    {
+        "name":  "Industrial VOL.1 вЂ” Worksite",
+        "bucket":  "prop",
+        "why":  "Factory and worksite equipment game-ready props"
+    },
+    {
+        "name":  "Abandoned Street Props Pack",
+        "bucket":  "prop",
+        "why":  "Urban decay and derelict environment props"
+    },
+    {
+        "name":  "65 Zombie Idle Animation by JKMotion",
+        "bucket":  "monster",
+        "why":  "Zombie idle animations for horror encounters"
+    },
+    {
+        "name":  "Main Menu вЂ” 3D Immerse UI",
+        "bucket":  "ui",
+        "why":  "3D immersive menu interface system"
+    },
+    {
+        "name":  "Industrial Road Props Pack",
+        "bucket":  "prop",
+        "why":  "Industrial props for factory environments"
+    },
+    {
+        "name":  "Industrial Fuse Box Pack",
+        "bucket":  "prop",
+        "why":  "Electrical equipment props for emergency crew work"
+    },
+    {
+        "name":  "Skills Indicators (Customizable) (5.2-5.7)",
+        "bucket":  "ui",
+        "why":  "HUD status indicators for player feedback"
+    },
+    {
+        "name":  "Modern Hospital Props VOL.5",
+        "bucket":  "prop",
+        "why":  "Hospital environment props"
+    },
+    {
+        "name":  "Hospital Props VOL.6 вЂ” Lobby and Office Furniture",
+        "bucket":  "prop",
+        "why":  "Hospital furnishing and lobby assets"
+    },
+    {
+        "name":  "Modern Hospital Props VOL.2 вЂ” Medications and Tools",
+        "bucket":  "prop",
+        "why":  "Medical equipment and tools for emergency scenes"
+    },
+    {
+        "name":  "Hospital Props VOL.1 вЂ” Interior \u0026 Emergency Equipment",
+        "bucket":  "prop",
+        "why":  "Emergency medical equipment props"
+    },
+    {
+        "name":  "Vertex Animation Manager (5.5-5.7)",
+        "bucket":  "plugin",
+        "why":  "Vertex animation plugin for character deformation"
+    },
+    {
+        "name":  "Old Industrial City and Shipyard \u0026 Industrial Interiors",
+        "bucket":  "leveltool",
+        "why":  "Industrial environment assets for factory levels"
+    },
+    {
+        "name":  "Extended Progress Bar",
+        "bucket":  "ui",
+        "why":  "UI progress bar element"
+    },
+    {
+        "name":  "AI Doll вЂ” Horror",
+        "bucket":  "plugin",
+        "why":  "Horror game system with AI mechanics"
+    },
+    {
+        "name":  "Trail Hunter PRO",
+        "bucket":  "plugin",
+        "why":  "Multiplayer plugin with level streaming for co-op"
+    },
+    {
+        "name":  "OG Main Menu System (5.5-5.7)",
+        "bucket":  "ui",
+        "why":  "Main menu UI system"
+    },
+    {
+        "name":  "Quillscript Dialog System v2.5 (5.5-5.7)",
+        "bucket":  "plugin",
+        "why":  "Dialogue and quest system"
+    },
+    {
+        "name":  "Modular Buildings",
+        "bucket":  "leveltool",
+        "why":  "Modular building components for level construction"
+    },
+    {
+        "name":  "Footsteps Sound Effects вЂ” Ultimate Collection Bundle",
+        "bucket":  "audio",
+        "why":  "Comprehensive footstep foley effects"
+    },
+    {
+        "name":  "European Alleys",
+        "bucket":  "leveltool",
+        "why":  "European urban street environment assets"
+    },
+    {
+        "name":  "Downtown вЂ” City Pack",
+        "bucket":  "leveltool",
+        "why":  "Downtown urban environment for street levels"
+    },
+    {
+        "name":  "Suburbs вЂ” City Pack",
+        "bucket":  "leveltool",
+        "why":  "Suburban residential environment for house settings"
+    },
+    {
+        "name":  "British City Pack",
+        "bucket":  "leveltool",
+        "why":  "British urban environment assets"
+    },
+    {
+        "name":  "Dialogue Mocap Animations Vol.1",
+        "bucket":  "character",
+        "why":  "Motion-captured dialogue animations for realistic characters"
+    },
+    {
+        "name":  "Stones and Rocks pack",
+        "bucket":  "prop",
+        "why":  "РРЅРґР°СЃС‚СЂРёР°Р»СЊРЅС‹Рµ РєР°РјРЅРё Рё Р±РµС‚РѕРЅ РґР»СЏ РґРµРєРѕСЂР° Р·Р°РІРѕРґР°/РґРѕРјР°"
+    },
+    {
+        "name":  "Frosted Glass",
+        "bucket":  "material",
+        "why":  "РЎС‚РµРєР»Рѕ РґР»СЏ РѕРєРѕРЅ Рё РґРІРµСЂРµР№ РІ РёРЅС‚РµСЂСЊРµСЂР°С… Р·РґР°РЅРёР№"
+    },
+    {
+        "name":  "Realistic Windows: Advanced Pack",
+        "bucket":  "material",
+        "why":  "РњР°С‚РµСЂРёР°Р»С‹ РѕРєРѕРЅ РґР»СЏ СЂРµР°Р»РёСЃС‚РёС‡РЅС‹С… РґРѕРјРѕРІ Рё Р±РѕР»СЊРЅРёС†"
+    },
+    {
+        "name":  "Drink Beverage Coffee 3D Model",
+        "bucket":  "prop",
+        "why":  "Р‘С‹С‚РѕРІРѕР№ РїСЂРѕРїСЃ РґР»СЏ РёРЅС‚РµСЂР°РєС†РёР№ РїРµСЂСЃРѕРЅР°Р¶РµР№"
+    },
+    {
+        "name":  "Scans VOL.2 вЂ” Clothes",
+        "bucket":  "prop",
+        "why":  "РћРґРµР¶РґР° Рё РїРµСЂСЃРѕРЅР°Р»СЊРЅС‹Рµ РІРµС‰Рё РіСЂР°Р¶РґР°РЅСЃРєРёС… РїРµСЂСЃРѕРЅР°Р¶РµР№"
+    },
+    {
+        "name":  "Lighting VOL.5 вЂ” Exterior Lights",
+        "bucket":  "prop",
+        "why":  "РЈР»РёС‡РЅРѕРµ РѕСЃРІРµС‰РµРЅРёРµ РґР»СЏ РёРЅРґР°СЃС‚СЂРёР°Р»СЊРЅРѕРіРѕ РѕРєСЂСѓР¶РµРЅРёСЏ"
+    },
+    {
+        "name":  "Generic Inventory System 1.1.1",
+        "bucket":  "plugin",
+        "why":  "UI СЃРёСЃС‚РµРјР° РёРЅРІРµРЅС‚Р°СЂСЏ РґР»СЏ СѓРїСЂР°РІР»РµРЅРёСЏ РёРЅСЃС‚СЂСѓРјРµРЅС‚Р°РјРё Рё СЃРЅР°СЂСЏР¶РµРЅРёРµРј"
+    },
+    {
+        "name":  "Vertex Animation Toolkit 1.2.6",
+        "bucket":  "plugin",
+        "why":  "РўСѓР»РєРёС‚ Р°РЅРёРјР°С†РёРё РїРµСЂСЃРѕРЅР°Р¶РµР№ Рё РґРµС„РѕСЂРјР°С†РёРё СЃРєРµР»РµС‚Р°"
+    },
+    {
+        "name":  "Snow Effects",
+        "bucket":  "vfx",
+        "why":  "РЎРЅРµРі Рё РґС‹РјРѕРІС‹Рµ СЌС„С„РµРєС‚С‹ РґР»СЏ СЃРѕР·РґР°РЅРёСЏ Р°С‚РјРѕСЃС„РµСЂС‹ СѓР¶Р°СЃР°"
+    },
+    {
+        "name":  "Zombie Animations 1.2",
+        "bucket":  "monster",
+        "why":  "Р’СЂР°РіРё Рё РјРѕРЅСЃС‚СЂС‹ Р°РЅРёРјР°С†РёРё РґР»СЏ РїСЂРѕС‚РёРІРЅРёРєРѕРІ-СЃСѓС‰РµСЃС‚РІ"
+    },
+    {
+        "name":  "Stone Bridges Optimized",
+        "bucket":  "prop",
+        "why":  "РљР°РјРЅРё Рё Р±РµС‚РѕРЅ РґР»СЏ РёРЅРґР°СЃС‚СЂРёР°Р»СЊРЅРѕРіРѕ РѕРєСЂСѓР¶РµРЅРёСЏ Р·Р°РІРѕРґР°"
+    },
+    {
+        "name":  "DC Mirror Set",
+        "bucket":  "prop",
+        "why":  "РњРµР±РµР»СЊ Рё Р·РµСЂРєР°Р»Р° РґР»СЏ СЂРµР°Р»РёСЃС‚РёС‡РЅС‹С… РёРЅС‚РµСЂСЊРµСЂРѕРІ РґРѕРјРѕРІ Рё Р±РѕР»СЊРЅРёС†"
+    },
+    {
+        "name":  "Snow Blowing Landscape Effect",
+        "bucket":  "vfx",
+        "why":  "РЎРЅРµР¶РЅС‹Рµ С‡Р°СЃС‚РёС†С‹ РґР»СЏ Р°С‚РјРѕСЃС„РµСЂРЅС‹С… СЃС†РµРЅ Рё РїРѕРіРѕРґС‹"
+    },
+    {
+        "name":  "Snow Vol. 1 вЂ” Scanned Materials",
+        "bucket":  "material",
+        "why":  "РњР°С‚РµСЂРёР°Р»С‹ СЃРЅРµРіР° РґР»СЏ РїРѕРІРµСЂС…РЅРѕСЃС‚РµР№ Р·РґР°РЅРёР№ Рё Р»Р°РЅРґС€Р°С„С‚Р°"
+    },
+    {
+        "name":  "C++ Generator 1.2",
+        "bucket":  "plugin",
+        "why":  "РџСЂРѕС†РµРґСѓСЂРЅР°СЏ РіРµРЅРµСЂР°С†РёСЏ СѓСЂРѕРІРЅРµР№ РґР»СЏ РІР°СЂРёР°С‚РёРІРЅРѕСЃС‚Рё СЃС†РµРЅР°СЂРёРµРІ РґРѕРјРѕРІ/Р·Р°РІРѕРґРѕРІ"
+    },
+    {
+        "name":  "Procedural World Generator v1.1",
+        "bucket":  "plugin",
+        "why":  "РџСЂРѕС†РµРґСѓСЂРЅР°СЏ РіРµРЅРµСЂР°С†РёСЏ РґР»СЏ СЃРѕР·РґР°РЅРёСЏ РІР°СЂРёР°С‚РёРІРЅС‹С… Р»РµРІРµР»РѕРІ РґРѕРјР°/Р·Р°РІРѕРґР°/Р±РѕР»СЊРЅРёС†С‹ РІ РєРѕРѕРї-СЂРµР¶РёРјРµ"
+    },
+    {
+        "name":  "Monster Within",
+        "bucket":  "audio",
+        "why":  "Р—РІСѓРєРѕРІР°СЏ Р±РёР±Р»РёРѕС‚РµРєР° РґР»СЏ С…РѕСЂСЂРѕСЂ-Р°С‚РјРѕСЃС„РµСЂС‹ Рё СЃРїРµС†СЌС„С„РµРєС‚РѕРІ РёРіСЂС‹ РїСЂРѕ Р°РІР°СЂРёР№РЅСѓСЋ Р±СЂРёРіР°РґСѓ"
+    },
+    {
+        "name":  "Big Locomotion Pack V04",
+        "bucket":  "character",
+        "why":  "РђРЅРёРјР°С†РёРё РґРІРёР¶РµРЅРёР№ (С…РѕРґСЊР±Р°, Р±РµРі, РІР·Р°РёРјРѕРґРµР№СЃС‚РІРёРµ) РґР»СЏ РѕР±С‹С‡РЅС‹С… РіСЂР°Р¶РґР°РЅСЃРєРёС… РїРµСЂСЃРѕРЅР°Р¶РµР№-СЂР°Р±РѕС‚РЅРёРєРѕРІ"
+    },
+    {
+        "name":  "FABRIC AND LEATHER MATERIAL",
+        "bucket":  "material",
+        "why":  "РњР°С‚РµСЂРёР°Р»С‹ РґР»СЏ С‚РµРєСЃС‚СѓСЂ Р±С‹С‚РѕРІС‹С… РїСЂРµРґРјРµС‚РѕРІ, СЃРїРµС†СЃРЅР°СЂСЏР¶РµРЅРёСЏ (СЂСѓРєР°РІРёС†С‹, РѕРґРµР¶РґР°) Рё СЃРЅР°СЂСЏР¶РµРЅРёСЏ"
+    },
+    {
+        "name":  "Industrial Mining Equipment",
+        "bucket":  "prop",
+        "why":  "РРЅСЃС‚СЂСѓРјРµРЅС‚С‹ Рё РѕР±РѕСЂСѓРґРѕРІР°РЅРёРµ РґР»СЏ РёРЅРґР°СЃС‚СЂРёР°Р»СЊРЅС‹С… СЃС†РµРЅР°СЂРёРµРІ, РїРѕРґС…РѕРґРёС‚ РґР»СЏ Р°РІР°СЂРёР№РЅРѕР№ Р±СЂРёРіР°РґС‹ РЅР° Р·Р°РІРѕРґРµ"
+    },
+    {
+        "name":  "Buildings VOL.10 вЂ” Air Pipes and Vents",
+        "bucket":  "prop",
+        "why":  "Р’РµРЅС‚РёР»СЏС†РёСЏ Рё С‚СЂСѓР±РѕРїСЂРѕРІРѕРґС‹ РґР»СЏ С„Р°Р±СЂРёРє, Р±РѕР»СЊРЅРёС†, Р¶РёР»С‹С… Р·РґР°РЅРёР№ вЂ” РєСЂРёС‚РёС‡РЅРѕ РґР»СЏ СЃРµС‚С‚РёРЅРіР°"
+    },
+    {
+        "name":  "Abandoned school",
+        "bucket":  "leveltool",
+        "why":  "Р—Р°Р±СЂРѕС€РµРЅРЅРѕРµ Р·РґР°РЅРёРµ СЃ С…РѕСЂСЂРѕСЂ-Р°С‚РјРѕСЃС„РµСЂРѕР№ РґР»СЏ СЃРѕР·РґР°РЅРёСЏ СѓСЂРѕРІРЅРµР№ РёРіСЂС‹"
+    },
+    {
+        "name":  "Post-Apocalyptic Industrial Scene",
+        "bucket":  "leveltool",
+        "why":  "РРЅРґР°СЃС‚СЂРёР°Р»СЊРЅС‹Р№ СЃРµС‚С‚РёРЅРі СЃ РїРѕРІСЂРµР¶РґРµРЅРёСЏРјРё Рё С…РѕСЂСЂРѕСЂ-РІРёР·СѓР°Р»РѕРј РґР»СЏ Р·Р°РІРѕРґСЃРєРёС… СѓСЂРѕРІРЅРµР№"
+    },
+    {
+        "name":  "Found Footage Handheld Shaky Cinematic Camera System",
+        "bucket":  "plugin",
+        "why":  "Р”РёРЅР°РјРёС‡РЅР°СЏ СЃРёСЃС‚РµРјР° РєР°РјРµСЂС‹ СЃ РґСЂРѕР¶Р°РЅРёРµРј РґР»СЏ РєРёРЅРµРјР°С‚РёС‡РЅРѕРіРѕ С…РѕСЂСЂРѕСЂ-РєРѕРјРµРґРёР№РЅРѕРіРѕ СЃС‚РёР»СЏ"
+    },
+    {
+        "name":  "Replicated Interaction Kit Vol 1",
+        "bucket":  "plugin",
+        "why":  "РРЅС‚РµСЂР°РєС‚РёРІРЅС‹Рµ РїСЂРѕРїСЃС‹ (РїРµСЂРµРєР»СЋС‡Р°С‚РµР»Рё, РІРµРЅС‚РёР»Рё, С†РµРїРё) РґР»СЏ РёРіСЂРѕРІС‹С… РјРµС…Р°РЅРёРє РєРѕРјР°РЅРґРЅРѕР№ СЂР°Р±РѕС‚С‹"
+    },
+    {
+        "name":  "Buildings VOL.6 вЂ” Electrical Boxes",
+        "bucket":  "prop",
+        "why":  "Р­Р»РµРєС‚СЂРёС‡РµСЃРєРёРµ С‰РёС‚С‹ Рё РёРЅР¶РµРЅРµСЂРЅРѕРµ РѕР±РѕСЂСѓРґРѕРІР°РЅРёРµ РґР»СЏ РёРЅРґР°СЃС‚СЂРёР°Р»СЊРЅС‹С… Р»РѕРєР°С†РёР№"
+    },
+    {
+        "name":  "NVIDIA DLSS 8.4.0",
+        "bucket":  "plugin",
+        "why":  "РџР»Р°РіРёРЅ РѕРїС‚РёРјРёР·Р°С†РёРё РїРѕРґРґРµСЂР¶РёРІР°РµС‚ UE 5.2-5.7 РґР»СЏ СѓР»СѓС‡С€РµРЅРёСЏ РїСЂРѕРёР·РІРѕРґРёС‚РµР»СЊРЅРѕСЃС‚Рё"
+    },
+    {
+        "name":  "Industrial Factory",
+        "bucket":  "leveltool",
+        "why":  "Р“РѕС‚РѕРІР°СЏ РёРЅРґР°СЃС‚СЂРёР°Р»СЊРЅР°СЏ С„Р°Р±СЂРёРєР° РєР°Рє РѕРґРёРЅ РёР· РѕСЃРЅРѕРІРЅС‹С… СЃРµС‚С‚РёРЅРіРѕРІ РґР»СЏ СѓСЂРѕРІРЅРµР№"
+    },
+    {
+        "name":  "Stylized Lightning Vol.1",
+        "bucket":  "vfx",
+        "why":  "Р­Р»РµРєС‚СЂРёС‡РµСЃРєРёРµ СЂР°Р·СЂСЏРґС‹ Рё СЌС„С„РµРєС‚С‹ РґР»СЏ РѕРїР°СЃРЅС‹С… Р·РѕРЅ, РїРѕРІСЂРµР¶РґС‘РЅРЅРѕР№ СЌР»РµРєС‚СЂРѕСЃРµС‚Рё"
+    },
+    {
+        "name":  "Muddy Materials",
+        "bucket":  "material",
+        "why":  "Dirt/mud surface textures for industrial and horror-themed environments in game settings"
+    },
+    {
+        "name":  "Cinematic Fire 3D VDB Pack Loop",
+        "bucket":  "vfx",
+        "why":  "Fire effects suitable for emergency disaster scenarios and horror atmosphere"
+    },
+    {
+        "name":  "Video-Presets 3100 Cinematic Sound Effects For Filmmakers",
+        "bucket":  "audio",
+        "why":  "3100 foley and ambient sound effects for horror-comedy atmosphere and emergency audio design"
+    },
+    {
+        "name":  "Pick It UP вЂ” Collectables System",
+        "bucket":  "plugin",
+        "why":  "Item pickup/interaction system for equipment and tools management in coop gameplay"
+    },
+    {
+        "name":  "Drip and Swag Clothing Pack",
+        "bucket":  "character",
+        "why":  "Realistic casual clothing pack for authentic civilian character appearances"
+    },
+    {
+        "name":  "Dynamic AI System (5.7)",
+        "bucket":  "plugin",
+        "why":  "AI behavior system for NPC civilians, emergency crew dynamics, and character perception"
+    },
+    {
+        "name":  "Hyper Mesh to Icon Creator v3.15",
+        "bucket":  "ui",
+        "why":  "Tool for creating HUD icons and menu elements from 3D assets"
+    },
+    {
+        "name":  "Hyper Slot based Inventory V3",
+        "bucket":  "plugin",
+        "why":  "Slot-based inventory system for cooperative equipment and item management"
+    },
+    {
+        "name":  "Small Town Stores вЂ” Modular Pack",
+        "bucket":  "prop",
+        "why":  "Modular game-ready props for building indoor urban/commercial environments"
+    },
+    {
+        "name":  "SteamCore PRO 1.0.8 (5.3-5.7)",
+        "bucket":  "plugin",
+        "why":  "Steam network integration for co-op sessions and online multiplayer"
+    },
+    {
+        "name":  "Classic Survival Horror Framework",
+        "bucket":  "plugin",
+        "why":  "Dedicated horror game systems foundation for mechanics"
+    },
+    {
+        "name":  "ChunkCore (Chunk Downloader) (5.3-5.7)",
+        "bucket":  "plugin",
+        "why":  "Dynamic level loading and chunk management for world streaming"
+    },
+    {
+        "name":  "Roadmap Navigation 1.1.5 (5.3-5.7)",
+        "bucket":  "plugin",
+        "why":  "AI pathfinding and navigation for enemy behavior"
+    },
+    {
+        "name":  "NPC Eyes Sight System вЂ” PRO (5.5-5.7)",
+        "bucket":  "plugin",
+        "why":  "AI perception and sight mechanics for enemy detection"
+    },
+    {
+        "name":  "Easy Game UI Ultimate",
+        "bucket":  "ui",
+        "why":  "Complete HUD, menu, and UI framework system"
+    },
+    {
+        "name":  "MONSTER FULL PACK VOL 1",
+        "bucket":  "monster",
+        "why":  "Pack of enemy creature models and characters for horror"
+    },
+    {
+        "name":  "Runtime Audio Importer (4.27-5.7)",
+        "bucket":  "plugin",
+        "why":  "Audio toolkit for importing and managing dynamic sound assets"
+    },
+    {
+        "name":  "Runtime Audio Importer (MetaSound) (5.3-5.7)",
+        "bucket":  "plugin",
+        "why":  "Advanced audio system with MetaSound integration for audio design"
+    },
+    {
+        "name":  "HKH Object Pooling 2.4.0 (5.6-5.7)",
+        "bucket":  "plugin",
+        "why":  "Performance optimization through object pooling and recycling"
+    },
+    {
+        "name":  "Easy Options Menu v2.2 (5.1-5.7)",
+        "bucket":  "ui",
+        "why":  "Menu system for game options and settings"
+    },
+    {
+        "name":  "Dynamic Real Water (5.5-5.7)",
+        "bucket":  "plugin",
+        "why":  "Water simulation and visual effects for environmental scenes"
+    },
+    {
+        "name":  "Sonomar Collection: Abandoned Asylum",
+        "bucket":  "audio",
+        "why":  "Horror ambience perfect for institutional/hospital horror atmosphere"
+    },
+    {
+        "name":  "SFXtools вЂ” Jumpscares",
+        "bucket":  "audio",
+        "why":  "Professional horror sound design for atmospheric tension and scares"
+    },
+    {
+        "name":  "Gore And Slimy Sound Pack",
+        "bucket":  "audio",
+        "why":  "Visceral horror SFX for body horror atmosphere"
+    },
+    {
+        "name":  "Chains Sound Pack",
+        "bucket":  "audio",
+        "why":  "Industrial foley for factory and structural environments"
+    },
+    {
+        "name":  "Metal Core Alliance",
+        "bucket":  "audio",
+        "why":  "Industrial metallic/mechanical sounds for manufacturing settings"
+    },
+    {
+        "name":  "Earthquake Sounds Sound Pack",
+        "bucket":  "audio",
+        "why":  "Structural damage and distress ambience for horror scenarios"
+    },
+    {
+        "name":  "Monster Library Vol 3",
+        "bucket":  "audio",
+        "why":  "Creature vocalizations for horror atmosphere"
+    },
+    {
+        "name":  "Monster Sound FX Pack 1",
+        "bucket":  "audio",
+        "why":  "Creature sound effects for horror encounters"
+    },
+    {
+        "name":  "Snapping Helper",
+        "bucket":  "leveltool",
+        "why":  "Placement/snapping system for manual level construction"
+    },
+    {
+        "name":  "Modular Snap System",
+        "bucket":  "leveltool",
+        "why":  "Modular snapping framework for manual level building"
+    },
+    {
+        "name":  "BOOM Library DOGS",
+        "bucket":  "audio",
+        "why":  "Foley library with dog sounds for horror-ambient and environmental audio"
+    },
+    {
+        "name":  "Rope Stress and Creak Sound Pack",
+        "bucket":  "audio",
+        "why":  "Door and structure creak sounds for industrial foley"
+    },
+    {
+        "name":  "Ghosthack x Boom Library Sound FX \u0026 Foley Bundle",
+        "bucket":  "audio",
+        "why":  "Professional foley and SFX collection for comprehensive game audio"
+    },
+    {
+        "name":  "Abandoned Service Garage вЂ” VOL.3 вЂ” Sales and Service",
+        "bucket":  "prop",
+        "why":  "Industrial game-ready modular environment meshes for factory/workshop settings"
+    },
+    {
+        "name":  "Calysto Smart Scatter вЂ” PCG Scattering",
+        "bucket":  "plugin",
+        "why":  "Procedural content generation tool for efficient asset placement on levels"
+    },
+    {
+        "name":  "Simple UDP TCP Socket Client",
+        "bucket":  "plugin",
+        "why":  "Network plugin for co-op player synchronization and multiplayer foundation"
+    },
+    {
+        "name":  "Quest Editor Plugin",
+        "bucket":  "plugin",
+        "why":  "Quest and dialogue system editor for mission and narrative design"
+    },
+    {
+        "name":  "Next Gen Destruction Toolkit",
+        "bucket":  "plugin",
+        "why":  "Object destruction mechanics for interactive industrial environments"
+    },
+    {
+        "name":  "Fire Chat PRO",
+        "bucket":  "plugin",
+        "why":  "In-game communication system for co-op player voice/chat interaction"
+    },
+    {
+        "name":  "Screen Space Fog Scattering",
+        "bucket":  "plugin",
+        "why":  "Fog and atmospheric scattering effects for horror ambience in indoor spaces"
+    },
+    {
+        "name":  "Blueprint Outline",
+        "bucket":  "plugin",
+        "why":  "Visual outline highlighting system for interactive object feedback"
+    },
+    {
+        "name":  "Stylized Dynamic Sky \u0026 Weather System V4",
+        "bucket":  "plugin",
+        "why":  "Weather and atmospheric system for environmental ambience variation"
+    },
+    {
+        "name":  "UIWS вЂ” Unified Interactive Water System",
+        "bucket":  "plugin",
+        "why":  "Interactive water simulation and effects for pipes/flooding in indoor environments"
+    },
+    {
+        "name":  "Blockout Tools Plugin 1.52",
+        "bucket":  "leveltool",
+        "why":  "Essential level blockout and manual construction tool for house/factory/hospital environments"
+    },
+    {
+        "name":  "Fluid Ninja VFX Tools",
+        "bucket":  "plugin",
+        "why":  "Advanced particle effects creation system for horror atmosphere smoke/fog/destruction effects"
+    },
+    {
+        "name":  "Ultra Volumetrics",
+        "bucket":  "plugin",
+        "why":  "Volumetric effects for ambient horror lighting, fog, and atmospheric density effects"
+    },
+    {
+        "name":  "rdLODtools 1.5.0",
+        "bucket":  "plugin",
+        "why":  "Performance optimization through automated LOD generation critical for multiplayer sessions"
+    },
+    {
+        "name":  "Common Loading Screen 1.1.4",
+        "bucket":  "ui",
+        "why":  "Customizable loading screen UI component for mission transitions"
+    },
+    {
+        "name":  "GAS Companion 6.2.1",
+        "bucket":  "plugin",
+        "why":  "Gameplay Ability System extension for character abilities and mechanic interactions"
+    },
+    {
+        "name":  "Easy Multi Save",
+        "bucket":  "plugin",
+        "why":  "Robust multi-slot cooperative save system for campaign progression"
+    },
+    {
+        "name":  "Easy Player Feedback 1.2",
+        "bucket":  "plugin",
+        "why":  "On-screen notification and feedback system for player alerts/HUD messages"
+    },
+    {
+        "name":  "Clouds Tunnel Vdb Pack",
+        "bucket":  "vfx",
+        "why":  "Game-ready volumetric VDB assets for fog, smoke, and environmental atmospheric effects"
+    },
+    {
+        "name":  "3 Medical Outfits (Female) Vol.02",
+        "bucket":  "character",
+        "why":  "Medical-themed character outfit variations perfectly suited for emergency crew paramedic roles"
+    },
+    {
+        "name":  "Working Gloves 146 вЂ” All MH Bodies \u0026 UE5 Skeletons вЂ” Rigged",
+        "bucket":  "character",
+        "why":  "Realistic work gloves for emergency maintenance crew appearance"
+    },
+    {
+        "name":  "Surgery Gloves 147 вЂ” All MH Bodies \u0026 UE5 Skeletons вЂ” Rigged",
+        "bucket":  "character",
+        "why":  "Medical gloves for hospital/emergency responder scenario authenticity"
+    },
+    {
+        "name":  "Vest 57 вЂ” All MH Bodies \u0026 UE5 Skeletons вЂ” Rigged",
+        "bucket":  "character",
+        "why":  "Tactical utility vest for emergency response team outfit"
+    },
+    {
+        "name":  "TShirt 31 вЂ” Male/Female MH \u0026 UE5 Skeletons вЂ” Rigged",
+        "bucket":  "character",
+        "why":  "Casual clothing base for realistic civilian NPCs"
+    },
+    {
+        "name":  "Jeans 125 вЂ” All MH Bodies \u0026 UE5 Skeletons вЂ” Rigged",
+        "bucket":  "character",
+        "why":  "Essential civilian pants for ordinary worker characters"
+    },
+    {
+        "name":  "Puffer 61 вЂ” All MH Bodies \u0026 UE5 Skeletons вЂ” Rigged",
+        "bucket":  "character",
+        "why":  "Winter/casual jacket for diverse civilian NPC outfits"
+    },
+    {
+        "name":  "Tactical Masks",
+        "bucket":  "character",
+        "why":  "PPE protective equipment essential to emergency responder theme"
+    },
+    {
+        "name":  "DEKO/VFX VOL.1 вЂ” Fog, Rain, and Water",
+        "bucket":  "vfx",
+        "why":  "Environmental atmospheric fog/water effects for horror ambience"
+    },
+    {
+        "name":  "DEKO/VFX VOL.2 вЂ” General Effects",
+        "bucket":  "vfx",
+        "why":  "General environmental and action VFX for horror-comedy scenarios"
+    },
+    {
+        "name":  "Cinematic Cam Pro (5.5-5.6)",
+        "bucket":  "plugin",
+        "why":  "Camera system and post-effect cinematics for cutscenes"
+    },
+    {
+        "name":  "FxER PostFX NightVision",
+        "bucket":  "plugin",
+        "why":  "Post-effect filter for dark horror atmosphere and vision effects"
+    },
+    {
+        "name":  "Gaming Health Widget",
+        "bucket":  "ui",
+        "why":  "Game UI widget for player health status display"
+    },
+    {
+        "name":  "Lighting VOL.4 вЂ” Residential",
+        "bucket":  "leveltool",
+        "why":  "Residential interior/exterior lighting kit for house level construction"
+    },
+    {
+        "name":  "Blendcore вЂ” Modular Master Material",
+        "bucket":  "material",
+        "why":  "Master material system for industrial/horror surface texturing (rust/concrete/dirt)"
+    },
+    {
+        "name":  "Fully Customizable Enemy Spawn System (Multiplayer Support)",
+        "bucket":  "plugin",
+        "why":  "AI spawning system with multiplayer coop support for enemy/creature encounters"
+    },
+    {
+        "name":  "Dynamic Chaos Destruction Fields",
+        "bucket":  "plugin",
+        "why":  "Physics destruction system for damaged building/factory environments"
+    },
+    {
+        "name":  "Vintage Mansion Environment Kit",
+        "bucket":  "prop",
+        "why":  "Game-ready house environment meshes for horror-dark mansion setting"
+    },
+    {
+        "name":  "Dark Russian Voices",
+        "bucket":  "audio",
+        "why":  "Human vocal sounds for character dialogue and horror atmosphere"
+    },
+    {
+        "name":  "Jobsite VOL.2 вЂ” Modular Storage and Supplies",
+        "bucket":  "prop",
+        "why":  "Modular industrial/factory props and supply equipment for factory level"
+    },
+    {
+        "name":  "Old Brick House",
+        "bucket":  "prop",
+        "why":  "Game-ready house environment with horror aesthetic for residential setting"
+    },
+    {
+        "name":  "Hyper Scalable Interaction System v3",
+        "bucket":  "plugin",
+        "why":  "Interactive gameplay mechanics system for emergency crew activities and puzzle solving"
+    },
+    {
+        "name":  "Easy Toolbag",
+        "bucket":  "prop",
+        "why":  "Emergency repair tools and equipment props tailored for crew gameplay mechanics"
+    },
+    {
+        "name":  "Scatter Paper and Keys Pack",
+        "bucket":  "prop",
+        "why":  "Everyday environmental prop pack (papers, keys) for house/factory/hospital interiors"
+    },
+    {
+        "name":  "Silent Walking Animations",
+        "bucket":  "plugin",
+        "why":  "Character movement animation system for realistic civilian crew animations"
+    },
+    {
+        "name":  "Ghost Creature Anims",
+        "bucket":  "monster",
+        "why":  "Supernatural creature animations for horror encounters in emergency scenarios"
+    },
+    {
+        "name":  "Interaction System X",
+        "bucket":  "plugin",
+        "why":  "Core interactive object system for environmental game mechanics"
+    },
+    {
+        "name":  "GASP-DynamicAdditiveOverlay 1.5.7",
+        "bucket":  "plugin",
+        "why":  "Dynamic visual overlay and posteffect system for horror visual feedback"
+    },
+    {
+        "name":  "Electronic Equipment",
+        "bucket":  "prop",
+        "why":  "Industrial equipment props for factory and facility environments"
+    },
+    {
+        "name":  "Car Fire FX VDB",
+        "bucket":  "vfx",
+        "why":  "Volumetric fire effects for emergency and hazard scenarios"
+    },
+    {
+        "name":  "Fire FX VDB",
+        "bucket":  "vfx",
+        "why":  "Fire visual effects for building hazards and horror atmosphere"
+    },
+    {
+        "name":  "VFX Impacts (all ver.)",
+        "bucket":  "vfx",
+        "why":  "Visual impact effects for environmental damage and disturbance"
+    },
+    {
+        "name":  "ZomTech Lite вЂ” AI Zombie",
+        "bucket":  "monster",
+        "why":  "AI-driven zombie system with character model for horror encounters"
+    },
+    {
+        "name":  "Grandpa\u0027s Attic (Furniture storage props)",
+        "bucket":  "prop",
+        "why":  "Household furniture props for interior home and building environments"
+    },
+    {
+        "name":  "Ocular Sounds вЂ” The Ultimate Sound FX Bundle (All in One) вЂ” 4000+",
+        "bucket":  "audio",
+        "why":  "Massive sound effects library covering ambient, foley, and UI audio needs"
+    },
+    {
+        "name":  "Ground Vortex VDB",
+        "bucket":  "vfx",
+        "why":  "Volumetric atmospheric effects for environmental horror storytelling"
+    },
+    {
+        "name":  "Stylized Explosions Vol.1 вЂ” Niagara",
+        "bucket":  "vfx",
+        "why":  "Explosion visual effects for building hazards and emergency scenarios"
+    },
+    {
+        "name":  "Lightning VFX Bundle",
+        "bucket":  "vfx",
+        "why":  "Electric hazard effects for industrial/factory horror atmosphere"
+    },
+    {
+        "name":  "Radiation VFX",
+        "bucket":  "vfx",
+        "why":  "Industrial hazard environmental effects for contaminated factory/plant settings"
+    },
+    {
+        "name":  "Explosion VFX",
+        "bucket":  "vfx",
+        "why":  "Destruction and explosion effects for emergency response scenarios"
+    },
+    {
+        "name":  "3D Flipbook and Stop-Motion Animator",
+        "bucket":  "plugin",
+        "why":  "Animation tool system for rigging and animating character assets"
+    },
+    {
+        "name":  "Nuke Explosions Pack",
+        "bucket":  "vfx",
+        "why":  "Large-scale destruction and explosion effects for emergency disaster scenarios"
+    },
+    {
+        "name":  "Meta Customization System",
+        "bucket":  "plugin",
+        "why":  "Character customization system for crew member personalization and loadouts"
+    },
+    {
+        "name":  "Interactive Procedural City Generator (5.5+)",
+        "bucket":  "leveltool",
+        "why":  "Level building and procedural generation tool for house/factory/hospital environments"
+    },
+    {
+        "name":  "Blood FX Alembic",
+        "bucket":  "vfx",
+        "why":  "Horror blood effects in alembic volume format for realistic gore"
+    },
+    {
+        "name":  "Realistic Blood VFX",
+        "bucket":  "vfx",
+        "why":  "Cinematic realistic blood visual effects for horror atmosphere"
+    },
+    {
+        "name":  "Realistic Blood Decals",
+        "bucket":  "material",
+        "why":  "Blood decal materials for surfaces to enhance horror atmosphere"
+    },
+    {
+        "name":  "Explosion VFX 2",
+        "bucket":  "vfx",
+        "why":  "Additional explosion/destruction effects for environmental hazards"
+    },
+    {
+        "name":  "BUNDLE Survivors Animations",
+        "bucket":  "character",
+        "why":  "Survivor/emergency crew character animation bundle for realistic movement"
+    },
+    {
+        "name":  "Runtime Archiver (Zip, Oodle, Tar, LZ4, GZip)",
+        "bucket":  "plugin",
+        "why":  "Asset loading and compression optimization for network sessions and performance"
+    },
+    {
+        "name":  "Hyper Footstep System v3",
+        "bucket":  "audio",
+        "why":  "Environmental foley system providing footstep and movement audio ambience"
+    },
+    {
+        "name":  "Modular Sewers \u0026 Tunnels",
+        "bucket":  "leveltool",
+        "why":  "Modular building kit components for constructing underground levels in industrial environments"
+    },
+    {
+        "name":  "Nice Settings Menu",
+        "bucket":  "ui",
+        "why":  "UI menu system for game settings and configuration interface"
+    },
+    {
+        "name":  "Rigged NPC Creator (5.5+)",
+        "bucket":  "plugin",
+        "why":  "Character creation and rigging tool for generating non-player characters with animations"
+    },
+    {
+        "name":  "Massive | World вЂ” Procedural world generation with PCG (5.5+)",
+        "bucket":  "plugin",
+        "why":  "Procedural level generation system using PCG for dynamic environment construction"
+    },
+    {
+        "name":  "Jobsite VOL.12 вЂ” Office",
+        "bucket":  "prop",
+        "why":  "Office and workplace props collection for industrial and commercial environment decoration"
+    },
+    {
+        "name":  "Casual Girl",
+        "bucket":  "character",
+        "why":  "Realistic civilian female character model for emergency response team members or rescue victims"
+    },
+    {
+        "name":  "Realistic Water Explosions Pack",
+        "bucket":  "vfx",
+        "why":  "Water and pipe rupture effects for industrial disaster scenarios in factory/building settings"
+    },
+    {
+        "name":  "Scans VOL.5 вЂ” Cardboard Boxes (Nanite)",
+        "bucket":  "prop",
+        "why":  "Game-ready cardboard boxes as everyday environmental props for buildings"
+    },
+    {
+        "name":  "Clothing Collection вЂ” Male MH \u0026 UE5 Skeletons вЂ” Rigged",
+        "bucket":  "character",
+        "why":  "Rigged male worker clothing for realistic emergency crew characters"
+    },
+    {
+        "name":  "Fast AI Plugin (Multiplayer) 2.2.6 (5.5-5.6)",
+        "bucket":  "plugin",
+        "why":  "Multiplayer AI behavior system for crew mechanics and threat pathfinding"
+    },
+    {
+        "name":  "Cobra Concrete Material Pack вЂ” Basic (5.1+)",
+        "bucket":  "material",
+        "why":  "Industrial concrete and weathered surface skins for factory/building/hospital environments"
+    },
+    {
+        "name":  "M5 VFX Vol1. Smoke and Big Explosion(Niagara)",
+        "bucket":  "vfx",
+        "why":  "Smoke and explosion effects for industrial accidents and hazard scenarios"
+    },
+    {
+        "name":  "Modular Staircase Blueprint (5.5+)",
+        "bucket":  "prop",
+        "why":  "Modular stairs and building structural elements for manual level construction"
+    },
+    {
+        "name":  "Animations For Monsters",
+        "bucket":  "monster",
+        "why":  "Horror creature animations for antagonists encountered during emergency response"
+    },
+    {
+        "name":  "Procedural Utility Tower and Electric Meters",
+        "bucket":  "prop",
+        "why":  "Game-ready РёРЅРґР°СЃС‚СЂРёР°Р»СЊРЅС‹Рµ РєРѕРјРјСѓРЅР°Р»СЊРЅС‹Рµ РїСЂРѕРїСЃС‹ РґР»СЏ Р·Р°РІРѕРґР°/Р·РґР°РЅРёСЏ"
+    },
+    {
+        "name":  "Holidays VOL.1 вЂ” Halloween Decor",
+        "bucket":  "prop",
+        "why":  "РҐРѕСЂСЂРѕСЂ-РґРµРєРѕСЂ РґР»СЏ СЃРѕР·РґР°РЅРёСЏ СЃС‚СЂР°С€РЅРѕР№ Р°С‚РјРѕСЃС„РµСЂС‹ РІ РёРЅС‚РµСЂСЊРµСЂР°С…"
+    },
+    {
+        "name":  "Trash VOL.2 вЂ” Floor Debris",
+        "bucket":  "prop",
+        "why":  "РњСѓСЃРѕСЂ Рё РѕР±Р»РѕРјРєРё РґР»СЏ Р°РІР°СЂРёР№РЅС‹С… СЃС†РµРЅ Рё Р·Р°РїСѓС‰РµРЅРЅС‹С… РїРѕРјРµС‰РµРЅРёР№"
+    },
+    {
+        "name":  "Decals VOL.4 вЂ” Decay",
+        "bucket":  "material",
+        "why":  "РўРµРєСЃС‚СѓСЂС‹ СЂР°Р·Р»РѕР¶РµРЅРёСЏ Рё РґРµРіСЂР°РґР°С†РёРё РґР»СЏ С…РѕСЂСЂРѕСЂ-Р°С‚РјРѕСЃС„РµСЂС‹"
+    },
+    {
+        "name":  "Decals VOL.5 вЂ” Grunge",
+        "bucket":  "material",
+        "why":  "Р“СЂСЏР·СЊ Рё РіСЂР°РЅР¶-С‚РµРєСЃС‚СѓСЂС‹ РґР»СЏ СЂРµР°Р»РёСЃС‚РёС‡РЅС‹С… РїРѕРІСЂРµР¶РґРµРЅРЅС‹С… РїРѕРІРµСЂС…РЅРѕСЃС‚РµР№"
+    },
+    {
+        "name":  "Laboratory Environment",
+        "bucket":  "leveltool",
+        "why":  "РРЅС‚РµСЂСЊРµСЂ Р»Р°Р±РѕСЂР°С‚РѕСЂРёРё РјРѕР¶РµС‚ Р°РґР°РїС‚РёСЂРѕРІР°С‚СЊСЃСЏ РїРѕРґ Р±РѕР»СЊРЅРёС‡РЅРѕРµ РѕС‚РґРµР»РµРЅРёРµ"
+    },
+    {
+        "name":  "Abandoned Utility Room",
+        "bucket":  "leveltool",
+        "why":  "Р—Р°Р±СЂРѕС€РµРЅРЅРѕРµ СЃР»СѓР¶РµР±РЅРѕРµ РїРѕРјРµС‰РµРЅРёРµ вЂ” РёРґРµР°Р»СЊРЅС‹Р№ СЃРµС‚С‚РёРЅРі РґР»СЏ Р°РІР°СЂРёР№РЅРѕР№ Р±СЂРёРіР°РґС‹"
+    },
+    {
+        "name":  "Modern Buildings Pack",
+        "bucket":  "leveltool",
+        "why":  "РЎРѕРІСЂРµРјРµРЅРЅС‹Рµ Р·РґР°РЅРёСЏ Рё РєРѕРЅСЃС‚СЂСѓРєС†РёРё РґР»СЏ РѕСЃРЅРѕРІРЅС‹С… Р»РѕРєР°С†РёР№"
+    },
+    {
+        "name":  "UTOPIA HOUSE",
+        "bucket":  "leveltool",
+        "why":  "Р–РёР»РѕР№ РґРѕРј вЂ” РѕРґРёРЅ РёР· РѕСЃРЅРѕРІРЅС‹С… СЃРµС‚С‚РёРЅРіРѕРІ РёРіСЂС‹"
+    },
+    {
+        "name":  "Zombie AI System",
+        "bucket":  "monster",
+        "why":  "AI СЃРёСЃС‚РµРјР° РґР»СЏ РІСЂР°Р¶РґРµР±РЅС‹С… СЃСѓС‰РµСЃС‚РІ (Р·РѕРјР±Рё/РјРѕРЅСЃС‚СЂС‹ РЅР° РѕС‚Р»РѕР¶РµРЅРѕ)"
+    },
+    {
+        "name":  "Citizen NPC (5.0+)",
+        "bucket":  "character",
+        "why":  "Р“СЂР°Р¶РґР°РЅСЃРєРёРµ РїРµСЂСЃРѕРЅР°Р¶Рё РґР»СЏ Р¶РёР»С‹С… Р»РѕРєР°С†РёР№ (РґРѕРј/Р±РѕР»СЊРЅРёС†Р°/Р·Р°РІРѕРґ)"
+    },
+    {
+        "name":  "Pro Inventory System (5.1+)",
+        "bucket":  "plugin",
+        "why":  "РЎРёСЃС‚РµРјР° РёРЅРІРµРЅС‚Р°СЂСЏ РґР»СЏ РёРЅСЃС‚СЂСѓРјРµРЅС‚РѕРІ/СЃРЅР°СЂСЏР¶РµРЅРёСЏ Р°РІР°СЂРёР№РЅРѕР№ Р±СЂРёРіР°РґС‹"
+    },
+    {
+        "name":  "Suburbs VOL.24 вЂ” Apartment",
+        "bucket":  "prop",
+        "why":  "РРіСЂРѕРІС‹Рµ РїСЂРѕРїСЃС‹ РґР»СЏ РѕР±СѓСЃС‚СЂРѕР№СЃС‚РІР° Р¶РёР»РѕРіРѕ РёРЅС‚РµСЂСЊРµСЂР° РґРѕРјР°"
+    },
+    {
+        "name":  "Customizable Interaction Plugin 2.0.6 (5.6)",
+        "bucket":  "plugin",
+        "why":  "РЎРёСЃС‚РµРјР° РёРЅС‚РµСЂР°РєС†РёРё РґР»СЏ РІР·Р°РёРјРѕРґРµР№СЃС‚РІРёСЏ СЃ РѕР±СЉРµРєС‚Р°РјРё Рё РјРµС…Р°РЅРёРєР°РјРё"
+    },
+    {
+        "name":  "Suburbs VOL.22 вЂ” Shed \u0026 Garden",
+        "bucket":  "prop",
+        "why":  "РџСЂРѕРїСЃС‹ Р±С‹С‚РѕРІРѕР№ С‚РµС…РЅРёРєРё Рё РёРЅСЃС‚СЂСѓРјРµРЅС‚РѕРІ РґР»СЏ С‡Р°СЃС‚РЅРѕРіРѕ РґРѕРјР°"
+    },
+    {
+        "name":  "Suburbs VOL.23 вЂ” Garden Boxes",
+        "bucket":  "prop",
+        "why":  "Р‘С‹С‚РѕРІС‹Рµ РїСЂРѕРїСЃС‹ (СЏС‰РёРєРё, РєРѕРЅС‚РµР№РЅРµСЂС‹) РґР»СЏ РіСЂР°Р¶РґР°РЅСЃРєРёС… Р»РѕРєР°С†РёР№"
+    },
+    {
+        "name":  "Signage VOL.5 вЂ” Letters",
+        "bucket":  "prop",
+        "why":  "РњРѕРґСѓР»СЊРЅС‹Рµ РІС‹РІРµСЃРєРё Рё Р±СѓРєРІС‹ РґР»СЏ РіРѕСЃСѓС‡СЂРµР¶РґРµРЅРёР№ (Р±РѕР»СЊРЅРёС†Р°/Р·Р°РІРѕРґ/Р¶РёР»РѕР№ РґРѕРј)"
+    },
+    {
+        "name":  "Rubble and Debris вЂ” Modular Set",
+        "bucket":  "prop",
+        "why":  "Р Р°Р·СЂСѓС€РµРЅРЅС‹Рµ СЌР»РµРјРµРЅС‚С‹ Рё РѕР±Р»РѕРјРєРё РґР»СЏ С…РѕСЂСЂРѕСЂ-Р°С‚РјРѕСЃС„РµСЂС‹ РїРѕРІСЂРµР¶РґС‘РЅРЅС‹С… Р·РґР°РЅРёР№"
+    },
+    {
+        "name":  "Realistic Materials Vol.6 вЂ” Roads \u0026 Sidewalks (40+ Materials)",
+        "bucket":  "material",
+        "why":  "РР·РЅРѕСЃ/РіСЂСЏР·СЊ РґРѕСЂРѕРі Рё С‚СЂРѕС‚СѓР°СЂРѕРІ РІРѕРєСЂСѓРі РґРѕРјРѕРІ/Р±РѕР»СЊРЅРёС†/Р·Р°РІРѕРґРѕРІ"
+    },
+    {
+        "name":  "Realistic Materials VOL.4 вЂ” Suburban Interiors (70+ Materials)",
+        "bucket":  "material",
+        "why":  "Р РµР°Р»РёСЃС‚РёС‡РЅС‹Рµ РїРѕРІРµСЂС…РЅРѕСЃС‚Рё РєРёСЂРїРёС‡Р°/Р±РµС‚РѕРЅР°/РїР»РёС‚РєРё РґР»СЏ Р±С‹С‚РѕРІС‹С… РёРЅС‚РµСЂСЊРµСЂРѕРІ"
+    },
+    {
+        "name":  "Decals VOL.3 вЂ” Blood",
+        "bucket":  "vfx",
+        "why":  "РљСЂРѕРІР°РІС‹Рµ СЃР»РµРґС‹ Рё РґРµРєР°Р»Рё РґР»СЏ С…РѕСЂСЂРѕСЂ-Р°С‚РјРѕСЃС„РµСЂС‹"
+    },
+    {
+        "name":  "Decals VOL.1 вЂ” Town Signs",
+        "bucket":  "material",
+        "why":  "Р“РѕСЂРѕРґСЃРєРёРµ РІС‹РІРµСЃРєРё Рё РЅР°РґРїРёСЃРё РЅР° С„Р°СЃР°РґР°С… РіСЂР°Р¶РґР°РЅСЃРєРёС… Р·РґР°РЅРёР№"
+    },
+    {
+        "name":  "Decals VOL.2 вЂ” Roads and Streets",
+        "bucket":  "material",
+        "why":  "Р”РѕСЂРѕР¶РЅР°СЏ СЂР°Р·РјРµС‚РєР° Рё СЃР»РµРґС‹ РґР»СЏ РѕРєСЂСѓР¶Р°СЋС‰РёС… Р»РѕРєР°С†РёР№"
+    },
+    {
+        "name":  "Scans VOL.7 вЂ” Firewood",
+        "bucket":  "prop",
+        "why":  "РРіСЂРѕРІС‹Рµ РїСЂРѕРїСЃС‹ РґСЂРѕРІ/С‚РѕРїР»РёРІР° РґР»СЏ РІР·Р°РёРјРѕРґРµР№СЃС‚РІРёСЏ РІ Р±С‹С‚РѕРІС‹С… СЃС†РµРЅР°С…"
+    },
+    {
+        "name":  "Destruction Complete (5.2+)",
+        "bucket":  "plugin",
+        "why":  "Environmental destruction and damage mechanics system"
+    },
+    {
+        "name":  "Interactive Map System (5.2+)",
+        "bucket":  "plugin",
+        "why":  "In-game HUD map and UI system"
+    },
+    {
+        "name":  "Advanced Asymmetrical Multiplayer Template (5.5)",
+        "bucket":  "plugin",
+        "why":  "Cooperative multiplayer framework and coop gameplay mechanics"
+    },
+    {
+        "name":  "Cine Cam (5.6-5.7)",
+        "bucket":  "plugin",
+        "why":  "Cinematic camera system for horror atmosphere control"
+    },
+    {
+        "name":  "Infinite Characters Collection",
+        "bucket":  "character",
+        "why":  "Modular civilian NPC variations for emergency crew members"
+    },
+    {
+        "name":  "Slime \u0026 Puke FX",
+        "bucket":  "vfx",
+        "why":  "Organic/disgusting visual effects for horror atmosphere"
+    },
+    {
+        "name":  "Nature Water FX (all ver.)",
+        "bucket":  "vfx",
+        "why":  "Water particle effects for industrial and environmental scenarios"
+    },
+    {
+        "name":  "Mechanical Damage FX (all ver.)",
+        "bucket":  "vfx",
+        "why":  "Impact and destruction visual effects for horror scenarios"
+    },
+    {
+        "name":  "Combat Hits",
+        "bucket":  "audio",
+        "why":  "Foley impact and collision sounds for environmental interactions"
+    },
+    {
+        "name":  "Tire Repair Shop (5.0+)",
+        "bucket":  "prop",
+        "why":  "Industrial workshop environment with game-ready assets and tools"
+    },
+    {
+        "name":  "King Wash Laundromat",
+        "bucket":  "prop",
+        "why":  "Commercial laundromat interior with everyday props and fixtures"
+    },
+    {
+        "name":  "Metro 15 вЂ” Environment Pack",
+        "bucket":  "prop",
+        "why":  "РџРѕРґР·РµРјРµР»СЊРµ/РїРѕРґР·РµРјРЅС‹Рµ С‚СѓРЅРЅРµР»Рё РґР»СЏ Р·Р°РІРѕРґР° РёР»Рё С‚РµС…РЅРёС‡РµСЃРєРёС… РїРѕРјРµС‰РµРЅРёР№"
+    },
+    {
+        "name":  "Electrical Substation / 34 Assets",
+        "bucket":  "prop",
+        "why":  "34 РёРЅРґР°СЃС‚СЂРёР°Р»СЊРЅС‹С… Р°СЃСЃРµС‚Р° СЌР»РµРєС‚СЂРѕРѕР±РѕСЂСѓРґРѕРІР°РЅРёСЏ РґР»СЏ Р·Р°РІРѕРґР°/Р±РѕР»СЊРЅРёС†С‹/РєРѕРјРјСѓРЅР°Р»СЊРЅС‹С… СЃРµС‚РµР№"
+    },
+    {
+        "name":  "Rising and Drifting Steam VDB Loop Pack",
+        "bucket":  "vfx",
+        "why":  "VDB СЌС„С„РµРєС‚С‹ РїР°СЂР°/РґС‹РјР° РґР»СЏ Р°С‚РјРѕСЃС„РµСЂС‹ СѓС‚РµС‡РµРє, СЂР°Р·СЂС‹РІРѕРІ С‚СЂСѓР±, С…РѕСЂСЂРѕСЂ-ambience"
+    },
+    {
+        "name":  "Easy Atmos",
+        "bucket":  "plugin",
+        "why":  "Niagara СЃРёСЃС‚РµРјР° Р°С‚РјРѕСЃС„РµСЂРЅС‹С… СЌС„С„РµРєС‚РѕРІ (РґС‹Рј, С‚СѓРјР°РЅ, РіР°Р·) РґР»СЏ СЃРѕР·РґР°РЅРёСЏ С…РѕСЂСЂРѕСЂ-Р°С‚РјРѕСЃС„РµСЂС‹"
+    },
+    {
+        "name":  "Modular Interface Pack",
+        "bucket":  "ui",
+        "why":  "РњРѕРґСѓР»СЊРЅС‹Рµ UI РєРѕРјРїРѕРЅРµРЅС‚С‹ РґР»СЏ HUD/РјРµРЅСЋ РІ РєРѕРѕРї-РёРіСЂРµ"
+    },
+    {
+        "name":  "Backpack Collection",
+        "bucket":  "prop",
+        "why":  "Р СЋРєР·Р°РєРё Рё СЃСѓРјРєРё РґР»СЏ СЃРїР°СЃР°С‚РµР»РµР№/С‚РµС…РЅРёРєРѕРІ/РєРѕРјРјСѓРЅР°Р»СЊС‰РёРєРѕРІ"
+    },
+    {
+        "name":  "Nine Slice Magic",
+        "bucket":  "ui",
+        "why":  "UI СЃРёСЃС‚РµРјР° РґР»СЏ РјРµРЅСЋ, РґРёР°Р»РѕРіРѕРІ Рё РёРЅС‚РµСЂС„РµР№СЃРѕРІ (РІСЃРµ РІРµСЂСЃРёРё UE)"
+    },
+    {
+        "name":  "Enhanced Locomotion System (Replication)",
+        "bucket":  "plugin",
+        "why":  "РЎРёСЃС‚РµРјР° РґРІРёР¶РµРЅРёСЏ РїРµСЂСЃРѕРЅР°Р¶Р° СЃ СЃРµС‚РµРІРѕР№ СЂРµРїР»РёРєР°С†РёРµР№, РєСЂРёС‚РёС‡РЅР° РґР»СЏ РєРѕРѕРї-СЂРµР¶РёРјР°"
+    },
+    {
+        "name":  "Painting, Picture and Poster Frames",
+        "bucket":  "prop",
+        "why":  "Р”РµРєРѕСЂР°С‚РёРІРЅС‹Рµ РєР°СЂС‚РёРЅС‹ Рё СЂР°РјРєРё РґР»СЏ Р±С‹С‚РѕРІРѕРіРѕ РёРЅС‚РµСЂСЊРµСЂР° РґРѕРјР°/РѕС„РёСЃР°/Р±РѕР»СЊРЅРёС†С‹"
+    },
+    {
+        "name":  "Container District Environment w/ Container Tool",
+        "bucket":  "leveltool",
+        "why":  "РРЅСЃС‚СЂСѓРјРµРЅС‚ РґР»СЏ Р±С‹СЃС‚СЂРѕРіРѕ СЂР°Р·РјРµС‰РµРЅРёСЏ Рё СЃС‚СЂРѕР№РєРё РёРЅРґР°СЃС‚СЂРёР°Р»СЊРЅРѕР№ Р»РѕРєР°С†РёРё СЃ РєРѕРЅС‚РµР№РЅРµСЂР°РјРё"
+    },
+    {
+        "name":  "STEAMPUNK-PARTS-MACHINES-GEAR-INDUSTRY",
+        "bucket":  "prop",
+        "why":  "Industrial machinery parts and gears for factory/workshop environments"
+    },
+    {
+        "name":  "Junkyard Environment / 14 Assets",
+        "bucket":  "prop",
+        "why":  "Modular industrial debris and wreckage props for deteriorated factory exploration"
+    },
+    {
+        "name":  "Trash and Debris Vol. 3",
+        "bucket":  "prop",
+        "why":  "Clutter and refuse meshes for run-down interior environments"
+    },
+    {
+        "name":  "Modular Ruins A",
+        "bucket":  "prop",
+        "why":  "Modular ruined structure components for building deteriorated indoor spaces"
+    },
+    {
+        "name":  "BCD Closeup Camera",
+        "bucket":  "plugin",
+        "why":  "Camera system enabling close-up object interaction and UI overlay for emergency tool inspection"
+    },
+    {
+        "name":  "Dialogue \u0026 Quest Master",
+        "bucket":  "plugin",
+        "why":  "Dialog and quest management system for NPC interactions and mission/objective progression"
+    },
+    {
+        "name":  "Realistic Working Clock Pack",
+        "bucket":  "prop",
+        "why":  "Functional decorative timepiece assets for interior environment authenticity"
+    },
+    {
+        "name":  "Stone Sculptures VOL.1 вЂ” Modular Urns \u0026 Stand",
+        "bucket":  "prop",
+        "why":  "Decorative modular stone elements for building atmosphere in institutional settings"
+    },
+    {
+        "name":  "Idle Anim Set (5.1+)",
+        "bucket":  "character",
+        "why":  "Standing animations for civilians in emergency scenarios"
+    },
+    {
+        "name":  "Talk Animation (5.1+)",
+        "bucket":  "character",
+        "why":  "Dialogue animations for NPCs and ordinary people"
+    },
+    {
+        "name":  "Rest Sitting Animation (5.1+)",
+        "bucket":  "character",
+        "why":  "Sitting poses for civilians in residential/facility environments"
+    },
+    {
+        "name":  "Work Animations (5.3+)",
+        "bucket":  "character",
+        "why":  "Labor/service worker animations fitting emergency crew theme"
+    },
+    {
+        "name":  "Body Motion Pack (5.5+)",
+        "bucket":  "character",
+        "why":  "General body movement animations for realistic human motion"
+    },
+    {
+        "name":  "Cleaning Animations (5.5+)",
+        "bucket":  "character",
+        "why":  "Maintenance/janitorial animations for ordinary workers in facilities"
+    },
+    {
+        "name":  "Healing Animations (5.3+)",
+        "bucket":  "character",
+        "why":  "Medical aid animations for paramedic crew members"
+    },
+    {
+        "name":  "Realistic Lab",
+        "bucket":  "prop",
+        "why":  "Laboratory equipment props for hospital setting"
+    },
+    {
+        "name":  "Factory",
+        "bucket":  "prop",
+        "why":  "Industrial factory level asset matching game setting"
+    },
+    {
+        "name":  "Haunted House (5.3+)",
+        "bucket":  "prop",
+        "why":  "Horror-themed house environment for horror-comedy atmosphere"
+    },
+    {
+        "name":  "City Brick Wall вЂ” 4K Material Pack",
+        "bucket":  "material",
+        "why":  "Industrial brick textures for factory/building surfaces"
+    },
+    {
+        "name":  "Mud Material Pack 4",
+        "bucket":  "material",
+        "why":  "Dirt/grime textures for industrial and deteriorated environments"
+    },
+    {
+        "name":  "Indoor material pack vol 1",
+        "bucket":  "material",
+        "why":  "Interior surface materials for residential/facility spaces"
+    },
+    {
+        "name":  "BackPacks вЂ” System + Models (5.1+)",
+        "bucket":  "prop",
+        "why":  "Backpack equipment props for emergency crew gear"
+    },
+    {
+        "name":  "ia scatter 3.58 (4.27-5.6)",
+        "bucket":  "leveltool",
+        "why":  "Tool for procedural prop placement and level layout"
+    },
+    {
+        "name":  "Bad Guy Game Character",
+        "bucket":  "character",
+        "why":  "Character model for human NPCs and civilians"
+    },
+    {
+        "name":  "Agents Characters Pack",
+        "bucket":  "character",
+        "why":  "Multiple modular character models for emergency crew and civilians"
+    },
+    {
+        "name":  "Enhanced Movement System (5.5)",
+        "bucket":  "plugin",
+        "why":  "Character movement mechanics for realistic human locomotion"
+    },
+    {
+        "name":  "NPC AI Queuing System 2.1 (5.5-5.6)",
+        "bucket":  "plugin",
+        "why":  "AI behavior system for crowd/facility civilian interactions"
+    },
+    {
+        "name":  "Eleven Labs (5.5+)",
+        "bucket":  "plugin",
+        "why":  "Text-to-speech integration for character dialogue and interaction"
+    },
+    {
+        "name":  "Loop Horror Animations (5.0+)",
+        "bucket":  "plugin",
+        "why":  "Animation system specifically designed for horror-genre creature and NPC behaviors"
+    },
+    {
+        "name":  "Abandoned Horror Village (5.1+)",
+        "bucket":  "leveltool",
+        "why":  "Pre-built horror environment assets providing ready-to-use building blocks for constructing scary settings"
+    },
+    {
+        "name":  "Ruins Constructor",
+        "bucket":  "leveltool",
+        "why":  "Modular system for rapidly constructing ruined and damaged building environments"
+    },
+    {
+        "name":  "Cinemotion 3 Real Handheld Camera Motion Kit (5.4+)",
+        "bucket":  "plugin",
+        "why":  "Professional camera control and motion animation system for cinematic views"
+    },
+    {
+        "name":  "The Beast Main Menu V2 (5.4+)",
+        "bucket":  "ui",
+        "why":  "Complete menu and game UI system ready for integration"
+    },
+    {
+        "name":  "AI Behavior System 1.0.7 (5.5)",
+        "bucket":  "plugin",
+        "why":  "AI perception and behavior framework for creature and NPC intelligence"
+    },
+    {
+        "name":  "Monster AI Kit (5.5)",
+        "bucket":  "plugin",
+        "why":  "Specialized AI system for monster and creature behavior programming"
+    },
+    {
+        "name":  "Interaction Toolkit +",
+        "bucket":  "plugin",
+        "why":  "System for interactive world objects (doors, switches, items) essential for exploration-based gameplay"
+    },
+    {
+        "name":  "Goofy NPC (5.3+)",
+        "bucket":  "character",
+        "why":  "Realistic civilian NPC character model with comedic personality fitting horror-comedy tone"
+    },
+    {
+        "name":  "Smoke Burst FX VDB (5.3+)",
+        "bucket":  "vfx",
+        "why":  "Smoke and particle effects for horror atmosphere (industrial accidents, environmental hazards)"
+    },
+    {
+        "name":  "Advanced Third Person Camera (4.24-5.4)",
+        "bucket":  "plugin",
+        "why":  "Camera control system essential for player perspective and gameplay"
+    },
+    {
+        "name":  "Building Generator (5.0+)",
+        "bucket":  "plugin",
+        "why":  "Procedural generation system for creating interior/exterior level structures and layouts"
+    },
+    {
+        "name":  "Ascent Toolset (ATS) V 2.2",
+        "bucket":  "plugin",
+        "why":  "Quest, dialogue, and state machine system for NPC interactions and narrative"
+    },
+    {
+        "name":  "Simple Crosshairs Pack",
+        "bucket":  "ui",
+        "why":  "UI crosshairs element for HUD and interaction targeting"
+    },
+    {
+        "name":  "Advanced Night Vision",
+        "bucket":  "plugin",
+        "why":  "Night vision postfx material effect for dark horror environments"
+    },
+    {
+        "name":  "Customizable Neon Sign Pack",
+        "bucket":  "prop",
+        "why":  "Game-ready 3D neon sign models for industrial/factory aesthetic"
+    },
+    {
+        "name":  "HQ Furniture Pack",
+        "bucket":  "prop",
+        "why":  "Game-ready furniture 3D models for house and interior environments"
+    },
+    {
+        "name":  "38 Bartender NPC Mocap Animations",
+        "bucket":  "character",
+        "why":  "Mocap animations reusable for civilian NPCs, workers, and maintenance crew"
+    },
+    {
+        "name":  "Streaming Portal Levels (5.2)",
+        "bucket":  "plugin",
+        "why":  "Level streaming plugin system for performance optimization and level management"
+    },
+    {
+        "name":  "Interactive and Customizable 3D UI Pack",
+        "bucket":  "ui",
+        "why":  "Menu and HUD system for coop game interface"
+    },
+    {
+        "name":  "Kronos Matchmaking v2.6.0",
+        "bucket":  "plugin",
+        "why":  "Multiplayer session management and matchmaking for coop"
+    },
+    {
+        "name":  "Modular Town",
+        "bucket":  "leveltool",
+        "why":  "Modular environment blocks (village/town/farm) for constructing diverse emergency scenarios"
+    },
+    {
+        "name":  "Realistic Materials VOL.3 вЂ” Suburban Exteriors",
+        "bucket":  "material",
+        "why":  "Realistic surfaces (50 materials) for suburban and industrial environment texturing"
+    },
+    {
+        "name":  "Mutant Creature 03 вЂ” Game Assets + Extra",
+        "bucket":  "monster",
+        "why":  "Creature asset for horror atmosphere in emergency scenarios"
+    },
+    {
+        "name":  "Universal MP Indicator (5.0-5.3)",
+        "bucket":  "plugin",
+        "why":  "UI РёРЅСЃС‚СЂСѓРјРµРЅС‚ РґР»СЏ СѓРїСЂР°РІР»РµРЅРёСЏ РјСѓР»СЊС‚РёРїР»РµРµСЂРѕРј Рё СЃРµС‚РµРІС‹РјРё СЃРµСЃСЃРёСЏРјРё"
+    },
+    {
+        "name":  "Hierarchical Scatter Tool (5.0+)",
+        "bucket":  "leveltool",
+        "why":  "РРЅСЃС‚СЂСѓРјРµРЅС‚ СЂР°СЃСЃС‚Р°РЅРѕРІРєРё РѕР±СЉРµРєС‚РѕРІ РґР»СЏ Р±Р»РѕРєР°СѓС‚Р° Рё СЂСѓС‡РЅРѕР№ СЃС‚СЂРѕР№РєРё СѓСЂРѕРІРЅРµР№"
+    },
+    {
+        "name":  "Runtime DataTable (5.1-5.5)",
+        "bucket":  "plugin",
+        "why":  "РЎРёСЃС‚РµРјР° РґРёРЅР°РјРёС‡РµСЃРєРѕРіРѕ СѓРїСЂР°РІР»РµРЅРёСЏ РґР°РЅРЅС‹РјРё РґР»СЏ СЃРµР№РІР°/Р·Р°РіСЂСѓР·РєРё СЃРѕСЃС‚РѕСЏРЅРёСЏ РёРіСЂС‹"
+    },
+    {
+        "name":  "EDITABLE SURVIVAL HORROR UI ELEMENTS BUNDLE (PNG + PSD)",
+        "bucket":  "ui",
+        "why":  "РљР°СЃС‚РѕРјРёР·РёСЂСѓРµРјС‹Рµ UI СЌР»РµРјРµРЅС‚С‹ Рё РЅРѕС‚РёС„РёРєР°С†РёРё РґР»СЏ С…РѕСЂСЂРѕСЂ-РёРЅС‚РµСЂС„РµР№СЃР°"
+    },
+    {
+        "name":  "Whooshes \u0026 Impacts 2",
+        "bucket":  "audio",
+        "why":  "Р¤РѕР»Рё-Р·РІСѓРєРё РІР·Р°РёРјРѕРґРµР№СЃС‚РІРёСЏ РѕР±СЉРµРєС‚РѕРІ (whooshes, impacts) РґР»СЏ РёРіСЂРѕРІС‹С… СЃРѕР±С‹С‚РёР№"
+    },
+    {
+        "name":  "Crash \u0026 Smash",
+        "bucket":  "audio",
+        "why":  "Р¤РѕР»Рё-Р·РІСѓРєРё СЂР°Р·СЂСѓС€РµРЅРёСЏ, РїР°РґРµРЅРёСЏ, РґРµС„РѕСЂРјР°С†РёР№ РєРѕРЅСЃС‚СЂСѓРєС†РёР№"
+    },
+    {
+        "name":  "Crash \u0026 Smash вЂ” Designed",
+        "bucket":  "audio",
+        "why":  "РЎРїРµС†РёР°Р»СЊРЅРѕ СЂР°Р·СЂР°Р±РѕС‚Р°РЅРЅС‹Рµ С„РѕР»Рё Р·РІСѓРєРё СЂР°Р·СЂСѓС€РµРЅРёСЏ Рё РїРѕРІСЂРµР¶РґРµРЅРёР№"
+    },
+    {
+        "name":  "Inventory System Pro by Moonville (5.5)",
+        "bucket":  "plugin",
+        "why":  "РЎРёСЃС‚РµРјР° СѓРїСЂР°РІР»РµРЅРёСЏ РёРЅРІРµРЅС‚Р°СЂРµРј Рё UI РґР»СЏ РєРѕРѕРїРµСЂР°С‚РёРІРЅРѕР№ РёРіСЂС‹"
+    },
+    {
+        "name":  "Landscaping v7.24 (5.5-5.6)",
+        "bucket":  "leveltool",
+        "why":  "РџР»Р°РіРёРЅ СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРёСЏ Р»Р°РЅРґС€Р°С„С‚Р° Рё С‚РµСЂСЂРµР№РЅР° РґР»СЏ СЃРѕР·РґР°РЅРёСЏ СѓСЂРѕРІРЅРµР№"
+    },
+    {
+        "name":  "Ultimate Menu System",
+        "bucket":  "ui",
+        "why":  "РЎРёСЃС‚РµРјР° РјРµРЅСЋ Рё HUD-РёРЅС‚РµСЂС„РµР№СЃР° РґР»СЏ РёРіСЂС‹"
+    },
+    {
+        "name":  "Root Cellar",
+        "bucket":  "prop",
+        "why":  "Р“РѕС‚РѕРІС‹Р№ РёРЅС‚РµСЂСЊРµСЂ РїРѕРґРІР°Р»Р° РґРѕРјР°, РѕСЃРЅРѕРІРЅРѕР№ СЃРµС‚С‚РёРЅРі РґР»СЏ С…РѕСЂСЂРѕСЂ-Р°С‚РјРѕСЃС„РµСЂС‹"
+    },
+    {
+        "name":  "Public Hallway Pack",
+        "bucket":  "prop",
+        "why":  "РњРѕРґСѓР»СЊРЅС‹Рµ РєРѕСЂРёРґРѕСЂС‹ Р±РѕР»СЊРЅРёС†С‹/СѓС‡СЂРµР¶РґРµРЅРёСЏ, РѕСЃРЅРѕРІРЅР°СЏ Р»РѕРєР°С†РёСЏ РґР»СЏ Р°РІР°СЂРёР№РЅРѕР№ Р±СЂРёРіР°РґС‹"
+    },
+    {
+        "name":  "The Big Mansion",
+        "bucket":  "prop",
+        "why":  "Р“РѕС‚РѕРІС‹Р№ РёРЅС‚РµСЂСЊРµСЂ Р¶РёР»РѕРіРѕ РґРѕРјР°, РѕРґРёРЅ РёР· РіР»Р°РІРЅС‹С… СЃРµС‚С‚РёРЅРіРѕРІ РёРіСЂС‹"
+    },
+    {
+        "name":  "MAE Cobweb Collection 01",
+        "bucket":  "prop",
+        "why":  "РџР°СѓС‚РёРЅР° Рё С…РѕСЂСЂРѕСЂ-РґРµРєРѕСЂ РґР»СЏ Р·Р°Р±СЂРѕС€РµРЅРЅС‹С… РїРѕРјРµС‰РµРЅРёР№"
+    },
+    {
+        "name":  "Procedural Moss \u0026 Snow",
+        "bucket":  "material",
+        "why":  "РџРѕРІРµСЂС…РЅРѕСЃС‚Рё СЃ РјС…РѕРј Рё РіСЂСЏР·СЊСЋ РґР»СЏ РіСЂСЏР·РЅС‹С…/Р·Р°Р±СЂРѕС€РµРЅРЅС‹С… Р»РѕРєР°С†РёР№"
+    },
+    {
+        "name":  "[SCANS] Urban Props Vol. 2",
+        "bucket":  "prop",
+        "why":  "Game-ready urban/industrial props for emergency crew settings (tools, equipment, fixtures)"
+    },
+    {
+        "name":  "Breakable Glass",
+        "bucket":  "plugin",
+        "why":  "Destructible glass mechanics for environmental destruction and emergency scenarios"
+    },
+    {
+        "name":  "Destruction System (5.4+)",
+        "bucket":  "plugin",
+        "why":  "Destruction/damage system core for emergency crew interactions with environment"
+    },
+    {
+        "name":  "Blood: Customizable 4K",
+        "bucket":  "material",
+        "why":  "High-detail blood decals and textures for horror atmosphere and violence"
+    },
+    {
+        "name":  "Blood: Splashes",
+        "bucket":  "material",
+        "why":  "Blood splash effects/textures for horror ambiance"
+    },
+    {
+        "name":  "Cellar Materials",
+        "bucket":  "material",
+        "why":  "Surface materials (concrete, dirt, rust) for basement/industrial horror settings"
+    },
+    {
+        "name":  "HQ Decorative / Bathroom Vol.1",
+        "bucket":  "prop",
+        "why":  "Game-ready indoor bathroom and decorative props for residential environments"
+    },
+    {
+        "name":  "Path Tracing Glass Shader (5.1+)",
+        "bucket":  "material",
+        "why":  "Realistic glass/window surface shader for indoor interiors"
+    },
+    {
+        "name":  "X-DECAL Tri-planar Projection (5.3+)",
+        "bucket":  "plugin",
+        "why":  "Decal projection system for damage/wear effects on surfaces"
+    },
+    {
+        "name":  "Factory Interior + Warehouse Props Vol 1 вЂ” BUNDLE",
+        "bucket":  "prop",
+        "why":  "Game-ready industrial props for factory setting (one of three main level themes)"
+    },
+    {
+        "name":  "Uscans Doors 01",
+        "bucket":  "prop",
+        "why":  "Door props essential for house/factory/hospital environments"
+    },
+    {
+        "name":  "Modular House",
+        "bucket":  "prop",
+        "why":  "Residential modular building assets for house setting scenes"
+    },
+    {
+        "name":  "Modular Neighborhood Pack",
+        "bucket":  "prop",
+        "why":  "Suburban residential environment pieces for house/neighborhood scenarios"
+    },
+    {
+        "name":  "99 PBR Materials Vol.02",
+        "bucket":  "material",
+        "why":  "PBR surface materials for industrial/concrete/realistic surfaces"
+    },
+    {
+        "name":  "EXTILE PLUS Non-repetitive tiling master materials",
+        "bucket":  "material",
+        "why":  "Industrial tiling materials for concrete/tile surfaces in factory/hospital"
+    },
+    {
+        "name":  "Wood Material Pack 3",
+        "bucket":  "material",
+        "why":  "Wooden surface materials for residential doors/furniture"
+    },
+    {
+        "name":  "Junkyard Environment Kit",
+        "bucket":  "prop",
+        "why":  "Industrial decay/deteriorated environment assets supporting horror atmosphere"
+    },
+    {
+        "name":  "Dialog Animations",
+        "bucket":  "character",
+        "why":  "NPC dialogue animations for civilian/worker conversations"
+    },
+    {
+        "name":  "Construction NPC Animations",
+        "bucket":  "character",
+        "why":  "Civilian worker animation set for maintenance crews and ordinary people"
+    },
+    {
+        "name":  "Camera with Shift Lens",
+        "bucket":  "plugin",
+        "why":  "Camera control plugin for cinematic perspective manipulation and framing"
+    },
+    {
+        "name":  "Houses and sheds constructor",
+        "bucket":  "prop",
+        "why":  "Modular house and shed components for residential setting construction"
+    },
+    {
+        "name":  "Deserted Industrial Ruins вЂ” Abandoned Oasis",
+        "bucket":  "prop",
+        "why":  "Industrial ruin assets with decay materials for factory and industrial environments"
+    },
+    {
+        "name":  "Highpoly rubble вЂ” Photogrammetry based props and materials",
+        "bucket":  "prop",
+        "why":  "Destruction and rubble assets with decay materials for environmental destruction scenes"
+    },
+    {
+        "name":  "4K Fabric Material Bundle",
+        "bucket":  "material",
+        "why":  "High-resolution fabric surface materials for furniture and prop variation"
+    },
+    {
+        "name":  "Village Houses Pack",
+        "bucket":  "prop",
+        "why":  "Modular residential house structures for interior and exterior building construction"
+    },
+    {
+        "name":  "Modular Interiors and Explorer Props",
+        "bucket":  "prop",
+        "why":  "Interior furnishings and props for room and hallway building in enclosed environments"
+    },
+    {
+        "name":  "Floors and Walls Vol.1 Photoscanned textures",
+        "bucket":  "material",
+        "why":  "Realistic industrial/building surface textures for factory/hospital interiors"
+    },
+    {
+        "name":  "Animated Blood Spray Decals",
+        "bucket":  "material",
+        "why":  "Horror visual effect material for environmental gore/decay"
+    },
+    {
+        "name":  "Horror Collection: Blood",
+        "bucket":  "material",
+        "why":  "1000+ horror surface definitions including blood, decay, organic degradation"
+    },
+    {
+        "name":  "Advanced Jigsaw Inventory system",
+        "bucket":  "plugin",
+        "why":  "Game inventory system for managing emergency equipment and gear loadouts"
+    },
+    {
+        "name":  "Interior Game Table Lamp Light",
+        "bucket":  "prop",
+        "why":  "Game-ready indoor furniture/lighting prop for building interiors"
+    },
+    {
+        "name":  "Modular Tunnel Collection вЂ” Vol. 1",
+        "bucket":  "leveltool",
+        "why":  "РњРѕРґСѓР»СЊРЅС‹Рµ РєРѕРјРїРѕРЅРµРЅС‚С‹ РґР»СЏ СЂСѓС‡РЅРѕР№ СЃС‚СЂРѕР№РєРё РїРѕРґР·РµРјРЅС‹С…/РёРЅРґСѓСЃС‚СЂРёР°Р»СЊРЅС‹С… Р»РѕРєР°С†РёР№"
+    },
+    {
+        "name":  "VDB Waterfall \u0026 River Pack",
+        "bucket":  "vfx",
+        "why":  "Р’РѕРґСЏРЅС‹Рµ СЌС„С„РµРєС‚С‹ РґР»СЏ СЃС†РµРЅР°СЂРёРµРІ Р§Рџ (РїСЂРѕС‚РµС‡РєРё, Р·Р°С‚РѕРїР»РµРЅРёРµ, РѕРїР°СЃРЅРѕСЃС‚СЊ РІРѕРґС‹)"
+    },
+    {
+        "name":  "Laboratory Interior Studio in Loft Style",
+        "bucket":  "prop",
+        "why":  "Game-ready РјРµС€Рё РёРЅРґСѓСЃС‚СЂРёР°Р»СЊРЅРѕРіРѕ РёРЅС‚РµСЂСЊРµСЂР° РґР»СЏ Р»РѕРєР°С†РёР№ Р·Р°РІРѕРґР°/Р»Р°Р±РѕСЂР°С‚РѕСЂРёРё"
+    },
+    {
+        "name":  "AI Behavior System",
+        "bucket":  "plugin",
+        "why":  "Framework РїРѕРІРµРґРµРЅРёСЏ AI РґР»СЏ NPC Рё СЃСѓС‰РµСЃС‚РІ СЂРµР°РіРёСЂСѓСЋС‰РёС… РЅР° РєРѕРјР°РЅРґС‹"
+    },
+    {
+        "name":  "Monster Wendigo",
+        "bucket":  "monster",
+        "why":  "РҐРѕСЂСЂРѕСЂ-СЃСѓС‰РµСЃС‚РІРѕ РґР»СЏ Р°С‚РјРѕСЃС„РµСЂС‹ РёРіСЂС‹"
+    },
+    {
+        "name":  "Explosion FX Customizable",
+        "bucket":  "vfx",
+        "why":  "Р­С„С„РµРєС‚С‹ РІР·СЂС‹РІРѕРІ РґР»СЏ СЃС†РµРЅР°СЂРёРµРІ С‡СЂРµР·РІС‹С‡Р°Р№РЅС‹С… СЃРёС‚СѓР°С†РёР№"
+    },
+    {
+        "name":  "All-in-one Creator Bundle",
+        "bucket":  "audio",
+        "why":  "SFX Рё sounds РґР»СЏ С…РѕСЂСЂРѕСЂ-СЌРјР±РёРµРЅС‚Р°, С„РѕР»РµР№ Рё UI-Р·РІСѓРєРѕРІ"
+    },
+    {
+        "name":  "Multiplayer Blueprint Lobby Solution",
+        "bucket":  "plugin",
+        "why":  "РЎРёСЃС‚РµРјР° РјСѓР»СЊС‚РёРїР»РµР№РµСЂР° Рё СЃРµСЃСЃРёР№ РґР»СЏ РєРѕРѕРї-РёРіСЂС‹"
+    },
+    {
+        "name":  "Steam powered Generators",
+        "bucket":  "prop",
+        "why":  "РРЅРґР°СЃС‚СЂРёР°Р»СЊРЅРѕРµ РѕР±РѕСЂСѓРґРѕРІР°РЅРёРµ РґР»СЏ Р·Р°РІРѕРґР°/С‚РµС…РїРѕРґРїРѕР»СЊСЏ"
+    },
+    {
+        "name":  "More Doors",
+        "bucket":  "prop",
+        "why":  "РРЅС‚РµСЂР°РєС‚РёРІРЅС‹Рµ РґРІРµСЂРЅС‹Рµ СЃРёСЃС‚РµРјС‹ РґР»СЏ РЅР°РІРёРіР°С†РёРё Рё РіРѕР»РѕРІРѕР»РѕРјРѕРє"
+    },
+    {
+        "name":  "Ultimate Door Collection",
+        "bucket":  "prop",
+        "why":  "Р Р°СЃС€РёСЂРµРЅРЅС‹Р№ РЅР°Р±РѕСЂ РґРІРµСЂРЅС‹С… РјРѕРґРµР»РµР№ РґР»СЏ СЂР°Р·РЅС‹С… РїРѕРјРµС‰РµРЅРёР№"
+    },
+    {
+        "name":  "VDB Smoke Pack",
+        "bucket":  "vfx",
+        "why":  "Р”С‹РјРѕРІС‹Рµ СЌС„С„РµРєС‚С‹ РґР»СЏ Р°С‚РјРѕСЃС„РµСЂС‹ Рё С…РѕСЂСЂРѕСЂ-СЃРёС‚СѓР°С†РёР№"
+    },
+    {
+        "name":  "Procedural City Creator Tools",
+        "bucket":  "plugin",
+        "why":  "РџСЂРѕС†РµРґСѓСЂРЅР°СЏ РіРµРЅРµСЂР°С†РёСЏ СѓСЂРѕРІРЅРµР№ РґР»СЏ СЂР°Р·РЅРѕРѕР±СЂР°Р·РёСЏ СЃС†РµРЅР°СЂРёРµРІ"
+    },
+    {
+        "name":  "Animal Skull Pack",
+        "bucket":  "prop",
+        "why":  "horror decoration skulls for haunted atmosphere"
+    },
+    {
+        "name":  "Retro 80\u0027s VOL.4 вЂ” Electronics",
+        "bucket":  "prop",
+        "why":  "household appliances and electronics for residential interiors"
+    },
+    {
+        "name":  "Grocery VOL.2 вЂ” Household Items",
+        "bucket":  "prop",
+        "why":  "kitchen and household items for house settings"
+    },
+    {
+        "name":  "Garbage and Debris Vol.1",
+        "bucket":  "prop",
+        "why":  "industrial debris and garbage for neglected horror atmosphere"
+    },
+    {
+        "name":  "Assortment of Riot Gear",
+        "bucket":  "prop",
+        "why":  "Р·Р°С‰РёС‚РЅРѕРµ СЃРїРµС†СЃРЅР°СЂСЏР¶РµРЅРёРµ РґР»СЏ Р°РІР°СЂРёР№РЅРѕР№ Р±СЂРёРіР°РґС‹"
+    },
+    {
+        "name":  "Trash Pack Vol 3",
+        "bucket":  "prop",
+        "why":  "Р±С‹С‚РѕРІС‹Рµ РѕС‚С…РѕРґС‹ Рё РјСѓСЃРѕСЂ РґР»СЏ СЂРµР°Р»РёСЃС‚РёС‡РЅРѕРіРѕ РѕРєСЂСѓР¶РµРЅРёСЏ"
+    },
+    {
+        "name":  "Trash Pack Vol 2",
+        "bucket":  "prop",
+        "why":  "Р±С‹С‚РѕРІС‹Рµ РѕС‚С…РѕРґС‹ Рё РјСѓСЃРѕСЂ РґР»СЏ СЂРµР°Р»РёСЃС‚РёС‡РЅРѕРіРѕ РѕРєСЂСѓР¶РµРЅРёСЏ"
+    },
+    {
+        "name":  "Cemetery Vol. 1",
+        "bucket":  "prop",
+        "why":  "С…РѕСЂСЂРѕСЂ-РґРµРєРѕСЂ СЌР»РµРјРµРЅС‚С‹ (РєРѕСЃС‚Рё, РѕСЃС‚Р°РЅРєРё) РґР»СЏ РјСЂР°С‡РЅРѕР№ Р°С‚РјРѕСЃС„РµСЂС‹"
+    },
+    {
+        "name":  "Roadside VOL.3 вЂ” Rural Props",
+        "bucket":  "prop",
+        "why":  "РЎРµР»СЊСЃРєРёРµ РїСЂРѕРїСЃС‹ РґР»СЏ Р±С‹С‚РѕРІС‹С… РёРЅС‚РµСЂСЊРµСЂРѕРІ РґРѕРјРѕРІ Рё РґР°С‡ РІ СЃРµС‚С‚РёРЅРіРµ Р°РІР°СЂРёР№РЅРѕР№ Р±СЂРёРіР°РґС‹"
+    },
+    {
+        "name":  "Buildings VOL.9 вЂ” Modular Pipes \u0026 Gutters",
+        "bucket":  "prop",
+        "why":  "РњРѕРґСѓР»СЊРЅС‹Рµ РєРѕРјРјСѓРЅР°Р»СЊРЅС‹Рµ С‚СЂСѓР±С‹ Рё РІРѕРґРѕСЃС‚РѕРєРё РґР»СЏ РёРЅРґР°СЃС‚СЂРёР°Р»СЊРЅРѕРіРѕ РѕРєСЂСѓР¶РµРЅРёСЏ Р·Р°РІРѕРґР°/Р±РѕР»СЊРЅРёС†С‹"
+    },
+    {
+        "name":  "Suburbs VOL.15 вЂ” Bathroom",
+        "bucket":  "prop",
+        "why":  "Р’Р°РЅРЅС‹Рµ РєРѕРјРЅР°С‚С‹ РґР»СЏ РґРѕРјРѕРІ Рё Р±РѕР»СЊРЅРёС† РІ Р»РѕРєР°С†РёСЏС… СЃРїР°СЃР°С‚РµР»РµР№"
+    },
+    {
+        "name":  "Suburbs VOL.10 вЂ” Fireplaces",
+        "bucket":  "prop",
+        "why":  "Р”РѕРјР°С€РЅРёРµ РєР°РјРёРЅС‹ РґР»СЏ Р¶РёР»С‹С… СЃС†РµРЅР°СЂРёРµРІ Рё Р°С‚РјРѕСЃС„РµСЂС‹ РІ РґРѕРјР°С…"
+    },
+    {
+        "name":  "Cinematic Fire",
+        "bucket":  "vfx",
+        "why":  "РљРёРЅРµРјР°С‚РѕРіСЂР°С„РёС‡РµСЃРєРёРµ СЌС„С„РµРєС‚С‹ РѕРіРЅСЏ РґР»СЏ РѕРїР°СЃРЅС‹С… СЃРёС‚СѓР°С†РёР№ Рё РіРѕСЂСЏС‰РёС… РѕР±СЉРµРєС‚РѕРІ"
+    },
+    {
+        "name":  "MARS Master Material",
+        "bucket":  "material",
+        "why":  "РњР°СЃС‚РµСЂ-РјР°С‚РµСЂРёР°Р» РґР»СЏ РёРЅРґР°СЃС‚СЂРёР°Р»СЊРЅС‹С… РїРѕРІРµСЂС…РЅРѕСЃС‚РµР№: РіСЂСЏР·СЊ, СЂР¶Р°РІС‡РёРЅР°, Р±РµС‚РѕРЅ, РјРµС‚Р°Р»Р»"
+    },
+    {
+        "name":  "Parking Garage",
+        "bucket":  "leveltool",
+        "why":  "Р“РѕС‚РѕРІРѕРµ РѕРєСЂСѓР¶РµРЅРёРµ РїРѕРґР·РµРјРЅРѕРіРѕ РїР°СЂРєРёРЅРіР° РґР»СЏ СЃРѕР·РґР°РЅРёСЏ СѓСЂРѕРІРЅРµР№ Р»РѕРєР°С†РёР№"
+    },
+    {
+        "name":  "The Slow Mo Kit",
+        "bucket":  "plugin",
+        "why":  "РЎРёСЃС‚РµРјР° Р·Р°РјРµРґР»РµРЅРёСЏ РІСЂРµРјРµРЅРё РґР»СЏ РёРіСЂРѕРІС‹С… РјРµС…Р°РЅРёРє СЃРїР°СЃР°С‚РµР»СЊРЅС‹С… СЃС†РµРЅР°СЂРёРµРІ"
+    },
+    {
+        "name":  "Advanced Locomotion Component v2.4",
+        "bucket":  "plugin",
+        "why":  "РџСЂРѕРґРІРёРЅСѓС‚Р°СЏ СЃРёСЃС‚РµРјР° РїРµСЂРµРґРІРёР¶РµРЅРёСЏ РїРµСЂСЃРѕРЅР°Р¶РµР№ СЃ СЂРµР°Р»РёСЃС‚РёС‡РЅС‹РјРё Р°РЅРёРјР°С†РёСЏРјРё"
+    },
+    {
+        "name":  "Cinematic Droplets Pack",
+        "bucket":  "vfx",
+        "why":  "Р­С„С„РµРєС‚С‹ РєР°РїРµР»СЊ РІРѕРґС‹, РєРѕРЅРґРµРЅСЃР°С‚Р° Рё РІР»Р°РіРё РґР»СЏ С…РѕСЂСЂРѕСЂ-Р°С‚РјРѕСЃС„РµСЂС‹"
+    },
+    {
+        "name":  "Apocalyptic Props",
+        "bucket":  "prop",
+        "why":  "РџСЂРѕРїСЃС‹ СЂР°Р·СЂСѓС€РµРЅРёР№, РѕР±Р»РѕРјРєРѕРІ Рё С…РѕСЂСЂРѕСЂ-РґРµРєРѕСЂР°С‚РёРІРЅС‹С… СЌР»РµРјРµРЅС‚РѕРІ РґР»СЏ СЃС†РµРЅР°СЂРёРµРІ"
+    },
+    {
+        "name":  "Character Customization: Female",
+        "bucket":  "plugin",
+        "why":  "РЎРёСЃС‚РµРјР° РјРѕРґСѓР»СЊРЅРѕР№ РєР°СЃС‚РѕРјРёР·Р°С†РёРё Р¶РµРЅСЃРєРѕРіРѕ РїРµСЂСЃРѕРЅР°Р¶Р° РґР»СЏ РєРѕРјР°РЅРґС‹ Р°РІР°СЂРёР№РЅРѕР№ Р±СЂРёРіР°РґС‹"
+    },
+    {
+        "name":  "Food Props: Fruits and Vegetables vol.2",
+        "bucket":  "prop",
+        "why":  "Р‘С‹С‚РѕРІС‹Рµ РїСЂРѕРїСЃС‹ РїСЂРѕРґСѓРєС‚РѕРІ РїРёС‚Р°РЅРёСЏ РґР»СЏ РґРѕРјРѕРІ Рё Р±РѕР»СЊРЅРёС‡РЅС‹С… РїРѕРјРµС‰РµРЅРёР№"
+    },
+    {
+        "name":  "Food Props: Fruits and Vegetables vol.3",
+        "bucket":  "prop",
+        "why":  "Р‘С‹С‚РѕРІС‹Рµ РїСЂРѕРїСЃС‹ С„СЂСѓРєС‚РѕРІ Рё РѕРІРѕС‰РµР№ РґР»СЏ РёРЅС‚РµСЂСЊРµСЂРѕРІ Р»РѕРєР°С†РёР№"
+    },
+    {
+        "name":  "Decay: Oil Drums District (5.1+)",
+        "bucket":  "prop",
+        "why":  "РРЅРґР°СЃС‚СЂРёР°Р»СЊРЅРѕРµ РѕРєСЂСѓР¶РµРЅРёРµ СЃ РјР°СЃР»СЏРЅС‹РјРё Р±РѕС‡РєР°РјРё РїРѕРґС…РѕРґРёС‚ РґР»СЏ СЃРµС‚С‚РёРЅРіР° Р·Р°РІРѕРґР°"
+    },
+    {
+        "name":  "Old minimarket complete environment (5.0+)",
+        "bucket":  "leveltool",
+        "why":  "РџРѕР»РЅРѕРµ РѕРєСЂСѓР¶РµРЅРёРµ РјР°СЂРєРµС‚Р°/РјР°РіР°Р·РёРЅР° РјРѕР¶РµС‚ Р±С‹С‚СЊ РѕСЃРЅРѕРІРѕР№ РґР»СЏ РёРЅС‚РµСЂСЊРµСЂРЅРѕРіРѕ СѓСЂРѕРІРЅСЏ"
+    },
+    {
+        "name":  "Battle Damaged Decals 1",
+        "bucket":  "material",
+        "why":  "РњР°С‚РµСЂРёР°Р»С‹ СЃ РїРѕРІСЂРµР¶РґРµРЅРёСЏРјРё РїРѕРґС…РѕРґСЏС‚ РґР»СЏ С…РѕСЂСЂРѕСЂ-РґРµРєРѕСЂР° Рё Р°С‚РјРѕСЃС„РµСЂС‹ СЂР°Р·СЂСѓС…Рё"
+    },
+    {
+        "name":  "Luos\u0027s Noise Texture Pack",
+        "bucket":  "material",
+        "why":  "РўРµРєСЃС‚СѓСЂС‹ С€СѓРјР° РґР»СЏ РіСЂСЏР·РЅС‹С…, СЂР¶Р°РІС‹С…, РёРЅРґР°СЃС‚СЂРёР°Р»СЊРЅС‹С… РїРѕРІРµСЂС…РЅРѕСЃС‚РµР№"
+    },
+    {
+        "name":  "HQ Outdoor Lamps Vol. 1",
+        "bucket":  "prop",
+        "why":  "РЎРІРµС‚РёР»СЊРЅРёРєРё РґР»СЏ РѕРєСЂСѓР¶РµРЅРёСЏ Рё РёРЅС‚РµСЂСЊРµСЂР° Р·РґР°РЅРёР№"
+    },
+    {
+        "name":  "Fire and Explosion FX Pack (4.27+)",
+        "bucket":  "vfx",
+        "why":  "Р­С„С„РµРєС‚С‹ РѕРіРЅСЏ Рё РІР·СЂС‹РІРѕРІ РґР»СЏ С…РѕСЂСЂРѕСЂ-Р°С‚РјРѕСЃС„РµСЂС‹ Рё РёРЅС†РёРґРµРЅС‚РѕРІ РІ РёРіСЂРµ"
+    },
+    {
+        "name":  "Niagara Effects06",
+        "bucket":  "vfx",
+        "why":  "РќР°Р±РѕСЂ СЌС„С„РµРєС‚РѕРІ Niagara РґР»СЏ РІРёР·СѓР°Р»СЊРЅРѕР№ Р°С‚РјРѕСЃС„РµСЂС‹"
+    },
+    {
+        "name":  "Big gates pack",
+        "bucket":  "prop",
+        "why":  "РџР°РєРµС‚ РІРѕСЂРѕС‚/РґРІРµСЂРµР№ РґР»СЏ РёРЅС‚РµСЂСЊРµСЂР° Рё СЌРєСЃС‚РµСЂСЊРµСЂР° Р·РґР°РЅРёР№"
+    },
+    {
+        "name":  "Radio System and Interaction",
+        "bucket":  "plugin",
+        "why":  "РЎРёСЃС‚РµРјР° РІР·Р°РёРјРѕРґРµР№СЃС‚РІРёСЏ Рё СЂР°РґРёРѕ РґР»СЏ РєРѕРѕРї-РјРµС…Р°РЅРёРє Рё РёРЅС‚РµСЂР°РєС†РёРё РјРµР¶РґСѓ РёРіСЂРѕРєР°РјРё"
+    },
+    {
+        "name":  "Abandoned Architecture (5.0+)",
+        "bucket":  "leveltool",
+        "why":  "Р—Р°Р±СЂРѕС€РµРЅРЅС‹Рµ Р°СЂС…РёС‚РµРєС‚СѓСЂРЅС‹Рµ СЃРѕРѕСЂСѓР¶РµРЅРёСЏ РїРѕРґС…РѕРґСЏС‚ РґР»СЏ С…РѕСЂСЂРѕСЂ-СЃРµС‚С‚РёРЅРіР° РґРѕРјР°/Р·Р°РІРѕРґР°"
+    },
+    {
+        "name":  "Utility/Power Pole",
+        "bucket":  "prop",
+        "why":  "РџСЂРѕРјС‹С€Р»РµРЅРЅРѕРµ РѕР±РѕСЂСѓРґРѕРІР°РЅРёРµ РґР»СЏ С„Р°Р±СЂРёРє Рё СЃС†РµРЅР°СЂРёРµРІ Р°РІР°СЂРёР№РЅРѕРіРѕ СЂРµР°РіРёСЂРѕРІР°РЅРёСЏ"
+    },
+    {
+        "name":  "Interactive Lights System",
+        "bucket":  "plugin",
+        "why":  "РЎРёСЃС‚РµРјР° СѓРїСЂР°РІР»РµРЅРёСЏ РѕРєСЂСѓР¶Р°СЋС‰РёРј РѕСЃРІРµС‰РµРЅРёРµРј РґР»СЏ РёРЅС‚РµСЂР°РєС‚РёРІРЅС‹С… РїРѕРјРµС‰РµРЅРёР№"
+    },
+    {
+        "name":  "Lockpicking Minigame System",
+        "bucket":  "plugin",
+        "why":  "РњРµС…Р°РЅРёРєР° РІР·Р°РёРјРѕРґРµР№СЃС‚РІРёСЏ РґР»СЏ РѕС‚РєСЂС‹С‚РёСЏ РґРІРµСЂРµР№, С€РєР°С„С‡РёРєРѕРІ, РіРѕР»РѕРІРѕР»РѕРјРѕРє"
+    },
+    {
+        "name":  "Modular Sewer System Pack",
+        "bucket":  "prop",
+        "why":  "РџСЂРѕРјС‹С€Р»РµРЅРЅС‹Рµ С‚СЂСѓР±РѕРїСЂРѕРІРѕРґС‹ Рё РґРµС‚Р°Р»Рё СЃРёСЃС‚РµРј РґР»СЏ С„Р°Р±СЂРёРє, РїРѕРґРІР°Р»РѕРІ, Р·Р°РІРѕРґСЃРєРёС… СЃС†РµРЅ"
+    },
+    {
+        "name":  "Animated Curtains vol. 1",
+        "bucket":  "prop",
+        "why":  "Р‘С‹С‚РѕРІР°СЏ РјРµР±РµР»СЊ РґР»СЏ РёРЅС‚РµСЂСЊРµСЂРѕРІ Р¶РёР»С‹С… РїРѕРјРµС‰РµРЅРёР№"
+    },
+    {
+        "name":  "Abandoned / Horror Mansion Interior",
+        "bucket":  "leveltool",
+        "why":  "Р“РѕС‚РѕРІР°СЏ С…РѕСЂСЂРѕСЂ-СЃСЂРµРґР° РґРѕРјР° СЃ РјРѕРґСѓР»СЊРЅС‹РјРё СЌР»РµРјРµРЅС‚Р°РјРё РґР»СЏ СЃС‚СЂРѕР№РєРё СѓСЂРѕРІРЅРµР№"
+    },
+    {
+        "name":  "Modular Wooden Buildings",
+        "bucket":  "leveltool",
+        "why":  "РњРѕРґСѓР»СЊРЅС‹Рµ СЃС‚СЂРѕРёС‚РµР»СЊРЅС‹Рµ Р±Р»РѕРєРё РґР»СЏ Р±С‹СЃС‚СЂРѕРіРѕ РєРѕРЅСЃС‚СЂСѓРёСЂРѕРІР°РЅРёСЏ РёРЅС‚РµСЂСЊРµСЂРѕРІ РїРѕРјРµС‰РµРЅРёР№"
+    },
+    {
+        "name":  "LGUI вЂ” 3D UI for UnrealEngine",
+        "bucket":  "plugin",
+        "why":  "РЎРёСЃС‚РµРјР° UI РґР»СЏ СЃРѕР·РґР°РЅРёСЏ HUD, РјРµРЅСЋ Рё РёРЅС‚РµСЂС„РµР№СЃР° РёРіСЂС‹ РІ 3D"
+    },
+    {
+        "name":  "Decals Walls and Paint Vol. 1",
+        "bucket":  "material",
+        "why":  "Р”РµРєР°Р»Рё РіСЂСЏР·Рё, СЂР¶Р°РІС‡РёРЅС‹, РїРѕРІСЂРµР¶РґРµРЅРёР№ РЅР° Р±РµС‚РѕРЅРµ Рё РїР»РёС‚РєРµ РґР»СЏ С…РѕСЂСЂРѕСЂ-СЌСЃС‚РµС‚РёРєРё"
+    },
+    {
+        "name":  "Auto Mesh Outline",
+        "bucket":  "plugin",
+        "why":  "Р’РёР·СѓР°Р»СЊРЅС‹Р№ СЌС„С„РµРєС‚ РѕР±РІРѕРґР° РѕР±СЉРµРєС‚РѕРІ РґР»СЏ РІС‹РґРµР»РµРЅРёСЏ РёРЅС‚РµСЂР°РєС‚РёРІРЅС‹С… РїСЂРµРґРјРµС‚РѕРІ Рё UI"
+    },
+    {
+        "name":  "Niagara WaterFoam Splash Pack",
+        "bucket":  "vfx",
+        "why":  "Water splash effects for leaky pipes and broken water systems in houses/factories"
+    },
+    {
+        "name":  "Industrial Zone вЂ” BIG/MEDIUM/SMALL",
+        "bucket":  "prop",
+        "why":  "Modular scalable industrial environment components for factory and basement emergency responder scenarios"
+    },
+    {
+        "name":  "Brooke Industrial Town (5.1+)",
+        "bucket":  "prop",
+        "why":  "Industrial setting props and environment pieces for factory and workplace levels"
+    },
+    {
+        "name":  "Ghost Town VOL.4 вЂ” Abandoned Houses",
+        "bucket":  "prop",
+        "why":  "Game-ready derelict residential meshes for horror-comedy abandoned house levels"
+    },
+    {
+        "name":  "Water Simulation Effects (5.0+)",
+        "bucket":  "vfx",
+        "why":  "Liquid physics and visual effects for environmental hazards like burst pipes and flooding"
+    },
+    {
+        "name":  "Modular Abandoned Building (4.27+)",
+        "bucket":  "prop",
+        "why":  "Modular building meshes for constructing dilapidated interior environments"
+    },
+    {
+        "name":  "Uscans Workshop 01 (5.2+)",
+        "bucket":  "prop",
+        "why":  "Interior workshop environment with industrial tools and equipment setup relevant to emergency responder scenarios"
+    },
+    {
+        "name":  "Climb and Vaulting Component v.2.0.5",
+        "bucket":  "plugin",
+        "why":  "Movement mechanics for navigating emergency response environments"
+    },
+    {
+        "name":  "Inventory Framework Plugin",
+        "bucket":  "plugin",
+        "why":  "Inventory management system for emergency equipment and tools"
+    },
+    {
+        "name":  "Dialogue Builder",
+        "bucket":  "plugin",
+        "why":  "Dialog and quest system for NPC interactions and emergency scenarios"
+    },
+    {
+        "name":  "Storm 3D VDB Pack",
+        "bucket":  "vfx",
+        "why":  "Volumetric weather/atmospheric effects for horror ambiance"
+    },
+    {
+        "name":  "Trail VFX Pack",
+        "bucket":  "vfx",
+        "why":  "Particle effects for horror atmosphere and environmental hazards"
+    },
+    {
+        "name":  "Landscape Stamping Tool вЂ” 100+ Custom Terrain Brushes",
+        "bucket":  "leveltool",
+        "why":  "Terrain and level design tools for manual building of emergency response locations"
+    },
+    {
+        "name":  "Modular Brutalist Levelscapes",
+        "bucket":  "prop",
+        "why":  "Industrial concrete/brutalist modular meshes for factory and institutional environments"
+    },
+    {
+        "name":  "Photo Scanned Bricks",
+        "bucket":  "material",
+        "why":  "Photorealistic brick/concrete surface textures for industrial horror settings"
+    },
+    {
+        "name":  "Electrical set / lamps / wires",
+        "bucket":  "prop",
+        "why":  "Industrial electrical equipment and utility props for realistic facility interiors"
+    },
+    {
+        "name":  "ABANDONED FACTORY / Industrial railway zone",
+        "bucket":  "prop",
+        "why":  "Complete industrial environment prop pack perfectly matching factory/industrial setting"
+    },
+    {
+        "name":  "Post Soviet Kitchen",
+        "bucket":  "prop",
+        "why":  "Realistic residential interior props for house-based emergency response scenarios"
+    },
+    {
+        "name":  "Post Soviet Electronics",
+        "bucket":  "prop",
+        "why":  "Mundane household electronics for Post-Soviet residential setting"
+    },
+    {
+        "name":  "Post Soviet Detergents",
+        "bucket":  "prop",
+        "why":  "Household cleaning products for domestic environments"
+    },
+    {
+        "name":  "Post Soviet Toilet and Bathroom",
+        "bucket":  "prop",
+        "why":  "Bathroom fixtures and utilities for realistic interiors"
+    },
+    {
+        "name":  "Residential Houses вЂ” Modular Pack",
+        "bucket":  "leveltool",
+        "why":  "Modular house geometry for level blockout and construction"
+    },
+    {
+        "name":  "Json to Struct and Json or Csv to datatable",
+        "bucket":  "plugin",
+        "why":  "Data serialization system for save/load and game data management"
+    },
+    {
+        "name":  "Menu System Pro by Moonville",
+        "bucket":  "ui",
+        "why":  "Menu and HUD framework for game interface"
+    },
+    {
+        "name":  "Modular abandoned factory",
+        "bucket":  "leveltool",
+        "why":  "Modular factory environment geometry for level building"
+    },
+    {
+        "name":  "[SCANS] Industrial Abandoned Buildings вЂ” Modular Environment",
+        "bucket":  "leveltool",
+        "why":  "Modular industrial setting assets for level construction"
+    },
+    {
+        "name":  "Animated Rain вЂ” Waterdrop Material \u0026 FX",
+        "bucket":  "vfx",
+        "why":  "Water droplet and rain effects for atmospheric horror scenes"
+    },
+    {
+        "name":  "Chemical Plant \u0026 Refinery Environment",
+        "bucket":  "leveltool",
+        "why":  "Modular industrial plant geometry for factory-setting levels"
+    },
+    {
+        "name":  "Urban Underground",
+        "bucket":  "leveltool",
+        "why":  "Underground corridor and chamber environment for level construction"
+    },
+    {
+        "name":  "Underground Caves and Bunker",
+        "bucket":  "leveltool",
+        "why":  "Underground cavern and bunker environment assets for level building"
+    },
+    {
+        "name":  "Underground Corridors",
+        "bucket":  "leveltool",
+        "why":  "Modular underground corridor system for hospital/facility construction"
+    },
+    {
+        "name":  "Modular Hotel",
+        "bucket":  "leveltool",
+        "why":  "Modular building asset adaptable to residential/facility interior spaces"
+    },
+    {
+        "name":  "AlterMesh вЂ” Geometry Nodes in Unreal",
+        "bucket":  "plugin",
+        "why":  "Procedural geometry modeling tool for level construction efficiency"
+    },
+    {
+        "name":  "Office NPC Animation Pack",
+        "bucket":  "character",
+        "why":  "Civilian worker animation library for realistic mundane activities"
+    },
+    {
+        "name":  "Lens Dirt Mask Effects",
+        "bucket":  "plugin",
+        "why":  "Camera post-effect system for visual polish and horror atmosphere"
+    },
+    {
+        "name":  "Pro Game Menu",
+        "bucket":  "ui",
+        "why":  "РЎРёСЃС‚РµРјР° РёРЅС‚РµСЂР°РєС‚РёРІРЅРѕРіРѕ РјРµРЅСЋ РґР»СЏ HUD/РёРЅС‚РµСЂС„РµР№СЃР° РєРѕРѕРї-РёРіСЂС‹"
+    },
+    {
+        "name":  "DYNAMIC RADIAL MENU X",
+        "bucket":  "ui",
+        "why":  "Р Р°РґРёР°Р»СЊРЅРѕРµ РјРµРЅСЋ РґР»СЏ РєРѕРЅС‚СЂРѕР»СЏ РёРЅСЃС‚СЂСѓРјРµРЅС‚РѕРІ Рё РґРµР№СЃС‚РІРёР№ Р°РІР°СЂРёР№РЅРѕР№ Р±СЂРёРіР°РґС‹"
+    },
+    {
+        "name":  "Advanced Multiplayer Lobby System V2",
+        "bucket":  "plugin",
+        "why":  "РЎРёСЃС‚РµРјР° СЃРµСЃСЃРёР№ Рё Р»РѕР±Р±Рё РґР»СЏ РєРѕРѕРї-СЂРµР¶РёРјР° (СЃРµС‚СЊ/СЃРµСЃСЃРёРё)"
+    },
+    {
+        "name":  "Realistic Water VFX",
+        "bucket":  "vfx",
+        "why":  "Р­С„С„РµРєС‚С‹ РІРѕРґС‹ РґР»СЏ СЃС†РµРЅ СЃ СѓС‚РµС‡РєР°РјРё, РЅР°РІРѕРґРЅРµРЅРёСЏРјРё (Р·Р°РІРѕРґ/РґРѕРј)"
+    },
+    {
+        "name":  "Customizable Bodycam Component",
+        "bucket":  "plugin",
+        "why":  "HUD РєРѕРјРїРѕРЅРµРЅС‚ РЅР°РіСЂСѓРґРЅРѕР№ РєР°РјРµСЂС‹ РґР»СЏ С‡Р»РµРЅРѕРІ Р°РІР°СЂРёР№РЅРѕР№ Р±СЂРёРіР°РґС‹"
+    },
+    {
+        "name":  "Realistic Environment VFX",
+        "bucket":  "vfx",
+        "why":  "Р”С‹Рј, РёСЃРєСЂС‹, СЌР»РµРєС‚СЂРѕ Рё РёРЅРґСѓСЃС‚СЂРёР°Р»СЊРЅС‹Рµ СЌС„С„РµРєС‚С‹ РґР»СЏ РѕРєСЂСѓР¶РµРЅРёСЏ"
+    },
+    {
+        "name":  "Modular Slum Environment",
+        "bucket":  "leveltool",
+        "why":  "РњРѕРґСѓР»СЊРЅРѕРµ СЂРµР°Р»РёСЃС‚РёС‡РЅРѕРµ РіРѕСЂРѕРґСЃРєРѕРµ РѕРєСЂСѓР¶РµРЅРёРµ РґР»СЏ СЂСѓС‡РЅРѕР№ СЃС‚СЂРѕР№РєРё СѓСЂРѕРІРЅРµР№"
+    },
+    {
+        "name":  "Dive Bar and Restaurant вЂ” COMBO Prop Pack",
+        "bucket":  "prop",
+        "why":  "Game-ready РїСЂРѕРїСЃС‹ РёРЅС‚РµСЂСЊРµСЂР° РґР»СЏ Р»РѕРєР°С†РёР№ РґРѕРјР°/РѕР±С‰РµСЃС‚РІРµРЅРЅС‹С… РјРµСЃС‚"
+    },
+    {
+        "name":  "Toolshed вЂ” COMBO Prop Pack",
+        "bucket":  "prop",
+        "why":  "Game-ready РїСЂРѕРїСЃС‹ РёРЅСЃС‚СЂСѓРјРµРЅС‚РѕРІ Рё СЃРїРµС†СЃРЅР°СЂСЏР¶РµРЅРёСЏ РґР»СЏ Р°РІР°СЂРёР№РЅРѕР№ Р±СЂРёРіР°РґС‹"
+    },
+    {
+        "name":  "Hospital вЂ” COMBO Prop Pack (VOL 1-6) (4.2x-5.5)",
+        "bucket":  "prop",
+        "why":  "Game-ready medical equipment, tools, and hospital interior props for emergency response setting"
+    },
+    {
+        "name":  "Abandoned Industrial Factory Environment +ULAT (5.0+)",
+        "bucket":  "leveltool",
+        "why":  "Modular factory level environment with level assembly tools for playable locations"
+    },
+    {
+        "name":  "Brick Factory (5.0+)",
+        "bucket":  "leveltool",
+        "why":  "Industrial brick factory modular environment for level construction"
+    },
+    {
+        "name":  "Underground Facility (5.0+)",
+        "bucket":  "leveltool",
+        "why":  "Industrial underground bunker/facility environment for diverse mission locations"
+    },
+    {
+        "name":  "[SCANS] Warehouse вЂ” Abandoned Factory District (5.1+)",
+        "bucket":  "leveltool",
+        "why":  "Photoscanned warehouse and industrial district for authentic factory setting environments"
+    },
+    {
+        "name":  "Convolution Bloom Kernels Pack",
+        "bucket":  "plugin",
+        "why":  "Post-processing bloom effects for camera/atmospheric horror visuals and cinematic moments"
+    },
+    {
+        "name":  "PP801 Character P1 (4.27+)",
+        "bucket":  "character",
+        "why":  "Realistic ordinary person character model for civilian emergency workers"
+    },
+    {
+        "name":  "Make Modular Skeletal Mesh (5.3)",
+        "bucket":  "plugin",
+        "why":  "Tool for creating modular character variants from single base mesh for crew customization"
+    },
+    {
+        "name":  "LP287 Character P4 (4.27+)",
+        "bucket":  "character",
+        "why":  "Realistic ordinary person character model for diverse emergency response crew members"
+    },
+    {
+        "name":  "LP287 Character P3 (4.27+)",
+        "bucket":  "character",
+        "why":  "Realistic ordinary person character model for crew variety and character customization"
+    },
+    {
+        "name":  "Linhi Character (4.27+)",
+        "bucket":  "character",
+        "why":  "Realistic ordinary person character model for playable emergency crew members"
+    },
+    {
+        "name":  "LanFang Character (5.0-5.4)",
+        "bucket":  "character",
+        "why":  "Realistic ordinary person character model for diverse crew representation"
+    },
+    {
+        "name":  "Apocalyptic Hospital",
+        "bucket":  "prop",
+        "why":  "Game-ready hospital environment with horror props matching core game setting"
+    },
+    {
+        "name":  "Smoke and Fire Spline вЂ” Niagara Fluids",
+        "bucket":  "vfx",
+        "why":  "Smoke and fire effects for horror and industrial disaster atmosphere"
+    },
+    {
+        "name":  "Ultimate Fire Pack Vol 1. by ActionVFX and Undertone FX, Inc.",
+        "bucket":  "vfx",
+        "why":  "Comprehensive fire effects for industrial/horror emergencies and hazards"
+    },
+    {
+        "name":  "Garage Warehouse Environment + ULAT",
+        "bucket":  "prop",
+        "why":  "Modular warehouse environment with industrial props for factory setting scenarios"
+    },
+    {
+        "name":  "Electric FX with Blueprint",
+        "bucket":  "vfx",
+        "why":  "Electric effects for industrial machinery hazards and horror ambiance"
+    },
+    {
+        "name":  "Realistic Blood VFX v.1.3",
+        "bucket":  "vfx",
+        "why":  "Р РµР°Р»РёСЃС‚РёС‡РЅС‹Рµ СЌС„С„РµРєС‚С‹ РєСЂРѕРІРё РґР»СЏ С…РѕСЂСЂРѕСЂ-СЃС†РµРЅ Рё РЅРµСЃС‡Р°СЃС‚РЅС‹С… СЃР»СѓС‡Р°РµРІ"
+    },
+    {
+        "name":  "Perfect Fire VFX",
+        "bucket":  "vfx",
+        "why":  "РћРіРЅРµРЅРЅС‹Рµ СЌС„С„РµРєС‚С‹ РґР»СЏ РїРѕР¶Р°СЂРѕРІ/РІР·СЂС‹РІРѕРІ РЅР° РѕР±СЉРµРєС‚Р°С… (Р·Р°РІРѕРґ/РґРѕРј)"
+    },
+    {
+        "name":  "Post Apocalyptic Refinery",
+        "bucket":  "prop",
+        "why":  "Game-ready РёРЅРґР°СЃС‚СЂРёР°Р»СЊРЅС‹Р№ РєРѕРјРїР»РµРєСЃ СЃ С‚РµРєСЃС‚СѓСЂР°РјРё СЂР¶Р°РІС‡РёРЅС‹/СѓСЂРѕРЅР° вЂ” РїРѕРґС…РѕРґРёС‚ РґР»СЏ Р·Р°РІРѕРґСЃРєРѕРіРѕ СѓСЂРѕРІРЅСЏ"
+    },
+    {
+        "name":  "Concrete Hallway",
+        "bucket":  "prop",
+        "why":  "РњРѕРґСѓР»СЊРЅС‹Рµ РјРµС€С‹ РёРЅРґР°СЃС‚СЂРёР°Р»СЊРЅРѕРіРѕ РєРѕСЂРёРґРѕСЂР° РґР»СЏ РёРЅС‚РµСЂСЊРµСЂРѕРІ Р·Р°РІРѕРґР°/Р±РѕР»СЊРЅРёС†С‹"
+    },
+    {
+        "name":  "Underground Car Park",
+        "bucket":  "prop",
+        "why":  "Р“РѕС‚РѕРІС‹Рµ Р°СЃСЃРµС‚С‹ РїРѕРґР·РµРјРЅРѕРіРѕ РіР°СЂР°Р¶Р°/РїРѕРґРІР°Р»Р° вЂ” С‡Р°СЃС‚СЊ РёРЅРґР°СЃС‚СЂРёР°Р»СЊРЅРѕРіРѕ СЃРµС‚С‚РёРЅРіР°"
+    },
+    {
+        "name":  "Post Soviet Village",
+        "bucket":  "prop",
+        "why":  "Game-ready Р°СЂС…РёС‚РµРєС‚СѓСЂР° Р¶РёР»С‹С… РґРѕРјРѕРІ СЃРѕРІРµС‚СЃРєРѕРіРѕ С‚РёРїР° РґР»СЏ СЃРµС‚С‚РёРЅРіР° РґРѕРјР°/РґРµСЂРµРІРЅРё"
+    },
+    {
+        "name":  "Map Border Collection",
+        "bucket":  "prop",
+        "why":  "Р”РµРєРѕСЂР°С‚РёРІРЅС‹Рµ РіСЂР°РЅРёС‡РЅС‹Рµ Р°СЃСЃРµС‚С‹ Рё РјР°С‚РµСЂРёР°Р»С‹ РґР»СЏ РѕС‚РґРµР»РєРё СѓСЂРѕРІРЅРµР№"
+    },
+    {
+        "name":  "Chaos Prop Destruction System",
+        "bucket":  "plugin",
+        "why":  "РЎРёСЃС‚РµРјР° СЂР°Р·СЂСѓС€РµРЅРёСЏ РїСЂРѕРїСЃРѕРІ РґР»СЏ РїРѕРІСЂРµР¶РґС‘РЅРЅС‹С… РїСЂРµРґРјРµС‚РѕРІ/РјРµР±РµР»Рё РІ СЃС†РµРЅР°С…"
+    },
+    {
+        "name":  "Ultimate Quest Manager",
+        "bucket":  "plugin",
+        "why":  "РЎРёСЃС‚РµРјР° СѓРїСЂР°РІР»РµРЅРёСЏ РєРІРµСЃС‚Р°РјРё Рё Р·Р°РґР°С‡Р°РјРё РґР»СЏ Р°РІР°СЂРёР№РЅС‹С… РјРёСЃСЃРёР№"
+    },
+    {
+        "name":  "Narrative 3 вЂ” Node Based Quests and Dialogue",
+        "bucket":  "plugin",
+        "why":  "Node-based СЃРёСЃС‚РµРјР° РґРёР°Р»РѕРіРѕРІ Рё РєРІРµСЃС‚РѕРІ РґР»СЏ РІР·Р°РёРјРѕРґРµР№СЃС‚РІРёСЏ РєРѕРјР°РЅРґС‹ Рё NPC"
+    },
+    {
+        "name":  "Pro Main Menu V3",
+        "bucket":  "ui",
+        "why":  "РџСЂРѕС„РµСЃСЃРёРѕРЅР°Р»СЊРЅР°СЏ СЃРёСЃС‚РµРјР° РјРµРЅСЋ РґР»СЏ HUD РёРіСЂС‹"
+    },
+    {
+        "name":  "57 Dialogue Mocap Animations",
+        "bucket":  "character",
+        "why":  "Motion-capture Р°РЅРёРјР°С†РёРё РґРёР°Р»РѕРіРѕРІ РґР»СЏ СЂРµР°Р»РёСЃС‚РёС‡РЅРѕРіРѕ РІР·Р°РёРјРѕРґРµР№СЃС‚РІРёСЏ Р°РІР°СЂРёР№РЅРѕР№ Р±СЂРёРіР°РґС‹"
+    },
+    {
+        "name":  "Medical Props Vol1",
+        "bucket":  "prop",
+        "why":  "Medical equipment and supplies for emergency crew response scenarios"
+    },
+    {
+        "name":  "Industrial Decal",
+        "bucket":  "material",
+        "why":  "Industrial surface decals and textures for factory/facility settings"
+    },
+    {
+        "name":  "Destruction Decal BP",
+        "bucket":  "vfx",
+        "why":  "Destruction and damage visual effects system for horror atmosphere"
+    },
+    {
+        "name":  "Audio Reactive FX 02",
+        "bucket":  "vfx",
+        "why":  "Dynamic Niagara/Cascade effects system for horror ambience synchronization"
+    },
+    {
+        "name":  "Delayed Healthbar System",
+        "bucket":  "ui",
+        "why":  "Co-op team health UI component for shared gameplay mechanics"
+    },
+    {
+        "name":  "CGAXIS вЂ“ PHYSICAL WOOD PBR TEXTURES",
+        "bucket":  "material",
+        "why":  "Realistic wood surfaces for residential and industrial interior environments"
+    },
+    {
+        "name":  "100 Wood Imperfection Texture вЂ” Vol.03",
+        "bucket":  "material",
+        "why":  "Detailed surface imperfections for gritty worn residential/industrial spaces"
+    },
+    {
+        "name":  "Zombie вЂ” Sound Effects Bundle",
+        "bucket":  "audio",
+        "why":  "Horror ambient and foley sounds for horror-comedy atmosphere"
+    },
+    {
+        "name":  "Post Soviet Pipes and Vents",
+        "bucket":  "prop",
+        "why":  "Industrial props and materials for factory/building setting"
+    },
+    {
+        "name":  "Abandoned Haunted House",
+        "bucket":  "prop",
+        "why":  "Game-ready props and environment assets for horror house location"
+    },
+    {
+        "name":  "KITBASH 3D вЂ“ CONSTRUCTION ZONE",
+        "bucket":  "prop",
+        "why":  "РРЅРґР°СЃС‚СЂРёР°Р»СЊРЅС‹Рµ РїСЂРѕРїСЃС‹ Р·РѕРЅС‹ СЃС‚СЂРѕРёС‚РµР»СЊСЃС‚РІР°/Р·Р°РІРѕРґР° РґР»СЏ СЃРµС‚С‚РёРЅРіР°"
+    },
+    {
+        "name":  "KITBASH 3D вЂ“ IRON FORGE",
+        "bucket":  "prop",
+        "why":  "РњРѕРґРµР»Рё РёРЅРґР°СЃС‚СЂРёР°Р»СЊРЅРѕРіРѕ РїСЂРѕРёР·РІРѕРґСЃС‚РІР°, РїРѕРґС…РѕРґСЏС‚ РґР»СЏ Р·Р°РІРѕРґР°-СЃРµС‚С‚РёРЅРіР°"
+    },
+    {
+        "name":  "Customizable Bodycam Component",
+        "bucket":  "plugin",
+        "why":  "Р‘РѕРґРёРєР°Рј РґР»СЏ С‡Р»РµРЅРѕРІ Р°РІР°СЂРёР№РЅРѕР№ Р±СЂРёРіР°РґС‹ вЂ” РєР»СЋС‡РµРІР°СЏ СЌРєРёРїРёСЂРѕРІРєР°"
+    },
+    {
+        "name":  "Kitbash3D вЂ” Wreckage",
+        "bucket":  "prop",
+        "why":  "Р Р°Р·СЂСѓС€РµРЅРёСЏ Рё РѕР±Р»РѕРјРєРё РґР»СЏ СЃС†РµРЅ Р°РІР°СЂРёР№РЅС‹С… СЃРёС‚СѓР°С†РёР№ Рё С‡СЂРµР·РІС‹С‡Р°Р№РЅС‹С… СЃР»СѓС‡Р°РµРІ"
+    },
+    {
+        "name":  "Electrocomponents Kitbash",
+        "bucket":  "prop",
+        "why":  "РњРѕРґСѓР»СЊРЅС‹Рµ СЌР»РµРєС‚СЂРѕРЅРЅС‹Рµ РєРѕРјРїРѕРЅРµРЅС‚С‹ РґР»СЏ РёРЅРґР°СЃС‚СЂРёР°Р»СЊРЅС‹С… РёРЅС‚РµСЂСЊРµСЂРѕРІ"
+    },
+    {
+        "name":  "Shader Compilation Screen вЂ” remove shader stutters",
+        "bucket":  "plugin",
+        "why":  "РћРїС‚РёРјРёР·Р°С†РёСЏ РїРµСЂС„РѕРјР°РЅСЃР° С€РµР№РґРµСЂРѕРІ РґР»СЏ РїР»Р°РІРЅРѕР№ СЂР°Р±РѕС‚С‹ UE5.7"
+    },
+    {
+        "name":  "Inspection System Pro by Moonville",
+        "bucket":  "plugin",
+        "why":  "РЎРёСЃС‚РµРјР° РёРЅС‚РµСЂР°РєС‚РёРІРЅРѕРіРѕ РѕСЃРјРѕС‚СЂР° Рё Р°РЅР°Р»РёР·Р° РѕР±СЉРµРєС‚РѕРІ РґР»СЏ РіРµР№РјРїР»РµСЏ"
+    },
+    {
+        "name":  "Church / Cathedral Interior Environment + ULAT",
+        "bucket":  "prop",
+        "why":  "РњРѕРґСѓР»СЊРЅС‹Рµ РёРЅС‚РµСЂСЊРµСЂС‹ Р·РґР°РЅРёР№ РїСЂРёРјРµРЅРёРјС‹ Рє Р±РѕР»СЊРЅРёС†Р°Рј Рё Р¶РёР»С‹Рј РїРѕРјРµС‰РµРЅРёСЏРј"
+    },
+    {
+        "name":  "Basic Locomotion System (REPLICATED)",
+        "bucket":  "plugin",
+        "why":  "РЎРёРЅС…СЂРѕРЅРёР·РёСЂРѕРІР°РЅРЅР°СЏ СЃРёСЃС‚РµРјР° РґРІРёР¶РµРЅРёСЏ РґР»СЏ РєРѕРѕРїРµСЂР°С‚РёРІРЅРѕРіРѕ РіРµР№РјРїР»РµСЏ"
+    },
+    {
+        "name":  "Corpse Bandit вЂ” Draugr Undead Zombie Monster Set",
+        "bucket":  "monster",
+        "why":  "РњРѕРґРµР»Рё Рё Р°РЅРёРјР°С†РёРё Р·РѕРјР±Рё-РјРѕРЅСЃС‚СЂРѕРІ РґР»СЏ С…РѕСЂСЂРѕСЂ-СЃС†РµРЅР°СЂРёРµРІ"
+    },
+    {
+        "name":  "Modular Building System (5.0+)",
+        "bucket":  "plugin",
+        "why":  "Level construction system for rapid building/assembly of house/factory/hospital environments"
+    },
+    {
+        "name":  "Concrete hangar v.1 (all ver)",
+        "bucket":  "prop",
+        "why":  "Industrial concrete structure for factory/warehouse/facility interiors with authentic deterioration"
+    },
+    {
+        "name":  "Kitchen Props вЂ” New, Used and Old, Soviet and Western Versions (4.27+)",
+        "bucket":  "prop",
+        "why":  "Residential appliances, furniture, and domestic items for realistic civilian house environments"
+    },
+    {
+        "name":  "Zombies Collection (4.27+)",
+        "bucket":  "monster",
+        "why":  "Multiple zombie creature models for horror encounters with regular infected civilians"
+    },
+    {
+        "name":  "Zombie 02 (4.27+)",
+        "bucket":  "monster",
+        "why":  "Single zombie character variant for diverse creature encounters in horror scenarios"
+    },
+    {
+        "name":  "EXGEN Procedural Materials (5.0+)",
+        "bucket":  "material",
+        "why":  "Procedural surface system for creating weathered industrial concrete, metal rust, decay aesthetic"
+    },
+    {
+        "name":  "Simple Instanced Spline Mesh (5.3)",
+        "bucket":  "leveltool",
+        "why":  "Spline-based mesh tool for procedural placement and rapid level layout of structures/pipes/paths"
+    },
+    {
+        "name":  "Player Electricity System (5.0+)",
+        "bucket":  "vfx",
+        "why":  "Electrical hazard/sparking effects for industrial horror atmosphere and equipment malfunctions"
+    },
+    {
+        "name":  "300+ Flat Icons",
+        "bucket":  "ui",
+        "why":  "UI icon collection for HUD, menus, and interface elements"
+    },
+    {
+        "name":  "Water Splash Pack 3",
+        "bucket":  "vfx",
+        "why":  "Water splash/spray Niagara effects for emergency water scenarios (flooding, broken pipes)"
+    },
+    {
+        "name":  "Water Physics v 1.4.0",
+        "bucket":  "plugin",
+        "why":  "Water physics simulation system for interactive water-based emergency gameplay"
+    },
+    {
+        "name":  "SuperZombie8",
+        "bucket":  "monster",
+        "why":  "Zombie creature character model for horror atmosphere in emergency scenarios"
+    },
+    {
+        "name":  "Triplex House Villa",
+        "bucket":  "prop",
+        "why":  "Game-ready Р¶РёР»РѕР№ РґРѕРј, РїРѕРґС…РѕРґРёС‚ РґР»СЏ СЃРµС‚С‚РёРЅРіР° Р°РІР°СЂРёР№РЅРѕР№ Р±СЂРёРіР°РґС‹ РІ Р¶РёР»С‹С… РїРѕРјРµС‰РµРЅРёСЏС…"
+    },
+    {
+        "name":  "Village Houses Environment \u0026 Furnished Interiors",
+        "bucket":  "prop",
+        "why":  "РњРѕРґСѓР»СЊРЅС‹Рµ Р¶РёР»С‹Рµ РґРѕРјР° СЃ РёРЅС‚РµСЂСЊРµСЂР°РјРё, Р±Р°Р·Р° РґР»СЏ СЃРµС‚С‚РёРЅРіР° РѕРїРµСЂР°С†РёР№ Р±СЂРёРіР°РґС‹ РІ Р¶РёР»С‹С… РєРІР°СЂС‚Р°Р»Р°С…"
+    },
+    {
+        "name":  "Wooden UI",
+        "bucket":  "ui",
+        "why":  "Р”РµСЂРµРІСЏРЅРЅС‹Р№ СЃС‚РёР»СЊ РґР»СЏ HUD/РјРµРЅСЋ, РїРѕРґС…РѕРґРёС‚ РґР»СЏ СѓСЋС‚РЅРѕР№ РєРѕРјРµРґРёР№РЅРѕР№ Р°С‚РјРѕСЃС„РµСЂС‹"
+    },
+    {
+        "name":  "Rain Thunder System",
+        "bucket":  "vfx",
+        "why":  "РџРѕРіРѕРґРЅС‹Рµ СЌС„С„РµРєС‚С‹ РґР»СЏ СЃРѕР·РґР°РЅРёСЏ С…РѕСЂСЂРѕСЂ-Р°С‚РјРѕСЃС„РµСЂС‹ СЃС†РµРЅ (РґРѕР¶РґСЊ, РіСЂРѕР·Р°)"
+    },
+    {
+        "name":  "Bank Building / Bank Interior + ULAT",
+        "bucket":  "prop",
+        "why":  "РњРѕРґСѓР»СЊРЅРѕРµ Р·РґР°РЅРёРµ СЃ РёРЅС‚РµСЂСЊРµСЂР°РјРё, РїРѕРґС…РѕРґРёС‚ РґР»СЏ РёРЅРґСѓСЃС‚СЂРёР°Р»СЊРЅРѕРіРѕ СЃРµС‚С‚РёРЅРіР° Р°РІР°СЂРёР№РЅС‹С… РѕРїРµСЂР°С†РёР№"
+    },
+    {
+        "name":  "Factory District (5.0+)",
+        "bucket":  "prop",
+        "why":  "Game-ready industrial environment props for factory setting"
+    },
+    {
+        "name":  "Ladders and Ledges Animset",
+        "bucket":  "plugin",
+        "why":  "Character climbing/traversal animation system for multi-level environments"
+    },
+    {
+        "name":  "Realistic Base Skeleton (5.3+)",
+        "bucket":  "character",
+        "why":  "Modular base character rig for creating emergency crew NPCs"
+    },
+    {
+        "name":  "Simple Multiplayer Lobby V4 (5.3)",
+        "bucket":  "ui",
+        "why":  "Multiplayer menu and lobby interface for coop session management"
+    },
+    {
+        "name":  "Advance Female Customization (5.2)",
+        "bucket":  "character",
+        "why":  "Character customization system for crew member variation"
+    },
+    {
+        "name":  "Mechanic Girl (5.0+)",
+        "bucket":  "character",
+        "why":  "Realistic female character model suitable for emergency crew member"
+    },
+    {
+        "name":  "Kick Up FX",
+        "bucket":  "vfx",
+        "why":  "Particle effect system for debris/impact feedback in horror environments"
+    },
+    {
+        "name":  "Population Control PRO",
+        "bucket":  "plugin",
+        "why":  "AI behavior system for managing crowds and NPC character control"
+    },
+    {
+        "name":  "Online Subsystem Blueprints",
+        "bucket":  "plugin",
+        "why":  "Multiplayer networking infrastructure for coop sessions"
+    },
+    {
+        "name":  "Niagara ReSpawn Character/Mesh Effect",
+        "bucket":  "vfx",
+        "why":  "Visual effects for player respawn events in multiplayer"
+    },
+    {
+        "name":  "Multiplayer Object Throwing System",
+        "bucket":  "plugin",
+        "why":  "Interactive object manipulation system for crew interaction gameplay"
+    },
+    {
+        "name":  "Multiplayer Horror Bodycam",
+        "bucket":  "plugin",
+        "why":  "First-person camera and post-processing system designed for horror atmosphere"
+    },
+    {
+        "name":  "CSW Auto-save plugin V2 (5.2)",
+        "bucket":  "plugin",
+        "why":  "Save system plugin for persistent progression in multiplayer coop gameplay"
+    },
+    {
+        "name":  "EOS Online Subsystem (only 5.3)",
+        "bucket":  "plugin",
+        "why":  "Network infrastructure via EOS for online multiplayer sessions and voice"
+    },
+    {
+        "name":  "Elevator Kit With Blueprint (5.3)",
+        "bucket":  "plugin",
+        "why":  "Interactive elevator/lift system for indoor level navigation in buildings"
+    },
+    {
+        "name":  "Workshop Tools And Props Barrels Boxes Bundle vol.1 (5.3)",
+        "bucket":  "prop",
+        "why":  "Game-ready industrial propsвЂ”tools, barrels, boxes for factory/workshop environments"
+    },
+    {
+        "name":  "Signage VOL.1 вЂ” Town and City (5.2-5.3)",
+        "bucket":  "prop",
+        "why":  "Industrial and urban signage (Nanite/low-poly) for hospital/factory/warehouse decoration"
+    },
+    {
+        "name":  "Interaction With Advanced Locomotion System 3.0.2 (5.2)",
+        "bucket":  "plugin",
+        "why":  "Advanced interaction and locomotion system for seamless cooperative gameplay mechanics"
+    },
+    {
+        "name":  "Blood Splatter Blueprint System (5.3)",
+        "bucket":  "vfx",
+        "why":  "Horror-themed VFX system for blood splatters fitting horror-comedy atmosphere"
+    },
+    {
+        "name":  "Horror and Decay VOL.5 вЂ” Urban Surfaces",
+        "bucket":  "material",
+        "why":  "Urban decay textures for industrial/horror surfaces in abandoned buildings"
+    },
+    {
+        "name":  "Horror and Decay VOL.3 вЂ” Quarantine/Hospital",
+        "bucket":  "material",
+        "why":  "Hospital/quarantine decay surfaces matching emergency crew setting"
+    },
+    {
+        "name":  "Horror and Decay VOL.2 вЂ” Urban Debris",
+        "bucket":  "material",
+        "why":  "Damaged urban surfaces and debris for deteriorated interiors"
+    },
+    {
+        "name":  "GOOD FX: Footstep",
+        "bucket":  "audio",
+        "why":  "Footstep foley effects for crew and civilian movement audio"
+    },
+    {
+        "name":  "GBWScratch - Scratches on any surface! Multiplayer Ready!",
+        "bucket":  "plugin",
+        "why":  "Surface damage/wear effects for deteriorated facility environments"
+    },
+    {
+        "name":  "Character Interaction",
+        "bucket":  "plugin",
+        "why":  "NPC interaction system for dialogue with residents and crew cooperation"
+    },
+    {
+        "name":  "ASIAN GIRL BASE MESH",
+        "bucket":  "character",
+        "why":  "Civilian female character base mesh for residents/emergency crew"
+    },
+    {
+        "name":  "234 Advanced Light Function",
+        "bucket":  "plugin",
+        "why":  "Atmospheric lighting effects for horror ambiance in dark facilities"
+    },
+    {
+        "name":  "Narrative 3 вЂ” Node Based Quests and Dialogue",
+        "bucket":  "plugin",
+        "why":  "РЎРёСЃС‚РµРјР° РґРёР°Р»РѕРіРѕРІ Рё РєРІРµСЃС‚РѕРІ РґР»СЏ РєРѕРѕРї-С…РѕСЂСЂРѕСЂ-РєРѕРјРµРґРёРё (v3.3.1 РґР»СЏ UE 5.3)"
+    },
+    {
+        "name":  "Trash VOL.1 вЂ” City Streets",
+        "bucket":  "prop",
+        "why":  "Р“РѕСЂРѕРґСЃРєРёРµ РїСЂРѕРїСЃС‹ Рё РјСѓСЃРѕСЂ РґР»СЏ СЂРµР°Р»РёСЃС‚РёС‡РЅРѕРіРѕ РѕРєСЂСѓР¶РµРЅРёСЏ (Nanite РґР»СЏ UE 5.1+)"
+    },
+    {
+        "name":  "Police Radio Vol.1",
+        "bucket":  "audio",
+        "why":  "Р—РІСѓРєРё РїРѕР»РёС†РµР№СЃРєРѕРіРѕ СЂР°РґРёРѕ РґР»СЏ Р°РІР°СЂРёР№РЅРѕР№ Р±СЂРёРіР°РґС‹ (РІСЃРµ РІРµСЂСЃРёРё UE)"
+    },
+    {
+        "name":  "LAKE HOUSE Asset Pack Vol-2",
+        "bucket":  "prop",
+        "why":  "РРіСЂРѕРІС‹Рµ РїСЂРѕРїСЃС‹ РґР»СЏ РґРѕРјРѕРІ Рё РёРЅС‚РµСЂСЊРµСЂРѕРІ (РѕРґРёРЅ РёР· РѕСЃРЅРѕРІРЅС‹С… СЃРµС‚С‚РёРЅРіРѕРІ)"
+    },
+    {
+        "name":  "Cobwebs Pack",
+        "bucket":  "material",
+        "why":  "РҐРѕСЂСЂРѕСЂ-РјР°С‚РµСЂРёР°Р»С‹ (РїР°СѓС‚РёРЅР°) РґР»СЏ СЃРѕР·РґР°РЅРёСЏ РјСЂР°С‡РЅРѕР№ Р°С‚РјРѕСЃС„РµСЂС‹"
+    },
+    {
+        "name":  "Oval Crypt",
+        "bucket":  "prop",
+        "why":  "РћРєСЂСѓР¶РµРЅРёРµ-РєСЂРёРїС‚Р°/РїРѕРґРІР°Р» РґР»СЏ С…РѕСЂСЂРѕСЂ-СЃРµС‚С‚РёРЅРіР° РґРѕРјР°/Р±РѕР»СЊРЅРёС†С‹"
+    },
+    {
+        "name":  "Functional Lamps Pack",
+        "bucket":  "prop",
+        "why":  "Р¤СѓРЅРєС†РёРѕРЅР°Р»СЊРЅС‹Рµ СЃРІРµС‚РёР»СЊРЅРёРєРё РґР»СЏ СЂРµР°Р»РёСЃС‚РёС‡РЅРѕРіРѕ РёРЅС‚РµСЂСЊРµСЂР° РґРѕРјР°/Р·Р°РІРѕРґР°/Р±РѕР»СЊРЅРёС†С‹"
+    },
+    {
+        "name":  "Art Of Shader вЂ” Distortion And Glitches",
+        "bucket":  "material",
+        "why":  "РЁРµР№РґРµСЂС‹ РґР»СЏ С…РѕСЂСЂРѕСЂ-СЌС„С„РµРєС‚РѕРІ Рё РїРѕСЃС‚СЌС„С„РµРєС‚РѕРІ (UE 5.0-5.3)"
+    },
+    {
+        "name":  "Pro HUD Pack V2: Horror Version",
+        "bucket":  "ui",
+        "why":  "Р“РѕС‚РѕРІС‹Р№ С…РѕСЂСЂРѕСЂ UI РґР»СЏ РјРµРЅСЋ/HUD/РЅРѕС‚РёС„РёРєР°С†РёР№, С‚РѕС‡РЅРѕРµ СЃРѕРІРїР°РґРµРЅРёРµ РїРѕ С‚РµРјР°С‚РёРєРµ"
+    },
+    {
+        "name":  "BlueprintWebSocket v1.0.6",
+        "bucket":  "plugin",
+        "why":  "РЎРµС‚РµРІРѕР№ РїР»Р°РіРёРЅ РґР»СЏ РєРѕРѕРї-СЃРµСЃСЃРёР№/РјСѓР»СЊС‚РёРїР»РµРµСЂР° (WebSocket)"
+    },
+    {
+        "name":  "Advanced Master Material For Props",
+        "bucket":  "material",
+        "why":  "Р‘Р°Р·РѕРІС‹Р№ РјР°С‚РµСЂРёР°Р» РґР»СЏ РёРЅРґР°СЃС‚СЂРёР°Р»СЊРЅРѕРіРѕ/РіСЂСЏР·РЅРѕРіРѕ РґРѕРјР°/Р·Р°РІРѕРґР°/Р±РѕР»СЊРЅРёС†С‹"
+    },
+    {
+        "name":  "Level Design Tools вЂ” DrCG Assistant Helper Toolkit",
+        "bucket":  "leveltool",
+        "why":  "Object placement and alignment utility for manual level building"
+    },
+    {
+        "name":  "Squad \u0026 Team Combat AI",
+        "bucket":  "plugin",
+        "why":  "AI behavior and perception systems for coop squad gameplay"
+    },
+    {
+        "name":  "F2 Modern Girl Ashley",
+        "bucket":  "character",
+        "why":  "Realistic modern civilian female character"
+    },
+    {
+        "name":  "F2 Modern Girl Riley",
+        "bucket":  "character",
+        "why":  "Realistic modern civilian female character"
+    },
+    {
+        "name":  "AI Behavior Toolkit v1.8.3",
+        "bucket":  "plugin",
+        "why":  "Advanced AI behavior and perception systems for NPCs"
+    },
+    {
+        "name":  "Premium Wood Material Pack 3",
+        "bucket":  "material",
+        "why":  "Industrial and building surface materials for house/factory/hospital"
+    },
+    {
+        "name":  "Female Cop",
+        "bucket":  "character",
+        "why":  "Realistic female character suitable for emergency responders"
+    },
+    {
+        "name":  "Male Mega Realistic Character Pack 01",
+        "bucket":  "character",
+        "why":  "Realistic male civilian characters for NPCs and responders"
+    },
+    {
+        "name":  "Pedestrians Vol 2 (Mini Pack)",
+        "bucket":  "character",
+        "why":  "NPC pedestrian animations for realistic civilians and workers in emergency scenarios"
+    },
+    {
+        "name":  "HTML Menus v1.18",
+        "bucket":  "ui",
+        "why":  "Menu and HUD interface system plugin for game UI"
+    },
+    {
+        "name":  "Menu System Pro by Moonville",
+        "bucket":  "ui",
+        "why":  "Complete menu system for game UI and HUD interface"
+    },
+    {
+        "name":  "Mission \u0026 Objectives v1.5",
+        "bucket":  "plugin",
+        "why":  "Quest and mission management system for dialogue and objectives"
+    },
+    {
+        "name":  "NPC Eyes Sight System",
+        "bucket":  "plugin",
+        "why":  "NPC AI perception and behavior detection system"
+    },
+    {
+        "name":  "Narrative 3",
+        "bucket":  "plugin",
+        "why":  "Node-based dialogue and quest system for story branching"
+    },
+    {
+        "name":  "Fluid Ninja LIVE 1.9",
+        "bucket":  "vfx",
+        "why":  "Smoke, water, and electricity visual effects for environmental hazards"
+    },
+    {
+        "name":  "Dynamic Campfire NIAGARA",
+        "bucket":  "vfx",
+        "why":  "Fire and flame effects for emergency/hazard scenarios"
+    },
+    {
+        "name":  "Spline Cable Kit",
+        "bucket":  "leveltool",
+        "why":  "Cable and wire spline system for industrial level layout and design"
+    },
+    {
+        "name":  "Industrial Area Hangar",
+        "bucket":  "prop",
+        "why":  "Industrial environment for factory/warehouse emergency response scenarios"
+    },
+    {
+        "name":  "Inventory Examine Interface",
+        "bucket":  "ui",
+        "why":  "Equipment and tools inventory UI system for emergency crew gear management"
+    },
+    {
+        "name":  "Landfill",
+        "bucket":  "prop",
+        "why":  "Industrial/derelict environment asset for varied emergency response settings"
+    },
+    {
+        "name":  "Luos\u0027s Particle Toolkit Vol. 1",
+        "bucket":  "plugin",
+        "why":  "VFX system for fire, smoke, electricity, sparks, and industrial horror effects"
+    },
+    {
+        "name":  "Manager Office",
+        "bucket":  "prop",
+        "why":  "Interior office furniture and props for hospital/office building scenes"
+    },
+    {
+        "name":  "Volumetric Glass",
+        "bucket":  "material",
+        "why":  "Glass surface material and transparency effects for windows and building interiors"
+    },
+    {
+        "name":  "ELECTRONICS INTERIOR",
+        "bucket":  "prop",
+        "why":  "Interior electrical equipment and industrial fixture props for factories/hospitals"
+    },
+    {
+        "name":  "Combat System AI Framework NPC 1.4.5",
+        "bucket":  "plugin",
+        "why":  "NPC and crew member AI behavior system for co-op gameplay and civilian interactions"
+    },
+    {
+        "name":  "Footstep Sound Component",
+        "bucket":  "audio",
+        "why":  "Realistic footstep foley system for character movement across surfaces"
+    },
+    {
+        "name":  "Open World Audio System",
+        "bucket":  "plugin",
+        "why":  "Spatial audio system for ambient horror atmosphere and realistic sound propagation"
+    },
+    {
+        "name":  "Modular Suburban Metal Fence",
+        "bucket":  "prop",
+        "why":  "Industrial/suburban fence and boundary props for building exteriors"
+    },
+    {
+        "name":  "Madre",
+        "bucket":  "character",
+        "why":  "Realistic female civilian character model usable as crew member or civilian NPC"
+    },
+    {
+        "name":  "KDath: Modular Buildings 01",
+        "bucket":  "leveltool",
+        "why":  "Modular building components system for constructing houses, factories, and interiors"
+    },
+    {
+        "name":  "Modern Male Pack",
+        "bucket":  "character",
+        "why":  "Realistic modern civilian/worker character pack for emergency crew variety"
+    },
+    {
+        "name":  "Survival NPC вЂ” Maria \"Mimi\" Estrada",
+        "bucket":  "character",
+        "why":  "Realistic female civilian character for survival/emergency scenarios"
+    },
+    {
+        "name":  "Modular Skeleton (5.0+)",
+        "bucket":  "character",
+        "why":  "Modular rig for horror elements and corpse assets"
+    },
+    {
+        "name":  "Zombie вЂ” Business Suit (5.1+)",
+        "bucket":  "monster",
+        "why":  "Zombie in realistic business attire for horror scenarios"
+    },
+    {
+        "name":  "Ultimate Interaction Manager (5.1+)",
+        "bucket":  "plugin",
+        "why":  "Core interaction system for game mechanics"
+    },
+    {
+        "name":  "Cinemotion 2 Real Handheld Camera Motion Kit (5.1+)",
+        "bucket":  "plugin",
+        "why":  "Realistic handheld camera motion for immersive gameplay feel"
+    },
+    {
+        "name":  "Ultimate Master Shader (5.1+)",
+        "bucket":  "material",
+        "why":  "Master shader for realistic industrial/urban surface rendering"
+    },
+    {
+        "name":  "Led Sign Materials (4.27+)",
+        "bucket":  "material",
+        "why":  "Industrial LED signage materials for factory/facility environments"
+    },
+    {
+        "name":  "Real LED Sign and Digital Display Creator (5.1+)",
+        "bucket":  "material",
+        "why":  "System for creating industrial LED signs and digital displays"
+    },
+    {
+        "name":  "Realistic Decomposition",
+        "bucket":  "material",
+        "why":  "Realistic decay and decomposition effects for horror atmosphere"
+    },
+    {
+        "name":  "Palisade Walls and Barriers вЂ” v1",
+        "bucket":  "prop",
+        "why":  "Industrial barriers and obstacles for emergency crew scenarios"
+    },
+    {
+        "name":  "2D Icons вЂ” 100 Rank",
+        "bucket":  "ui",
+        "why":  "Free UI icon pack for HUD/menus/notifications"
+    },
+    {
+        "name":  "GOOD FX Rain",
+        "bucket":  "vfx",
+        "why":  "Rain visual effect for atmospheric horror environment"
+    },
+    {
+        "name":  "Kitbash3D вЂ” Trash Pack V-01",
+        "bucket":  "prop",
+        "why":  "Scanned 3D debris/trash for industrial/gritty locations"
+    },
+    {
+        "name":  "Kitbash3D вЂ” Trash Pack V-02",
+        "bucket":  "prop",
+        "why":  "Scanned 3D debris/trash for industrial/gritty locations"
+    },
+    {
+        "name":  "Kitbash3D вЂ” Trash Pack V-03",
+        "bucket":  "prop",
+        "why":  "Scanned 3D debris/trash for industrial/gritty locations"
+    },
+    {
+        "name":  "Kitbash3D вЂ” Trash Pack V-04",
+        "bucket":  "prop",
+        "why":  "Scanned 3D debris/trash for industrial/gritty locations"
+    },
+    {
+        "name":  "Talk while walking or standing animations",
+        "bucket":  "character",
+        "why":  "Civilian NPC animation set for realistic emergency crew movements"
+    },
+    {
+        "name":  "Procedural Character Component",
+        "bucket":  "plugin",
+        "why":  "Modular character building system for procedurally varied civilian NPCs"
+    },
+    {
+        "name":  "Cooperative Horror (5.0-5.3)",
+        "bucket":  "plugin",
+        "why":  "VIP cooperative horror game systems, mechanics \u0026 frameworks package"
+    },
+    {
+        "name":  "Dark Statues",
+        "bucket":  "prop",
+        "why":  "Free horror decoration props for building creepy atmosphere"
+    },
+    {
+        "name":  "Dissolution VFX Pack using Niagara",
+        "bucket":  "vfx",
+        "why":  "Niagara-based dissolution/disintegration effects for horror environments"
+    },
+    {
+        "name":  "Bags, Backpack \u0026 Survival Kit",
+        "bucket":  "prop",
+        "why":  "Emergency crew specialized equipment and gear for gameplay interaction"
+    },
+    {
+        "name":  "Customizable Puddles (4.27+)",
+        "bucket":  "material",
+        "why":  "Water and liquid surface effects for industrial/hospital/factory environments"
+    },
+    {
+        "name":  "Garage Tools Props",
+        "bucket":  "prop",
+        "why":  "Workshop and maintenance tools relevant for factory/emergency crew settings"
+    },
+    {
+        "name":  "GOOD FX Impact",
+        "bucket":  "vfx",
+        "why":  "Physical impact and collision visual effects for horror scenarios"
+    },
+    {
+        "name":  "Horror Cafe",
+        "bucket":  "prop",
+        "why":  "Horror-themed environmental props and decorations for crime scene/facility settings"
+    },
+    {
+        "name":  "Inventory and Stat System",
+        "bucket":  "plugin",
+        "why":  "Item interaction and character status management mechanics for gameplay"
+    },
+    {
+        "name":  "Kai Locomotion System (5.0 / 5.1)",
+        "bucket":  "plugin",
+        "why":  "Character movement and animation system for realistic civilian locomotion"
+    },
+    {
+        "name":  "Killer Clown",
+        "bucket":  "monster",
+        "why":  "Horror creature character for enemy encounters in cooperative horror scenarios"
+    },
+    {
+        "name":  "Map System (5.2)",
+        "bucket":  "plugin",
+        "why":  "Level design and mapping tools for manual level construction and blockout"
+    },
+    {
+        "name":  "Unique Ground Material Bundle",
+        "bucket":  "material",
+        "why":  "Industrial/concrete/dirt surface materials for factory, hospital, and house environments"
+    },
+    {
+        "name":  "Universal AI Spawner",
+        "bucket":  "plugin",
+        "why":  "AI behavior and spawning system for managing creature and enemy encounters"
+    },
+    {
+        "name":  "Vendors and Customer Animations",
+        "bucket":  "character",
+        "why":  "Civilian and worker character animations for realistic NPC interactions"
+    },
+    {
+        "name":  "Vending Machine + Food \u0026 Drink вЂ” Prop Pack",
+        "bucket":  "prop",
+        "why":  "Household and facility props for environmental detail in factories/hospitals/houses"
+    },
+    {
+        "name":  "WindVFX",
+        "bucket":  "vfx",
+        "why":  "Ambient visual effects for horror atmosphere and environmental effects"
+    },
+    {
+        "name":  "Monsters вЂ” Killer",
+        "bucket":  "monster",
+        "why":  "Horror creature asset for co-op enemy encounters"
+    },
+    {
+        "name":  "Monsters вЂ” Mummy",
+        "bucket":  "monster",
+        "why":  "Horror enemy creature for game encounters"
+    },
+    {
+        "name":  "Monsters вЂ” Wraith",
+        "bucket":  "monster",
+        "why":  "Supernatural horror creature for antagonist variety"
+    },
+    {
+        "name":  "Otherside beast",
+        "bucket":  "monster",
+        "why":  "Horror creature asset for game-ready enemy entities"
+    },
+    {
+        "name":  "Pedestrians",
+        "bucket":  "character",
+        "why":  "Civilian character animations for realistic emergency responder NPCs"
+    },
+    {
+        "name":  "POLYGON вЂ” Construction Pack",
+        "bucket":  "prop",
+        "why":  "Modular building/industrial props for factory and facility interior decoration"
+    },
+    {
+        "name":  "Pop-up \u0026 Notification System",
+        "bucket":  "ui",
+        "why":  "HUD notification system for alerts and interactive feedback"
+    },
+    {
+        "name":  "PP801 Character P3",
+        "bucket":  "character",
+        "why":  "Realistic civilian character model for game NPCs"
+    },
+    {
+        "name":  "Protective Suit",
+        "bucket":  "prop",
+        "why":  "Protective equipment asset fitting emergency crew gear (hazmat/safety suits)"
+    },
+    {
+        "name":  "Survival NPC вЂ” Michael Mike Davies",
+        "bucket":  "character",
+        "why":  "Realistic civilian NPC character model for ordinary people encounters"
+    },
+    {
+        "name":  "Ultimate Quest Manager",
+        "bucket":  "plugin",
+        "why":  "Quest and dialogue system for narrative progression and crew missions"
+    },
+    {
+        "name":  "Pro Icon Pack: Survival",
+        "bucket":  "ui",
+        "why":  "Survival-themed icons for game interface and HUD"
+    },
+    {
+        "name":  "Procedural UI: background and borders UMG material KIT",
+        "bucket":  "ui",
+        "why":  "UMG material framework for procedural UI design"
+    },
+    {
+        "name":  "Real Liquid X вЂ” Liquid Material \u0026 Blueprint",
+        "bucket":  "vfx",
+        "why":  "Liquid materials and effects for water, industrial hazards, horror scenes"
+    },
+    {
+        "name":  "Zombie вЂ” Bloated Female",
+        "bucket":  "monster",
+        "why":  "Realistic female zombie enemy character with animations"
+    },
+    {
+        "name":  "Zombie вЂ” Army Soldier",
+        "bucket":  "monster",
+        "why":  "Zombie enemy with soldier appearance variant"
+    },
+    {
+        "name":  "Zombie вЂ” Starved Female (Cheerleader)",
+        "bucket":  "monster",
+        "why":  "Cheerleader-themed zombie character variant"
+    },
+    {
+        "name":  "Toolset Collection вЂ” Vol 1",
+        "bucket":  "prop",
+        "why":  "Game-ready tool models for emergency crew equipment"
+    },
+    {
+        "name":  "TNT Flexible Locomotion System Multiplayer Ready",
+        "bucket":  "plugin",
+        "why":  "Multiplayer-ready character movement system for coop gameplay"
+    },
+    {
+        "name":  "VFX Series Pack 1",
+        "bucket":  "vfx",
+        "why":  "Particle effects pack for horror, smoke, fire, visual effects"
+    },
+    {
+        "name":  "Abandoned Hospital",
+        "bucket":  "prop",
+        "why":  "Hospital environment and props matching core game setting"
+    },
+    {
+        "name":  "Butcher",
+        "bucket":  "character",
+        "why":  "Realistic civilian character model for NPC variation"
+    },
+    {
+        "name":  "Character Wound System",
+        "bucket":  "plugin",
+        "why":  "Damage and wound system mechanics for horror gameplay"
+    },
+    {
+        "name":  "CGMA Studio Offices",
+        "bucket":  "prop",
+        "why":  "Commercial office environment assets"
+    },
+    {
+        "name":  "Character Climbing",
+        "bucket":  "plugin",
+        "why":  "Character climbing mechanic for level navigation and exploration"
+    },
+    {
+        "name":  "Medical Worker 01",
+        "bucket":  "character",
+        "why":  "СЂРµР°Р»РёСЃС‚РёС‡РЅС‹Р№ РјРµРґСЂР°Р±РѕС‚РЅРёРє РґР»СЏ РєРѕРјР°РЅРґС‹ Р°РІР°СЂРёР№РЅРѕР№ Р±СЂРёРіР°РґС‹"
+    },
+    {
+        "name":  "Industrial VOL.2 вЂ” Security Fences and Barriers",
+        "bucket":  "prop",
+        "why":  "РёРЅРґР°СЃС‚СЂРёР°Р»СЊРЅС‹Рµ РѕРіСЂР°Р¶РґРµРЅРёСЏ РґР»СЏ Р·Р°РІРѕРґРѕРІ/РїСЂРѕРјС‹С€Р»РµРЅРЅС‹С… РїРѕРјРµС‰РµРЅРёР№"
+    },
+    {
+        "name":  "Lens and Film Post Process",
+        "bucket":  "plugin",
+        "why":  "РїРѕСЃС‚СЌС„С„РµРєС‚С‹ РєР°РјРµСЂС‹ РґР»СЏ Р°С‚РјРѕСЃС„РµСЂС‹"
+    },
+    {
+        "name":  "Retro Industrial Props",
+        "bucket":  "prop",
+        "why":  "РёРЅРґР°СЃС‚СЂРёР°Р»СЊРЅС‹Рµ РїСЂРѕРїСЃС‹ РґР»СЏ Р·Р°РІРѕРґР°/Р±РѕР»СЊРЅРёС†С‹"
+    },
+    {
+        "name":  "Quarantine Medical Tent",
+        "bucket":  "prop",
+        "why":  "РјРµРґРёС†РёРЅСЃРєРѕРµ РѕР±РѕСЂСѓРґРѕРІР°РЅРёРµ Рё РїР°Р»Р°С‚РєРё РґР»СЏ Р±РѕР»СЊРЅРёС‡РЅРѕРіРѕ СЃРµС‚С‚РёРЅРіР°"
+    },
+    {
+        "name":  "Character Customizer",
+        "bucket":  "plugin",
+        "why":  "РєР°СЃС‚РѕРјРёР·Р°С†РёСЏ РїРµСЂСЃРѕРЅР°Р¶РµР№ РґР»СЏ СЂР°Р·РЅРѕРѕР±СЂР°Р·РёСЏ РєРѕРјР°РЅРґС‹"
+    },
+    {
+        "name":  "Operation File Read Write",
+        "bucket":  "plugin",
+        "why":  "СЂР°Р±РѕС‚Р° СЃ С„Р°Р№Р»Р°РјРё РґР»СЏ СЃРµР№РІ/Р·Р°РіСЂСѓР·РєРё"
+    },
+    {
+        "name":  "General Movement Component v.1.6.1",
+        "bucket":  "plugin",
+        "why":  "РєРѕРјРїРѕРЅРµРЅС‚ РґРІРёР¶РµРЅРёР№ РґР»СЏ РїРµСЂСЃРѕРЅР°Р¶РµР№ Рё AI-РїРѕРІРµРґРµРЅРёСЏ"
+    },
+    {
+        "name":  "Basic Ping System",
+        "bucket":  "plugin",
+        "why":  "СЃРёСЃС‚РµРјР° РєРѕРјРјСѓРЅРёРєР°С†РёРё РґР»СЏ РєРѕРѕРїРµСЂР°С‚РёРІРЅРѕРіРѕ РіРµР№РјРїР»РµСЏ"
+    },
+    {
+        "name":  "Blueprint JSON",
+        "bucket":  "plugin",
+        "why":  "СЂР°Р±РѕС‚Р° СЃ JSON РґР»СЏ СЃРµР№РІ-СЃРёСЃС‚РµРјС‹"
+    },
+    {
+        "name":  "DEMON BRUTE",
+        "bucket":  "monster",
+        "why":  "РІСЂР°Рі/РјРѕРЅСЃС‚СЂ РґР»СЏ С…РѕСЂСЂРѕСЂ-СЃРµС‚С‚РёРЅРіР°"
+    },
+    {
+        "name":  "DEMON MINION",
+        "bucket":  "monster",
+        "why":  "РІСЂР°Рі/РјРѕРЅСЃС‚СЂ РґР»СЏ С…РѕСЂСЂРѕСЂ-СЃРµС‚С‚РёРЅРіР°"
+    },
+    {
+        "name":  "Flashlight Beam Pattern Pack",
+        "bucket":  "material",
+        "why":  "СЌС„С„РµРєС‚С‹ С„РѕРЅР°СЂРёРєР° РґР»СЏ Р°С‚РјРѕСЃС„РµСЂС‹ С…РѕСЂСЂРѕСЂР°"
+    },
+    {
+        "name":  "Ruined Apartment",
+        "bucket":  "prop",
+        "why":  "Р Р°Р·СЂСѓС€РµРЅРЅС‹Рµ РїСЂРѕРїСЃС‹ Рё Р±С‹С‚РѕРІР°СЏ СѓС‚РІР°СЂСЊ РґР»СЏ РґРѕРјР°-СЃРµС‚С‚РёРЅРіР° (С…РѕСЂСЂРѕСЂ, СЂРµР°Р»РёСЃС‚РёС‡РЅС‹Р№ РёРЅС‚РµСЂСЊРµСЂ)"
+    },
+    {
+        "name":  "Abandoned Soviet Maternity Hospital",
+        "bucket":  "prop",
+        "why":  "Р“РѕС‚РѕРІС‹Рµ РїСЂРѕРїСЃС‹ Р±РѕР»СЊРЅРёС†С‹ СЃ С…РѕСЂСЂРѕСЂ-РґРµРєРѕСЂРѕРј РґР»СЏ СЃРµС‚С‚РёРЅРіР° (РѕРєРЅР°, РґРІРµСЂРё, РјРµРґРѕР±РѕСЂСѓРґРѕРІР°РЅРёРµ, РёРЅРґР°СЃС‚СЂРёР°Р»)"
+    },
+    {
+        "name":  "Abandoned Soviet Play School",
+        "bucket":  "prop",
+        "why":  "Р—Р°Р±СЂРѕС€РµРЅРЅРѕРµ Р·РґР°РЅРёРµ С€РєРѕР»С‹ - СЂРµР°Р»РёСЃС‚РёС‡РЅРѕРµ РѕРєСЂСѓР¶РµРЅРёРµ Рё РїСЂРѕРїСЃС‹ (РёСЃС‚РѕСЂРёС‡РµСЃРєР°СЏ Р°СЂС…РёС‚РµРєС‚СѓСЂР°, РјРµР±РµР»СЊ, С„СѓСЂРЅРёС‚СѓСЂР°)"
+    },
+    {
+        "name":  "Factory",
+        "bucket":  "prop",
+        "why":  "РџСЂРѕРјС‹С€Р»РµРЅРЅС‹Рµ РїСЂРѕРїСЃС‹ Рё РѕРєСЂСѓР¶РµРЅРёРµ РґР»СЏ Р·Р°РІРѕРґР°-СЃРµС‚С‚РёРЅРіР° (С‚СЂСѓР±С‹, РјРµС…Р°РЅРёР·РјС‹, Р±РµС‚РѕРЅ, СЂР¶Р°РІС‡РёРЅР°)"
+    },
+    {
+        "name":  "Ghost Effect \u0026 Material",
+        "bucket":  "vfx",
+        "why":  "РњР°С‚РµСЂРёР°Р»С‹ Рё СЌС„С„РµРєС‚С‹ РґР»СЏ С…РѕСЂСЂРѕСЂ-Р°С‚РјРѕСЃС„РµСЂС‹ (РїСЂРёРІРёРґРµРЅРёСЏ, СЃРІРµСЂС…СЉРµСЃС‚РµСЃС‚РІРµРЅРЅС‹Рµ СЏРІР»РµРЅРёСЏ, РІРѕР»РѕСЃС‹)"
+    },
+    {
+        "name":  "Ultimate VHS Shader",
+        "bucket":  "material",
+        "why":  "Horror-themed VHS visual effect material for atmospheric stylization"
+    },
+    {
+        "name":  "Heaps and Piles",
+        "bucket":  "prop",
+        "why":  "3D scattered debris and objects for industrial/derelict environment clutter"
+    },
+    {
+        "name":  "Hierarchical Task Network Planning AI 1.11.1",
+        "bucket":  "plugin",
+        "why":  "Advanced AI planning system for emergency team NPC behavior coordination"
+    },
+    {
+        "name":  "Volumetric Fog",
+        "bucket":  "vfx",
+        "why":  "Atmospheric fog effects system creating horror ambience in enclosed spaces"
+    },
+    {
+        "name":  "Advanced Scan System",
+        "bucket":  "plugin",
+        "why":  "Scanning/inspection mechanics UI system perfect for emergency repair tool interactions"
+    },
+    {
+        "name":  "Advanced Locomotion Component v1.5",
+        "bucket":  "plugin",
+        "why":  "Character movement and animation component for player emergency team controls"
+    },
+    {
+        "name":  "House Modular Ruins",
+        "bucket":  "prop",
+        "why":  "Modular environment assets for constructing damaged factory/industrial interiors"
+    },
+    {
+        "name":  "Quest System",
+        "bucket":  "plugin",
+        "why":  "Quest and mission system for co-op emergency repair scenarios and objectives"
+    },
+    {
+        "name":  "Lightshaft Master Material",
+        "bucket":  "material",
+        "why":  "Master material for light shaft effects creating atmospheric horror lighting"
+    },
+    {
+        "name":  "Basic Interaction, Widgets \u0026 Notes",
+        "bucket":  "plugin",
+        "why":  "Interaction system with UI widgets enabling emergency repair mechanic gameplay"
+    },
+    {
+        "name":  "Basic Interaction, Widgets \u0026 Notes (5.0)",
+        "bucket":  "ui",
+        "why":  "Interaction system with UI widgets for emergency team mechanics and object interactions"
+    },
+    {
+        "name":  "Fabric Materials вЂ” 56 4K PBR Pack (5.0+)",
+        "bucket":  "material",
+        "why":  "Realistic 4K PBR fabric textures for civilian clothing, furniture, and prop surfaces"
+    },
+    {
+        "name":  "Post Process Pro Pack (5.0+)",
+        "bucket":  "plugin",
+        "why":  "Post-processing effects suite for creating horror atmosphere and visual mood"
+    },
+    {
+        "name":  "Fluid Ninja LIVE 1.8.5 (v.5.0)",
+        "bucket":  "vfx",
+        "why":  "Fluid simulation for water, steam, smoke effects in industrial/factory/horror environments"
+    },
+    {
+        "name":  "Niagara Realistic Starter VFX Pack 2 (5.0-5.3)",
+        "bucket":  "vfx",
+        "why":  "Realistic particle effects for fire, smoke, electrical hazards, and environmental destruction"
+    },
+    {
+        "name":  "Influence Spawn System",
+        "bucket":  "plugin",
+        "why":  "NPC and entity spawning system for managing civilian populations and game dynamics"
+    },
+    {
+        "name":  "The Ghost Entity (5.0+)",
+        "bucket":  "monster",
+        "why":  "Supernatural horror character animation asset for emergency response encounters"
+    },
+    {
+        "name":  "The Backroom 5 Modular Levels (5.0-5.3)",
+        "bucket":  "leveltool",
+        "why":  "Modular horror level geometry and blockout assets for indoor level construction"
+    },
+    {
+        "name":  "Fortuna Ultimate Menu System",
+        "bucket":  "ui",
+        "why":  "Game menu and HUD system for UI implementation"
+    },
+    {
+        "name":  "Environmental Fires",
+        "bucket":  "vfx",
+        "why":  "Fire effects for horror atmosphere and industrial hazard scenarios"
+    },
+    {
+        "name":  "Construction Props вЂ” Vol 1",
+        "bucket":  "prop",
+        "why":  "Industrial props and building elements for factory/construction settings"
+    },
+    {
+        "name":  "Loot Set 100+ 3D Props",
+        "bucket":  "prop",
+        "why":  "Game-ready 3D props for environment decoration and emergency equipment"
+    },
+    {
+        "name":  "Old Man Animset",
+        "bucket":  "character",
+        "why":  "Realistic older civilian character animations for crew members and NPCs"
+    },
+    {
+        "name":  "Zombie вЂ” Starved Male",
+        "bucket":  "monster",
+        "why":  "Horror creature model for emergency response scenarios"
+    },
+    {
+        "name":  "Zombie Pro вЂ” MoCap Pack",
+        "bucket":  "monster",
+        "why":  "Motion-capture zombie animations for horror gameplay elements"
+    },
+    {
+        "name":  "Pushable Actor",
+        "bucket":  "plugin",
+        "why":  "Interactive system for moveable objects and environmental interaction"
+    },
+    {
+        "name":  "Abandoned Factory",
+        "bucket":  "prop",
+        "why":  "Industrial factory location with game-ready modular meshes for core game setting"
+    },
+    {
+        "name":  "Construction Site",
+        "bucket":  "prop",
+        "why":  "Industrial work environment with tools, equipment, debris props fitting repair crew aesthetic"
+    },
+    {
+        "name":  "Autumn alley",
+        "bucket":  "prop",
+        "why":  "Residential alley providing household props and urban setting meshes for house location scenarios"
+    },
+    {
+        "name":  "Water Stylized Custom",
+        "bucket":  "material",
+        "why":  "Water surface materials for pipes, leaks, industrial water damage effects in factory/house"
+    },
+    {
+        "name":  "Niagara Water Explosions Pack 01",
+        "bucket":  "vfx",
+        "why":  "Particle effects for steam bursts, water spray, industrial environmental effects"
+    },
+    {
+        "name":  "Industrial Kitbash and Coal Mine Set",
+        "bucket":  "prop",
+        "why":  "РњРѕРґСѓР»СЊРЅС‹Рµ РїСЂРѕРјС‹С€Р»РµРЅРЅС‹Рµ СЌР»РµРјРµРЅС‚С‹ РґР»СЏ Р±С‹СЃС‚СЂРѕР№ СЃР±РѕСЂРєРё СѓСЂРѕРІРЅСЏ Р·Р°РІРѕРґР°"
+    },
+    {
+        "name":  "Essential Niagara Environmental VFX",
+        "bucket":  "vfx",
+        "why":  "Р”С‹Рј, РѕРіРѕРЅСЊ, РІРѕРґР° вЂ” С…РѕСЂСЂРѕСЂ-СЌС„С„РµРєС‚С‹ РґР»СЏ РёРЅРґСѓСЃС‚СЂРёР°Р»СЊРЅРѕРіРѕ РѕРєСЂСѓР¶РµРЅРёСЏ"
+    },
+    {
+        "name":  "Zombies AC",
+        "bucket":  "monster",
+        "why":  "Р’СЂР°РіРё-Р·РѕРјР±Рё РґР»СЏ РєРѕРѕРї-С…РѕСЂСЂРѕСЂР° (РѕС‚Р»РѕР¶РµРЅРѕ РІ Р·Р°РєР»Р°РґРєСѓ)"
+    },
+    {
+        "name":  "Inventory Plugin",
+        "bucket":  "plugin",
+        "why":  "Equipment/tool management system for emergency repair team"
+    },
+    {
+        "name":  "Hospital вЂ” COMBO Prop Pack",
+        "bucket":  "prop",
+        "why":  "Hospital equipment and medical facility props for game setting"
+    },
+    {
+        "name":  "KitBash3D вЂ” Americana",
+        "bucket":  "prop",
+        "why":  "Modular suburban American props for house and town environments"
+    },
+    {
+        "name":  "KitBash3D вЂ” City Streets",
+        "bucket":  "prop",
+        "why":  "Modular urban street and building environment props"
+    },
+    {
+        "name":  "KitBash3D вЂ” Los Angeles",
+        "bucket":  "prop",
+        "why":  "Modular LA urban props for modern American city settings"
+    },
+    {
+        "name":  "Hong Kong Street",
+        "bucket":  "prop",
+        "why":  "Urban street environment with modular building and street props"
+    },
+    {
+        "name":  "Rain Sound Effects",
+        "bucket":  "audio",
+        "why":  "Ambient environmental audio for horror atmosphere and weather"
+    },
+    {
+        "name":  "House Furniture",
+        "bucket":  "prop",
+        "why":  "Game-ready household furniture for residential environments"
+    },
+    {
+        "name":  "Modular Prison Interior",
+        "bucket":  "prop",
+        "why":  "РњРѕРґСѓР»СЊРЅРѕРµ РёРЅРґР°СЃС‚СЂРёР°Р»СЊРЅРѕРµ РѕРєСЂСѓР¶РµРЅРёРµ СЃ Р±РµС‚РѕРЅРѕРј РґР»СЏ СЃРµС‚С‚РёРЅРіР°"
+    },
+    {
+        "name":  "Abandoned Factory",
+        "bucket":  "prop",
+        "why":  "Р—Р°РІРѕРґ РєР°Рє РѕСЃРЅРѕРІРЅРѕР№ СЃРµС‚С‚РёРЅРі СЃ РёРЅРґР°СЃС‚СЂРёР°Р»СЊРЅС‹РјРё РїСЂРѕРїСЃР°РјРё Рё РјР°С‚РµСЂРёР°Р»Р°РјРё"
+    },
+    {
+        "name":  "DevTon Abandoned Prison",
+        "bucket":  "prop",
+        "why":  "Р—Р°Р±СЂРѕС€РµРЅРЅР°СЏ С‚СЋСЂСЊРјР°, Р°Р»СЊС‚РµСЂРЅР°С‚РёРІРЅС‹Р№ СЃРµС‚С‚РёРЅРі СЃ Р°С‚РјРѕСЃС„РµСЂРѕР№"
+    },
+    {
+        "name":  "Tank Cleaning Center",
+        "bucket":  "prop",
+        "why":  "РРЅРґСѓСЃС‚СЂРёР°Р»СЊРЅС‹Р№ СЃРµС‚С‚РёРЅРі СЃ С‚РµС…РЅРёС‡РµСЃРєРёРјРё РѕР±СЉРµРєС‚Р°РјРё Рё РґРµРєРѕСЂРѕРј"
+    },
+    {
+        "name":  "EXPLOSIONS вЂ” Niagara Explosions, Fire, Smoke, Atom Explosions",
+        "bucket":  "vfx",
+        "why":  "Р­С„С„РµРєС‚С‹ РІР·СЂС‹РІРѕРІ, РѕРіРЅСЏ, РґС‹РјР° РґР»СЏ С…РѕСЂСЂРѕСЂ-СЃС†РµРЅ"
+    },
+    {
+        "name":  "Post Soviet Flat",
+        "bucket":  "prop",
+        "why":  "РЎРѕРІРµС‚СЃРєРёР№ РёРЅС‚РµСЂСЊРµСЂ Р¶РёР»РѕРіРѕ РґРѕРјР° РєР°Рє РѕРґРёРЅ РёР· СЃРµС‚С‚РёРЅРіРѕРІ"
+    },
+    {
+        "name":  "Abandoned Psychiatric Hospital",
+        "bucket":  "prop",
+        "why":  "Р‘РѕР»СЊРЅРёС†Р° РєР°Рє РѕСЃРЅРѕРІРЅРѕР№ СЃРµС‚С‚РёРЅРі СЃ РјСЂР°С‡РЅС‹Рј РґРµРєРѕСЂРѕРј"
+    },
+    {
+        "name":  "Slaughterhouse",
+        "bucket":  "prop",
+        "why":  "РРЅРґСѓСЃС‚СЂРёР°Р»СЊРЅС‹Р№ РѕР±СЉРµРєС‚ Р±РѕР№РЅРё СЃ Р°С‚РјРѕСЃС„РµСЂРѕР№ Рё РјР°С‚РµСЂРёР°Р»Р°РјРё"
+    },
+    {
+        "name":  "1900s Industrial Environment",
+        "bucket":  "prop",
+        "why":  "РРЅРґСѓСЃС‚СЂРёР°Р»СЊРЅС‹Р№ СЃРµС‚С‚РёРЅРі РЅР°С‡Р°Р»Р° XX РІРµРєР° СЃ РґРµС‚Р°Р»СЏРјРё Рё РїРѕРІРµСЂС…РЅРѕСЃС‚СЏРјРё"
+    },
+    {
+        "name":  "Concrete Debris VFX Pack",
+        "bucket":  "vfx",
+        "why":  "Р­С„С„РµРєС‚С‹ СЂР°Р·СЂСѓС€РµРЅРёСЏ РєРѕРЅРєСЂРµС‚Р° РґР»СЏ СЃС†РµРЅ РІР·Р°РёРјРѕРґРµР№СЃС‚РІРёСЏ Рё РїРѕРІСЂРµР¶РґРµРЅРёР№"
+    },
+    {
+        "name":  "Spiders Pack (4.27 вЂ” 5.3)",
+        "bucket":  "monster",
+        "why":  "РђРЅРёРјРёСЂРѕРІР°РЅРЅС‹Рµ РїР°СѓРєРё РєР°Рє РІСЂР°РіРё/СЃСѓС‰РµСЃС‚РІР° РґР»СЏ С…РѕСЂСЂРѕСЂ-Р°С‚РјРѕСЃС„РµСЂС‹"
+    },
+    {
+        "name":  "VisAI вЂ” Companion вЂ” Modern AI Framework",
+        "bucket":  "plugin",
+        "why":  "AI framework РґР»СЏ РїРѕРІРµРґРµРЅРёСЏ Рё РІРѕСЃРїСЂРёСЏС‚РёСЏ СЃСѓС‰РµСЃС‚РІ"
+    },
+    {
+        "name":  "Bodybags",
+        "bucket":  "prop",
+        "why":  "Horror decoration element for abandoned building/disaster scenarios"
+    },
+    {
+        "name":  "Water Effect (NIAGARA)",
+        "bucket":  "vfx",
+        "why":  "Water effects for foley, pipe breaks, flooding in factory/building emergencies"
+    },
+    {
+        "name":  "Cloud Forge вЂ” VDB Cloud Pack Volume 1",
+        "bucket":  "vfx",
+        "why":  "Smoke/fog volumes for horror atmosphere and emergency hazard visualization"
+    },
+    {
+        "name":  "Scaffolding Pack",
+        "bucket":  "prop",
+        "why":  "Industrial construction props for factory/building setting detail"
+    },
+    {
+        "name":  "Daily Life AI",
+        "bucket":  "plugin",
+        "why":  "Civilian NPC behavior system for realistic background characters"
+    },
+    {
+        "name":  "1940\u0027s Abandoned Office (Modular)",
+        "bucket":  "prop",
+        "why":  "Modular office/building interior props for house/hospital/workplace environments"
+    },
+    {
+        "name":  "Character Factory Vol 3 RuSpecial",
+        "bucket":  "character",
+        "why":  "РњРѕРґСѓР»СЊРЅС‹Рµ СЂРµР°Р»РёСЃС‚РёС‡РЅС‹Рµ РіСЂР°Р¶РґР°РЅСЃРєРёРµ РїРµСЂСЃРѕРЅР°Р¶Рё (Р¶РёР»СЊС†С‹, СЂР°Р±РѕС‡РёРµ, РєРѕРјРјСѓРЅР°Р»СЊС‰РёРєРё)"
+    },
+    {
+        "name":  "Safe House",
+        "bucket":  "plugin",
+        "why":  "Game systems РґР»СЏ РёРЅС‚РµСЂР°РєС†РёР№ РІ РёРЅС‚РµСЂСЊРµСЂР°С… РґРѕРјР°"
+    },
+    {
+        "name":  "General Movement Component (5.0)",
+        "bucket":  "plugin",
+        "why":  "РЎРёСЃС‚РµРјР° РґРІРёР¶РµРЅРёСЏ РїРµСЂСЃРѕРЅР°Р¶РµР№"
+    },
+    {
+        "name":  "Wooden Constructor",
+        "bucket":  "leveltool",
+        "why":  "РњРѕРґСѓР»СЊРЅС‹Р№ РёРЅСЃС‚СЂСѓРјРµРЅС‚ РґР»СЏ РєРѕРЅСЃС‚СЂСѓРёСЂРѕРІР°РЅРёСЏ СѓСЂРѕРІРЅРµР№ Р±Р»РѕРєР°СѓС‚РѕРј"
+    },
+    {
+        "name":  "Rusty Barrels Vol.1",
+        "bucket":  "prop",
+        "why":  "РРЅРґР°СЃС‚СЂРёР°Р»СЊРЅС‹Рµ РїСЂРѕРїСЃС‹ СЃ С‚РµРєСЃС‚СѓСЂР°РјРё СЂР¶Р°РІС‡РёРЅС‹ Рё РѕРєРёСЃРё"
+    },
+    {
+        "name":  "Victorian Decayed Alley Environment",
+        "bucket":  "material",
+        "why":  "РўРµРєСЃС‚СѓСЂС‹ РіСЂСЏР·Рё/СЂР¶Р°РІС‡РёРЅС‹/СЂР°Р·СЂСѓС€РµРЅРёСЏ РґР»СЏ С…РѕСЂСЂРѕСЂ-Р°С‚РјРѕСЃС„РµСЂС‹"
+    },
+    {
+        "name":  "Fire Hydrant Package",
+        "bucket":  "prop",
+        "why":  "РЎРїРµС†РѕР±РѕСЂСѓРґРѕРІР°РЅРёРµ (РіРёРґСЂР°РЅС‚) РґР»СЏ СЂРµР°Р»РёСЃС‚РёС‡РЅС‹С… СЃС†РµРЅР°СЂРёРµРІ Р°РІР°СЂРёР№РЅРѕР№ Р±СЂРёРіР°РґС‹"
+    },
+    {
+        "name":  "Real Fire Pack 2D Effect Pack",
+        "bucket":  "vfx",
+        "why":  "VFX РѕРіРЅСЏ/РїРѕР¶Р°СЂР° РґР»СЏ СЃС†РµРЅР°СЂРёРµРІ Рё С…РѕСЂСЂРѕСЂ-СЌС„С„РµРєС‚РѕРІ"
+    },
+    {
+        "name":  "Simple Multiplayer Lobby V4",
+        "bucket":  "plugin",
+        "why":  "РЎРёСЃС‚РµРјР° РјСѓР»СЊС‚РёРїР»РµРµСЂР° РґР»СЏ РєРѕРѕРї-СЂРµР¶РёРјР° РёРіСЂС‹"
+    },
+    {
+        "name":  "Humanoids Creatures Pack",
+        "bucket":  "character",
+        "why":  "Р РµР°Р»РёСЃС‚РёС‡РЅС‹Рµ РіСЂР°Р¶РґР°РЅСЃРєРёРµ РїРµСЂСЃРѕРЅР°Р¶Рё-Р»СЋРґРё РґР»СЏ РѕРєСЂСѓР¶РµРЅРёСЏ"
+    },
+    {
+        "name":  "Burning Wood Materials Animated",
+        "bucket":  "vfx",
+        "why":  "РђРЅРёРјРёСЂРѕРІР°РЅРЅС‹Рµ РјР°С‚РµСЂРёР°Р»С‹ РѕРіРЅСЏ РґР»СЏ С…РѕСЂСЂРѕСЂ-СЌС„С„РµРєС‚РѕРІ"
+    },
+    {
+        "name":  "Hmonster",
+        "bucket":  "monster",
+        "why":  "РњРѕРЅСЃС‚СЂ/СЃСѓС‰РµСЃС‚РІРѕ РґР»СЏ РѕС‚Р»РѕР¶РµРЅРЅРѕР№ СЂР°Р·СЂР°Р±РѕС‚РєРё (РІ Р·Р°РєР»Р°РґРєСѓ)"
+    },
+    {
+        "name":  "Universal Character Customization System",
+        "bucket":  "plugin",
+        "why":  "Modular system for creating diverse realistic civilian characters with animation framework"
+    },
+    {
+        "name":  "Hadi\u0027s Smart Camera 2.0",
+        "bucket":  "plugin",
+        "why":  "Dynamic camera control system for third-person co-op gameplay and cinematic moments"
+    },
+    {
+        "name":  "AI Optimizer",
+        "bucket":  "plugin",
+        "why":  "Performance optimization tool for managing game systems in complex multiplayer scenarios"
+    },
+    {
+        "name":  "Balance Component: 53 Animations + Blueprints",
+        "bucket":  "plugin",
+        "why":  "Character animation framework with balance mechanics for co-op interactions"
+    },
+    {
+        "name":  "Basic moving animation set",
+        "bucket":  "plugin",
+        "why":  "Foundational character locomotion and movement animations for civilians"
+    },
+    {
+        "name":  "Modular Characters MegaPack",
+        "bucket":  "character",
+        "why":  "Extensive modular system for creating diverse ordinary people (workers, residents, utility crew)"
+    },
+    {
+        "name":  "Real Materials Complete",
+        "bucket":  "material",
+        "why":  "Industrial/survival surface materials for factory, concrete, pipes, weathering, rust effects"
+    },
+    {
+        "name":  "Plan V Window Kit",
+        "bucket":  "prop",
+        "why":  "Modular architectural window and door elements for house/factory/hospital interiors"
+    },
+    {
+        "name":  "Lightning \u0026 Electric Effect Alembics Pack",
+        "bucket":  "vfx",
+        "why":  "High-fidelity electrical hazard and sparking effects for horror atmosphere in industrial settings"
+    },
+    {
+        "name":  "Giant Boss Pack",
+        "bucket":  "monster",
+        "why":  "Boss-tier creature animations and game systems for major horror encounters"
+    },
+    {
+        "name":  "Zombie вЂ” Bloated Male",
+        "bucket":  "monster",
+        "why":  "Grotesque zombie enemy variant for horror-comedy encounters"
+    },
+    {
+        "name":  "Zombie вЂ” Dismembered Crawler Male",
+        "bucket":  "monster",
+        "why":  "Mutilated zombie crawler variant adding grotesque horror-comedy variety"
+    },
+    {
+        "name":  "Realistic Blood VFX",
+        "bucket":  "vfx",
+        "why":  "Niagara gore effects for horror comedy moments in emergency crew scenarios"
+    },
+    {
+        "name":  "Kitbash Hard-Surface Mix V1",
+        "bucket":  "prop",
+        "why":  "Industrial hard-surface elements for factory/building/hospital interior decoration"
+    },
+    {
+        "name":  "Interaction With Advanced Locomotion System",
+        "bucket":  "plugin",
+        "why":  "Foundation character movement system for co-op gameplay mechanics"
+    },
+    {
+        "name":  "Universal Doors System",
+        "bucket":  "plugin",
+        "why":  "Door interaction mechanics essential for exploration and repair crew gameplay"
+    },
+    {
+        "name":  "Input Keys Icon Pack",
+        "bucket":  "ui",
+        "why":  "Control hint icons for HUD and player feedback"
+    },
+    {
+        "name":  "Dust and Smoke Effects (NIAGARA)",
+        "bucket":  "vfx",
+        "why":  "Environmental atmospheric effects for horror ambience in damaged/abandoned spaces"
+    },
+    {
+        "name":  "Interaction System Starter Pack",
+        "bucket":  "plugin",
+        "why":  "Interactive object mechanics foundation for repair/investigation gameplay systems"
+    },
+    {
+        "name":  "Pipe System Pack",
+        "bucket":  "prop",
+        "why":  "Modular industrial piping for factory/facility/building interior construction"
+    },
+    {
+        "name":  "Gore \u0026 Horror Props Megapack",
+        "bucket":  "prop",
+        "why":  "Game-ready horror props/gore decor for atmosphere in emergency response scenarios"
+    },
+    {
+        "name":  "EOS Online Subsystem (5.1)",
+        "bucket":  "plugin",
+        "why":  "Multiplayer networking backend for co-op sessions and voice communication"
+    },
+    {
+        "name":  "HairBuilder вЂ” Over 500 Hairstyles combinations",
+        "bucket":  "character",
+        "why":  "Modular character customization system for realistic civilian crew members"
+    },
+    {
+        "name":  "Ultimate Torches package / 50 Variations",
+        "bucket":  "prop",
+        "why":  "Industrial/horror lighting props for factories, basements, and dark environments"
+    },
+    {
+        "name":  "Hyper Skill Level Manager v2",
+        "bucket":  "plugin",
+        "why":  "Game progression/task completion system for emergency response mechanics"
+    },
+    {
+        "name":  "Hyper Swimming System V2",
+        "bucket":  "plugin",
+        "why":  "Water interaction system for flooded areas and facility maintenance scenarios"
+    },
+    {
+        "name":  "Pro Main Menu V3: Blue Edition",
+        "bucket":  "ui",
+        "why":  "Professional main menu system suitable for game HUD/UI needs"
+    },
+    {
+        "name":  "Easy Urban Concrete Kit",
+        "bucket":  "material",
+        "why":  "Urban concrete surface materials for industrial/horror environment building"
+    },
+    {
+        "name":  "Detective Character",
+        "bucket":  "character",
+        "why":  "Realistic civilian character model fitting emergency team/investigator role"
+    },
+    {
+        "name":  "Horror Mechanics",
+        "bucket":  "plugin",
+        "why":  "Game mechanics system specifically designed for horror game mechanics implementation"
+    },
+    {
+        "name":  "Abandoned Russian Building",
+        "bucket":  "prop",
+        "why":  "Industrial building props/assets providing game-ready meshes for factory/abandoned interior environments"
+    },
+    {
+        "name":  "Server Room Kit",
+        "bucket":  "prop",
+        "why":  "Industrial environment assets for factory/modern building interiors and infrastructure"
+    },
+    {
+        "name":  "Public Restroom Props",
+        "bucket":  "prop",
+        "why":  "Everyday bathroom fixtures suitable for house/hospital/factory settings"
+    },
+    {
+        "name":  "Abandoned Sewer",
+        "bucket":  "prop",
+        "why":  "Industrial infrastructure assets for underground building systems and sewer environment"
+    },
+    {
+        "name":  "Survival NPC вЂ” Hank \"Murph\" Murphy",
+        "bucket":  "character",
+        "why":  "Realistic civilian character model for ordinary people in emergency response scenarios"
+    }
+]

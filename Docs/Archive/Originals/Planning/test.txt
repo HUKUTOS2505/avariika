@@ -1,0 +1,69 @@
+Вот финальный список запросов + что из уже найденного брать обязательно.
+📋 ЗАПРОСЫ ДЛЯ ПОИСКА (вбивай, делай скрин, кидай мне)
+🥇 Скрин 1 — Кооп (САМОЕ ВАЖНОЕ, без этого нет игры):
+multiplayer
+EOS
+steam sessions
+voice chat
+lobby
+🥈 Скрин 2 — Окружение (локации):
+hospital
+apartment
+factory
+ship interior
+basement
+🥉 Скрин 3 — Звук (игра построена на звуке):
+horror sound
+ambient
+footstep
+monster sound
+(или просто зайди в категорию «Звуковые эффекты»)
+Скрин 4 — VFX:
+niagara
+smoke fire
+fog
+explosion
+(или категория «Эффекты Niagara»)
+Скрин 5 — Персонажи и монстры:
+worker character
+civilian
+creature
+monster
+(или категория «Персонажи»)
+Скрин 6 — Системы:
+inventory
+shop
+save game
+weather
+
+✅ ЧТО ОБЯЗАТЕЛЬНО БРАТЬ (из уже найденного)
+Окружение — больница (твой флагман):
+
+✅ City MODULAR HOSPITAL v.2 — главный, конструктор больницы (стены, лестницы, мебель, парковка, мусор)
+✅ Modern Hospital Environment (229 моделей) — добор
+✅ Hospital — COMBO Prop Pack (VOL 1-6) — вся мебель больницы
+
+Окружение — дом (для прототипа 0.1):
+
+✅ Modular Haunted House — модульный дом, на нём проще всего собрать ПЕРВЫЙ прототип
+
+Системы/плагины (то что реально нужно):
+
+✅ EOSCore (Epic Online Services) — фундамент коопа 🟢🟢 КРИТИЧНО
+✅ AudioToolkit Pro — обработка звука (вся игра на звуке)
+✅ Hyper Dynamic Weather & Sky — ночь/дождь/гроза
+✅ Easy Options Menu — меню настроек
+✅ OG Main Menu System — главное меню
+
+Мелочёвка:
+
+✅ POS System (FREE) — переделать под магазин снаряжения в ГАЗели
+
+
+⭐ ТОП-5 ПРИОРИТЕТ (если брать только самое нужное)
+
+EOSCore — без онлайна нет коопа (фундамент)
+Modular Haunted House ИЛИ City MODULAR HOSPITAL — нужна хоть ОДНА карта
+AudioToolkit Pro — звук = половина хоррора
+OG Main Menu + Easy Options Menu — меню (нужно для любой игры)
+Hyper Dynamic Weather — атмосфера ночи/дождя
