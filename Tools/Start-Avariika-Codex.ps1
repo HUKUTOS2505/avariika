@@ -1,6 +1,7 @@
 $ErrorActionPreference = "Stop"
 
 $ProjectPath = "C:\unrealEngine\avariika"
+$CodexHome = "C:\Users\admin\.codex"
 $McpHost = "127.0.0.1"
 $McpPort = 13579
 
@@ -12,7 +13,7 @@ function Write-Step {
         [ConsoleColor]$Color = [ConsoleColor]::Gray
     )
 
-    Write-Host ("[Avariika] " + $Message) -ForegroundColor $Color
+    Write-Host ("[Avariika Codex Personal] " + $Message) -ForegroundColor $Color
 }
 
 function Test-McpTcpPort {
@@ -47,30 +48,25 @@ if (-not (Test-Path -LiteralPath $ProjectPath)) {
 
 Set-Location -LiteralPath $ProjectPath
 
-$codexCommand = Get-Command codex -ErrorAction SilentlyContinue
-if (-not $codexCommand) {
+if (-not (Get-Command codex -ErrorAction SilentlyContinue)) {
     Write-Step "codex not found in PATH." Red
     exit 1
 }
 
-Write-Step "codex found: $($codexCommand.Source)" Green
+if (-not (Test-Path -LiteralPath $CodexHome)) {
+    New-Item -ItemType Directory -Path $CodexHome -Force | Out-Null
+}
+
+$env:CODEX_HOME = $CodexHome
+Write-Step "CODEX_HOME: $env:CODEX_HOME" Cyan
 
 if (Test-McpTcpPort) {
-    Write-Step "Unreal MCP TCP port open: ${McpHost}:${McpPort}" Green
+    Write-Step ("Unreal MCP TCP port open: {0}:{1}" -f $McpHost, $McpPort) Green
 }
 else {
-    Write-Step "Unreal MCP TCP port closed: ${McpHost}:${McpPort}" Yellow
+    Write-Step ("Unreal MCP TCP port closed: {0}:{1}" -f $McpHost, $McpPort) Yellow
 }
 
-Write-Step "Starting Codex: resume last session" Cyan
-& codex resume --last -C $ProjectPath -s danger-full-access -a never
-$resumeExitCode = $LASTEXITCODE
-
-if ($resumeExitCode -ne 0) {
-    Write-Step "Codex resume failed with exit code $resumeExitCode. Starting new session." Yellow
-    & codex -C $ProjectPath -s danger-full-access -a never
-    exit $LASTEXITCODE
-}
-
-Write-Step "Codex resume session finished." Green
-exit $resumeExitCode
+Write-Step "Starting Codex Personal" Cyan
+& codex -C $ProjectPath --dangerously-bypass-approvals-and-sandbox
+exit $LASTEXITCODE
