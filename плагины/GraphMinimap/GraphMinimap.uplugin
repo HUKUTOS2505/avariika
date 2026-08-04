@@ -1,0 +1,38 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "1.7",
+	"FriendlyName": "GraphMinimap",
+	"Description": "This plugin adds a minimap to the graph editor that gives you an overview of the entire graph.\r\nYou can also operate the graph editor from the minimap.",
+	"Category": "Editor",
+	"CreatedBy": "Naotsun",
+	"CreatedByURL": "https://twitter.com/Naotsun_UE",
+	"DocsURL": "https://github.com/Naotsun19B/GraphMinimap-Document",
+	"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/content/456239b86771488797ed5663224cff61",
+	"SupportURL": "https://github.com/Naotsun19B/GraphMinimap-Document",
+	"EngineVersion": "5.3.0",
+	"CanContainContent": false,
+	"Installed": true,
+	"Modules": [
+		{
+			"Name": "GraphMinimap",
+			"Type": "EditorNoCommandlet",
+			"LoadingPhase": "Default",
+			"PlatformAllowList": [
+				"Win64",
+				"Mac",
+				"Linux"
+			]
+		},
+		{
+			"Name": "GraphMinimapRemoteControl",
+			"Type": "EditorNoCommandlet",
+			"LoadingPhase": "Default"
+		},
+		{
+			"Name": "GraphMinimapStreamDeck",
+			"Type": "EditorNoCommandlet",
+			"LoadingPhase": "Default"
+		}
+	]
+}

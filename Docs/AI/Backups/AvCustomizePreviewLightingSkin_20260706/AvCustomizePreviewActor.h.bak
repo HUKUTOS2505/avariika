@@ -1,0 +1,56 @@
+#pragma once
+
+#include "CoreMinimal.h"
+#include "GameFramework/Actor.h"
+#include "Components/WorkerAppearanceComponent.h"
+#include "AvCustomizePreviewActor.generated.h"
+
+class USceneCaptureComponent2D;
+class UTextureRenderTarget2D;
+class UDirectionalLightComponent;
+class UPointLightComponent;
+
+UCLASS()
+class AVARYO_API AAvCustomizePreviewActor : public AActor
+{
+	GENERATED_BODY()
+
+public:
+	AAvCustomizePreviewActor();
+
+	void InitializePreview(UTextureRenderTarget2D* InRenderTarget);
+	void SetPreviewAppearance(const FWorkerAppearance& InAppearance);
+	void SetPreviewSlotColor(EWorkerSlot Slot, const FLinearColor& Color);
+
+	UFUNCTION(BlueprintCallable, Category="AvCustomize")
+	void SetPreviewYaw(float InYawDegrees);
+
+protected:
+	virtual void BeginPlay() override;
+
+private:
+	void ApplyIdleAnimation();
+	void ApplyPreviewYaw();
+	void ConfigurePreviewMeshes();
+	void ConfigurePreviewMesh(USkeletalMeshComponent* Mesh) const;
+	bool GetPreviewLocalBounds(FBox& OutLocalBounds) const;
+	void RefreshCaptureShowOnly();
+	void UpdateCaptureFraming();
+
+	UPROPERTY(VisibleAnywhere, Category="AvCustomize")
+	TObjectPtr<USceneComponent> SceneRoot;
+
+	UPROPERTY(VisibleAnywhere, Category="AvCustomize")
+	TObjectPtr<UWorkerAppearanceComponent> AppearanceComponent;
+
+	UPROPERTY(VisibleAnywhere, Category="AvCustomize")
+	TObjectPtr<USceneCaptureComponent2D> SceneCapture;
+
+	UPROPERTY(VisibleAnywhere, Category="AvCustomize")
+	TObjectPtr<UDirectionalLightComponent> KeyLight;
+
+	UPROPERTY(VisibleAnywhere, Category="AvCustomize")
+	TObjectPtr<UPointLightComponent> FillLight;
+
+	float PreviewYawDegrees = 0.f;
+};

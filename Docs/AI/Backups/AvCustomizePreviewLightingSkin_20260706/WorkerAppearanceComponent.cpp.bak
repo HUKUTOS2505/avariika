@@ -1,0 +1,420 @@
+#include "Components/WorkerAppearanceComponent.h"
+
+#include "Components/SkeletalMeshComponent.h"
+#include "Components/CapsuleComponent.h"
+#include "Engine/SkeletalMesh.h"
+#include "Materials/MaterialInstanceDynamic.h"
+#include "GameFramework/Actor.h"
+#include "GameFramework/Character.h"
+#include "Net/UnrealNetwork.h"
+#include "AssetRegistry/AssetRegistryModule.h"
+#include "AssetRegistry/IAssetRegistry.h"
+
+// ---- Курированные пути паком Modular Workers (Quantum, UE5-mann). См. MODULAR_WORKER_PLAN.md ----
+namespace AvWorkerAssets
+{
+	// База («бомж»)
+	static const TCHAR* Body  = TEXT("/Game/Modular_Workers/Mesh/Male/Body/European/SKM_Quantum_Body_Bottom.SKM_Quantum_Body_Bottom");
+	static const TCHAR* BodyBottom = TEXT("/Game/Modular_Workers/Mesh/Male/Body/European/SKM_Quantum_Body_Bottom.SKM_Quantum_Body_Bottom");
+	static const TCHAR* Head  = TEXT("/Game/Modular_Workers/Mesh/Male/Body/European/SKM_Quantum_Head.SKM_Quantum_Head");
+	static const TCHAR* Feet  = TEXT("/Game/Modular_Workers/Mesh/Male/Body/European/SKM_Quantum_Feet.SKM_Quantum_Feet");
+	static const TCHAR* Hair  = TEXT("/Game/Modular_Workers/Mesh/Male/Head_Modules/Hair/SKM_Hair_Short.SKM_Hair_Short");
+	static const TCHAR* Tshirt= TEXT("/Game/Modular_Workers/Mesh/Male/Clothes_Modules/Tshirt/SKM_TShirt_Bege.SKM_TShirt_Bege");
+	static const TCHAR* Jeans = TEXT("/Game/Modular_Workers/Mesh/Male/Pants_Modules/Jeans/SKM_Jeans_Blue.SKM_Jeans_Blue");
+	// Снаряжение (косметика=функция). Каска оранжевая — акцентный цвет проекта.
+	static const TCHAR* Helmet     = TEXT("/Game/Modular_Workers/Mesh/Male/Head_Modules/Helmet_Worker/SKM_Helmet_Worker_Orange.SKM_Helmet_Worker_Orange");
+	static const TCHAR* Respirator = TEXT("/Game/Modular_Workers/Mesh/Male/Face_Modules/Respirator/SKM_Respirator.SKM_Respirator");
+	static const TCHAR* Gloves     = TEXT("/Game/Modular_Workers/Mesh/Male/Arms_Modules/Gloves_Worker/SKM_Gloves_Worker.SKM_Gloves_Worker");
+
+	static TSoftObjectPtr<USkeletalMesh> Soft(const TCHAR* Path)
+	{
+		return TSoftObjectPtr<USkeletalMesh>(FSoftObjectPath(Path));
+	}
+}
+
+// =================== FWorkerAppearance ===================
+
+void FWorkerAppearance::Set(EWorkerSlot Slot, const TSoftObjectPtr<USkeletalMesh>& Mesh)
+{
+	if (Mesh.IsNull())
+	{
+		Clear(Slot);
+		return;
+	}
+	for (FWorkerSlotMesh& S : Slots)
+	{
+		if (S.Slot == Slot) { S.Mesh = Mesh; return; }
+	}
+	Slots.Emplace(Slot, Mesh);
+}
+
+void FWorkerAppearance::Clear(EWorkerSlot Slot)
+{
+	Slots.RemoveAll([Slot](const FWorkerSlotMesh& S){ return S.Slot == Slot; });
+}
+
+TSoftObjectPtr<USkeletalMesh> FWorkerAppearance::Get(EWorkerSlot Slot) const
+{
+	for (const FWorkerSlotMesh& S : Slots)
+	{
+		if (S.Slot == Slot) return S.Mesh;
+	}
+	return TSoftObjectPtr<USkeletalMesh>();
+}
+
+// =================== UWorkerAppearanceComponent ===================
+
+UWorkerAppearanceComponent::UWorkerAppearanceComponent()
+{
+	PrimaryComponentTick.bCanEverTick = false;
+	SetIsReplicatedByDefault(true);
+}
+
+void UWorkerAppearanceComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(UWorkerAppearanceComponent, Appearance);
+}
+
+void UWorkerAppearanceComponent::BeginPlay()
+{
+	Super::BeginPlay();
+	// Если внешность пришла заранее (сейв/реплика до BeginPlay) — собрать.
+	if (Appearance.Slots.Num() > 0)
+	{
+		RebuildVisuals();
+	}
+}
+
+bool IsAuth(const UActorComponent* C)
+{
+	const AActor* O = C ? C->GetOwner() : nullptr;
+	return O && O->HasAuthority();
+}
+
+void UWorkerAppearanceComponent::SetSlotMesh(EWorkerSlot Slot, USkeletalMesh* Mesh)
+{
+	if (!IsAuth(this)) return;
+	Appearance.Set(Slot, TSoftObjectPtr<USkeletalMesh>(Mesh));
+	RebuildVisuals();
+}
+
+void UWorkerAppearanceComponent::ClearSlot(EWorkerSlot Slot)
+{
+	if (!IsAuth(this)) return;
+	Appearance.Clear(Slot);
+	RebuildVisuals();
+}
+
+void UWorkerAppearanceComponent::ApplyAppearance(const FWorkerAppearance& NewAppearance)
+{
+	if (!IsAuth(this)) return;
+	Appearance = NewAppearance;
+	RebuildVisuals();
+}
+
+bool UWorkerAppearanceComponent::ApplyLocalPreviewAppearance(const FWorkerAppearance& NewAppearance)
+{
+	AActor* Owner = GetOwner();
+	if (!Owner || Owner->GetIsReplicated())
+	{
+		return false;
+	}
+
+	Appearance = NewAppearance;
+	RebuildVisuals();
+	return true;
+}
+
+void UWorkerAppearanceComponent::ClearAll()
+{
+	if (!IsAuth(this)) return;
+	Appearance.Slots.Reset();
+	RebuildVisuals();
+}
+
+void UWorkerAppearanceComponent::ApplyDefaultPreset()
+{
+	if (!IsAuth(this)) return;
+	FWorkerAppearance A;
+	A.Set(EWorkerSlot::Body,  AvWorkerAssets::Soft(AvWorkerAssets::Body));
+	A.Set(EWorkerSlot::Head,  AvWorkerAssets::Soft(AvWorkerAssets::Head));
+	A.Set(EWorkerSlot::Feet,  AvWorkerAssets::Soft(AvWorkerAssets::Feet));
+	A.Set(EWorkerSlot::Hair,  AvWorkerAssets::Soft(AvWorkerAssets::Hair));
+	A.Set(EWorkerSlot::Torso, AvWorkerAssets::Soft(AvWorkerAssets::Tshirt));
+	A.Set(EWorkerSlot::Legs,  AvWorkerAssets::Soft(AvWorkerAssets::Jeans));
+	ApplyAppearance(A);
+}
+
+void UWorkerAppearanceComponent::ApplyEquipmentFlags(bool bHelmet, bool bGasMask, bool bGloves)
+{
+	if (!IsAuth(this)) return;
+	if (bHelmet)  Appearance.Set(EWorkerSlot::Headgear, AvWorkerAssets::Soft(AvWorkerAssets::Helmet));
+	else          Appearance.Clear(EWorkerSlot::Headgear);
+	if (bGasMask) Appearance.Set(EWorkerSlot::FaceMask, AvWorkerAssets::Soft(AvWorkerAssets::Respirator));
+	else          Appearance.Clear(EWorkerSlot::FaceMask);
+	if (bGloves)  Appearance.Set(EWorkerSlot::Gloves,   AvWorkerAssets::Soft(AvWorkerAssets::Gloves));
+	else          Appearance.Clear(EWorkerSlot::Gloves);
+	RebuildVisuals();
+}
+
+void UWorkerAppearanceComponent::OnRep_Appearance()
+{
+	RebuildVisuals();
+}
+
+USkeletalMeshComponent* UWorkerAppearanceComponent::GetBodyComponent() const
+{
+	const TObjectPtr<USkeletalMeshComponent>* Found = SlotComps.Find(EWorkerSlot::Body);
+	return Found ? *Found : nullptr;
+}
+
+USkeletalMeshComponent* UWorkerAppearanceComponent::GetOrCreateSlotComp(EWorkerSlot Slot)
+{
+	if (TObjectPtr<USkeletalMeshComponent>* Found = SlotComps.Find(Slot))
+	{
+		if (*Found) return *Found;
+		SlotComps.Remove(Slot);
+	}
+	AActor* Owner = GetOwner();
+	if (!Owner) return nullptr;
+	USkeletalMeshComponent* Comp = NewObject<USkeletalMeshComponent>(Owner);
+	if (!Comp) return nullptr;
+	Comp->SetIsReplicated(false); // визуал локальный; реплицируется только FWorkerAppearance
+	Comp->RegisterComponent();
+	SlotComps.Add(Slot, Comp);
+	return Comp;
+}
+
+void UWorkerAppearanceComponent::AttachAsLeaderFollower(USkeletalMeshComponent* Part, USkeletalMeshComponent* Body)
+{
+	if (!Part || !Body) return;
+	Part->AttachToComponent(Body, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+	Part->SetRelativeLocationAndRotation(FVector::ZeroVector, FRotator::ZeroRotator);
+	Part->SetLeaderPoseComponent(Body); // общий скелет → кости 1:1
+	Part->SetVisibility(true, true);
+}
+
+// Папка пака + фильтры имени для каждого слота (авто-каталог).
+void UWorkerAppearanceComponent::GetSlotSearch(EWorkerSlot Slot, FString& Folder, FString& Inc, FString& Exc)
+{
+	const TCHAR* Base = TEXT("/Game/Modular_Workers/Mesh/Male/");
+	Folder.Reset(); Inc.Reset(); Exc.Reset();
+	switch (Slot)
+	{
+	case EWorkerSlot::Hair:     Folder = FString(Base) + TEXT("Head_Modules/Hair"); break;
+	case EWorkerSlot::Beard:    Folder = FString(Base) + TEXT("Face_Modules/Beard"); break;
+	case EWorkerSlot::Torso:    Folder = FString(Base) + TEXT("Clothes_Modules"); break;
+	case EWorkerSlot::Legs:     Folder = FString(Base) + TEXT("Pants_Modules"); break;
+	case EWorkerSlot::Headgear: Folder = FString(Base) + TEXT("Head_Modules"); Exc = TEXT("Hair"); break; // всё кроме волос
+	case EWorkerSlot::FaceMask: Folder = FString(Base) + TEXT("Face_Modules/Respirator"); break;
+	case EWorkerSlot::Glasses:  Folder = FString(Base) + TEXT("Face_Modules"); Inc = TEXT("Glasses"); break;
+	case EWorkerSlot::Gloves:   Folder = FString(Base) + TEXT("Arms_Modules"); Inc = TEXT("Gloves"); break;
+	case EWorkerSlot::Vest:     Folder = FString(Base) + TEXT("Chest_Modules/Vest_Worker"); break;
+	case EWorkerSlot::Feet:     Folder = FString(Base) + TEXT("Body/European"); Inc = TEXT("Feet"); break;
+	case EWorkerSlot::Body:     Folder = FString(Base) + TEXT("Body/European"); Inc = TEXT("Body"); break;
+	case EWorkerSlot::Head:     Folder = FString(Base) + TEXT("Body/European"); Inc = TEXT("Head"); break;
+	default: break;
+	}
+}
+
+static void AvScanSlot(EWorkerSlot Slot, TArray<FAssetData>& OutAssets)
+{
+	FString Folder, Inc, Exc;
+	UWorkerAppearanceComponent::GetSlotSearch(Slot, Folder, Inc, Exc);
+	if (Folder.IsEmpty()) return;
+	IAssetRegistry& AR = FModuleManager::LoadModuleChecked<FAssetRegistryModule>("AssetRegistry").Get();
+	FARFilter F;
+	F.PackagePaths.Add(FName(*Folder));
+	F.bRecursivePaths = true;
+	F.ClassPaths.Add(USkeletalMesh::StaticClass()->GetClassPathName());
+	TArray<FAssetData> Raw;
+	AR.GetAssets(F, Raw);
+	for (const FAssetData& A : Raw)
+	{
+		const FString N = A.AssetName.ToString();
+		if (!N.StartsWith(TEXT("SKM_"))) continue;
+		if (!Inc.IsEmpty() && !N.Contains(Inc)) continue;
+		if (!Exc.IsEmpty() && N.Contains(Exc)) continue;
+		OutAssets.Add(A);
+	}
+}
+
+TArray<FString> UWorkerAppearanceComponent::GetOptionsForSlot(EWorkerSlot Slot) const
+{
+	TArray<FAssetData> Assets;
+	AvScanSlot(Slot, Assets);
+	TArray<FString> Out;
+	for (const FAssetData& A : Assets) { Out.Add(A.AssetName.ToString()); }
+	Out.Sort();
+	return Out;
+}
+
+bool UWorkerAppearanceComponent::SetSlotByKey(EWorkerSlot Slot, const FString& Key)
+{
+	if (!IsAuth(this)) return false;
+	if (Key.IsEmpty() || Key.Equals(TEXT("none"), ESearchCase::IgnoreCase) || Key.Equals(TEXT("off"), ESearchCase::IgnoreCase))
+	{
+		ClearSlot(Slot);
+		return true;
+	}
+	TArray<FAssetData> Assets;
+	AvScanSlot(Slot, Assets);
+	// Сначала точное совпадение имени, потом «содержит».
+	const FAssetData* Best = nullptr;
+	for (const FAssetData& A : Assets)
+	{
+		if (A.AssetName.ToString().Equals(Key, ESearchCase::IgnoreCase)) { Best = &A; break; }
+	}
+	if (!Best)
+	{
+		for (const FAssetData& A : Assets)
+		{
+			if (A.AssetName.ToString().Contains(Key, ESearchCase::IgnoreCase)) { Best = &A; break; }
+		}
+	}
+	if (!Best) return false;
+	if (USkeletalMesh* M = Cast<USkeletalMesh>(Best->GetAsset()))
+	{
+		SetSlotMesh(Slot, M);
+		return true;
+	}
+	return false;
+}
+
+void UWorkerAppearanceComponent::ApplyColorToComp(USkeletalMeshComponent* Comp, const FLinearColor& Color) const
+{
+	if (!Comp) return;
+	const int32 Num = Comp->GetNumMaterials();
+	for (int32 i = 0; i < Num; ++i)
+	{
+		if (UMaterialInstanceDynamic* MID = Comp->CreateAndSetMaterialInstanceDynamic(i))
+		{
+			// Материалы пакета Modular_Workers имеют вектор-параметр "Color Correction" (тинт).
+			MID->SetVectorParameterValue(TEXT("Color Correction"), Color);
+		}
+	}
+}
+
+void UWorkerAppearanceComponent::SetSlotColor(EWorkerSlot Slot, FLinearColor Color)
+{
+	SlotColors.Add(Slot, Color);
+	USkeletalMeshComponent* Comp = nullptr;
+	if (TObjectPtr<USkeletalMeshComponent>* Found = SlotComps.Find(Slot))
+	{
+		Comp = *Found;
+	}
+	ApplyColorToComp(Comp, Color);
+}
+
+void UWorkerAppearanceComponent::ClearSlotColor(EWorkerSlot Slot)
+{
+	SlotColors.Remove(Slot);
+	RebuildVisuals(); // пересборка вернёт исходные материалы меша
+}
+
+void UWorkerAppearanceComponent::RebuildVisuals()
+{
+	AActor* Owner = GetOwner();
+	if (!Owner) return;
+
+	// На выделенном сервере визуал не нужен — внешность всё равно реплицирована.
+	if (GetNetMode() == NM_DedicatedServer) return;
+
+	USceneComponent* Root = Owner->GetRootComponent();
+	if (!Root) return;
+
+	ACharacter* OwnerCharacter = Cast<ACharacter>(Owner);
+	USkeletalMeshComponent* SourceBody = OwnerCharacter ? OwnerCharacter->GetMesh() : nullptr;
+	const bool bHasModularBody = !Appearance.Get(EWorkerSlot::Body).IsNull();
+	if (SourceBody)
+	{
+		SourceBody->SetVisibility(!bHasModularBody, true);
+	}
+
+	// 1) Тело — лидер позы. Создаём/обновляем первым.
+	USkeletalMeshComponent* Body = nullptr;
+	TSoftObjectPtr<USkeletalMesh> BodySoft = Appearance.Get(EWorkerSlot::Body);
+	if (!Appearance.Get(EWorkerSlot::Legs).IsNull())
+	{
+		const FString BodyAssetName = BodySoft.ToSoftObjectPath().GetAssetName();
+		if (BodyAssetName.Contains(TEXT("Body_Full")))
+		{
+			BodySoft = AvWorkerAssets::Soft(AvWorkerAssets::BodyBottom);
+		}
+	}
+	if (!BodySoft.IsNull())
+	{
+		Body = GetOrCreateSlotComp(EWorkerSlot::Body);
+		if (Body)
+		{
+			if (USkeletalMesh* M = BodySoft.LoadSynchronous())
+			{
+				Body->SetSkeletalMeshAsset(M);
+				if (const FLinearColor* C = SlotColors.Find(EWorkerSlot::Body)) { ApplyColorToComp(Body, *C); }
+			}
+			if (SourceBody)
+			{
+				Body->AttachToComponent(SourceBody->GetAttachParent() ? SourceBody->GetAttachParent() : Root, FAttachmentTransformRules::KeepRelativeTransform);
+				Body->SetRelativeTransform(SourceBody->GetRelativeTransform());
+				Body->SetLeaderPoseComponent(SourceBody);
+			}
+			else
+			{
+				Body->AttachToComponent(Root, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+				Body->SetRelativeLocationAndRotation(FVector::ZeroVector, FRotator(0.f, -90.f, 0.f));
+			}
+			Body->SetVisibility(true, true);
+		}
+	}
+
+	// 2) Остальные слоты — следуют позе тела.
+	TSet<EWorkerSlot> Present;
+	if (Body)
+	{
+		Present.Add(EWorkerSlot::Body);
+	}
+	for (const FWorkerSlotMesh& S : Appearance.Slots)
+	{
+		if (S.Slot == EWorkerSlot::Body) continue;
+		Present.Add(S.Slot);
+		USkeletalMeshComponent* Part = GetOrCreateSlotComp(S.Slot);
+		if (!Part) continue;
+		if (USkeletalMesh* M = S.Mesh.LoadSynchronous())
+		{
+			Part->SetSkeletalMeshAsset(M);
+			if (const FLinearColor* C = SlotColors.Find(S.Slot)) { ApplyColorToComp(Part, *C); }
+		}
+		if (Body)
+		{
+			AttachAsLeaderFollower(Part, Body);
+		}
+		else
+		{
+			// Без тела-лидера часть просто крепится к корню (ref-поза) — деградация, не краш.
+			Part->AttachToComponent(Root, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+			Part->SetVisibility(true, true);
+		}
+	}
+
+	// 3) Снести компоненты слотов, которых больше нет во внешности.
+	TArray<EWorkerSlot> ToRemove;
+	for (const TPair<EWorkerSlot, TObjectPtr<USkeletalMeshComponent>>& Pair : SlotComps)
+	{
+		if (!Present.Contains(Pair.Key))
+		{
+			ToRemove.Add(Pair.Key);
+		}
+	}
+	for (EWorkerSlot Slot : ToRemove)
+	{
+		if (TObjectPtr<USkeletalMeshComponent>* Found = SlotComps.Find(Slot))
+		{
+			if (*Found)
+			{
+				(*Found)->DestroyComponent();
+			}
+			SlotComps.Remove(Slot);
+		}
+	}
+}

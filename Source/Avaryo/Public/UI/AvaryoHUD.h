@@ -4,49 +4,55 @@
 #include "GameFramework/HUD.h"
 #include "AvaryoHUD.generated.h"
 
-/**
- * Простой HUD: подсказка "[E] Подобрать: ..." и список слотов инвентаря.
- * Рисуем через Canvas, без UMG — позже заменим на нормальные виджеты.
- */
+class UUserWidget;
+
 UCLASS()
 class AVARYO_API AAvaryoHUD : public AHUD
 {
 	GENERATED_BODY()
 
 public:
+	AAvaryoHUD();
+
 	virtual void DrawHUD() override;
 
-	/** Открыть/закрыть экран магазина (дев-команда AvShop). Локально на клиенте. */
 	void ToggleShop() { bShopOpen = !bShopOpen; }
 	bool IsShopOpen() const { return bShopOpen; }
 
-	/** Внутриигровое пауза-меню (Esc). Управляется из AAvaryoPlayerController. */
 	void SetPauseMenu(bool bOpen) { bPauseMenuOpen = bOpen; if (!bOpen) { HoveredBox = NAME_None; } }
 	bool IsPauseMenuOpen() const { return bPauseMenuOpen; }
 
-	// Клики/наведение по кнопкам пауза-меню (Canvas-хитбоксы AHUD)
+	void SetCustomize(bool bOpen);
+	bool IsCustomizeOpen() const { return bCustomizeOpen; }
+
+	UFUNCTION()
+	bool TriggerCustomizeRandomAppearance();
+
+	/** Routes the reliable PlayerController F9 input to the development-only transient inspector. */
+	bool ToggleCustomizeAppearanceInspector();
+
 	virtual void NotifyHitBoxClick(FName BoxName) override;
 	virtual void NotifyHitBoxBeginCursorOver(FName BoxName) override;
 	virtual void NotifyHitBoxEndCursorOver(FName BoxName) override;
 
 protected:
-	bool bShopOpen = false;
-
-	/** Модальный экран снаряжения: уровни/цены апгрейдов + баланс (читает леджер). */
 	void DrawShop();
-
-	/** Внутриигровое пауза-меню (Продолжить/Настройки/Выйти в меню) на Canvas. */
 	void DrawPauseMenu();
-	/** Открыть оверлей настроек (EasyOptionsMenu) поверх паузы. */
 	void OpenSettings();
 
+	bool bShopOpen = false;
 	bool bPauseMenuOpen = false;
 	FName HoveredBox = NAME_None;
-	TWeakObjectPtr<class UUserWidget> SettingsWidget;
+	TWeakObjectPtr<UUserWidget> SettingsWidget;
+
+	bool bCustomizeOpen = false;
+	TWeakObjectPtr<UUserWidget> CustomizeWidget;
+
+	/** Cook-visible soft reference; loaded only after startup localization registration has completed. */
+	UPROPERTY()
+	TSoftClassPtr<UUserWidget> CharacterCustomizationWidgetClass;
 
 private:
-	// Кэш статичных акторов миникарты (AExitZone/AToilet не двигаются) — обновляем ≤1 Гц,
-	// а не сканируем мир TActorIterator каждый DrawHUD-кадр (CODE_AUDIT3 #9).
 	TArray<FVector> CachedExitZoneLocs;
 	TArray<FVector> CachedToiletLocs;
 	float MinimapCacheStamp = -1000.f;

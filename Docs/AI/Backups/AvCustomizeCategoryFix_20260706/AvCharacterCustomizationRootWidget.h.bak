@@ -1,0 +1,130 @@
+#pragma once
+
+#include "CoreMinimal.h"
+#include "Blueprint/UserWidget.h"
+#include "Input/Events.h"
+#include "Input/Reply.h"
+#include "AvCharacterCustomizationRootWidget.generated.h"
+
+class UButton;
+class UCanvasPanel;
+class UHorizontalBox;
+class UImage;
+class UMaterialInstanceDynamic;
+class UTextBlock;
+class UTextureRenderTarget2D;
+class UWidget;
+class UWrapBox;
+class AAvCustomizePreviewActor;
+
+UCLASS(BlueprintType, Blueprintable)
+class AVARYO_API UAvCharacterCustomizationRootWidget : public UUserWidget
+{
+	GENERATED_BODY()
+
+public:
+	void RefreshFullscreenLayout();
+
+protected:
+	virtual void NativeConstruct() override;
+	virtual void NativeDestruct() override;
+	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
+	virtual FReply NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent) override;
+
+private:
+	UFUNCTION()
+	void HandleCloseClicked();
+
+	UFUNCTION()
+	void HandlePresetPreviousClicked();
+
+	UFUNCTION()
+	void HandlePresetNextClicked();
+
+	void EnsurePreview();
+	void RefreshPresetPreview();
+	void UpdatePresetLabels();
+	UImage* ResolvePreviewImage() const;
+	void UpdateResponsiveLayout(const FIntPoint& ViewportSize);
+	void ApplyCanvasSlot(UWidget* Widget, const FVector2D& Position, const FVector2D& Size, int32 ZOrder) const;
+	void RebuildBottomEquipmentPanel();
+	UWidget* GetOrCreateBottomTextWidget(FName WidgetName, const FText& Text);
+	void AddWidgetToBottomControls(UWidget* Widget, UWrapBox* ControlsRow, float MinWidth, const FMargin& SlotPadding) const;
+	float ComputeUIScale(int32 ViewportHeight) const;
+
+	UPROPERTY(meta=(BindWidgetOptional))
+	TObjectPtr<UButton> Button_Close;
+
+	UPROPERTY(meta=(BindWidgetOptional))
+	TObjectPtr<UButton> Btn_PresetPrevious;
+
+	UPROPERTY(meta=(BindWidgetOptional))
+	TObjectPtr<UButton> Btn_PresetNext;
+
+	UPROPERTY(meta=(BindWidgetOptional))
+	TObjectPtr<UTextBlock> Txt_CurrentPresetName;
+
+	UPROPERTY(meta=(BindWidgetOptional))
+	TObjectPtr<UTextBlock> Txt_PresetCounter;
+
+	UPROPERTY(meta=(BindWidgetOptional))
+	TObjectPtr<UImage> Img_Preview;
+
+	UPROPERTY(meta=(BindWidgetOptional))
+	TObjectPtr<UImage> Img_PreviewPlaceholder;
+
+	UPROPERTY(meta=(BindWidgetOptional))
+	TObjectPtr<UWidget> FullscreenDarkImage;
+
+	UPROPERTY(meta=(BindWidgetOptional))
+	TObjectPtr<UCanvasPanel> SafeContentContainer;
+
+	UPROPERTY(meta=(BindWidgetOptional))
+	TObjectPtr<UWidget> TopNavigation;
+
+	UPROPERTY(meta=(BindWidgetOptional))
+	TObjectPtr<UWidget> TopOrangeLine;
+
+	UPROPERTY(meta=(BindWidgetOptional))
+	TObjectPtr<UWidget> LeftCategoryPanel;
+
+	UPROPERTY(meta=(BindWidgetOptional))
+	TObjectPtr<UWidget> CenterPreviewPanel;
+
+	UPROPERTY(meta=(BindWidgetOptional))
+	TObjectPtr<UWidget> RightOptionsPanel;
+
+	UPROPERTY(meta=(BindWidgetOptional))
+	TObjectPtr<UWidget> BottomEquipmentPanel;
+
+	UPROPERTY(meta=(BindWidgetOptional))
+	TObjectPtr<UWidget> Btn_RandomizeAppearance;
+
+	UPROPERTY(meta=(BindWidgetOptional))
+	TObjectPtr<UWidget> EquipmentSlot_Jacket;
+
+	UPROPERTY(meta=(BindWidgetOptional))
+	TObjectPtr<UWidget> EquipmentSlot_Pants;
+
+	UPROPERTY(meta=(BindWidgetOptional))
+	TObjectPtr<UWidget> EquipmentSlot_Boots;
+
+	UPROPERTY(meta=(BindWidgetOptional))
+	TObjectPtr<UWidget> EquipmentSlot_Helmet;
+
+	UPROPERTY(meta=(BindWidgetOptional))
+	TObjectPtr<UWidget> EquipmentSlot_Mask;
+
+	FIntPoint CachedViewportSize = FIntPoint::ZeroValue;
+	bool bHasAppliedResponsiveLayout = false;
+	int32 CurrentPresetIndex = 0;
+
+	UPROPERTY(Transient)
+	TObjectPtr<UTextureRenderTarget2D> PreviewRenderTarget;
+
+	UPROPERTY(Transient)
+	TObjectPtr<UMaterialInstanceDynamic> PreviewMaterial;
+
+	UPROPERTY(Transient)
+	TObjectPtr<AAvCustomizePreviewActor> PreviewActor;
+};

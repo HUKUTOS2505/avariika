@@ -74,10 +74,75 @@ public:
 	FConsumableStock&       GetStockMutable() { return Stock; }
 	const FCareerStats&     GetCareer() const { return Career; }
 	FCareerStats&           GetCareerMutable() { return Career; }
+	bool HasSavedWorkerAppearance() const { return bHasSavedWorkerAppearance; }
+	const FWorkerAppearance& GetSavedWorkerAppearance() const { return SavedWorkerAppearance; }
+	void SetSavedWorkerAppearance(const FWorkerAppearance& NewAppearance);
+	bool GetSuppressRaisedHoodHeadgearConflictWarning() const
+	{
+		return bSuppressRaisedHoodHeadgearConflictWarning;
+	}
+	/** Saves only when the global warning preference actually changes. */
+	void SetSuppressRaisedHoodHeadgearConflictWarning(bool bSuppress);
+	/** Universal API name; the legacy serialized field is retained for backward compatibility. */
+	bool GetSuppressRaisedHoodEquipmentConflictWarning() const
+	{
+		return GetSuppressRaisedHoodHeadgearConflictWarning();
+	}
+	void SetSuppressRaisedHoodEquipmentConflictWarning(bool bSuppress)
+	{
+		SetSuppressRaisedHoodHeadgearConflictWarning(bSuppress);
+	}
+	bool GetSuppressHeadgearHeadphonesConflictWarning() const
+	{
+		return bSuppressHeadgearHeadphonesConflictWarning;
+	}
+	/** Saves only when the independent Headgear/Headphones preference changes. */
+	void SetSuppressHeadgearHeadphonesConflictWarning(bool bSuppress);
+
+	bool HasActiveCharacter() const;
+	const FAvCharacterRecord* GetActiveCharacter() const;
+	const TArray<FAvCharacterRecord>& GetCharacterRecords() const { return CharacterRecords; }
+	FName GetActiveCharacterId() const { return ActiveCharacterId; }
+	const FWorkerAppearance& GetActiveCharacterAppearance() const;
+	/** Factory-create, activate and atomically save one unique roster record. */
+	FName CreateCharacter();
+	/** Phase 1 rule: selection immediately becomes active. No-op for the current ID. */
+	bool SetActiveCharacter(FName CharacterId);
+	/** Deletes one record and selects next SortOrder (or previous). The last record is protected. */
+	bool DeleteCharacter(FName CharacterId);
+	void SetActiveCharacterAppearance(
+		const FWorkerAppearance& NewAppearance,
+		bool bHasMeaningfulAppearance,
+		FName BasePresetId = NAME_None,
+		EAvAppearanceOrigin AppearanceOrigin = EAvAppearanceOrigin::ManualCustomized);
+	void SetActiveCharacterDisplayName(const FString& NewDisplayName);
+	/** Renames exactly one existing roster record and saves once when the name changes. */
+	bool SetCharacterDisplayName(FName CharacterId, const FString& NewDisplayName);
+	int32 GetCharacterSchemaVersion() const { return CharacterSchemaVersion; }
+	bool WasLoadedActiveCharacterIdInvalid() const
+	{
+		return bLoadedActiveCharacterIdWasInvalid;
+	}
+	int32 GetDuplicateCharacterIdCount() const;
+	bool IsLegacyAppearanceMirrorSynchronized() const;
 
 protected:
 	void Load();
+	void LoadUserSettings();
+	void SaveUserSettings() const;
+	void CreateDefaultCharacterRecord();
+	void MigrateLegacyCharacterAppearance();
+	bool MigrateObsoleteFactoryBaseAppearance();
+	bool MigrateAppearanceOrigins(int32 LoadedSchemaVersion);
+	bool MigrateHeadTypeSkinPresentation(int32 LoadedSchemaVersion);
+	bool MigrateRosterMetadata(int32 LoadedSchemaVersion);
+	FAvCharacterRecord* GetActiveCharacterMutable();
+	void SynchronizeLegacyAppearanceCache();
+	FString MakeNextCharacterDisplayName() const;
+	FName MakeUniqueCharacterId() const;
 	static const TCHAR* SlotName() { return TEXT("AvariikaCompany"); }
+	static const TCHAR* UserSettingsSlotName() { return TEXT("AvariikaUserSettings"); }
+	static constexpr int32 CurrentCharacterSchemaVersion = 5;
 
 	int32 CompanyBalance = 0;
 	int32 ShiftNumber = 1;
@@ -91,4 +156,12 @@ protected:
 	int32 QuotaPaidSoFar = 0;
 	int32 QuotaWindowShifts = 3;
 	bool  bQuotaFailed = false;
+	bool bHasSavedWorkerAppearance = false;
+	FWorkerAppearance SavedWorkerAppearance;
+	bool bSuppressRaisedHoodHeadgearConflictWarning = false;
+	bool bSuppressHeadgearHeadphonesConflictWarning = false;
+	int32 CharacterSchemaVersion = 0;
+	FName ActiveCharacterId;
+	TArray<FAvCharacterRecord> CharacterRecords;
+	bool bLoadedActiveCharacterIdWasInvalid = false;
 };

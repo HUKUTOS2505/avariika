@@ -1,0 +1,350 @@
+#include "UI/AvCustomizePreviewActor.h"
+
+#include "Components/DirectionalLightComponent.h"
+#include "Components/PointLightComponent.h"
+#include "Components/RectLightComponent.h"
+#include "Components/SceneCaptureComponent2D.h"
+#include "Components/SkeletalMeshComponent.h"
+#include "Components/SkyLightComponent.h"
+#include "Animation/AnimSequence.h"
+#include "Engine/TextureRenderTarget2D.h"
+
+namespace
+{
+	constexpr float PreviewCaptureFovDegrees = 26.f;
+	constexpr float PreviewVerticalFitPadding = 1.24f;
+	constexpr float PreviewMinimumCameraDistance = 520.f;
+
+	void AddBoxCorners(const FBox& WorldBox, const FTransform& ActorTransform, FBox& OutLocalBox)
+	{
+		const FVector Min = WorldBox.Min;
+		const FVector Max = WorldBox.Max;
+		const FVector Corners[] =
+		{
+			FVector(Min.X, Min.Y, Min.Z),
+			FVector(Min.X, Min.Y, Max.Z),
+			FVector(Min.X, Max.Y, Min.Z),
+			FVector(Min.X, Max.Y, Max.Z),
+			FVector(Max.X, Min.Y, Min.Z),
+			FVector(Max.X, Min.Y, Max.Z),
+			FVector(Max.X, Max.Y, Min.Z),
+			FVector(Max.X, Max.Y, Max.Z)
+		};
+
+		for (const FVector& Corner : Corners)
+		{
+			OutLocalBox += ActorTransform.InverseTransformPosition(Corner);
+		}
+	}
+}
+
+AAvCustomizePreviewActor::AAvCustomizePreviewActor()
+{
+	PrimaryActorTick.bCanEverTick = false;
+	bReplicates = false;
+
+	SceneRoot = CreateDefaultSubobject<USceneComponent>(TEXT("SceneRoot"));
+	SetRootComponent(SceneRoot);
+
+	AppearanceComponent = CreateDefaultSubobject<UWorkerAppearanceComponent>(TEXT("PreviewAppearance"));
+
+	SceneCapture = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("SceneCapture"));
+	SceneCapture->SetupAttachment(SceneRoot);
+	SceneCapture->bCaptureEveryFrame = true;
+	SceneCapture->bCaptureOnMovement = false;
+	SceneCapture->bAlwaysPersistRenderingState = true;
+	SceneCapture->CaptureSource = ESceneCaptureSource::SCS_SceneColorHDR;
+	SceneCapture->CompositeMode = ESceneCaptureCompositeMode::SCCM_Overwrite;
+	SceneCapture->FOVAngle = PreviewCaptureFovDegrees;
+	SceneCapture->PrimitiveRenderMode = ESceneCapturePrimitiveRenderMode::PRM_UseShowOnlyList;
+	SceneCapture->ShowFlags.SetAntiAliasing(true);
+	SceneCapture->ShowFlags.SetAtmosphere(false);
+	SceneCapture->ShowFlags.SetFog(false);
+	SceneCapture->ShowFlags.SetVolumetricFog(false);
+	SceneCapture->PostProcessBlendWeight = 1.f;
+	SceneCapture->PostProcessSettings.bOverride_AutoExposureMethod = true;
+	SceneCapture->PostProcessSettings.AutoExposureMethod = EAutoExposureMethod::AEM_Manual;
+	SceneCapture->PostProcessSettings.bOverride_AutoExposureBias = true;
+	SceneCapture->PostProcessSettings.AutoExposureBias = 0.35f;
+	SceneCapture->PostProcessSettings.bOverride_AutoExposureApplyPhysicalCameraExposure = true;
+	SceneCapture->PostProcessSettings.AutoExposureApplyPhysicalCameraExposure = false;
+
+	KeyLight = CreateDefaultSubobject<UDirectionalLightComponent>(TEXT("KeyLight"));
+	KeyLight->SetupAttachment(SceneRoot);
+	KeyLight->SetMobility(EComponentMobility::Movable);
+	KeyLight->SetIntensity(0.6f);
+	KeyLight->SetLightColor(FLinearColor(1.f, 0.94f, 0.86f));
+	KeyLight->SetCastShadows(false);
+
+	FillLight = CreateDefaultSubobject<UPointLightComponent>(TEXT("FillLight"));
+	FillLight->SetupAttachment(SceneRoot);
+	FillLight->SetMobility(EComponentMobility::Movable);
+	FillLight->SetIntensity(650.f);
+	FillLight->SetAttenuationRadius(700.f);
+	FillLight->SetLightColor(FLinearColor(0.78f, 0.86f, 1.f));
+	FillLight->SetRelativeLocation(FVector(220.f, -130.f, 135.f));
+	FillLight->SetCastShadows(false);
+
+	SoftKeyLight = CreateDefaultSubobject<URectLightComponent>(TEXT("SoftKeyLight"));
+	SoftKeyLight->SetupAttachment(SceneRoot);
+	SoftKeyLight->SetMobility(EComponentMobility::Movable);
+	SoftKeyLight->SetIntensity(1850.f);
+	SoftKeyLight->SetSourceWidth(230.f);
+	SoftKeyLight->SetSourceHeight(260.f);
+	SoftKeyLight->SetAttenuationRadius(900.f);
+	SoftKeyLight->SetLightColor(FLinearColor(1.f, 0.955f, 0.90f));
+	SoftKeyLight->SetCastShadows(true);
+	SoftKeyLight->SetShadowBias(0.8f);
+
+	SoftFillLight = CreateDefaultSubobject<URectLightComponent>(TEXT("SoftFillLight"));
+	SoftFillLight->SetupAttachment(SceneRoot);
+	SoftFillLight->SetMobility(EComponentMobility::Movable);
+	SoftFillLight->SetIntensity(420.f);
+	SoftFillLight->SetSourceWidth(340.f);
+	SoftFillLight->SetSourceHeight(320.f);
+	SoftFillLight->SetAttenuationRadius(900.f);
+	SoftFillLight->SetLightColor(FLinearColor(0.82f, 0.89f, 1.f));
+	SoftFillLight->SetCastShadows(false);
+
+	RimLight = CreateDefaultSubobject<URectLightComponent>(TEXT("RimLight"));
+	RimLight->SetupAttachment(SceneRoot);
+	RimLight->SetMobility(EComponentMobility::Movable);
+	RimLight->SetIntensity(720.f);
+	RimLight->SetSourceWidth(160.f);
+	RimLight->SetSourceHeight(220.f);
+	RimLight->SetAttenuationRadius(850.f);
+	RimLight->SetLightColor(FLinearColor(0.78f, 0.88f, 1.f));
+	RimLight->SetCastShadows(false);
+
+	AmbientLight = CreateDefaultSubobject<USkyLightComponent>(TEXT("AmbientLight"));
+	AmbientLight->SetupAttachment(SceneRoot);
+	AmbientLight->SetMobility(EComponentMobility::Movable);
+	AmbientLight->SetIntensity(0.28f);
+	AmbientLight->SetLightColor(FLinearColor(0.80f, 0.86f, 1.f));
+	AmbientLight->bRealTimeCapture = false;
+	AmbientLight->SetCastShadows(false);
+}
+
+void AAvCustomizePreviewActor::BeginPlay()
+{
+	Super::BeginPlay();
+	UpdateCaptureFraming();
+}
+
+void AAvCustomizePreviewActor::InitializePreview(UTextureRenderTarget2D* InRenderTarget)
+{
+	SceneCapture->TextureTarget = InRenderTarget;
+	ConfigurePreviewMeshes();
+	UpdateCaptureFraming();
+	RefreshCaptureShowOnly();
+	SceneCapture->CaptureScene();
+}
+
+void AAvCustomizePreviewActor::SetPreviewAppearance(const FWorkerAppearance& InAppearance)
+{
+	if (AppearanceComponent)
+	{
+		AppearanceComponent->ApplyLocalPreviewAppearance(InAppearance);
+	}
+	ApplyIdleAnimation();
+	ApplyPreviewYaw();
+	ConfigurePreviewMeshes();
+	UpdateCaptureFraming();
+	RefreshCaptureShowOnly();
+	if (SceneCapture)
+	{
+		SceneCapture->CaptureScene();
+	}
+}
+
+void AAvCustomizePreviewActor::SetPreviewSlotColor(EWorkerSlot Slot, const FLinearColor& Color)
+{
+	if (AppearanceComponent)
+	{
+		AppearanceComponent->SetSlotColor(Slot, Color);
+	}
+	ConfigurePreviewMeshes();
+	UpdateCaptureFraming();
+	if (SceneCapture)
+	{
+		SceneCapture->CaptureScene();
+	}
+}
+
+void AAvCustomizePreviewActor::SetPreviewSkinColor(const FLinearColor& Color)
+{
+	if (AppearanceComponent)
+	{
+		AppearanceComponent->SetSkinColor(Color);
+	}
+	ConfigurePreviewMeshes();
+	UpdateCaptureFraming();
+	if (SceneCapture)
+	{
+		SceneCapture->CaptureScene();
+	}
+}
+
+void AAvCustomizePreviewActor::SetPreviewYaw(float InYawDegrees)
+{
+	PreviewYawDegrees = FMath::UnwindDegrees(InYawDegrees);
+	ApplyPreviewYaw();
+	UpdateCaptureFraming();
+	if (SceneCapture)
+	{
+		SceneCapture->CaptureScene();
+	}
+}
+
+void AAvCustomizePreviewActor::ApplyIdleAnimation()
+{
+	if (!AppearanceComponent)
+	{
+		return;
+	}
+
+	USkeletalMeshComponent* Body = AppearanceComponent->GetBodyComponent();
+	UAnimSequence* IdleAnimation = LoadObject<UAnimSequence>(
+		nullptr,
+		TEXT("/Game/Modular_Workers/Demo/Animations/Male/A_MM_Idle.A_MM_Idle"));
+	if (!Body || !IdleAnimation)
+	{
+		return;
+	}
+
+	Body->SetAnimationMode(EAnimationMode::AnimationSingleNode);
+	Body->SetAnimation(IdleAnimation);
+	Body->Play(true);
+}
+
+void AAvCustomizePreviewActor::ApplyPreviewYaw()
+{
+	if (!AppearanceComponent)
+	{
+		return;
+	}
+
+	if (USkeletalMeshComponent* Body = AppearanceComponent->GetBodyComponent())
+	{
+		Body->SetRelativeRotation(FRotator(0.f, -90.f + PreviewYawDegrees, 0.f));
+	}
+}
+
+void AAvCustomizePreviewActor::ConfigurePreviewMeshes()
+{
+	TArray<USkeletalMeshComponent*> Meshes;
+	GetComponents<USkeletalMeshComponent>(Meshes);
+	for (USkeletalMeshComponent* Mesh : Meshes)
+	{
+		ConfigurePreviewMesh(Mesh);
+	}
+}
+
+void AAvCustomizePreviewActor::ConfigurePreviewMesh(USkeletalMeshComponent* Mesh) const
+{
+	if (!Mesh)
+	{
+		return;
+	}
+
+	Mesh->SetForcedLOD(1);
+	Mesh->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::AlwaysTickPoseAndRefreshBones;
+	Mesh->bEnableUpdateRateOptimizations = false;
+	Mesh->SetComponentTickEnabled(true);
+}
+
+bool AAvCustomizePreviewActor::GetPreviewLocalBounds(FBox& OutLocalBounds) const
+{
+	FBox LocalBox(ForceInit);
+	const FTransform ActorTransform = GetActorTransform();
+
+	TArray<USkeletalMeshComponent*> Meshes;
+	GetComponents<USkeletalMeshComponent>(Meshes);
+	for (USkeletalMeshComponent* Mesh : Meshes)
+	{
+		if (!Mesh || !Mesh->GetSkeletalMeshAsset() || !Mesh->IsVisible())
+		{
+			continue;
+		}
+
+		const FBox WorldBox = Mesh->CalcBounds(Mesh->GetComponentTransform()).GetBox();
+		if (WorldBox.IsValid)
+		{
+			AddBoxCorners(WorldBox, ActorTransform, LocalBox);
+		}
+	}
+
+	if (!LocalBox.IsValid)
+	{
+		return false;
+	}
+
+	OutLocalBounds = LocalBox;
+	return true;
+}
+
+void AAvCustomizePreviewActor::RefreshCaptureShowOnly()
+{
+	if (!SceneCapture)
+	{
+		return;
+	}
+
+	SceneCapture->ClearShowOnlyComponents();
+	TArray<USkeletalMeshComponent*> Meshes;
+	GetComponents<USkeletalMeshComponent>(Meshes);
+	for (USkeletalMeshComponent* Mesh : Meshes)
+	{
+		if (Mesh)
+		{
+			SceneCapture->ShowOnlyComponent(Mesh);
+		}
+	}
+}
+
+void AAvCustomizePreviewActor::UpdateCaptureFraming()
+{
+	if (!SceneCapture || !KeyLight)
+	{
+		return;
+	}
+
+	FBox LocalBounds(ForceInit);
+	const bool bHasBounds = GetPreviewLocalBounds(LocalBounds);
+
+	const FVector Center = bHasBounds ? LocalBounds.GetCenter() : FVector(0.f, 0.f, 92.f);
+	const FVector Extent = bHasBounds ? LocalBounds.GetExtent() : FVector(45.f, 45.f, 92.f);
+	const float HalfVertical = FMath::Max(Extent.Z * PreviewVerticalFitPadding, 120.f);
+	const float FovRadians = FMath::DegreesToRadians(SceneCapture->FOVAngle * 0.5f);
+	const float FitDistance = HalfVertical / FMath::Max(FMath::Tan(FovRadians), 0.01f);
+	const float CameraDistance = FMath::Max(FitDistance, PreviewMinimumCameraDistance);
+	const FVector ViewDirection = FVector(-1.f, 0.08f, -0.015f).GetSafeNormal();
+	const FVector Focus = Center + FVector(0.f, 0.f, 4.f);
+	const FVector CameraLocal = Focus - ViewDirection * CameraDistance;
+
+	SceneCapture->SetRelativeLocation(CameraLocal);
+	SceneCapture->SetRelativeRotation((Focus - CameraLocal).Rotation());
+	KeyLight->SetRelativeRotation(FRotator(-32.f, -34.f, 0.f));
+	if (FillLight)
+	{
+		FillLight->SetRelativeLocation(Focus + FVector(250.f, -190.f, 75.f));
+	}
+	if (SoftKeyLight)
+	{
+		const FVector KeyPosition = Focus + FVector(250.f, -270.f, 185.f);
+		SoftKeyLight->SetRelativeLocation(KeyPosition);
+		SoftKeyLight->SetRelativeRotation((Focus + FVector(0.f, 0.f, 55.f) - KeyPosition).Rotation());
+	}
+	if (SoftFillLight)
+	{
+		const FVector FillPosition = Focus + FVector(240.f, 300.f, 125.f);
+		SoftFillLight->SetRelativeLocation(FillPosition);
+		SoftFillLight->SetRelativeRotation((Focus + FVector(0.f, 0.f, 45.f) - FillPosition).Rotation());
+	}
+	if (RimLight)
+	{
+		const FVector RimPosition = Focus + FVector(-210.f, 160.f, 165.f);
+		RimLight->SetRelativeLocation(RimPosition);
+		RimLight->SetRelativeRotation((Focus + FVector(0.f, 0.f, 75.f) - RimPosition).Rotation());
+	}
+}

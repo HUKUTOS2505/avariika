@@ -1,0 +1,790 @@
+#include "UI/AvCharacterCustomizationRootWidget.h"
+
+#include "Blueprint/WidgetTree.h"
+#include "Components/Border.h"
+#include "Components/Button.h"
+#include "Components/CanvasPanel.h"
+#include "Components/CanvasPanelSlot.h"
+#include "Components/ContentWidget.h"
+#include "Components/HorizontalBox.h"
+#include "Components/HorizontalBoxSlot.h"
+#include "Components/Image.h"
+#include "Components/PanelWidget.h"
+#include "Components/SizeBox.h"
+#include "Components/Spacer.h"
+#include "Components/TextBlock.h"
+#include "Components/VerticalBox.h"
+#include "Components/VerticalBoxSlot.h"
+#include "Components/Widget.h"
+#include "Components/WrapBox.h"
+#include "Components/WrapBoxSlot.h"
+#include "Game/AvaryoPlayerController.h"
+#include "Engine/SkeletalMesh.h"
+#include "Engine/TextureRenderTarget2D.h"
+#include "GameFramework/PlayerController.h"
+#include "InputCoreTypes.h"
+#include "Materials/MaterialInstanceDynamic.h"
+#include "Materials/MaterialInterface.h"
+#include "UI/AvCustomizePreviewActor.h"
+#include "Widgets/Layout/Anchors.h"
+
+namespace AvCustomizePreview
+{
+	constexpr int32 PresetCount = 25;
+	const FLinearColor CategoryActiveText(0.95f, 0.42f, 0.04f, 1.f);
+	const FLinearColor CategoryInactiveText(0.58f, 0.60f, 0.62f, 1.f);
+	const FLinearColor CategoryActiveIcon(0.95f, 0.42f, 0.04f, 1.f);
+	const FLinearColor CategoryInactiveIcon(0.58f, 0.60f, 0.62f, 1.f);
+}
+
+void UAvCharacterCustomizationRootWidget::NativeConstruct()
+{
+	Super::NativeConstruct();
+
+	SetIsFocusable(true);
+	if (Button_Close)
+	{
+		Button_Close->OnClicked.RemoveAll(this);
+		Button_Close->OnClicked.AddDynamic(this, &UAvCharacterCustomizationRootWidget::HandleCloseClicked);
+	}
+	if (Btn_PresetPrevious)
+	{
+		Btn_PresetPrevious->OnClicked.RemoveAll(this);
+		Btn_PresetPrevious->OnClicked.AddDynamic(this, &UAvCharacterCustomizationRootWidget::HandlePresetPreviousClicked);
+	}
+	if (Btn_PresetNext)
+	{
+		Btn_PresetNext->OnClicked.RemoveAll(this);
+		Btn_PresetNext->OnClicked.AddDynamic(this, &UAvCharacterCustomizationRootWidget::HandlePresetNextClicked);
+	}
+	BindCategoryButtons();
+
+	RebuildBottomEquipmentPanel();
+	EnsurePreview();
+	RefreshPresetPreview();
+	SelectCategory(EAvCustomizationCategory::Preset);
+	RefreshFullscreenLayout();
+	SetKeyboardFocus();
+}
+
+void UAvCharacterCustomizationRootWidget::NativeDestruct()
+{
+	if (PreviewActor)
+	{
+		PreviewActor->Destroy();
+		PreviewActor = nullptr;
+	}
+	PreviewRenderTarget = nullptr;
+	PreviewMaterial = nullptr;
+
+	Super::NativeDestruct();
+}
+
+void UAvCharacterCustomizationRootWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
+{
+	Super::NativeTick(MyGeometry, InDeltaTime);
+	RefreshCategoryVisuals();
+
+	const FVector2D LocalSize = MyGeometry.GetLocalSize();
+	if (LocalSize.X > 1.f && LocalSize.Y > 1.f)
+	{
+		const FIntPoint GeometrySize(FMath::RoundToInt(LocalSize.X), FMath::RoundToInt(LocalSize.Y));
+		if (!bHasAppliedResponsiveLayout || CachedViewportSize != GeometrySize)
+		{
+			CachedViewportSize = GeometrySize;
+			bHasAppliedResponsiveLayout = true;
+			UpdateResponsiveLayout(GeometrySize);
+		}
+		return;
+	}
+
+	RefreshFullscreenLayout();
+}
+
+FReply UAvCharacterCustomizationRootWidget::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent)
+{
+	const FKey Key = InKeyEvent.GetKey();
+	if (Key == EKeys::B || Key == EKeys::Escape)
+	{
+		HandleCloseClicked();
+		return FReply::Handled();
+	}
+
+	return Super::NativeOnKeyDown(InGeometry, InKeyEvent);
+}
+
+void UAvCharacterCustomizationRootWidget::HandleCloseClicked()
+{
+	if (AAvaryoPlayerController* PC = Cast<AAvaryoPlayerController>(GetOwningPlayer()))
+	{
+		PC->ToggleCustomize();
+	}
+}
+
+void UAvCharacterCustomizationRootWidget::HandlePresetPreviousClicked()
+{
+	CurrentPresetIndex = (CurrentPresetIndex + AvCustomizePreview::PresetCount - 1) % AvCustomizePreview::PresetCount;
+	RefreshPresetPreview();
+}
+
+void UAvCharacterCustomizationRootWidget::HandlePresetNextClicked()
+{
+	CurrentPresetIndex = (CurrentPresetIndex + 1) % AvCustomizePreview::PresetCount;
+	RefreshPresetPreview();
+}
+
+void UAvCharacterCustomizationRootWidget::HandleCategoryPresetClicked()
+{
+	SelectCategory(EAvCustomizationCategory::Preset);
+}
+
+void UAvCharacterCustomizationRootWidget::HandleCategoryHeadClicked()
+{
+	SelectCategory(EAvCustomizationCategory::Head);
+}
+
+void UAvCharacterCustomizationRootWidget::HandleCategoryHairClicked()
+{
+	SelectCategory(EAvCustomizationCategory::Hair);
+}
+
+void UAvCharacterCustomizationRootWidget::HandleCategoryHeadwearClicked()
+{
+	SelectCategory(EAvCustomizationCategory::Headwear);
+}
+
+void UAvCharacterCustomizationRootWidget::HandleCategoryBeardClicked()
+{
+	SelectCategory(EAvCustomizationCategory::Beard);
+}
+
+void UAvCharacterCustomizationRootWidget::HandleCategoryBalaclavaClicked()
+{
+	SelectCategory(EAvCustomizationCategory::Balaclava);
+}
+
+void UAvCharacterCustomizationRootWidget::HandleCategoryHandsClicked()
+{
+	SelectCategory(EAvCustomizationCategory::Hands);
+}
+
+void UAvCharacterCustomizationRootWidget::EnsurePreview()
+{
+	UImage* PreviewImage = ResolvePreviewImage();
+	UWorld* World = GetWorld();
+	if (!PreviewImage || !World)
+	{
+		return;
+	}
+
+	if (!PreviewRenderTarget)
+	{
+		PreviewRenderTarget = NewObject<UTextureRenderTarget2D>(this);
+		PreviewRenderTarget->RenderTargetFormat = ETextureRenderTargetFormat::RTF_RGBA16f;
+		PreviewRenderTarget->ClearColor = FLinearColor::Transparent;
+		PreviewRenderTarget->InitAutoFormat(1024, 1024);
+		PreviewRenderTarget->UpdateResourceImmediate(true);
+	}
+
+	if (!PreviewMaterial)
+	{
+		UMaterialInterface* PreviewMaterialBase = LoadObject<UMaterialInterface>(
+			nullptr,
+			TEXT("/Game/Avariika/UI/CharacterCustomization/M_PreviewWorker_UI.M_PreviewWorker_UI"));
+		if (PreviewMaterialBase)
+		{
+			PreviewMaterial = UMaterialInstanceDynamic::Create(PreviewMaterialBase, this);
+		}
+	}
+	if (!PreviewMaterial)
+	{
+		return;
+	}
+
+	PreviewMaterial->SetTextureParameterValue(TEXT("PreviewTexture"), PreviewRenderTarget);
+	PreviewImage->SetBrushFromMaterial(PreviewMaterial);
+	PreviewImage->SetRenderOpacity(1.f);
+	PreviewImage->SetVisibility(ESlateVisibility::Visible);
+
+	if (!PreviewActor)
+	{
+		FActorSpawnParameters SpawnParameters;
+		SpawnParameters.Owner = GetOwningPlayer();
+		SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		PreviewActor = World->SpawnActor<AAvCustomizePreviewActor>(
+			AAvCustomizePreviewActor::StaticClass(),
+			FVector(0.f, 0.f, -5000.f),
+			FRotator::ZeroRotator,
+			SpawnParameters);
+		if (PreviewActor)
+		{
+			PreviewActor->InitializePreview(PreviewRenderTarget);
+		}
+	}
+
+	if (PreviewActor && PreviewImage->GetBrush().GetResourceObject() == PreviewMaterial)
+	{
+		if (UWidget* PreviewTitle = WidgetTree->FindWidget(TEXT("Txt_PreviewTitle")))
+		{
+			PreviewTitle->SetVisibility(ESlateVisibility::Collapsed);
+		}
+		if (UWidget* PreviewSubtitle = WidgetTree->FindWidget(TEXT("Txt_PreviewSubtitle")))
+		{
+			PreviewSubtitle->SetVisibility(ESlateVisibility::Collapsed);
+		}
+	}
+}
+
+void UAvCharacterCustomizationRootWidget::RefreshPresetPreview()
+{
+	EnsurePreview();
+	UpdatePresetLabels();
+	if (!PreviewActor)
+	{
+		return;
+	}
+
+	const int32 PresetNumber = CurrentPresetIndex + 1;
+	const FString AssetName = FString::Printf(TEXT("SKM_Worker_Male_%d"), PresetNumber);
+	const FString AssetPath = FString::Printf(
+		TEXT("/Game/Modular_Workers/Mesh/Male/Presets/%s.%s"),
+		*AssetName,
+		*AssetName);
+
+	FWorkerAppearance Appearance;
+	Appearance.Set(
+		EWorkerSlot::Body,
+		TSoftObjectPtr<USkeletalMesh>(FSoftObjectPath(AssetPath)));
+	PreviewActor->SetPreviewAppearance(Appearance);
+}
+
+void UAvCharacterCustomizationRootWidget::UpdatePresetLabels()
+{
+	const int32 PresetNumber = CurrentPresetIndex + 1;
+	if (Txt_CurrentPresetName)
+	{
+		Txt_CurrentPresetName->SetText(FText::FromString(FString::Printf(TEXT("Worker %02d"), PresetNumber)));
+	}
+	if (Txt_PresetCounter)
+	{
+		Txt_PresetCounter->SetText(FText::FromString(FString::Printf(
+			TEXT("%d / %d"),
+			PresetNumber,
+			AvCustomizePreview::PresetCount)));
+	}
+}
+
+UImage* UAvCharacterCustomizationRootWidget::ResolvePreviewImage() const
+{
+	if (Img_Preview)
+	{
+		return Img_Preview;
+	}
+	if (Img_PreviewPlaceholder)
+	{
+		return Img_PreviewPlaceholder;
+	}
+	if (!WidgetTree)
+	{
+		return nullptr;
+	}
+	if (UImage* PreviewImage = Cast<UImage>(WidgetTree->FindWidget(TEXT("Img_Preview"))))
+	{
+		return PreviewImage;
+	}
+	return Cast<UImage>(WidgetTree->FindWidget(TEXT("Img_PreviewPlaceholder")));
+}
+
+namespace
+{
+	template <typename WidgetType>
+	WidgetType* FindAvWidget(const UWidgetTree* WidgetTree, const TCHAR* Name)
+	{
+		return WidgetTree ? Cast<WidgetType>(WidgetTree->FindWidget(FName(Name))) : nullptr;
+	}
+
+	struct FAvCategoryVisualNames
+	{
+		EAvCustomizationCategory Category;
+		const TCHAR* ActiveBackground;
+		const TCHAR* ActiveLine;
+		const TCHAR* Icon;
+		const TCHAR* Text;
+		const TCHAR* Overlay;
+		const TCHAR* Content;
+	};
+
+	static constexpr FAvCategoryVisualNames CategoryVisualNames[] =
+	{
+		{ EAvCustomizationCategory::Preset, TEXT("Border_CategoryPresetActiveBG"), TEXT("Border_CategoryPresetActiveLine"), TEXT("Img_CategoryPreset"), TEXT("Txt_CategoryPreset"), TEXT("Overlay_CategoryPreset"), TEXT("HB_CategoryPresetContent") },
+		{ EAvCustomizationCategory::Head, TEXT("Border_CategoryHeadActiveBG"), TEXT("Border_CategoryHeadActiveLine"), TEXT("Img_CategoryHead"), TEXT("Txt_CategoryHead"), TEXT("Overlay_CategoryHead"), TEXT("HB_CategoryHeadContent") },
+		{ EAvCustomizationCategory::Hair, TEXT("Border_CategoryHairActiveBG"), TEXT("Border_CategoryHairActiveLine"), TEXT("Img_CategoryHair"), TEXT("Txt_CategoryHair"), TEXT("Overlay_CategoryHair"), TEXT("HB_CategoryHairContent") },
+		{ EAvCustomizationCategory::Headwear, TEXT("Border_CategoryHeadwearActiveBG"), TEXT("Border_CategoryHeadwearActiveLine"), TEXT("Img_CategoryHeadwear"), TEXT("Txt_CategoryHeadwear"), TEXT("Overlay_CategoryHeadwear"), TEXT("HB_CategoryHeadwearContent") },
+		{ EAvCustomizationCategory::Beard, TEXT("Border_CategoryBeardActiveBG"), TEXT("Border_CategoryBeardActiveLine"), TEXT("Img_CategoryBeard"), TEXT("Txt_CategoryBeard"), TEXT("Overlay_CategoryBeard"), TEXT("HB_CategoryBeardContent") },
+		{ EAvCustomizationCategory::Balaclava, TEXT("Border_CategoryBalaclavaActiveBG"), TEXT("Border_CategoryBalaclavaActiveLine"), TEXT("Img_CategoryBalaclava"), TEXT("Txt_CategoryBalaclava"), TEXT("Overlay_CategoryBalaclava"), TEXT("HB_CategoryBalaclavaContent") },
+		{ EAvCustomizationCategory::Hands, TEXT("Border_CategoryHandsActiveBG"), TEXT("Border_CategoryHandsActiveLine"), TEXT("Img_CategoryHands"), TEXT("Txt_CategoryHands"), TEXT("Overlay_CategoryHands"), TEXT("HB_CategoryHandsContent") },
+	};
+
+	const FAvCategoryVisualNames* FindCategoryVisualNames(EAvCustomizationCategory Category)
+	{
+		for (const FAvCategoryVisualNames& Names : CategoryVisualNames)
+		{
+			if (Names.Category == Category)
+			{
+				return &Names;
+			}
+		}
+		return nullptr;
+	}
+}
+
+void UAvCharacterCustomizationRootWidget::BindCategoryButtons()
+{
+	if (Btn_CategoryPreset)
+	{
+		Btn_CategoryPreset->OnClicked.RemoveAll(this);
+		Btn_CategoryPreset->OnClicked.AddDynamic(this, &UAvCharacterCustomizationRootWidget::HandleCategoryPresetClicked);
+		NormalizeCategoryButton(Btn_CategoryPreset);
+	}
+	if (Btn_CategoryHead)
+	{
+		Btn_CategoryHead->OnClicked.RemoveAll(this);
+		Btn_CategoryHead->OnClicked.AddDynamic(this, &UAvCharacterCustomizationRootWidget::HandleCategoryHeadClicked);
+		NormalizeCategoryButton(Btn_CategoryHead);
+	}
+	if (Btn_CategoryHair)
+	{
+		Btn_CategoryHair->OnClicked.RemoveAll(this);
+		Btn_CategoryHair->OnClicked.AddDynamic(this, &UAvCharacterCustomizationRootWidget::HandleCategoryHairClicked);
+		NormalizeCategoryButton(Btn_CategoryHair);
+	}
+	if (Btn_CategoryHeadwear)
+	{
+		Btn_CategoryHeadwear->OnClicked.RemoveAll(this);
+		Btn_CategoryHeadwear->OnClicked.AddDynamic(this, &UAvCharacterCustomizationRootWidget::HandleCategoryHeadwearClicked);
+		NormalizeCategoryButton(Btn_CategoryHeadwear);
+	}
+	if (Btn_CategoryBeard)
+	{
+		Btn_CategoryBeard->OnClicked.RemoveAll(this);
+		Btn_CategoryBeard->OnClicked.AddDynamic(this, &UAvCharacterCustomizationRootWidget::HandleCategoryBeardClicked);
+		NormalizeCategoryButton(Btn_CategoryBeard);
+	}
+	if (Btn_CategoryBalaclava)
+	{
+		Btn_CategoryBalaclava->OnClicked.RemoveAll(this);
+		Btn_CategoryBalaclava->OnClicked.AddDynamic(this, &UAvCharacterCustomizationRootWidget::HandleCategoryBalaclavaClicked);
+		NormalizeCategoryButton(Btn_CategoryBalaclava);
+	}
+	if (Btn_CategoryHands)
+	{
+		Btn_CategoryHands->OnClicked.RemoveAll(this);
+		Btn_CategoryHands->OnClicked.AddDynamic(this, &UAvCharacterCustomizationRootWidget::HandleCategoryHandsClicked);
+		NormalizeCategoryButton(Btn_CategoryHands);
+	}
+}
+
+void UAvCharacterCustomizationRootWidget::SelectCategory(EAvCustomizationCategory Category)
+{
+	SelectedCategory = Category;
+	RefreshCategoryVisuals();
+}
+
+void UAvCharacterCustomizationRootWidget::RefreshCategoryVisuals()
+{
+	static constexpr EAvCustomizationCategory Categories[] =
+	{
+		EAvCustomizationCategory::Preset,
+		EAvCustomizationCategory::Head,
+		EAvCustomizationCategory::Hair,
+		EAvCustomizationCategory::Headwear,
+		EAvCustomizationCategory::Beard,
+		EAvCustomizationCategory::Balaclava,
+		EAvCustomizationCategory::Hands
+	};
+
+	for (EAvCustomizationCategory Category : Categories)
+	{
+		ApplyCategoryVisual(Category, false);
+	}
+	ApplyCategoryVisual(SelectedCategory, true);
+}
+
+void UAvCharacterCustomizationRootWidget::ApplyCategoryVisual(EAvCustomizationCategory Category, bool bActive)
+{
+	const FAvCategoryVisualNames* Names = FindCategoryVisualNames(Category);
+	if (!Names || !WidgetTree)
+	{
+		return;
+	}
+
+	if (UBorder* ActiveBackground = FindAvWidget<UBorder>(WidgetTree, Names->ActiveBackground))
+	{
+		NormalizeCategoryWidgetGeometry(ActiveBackground);
+		ActiveBackground->SetVisibility(bActive ? ESlateVisibility::HitTestInvisible : ESlateVisibility::Hidden);
+	}
+	if (UWidget* ActiveLine = FindAvWidget<UWidget>(WidgetTree, Names->ActiveLine))
+	{
+		NormalizeCategoryWidgetGeometry(ActiveLine);
+		ActiveLine->SetVisibility(bActive ? ESlateVisibility::HitTestInvisible : ESlateVisibility::Hidden);
+	}
+	if (UImage* Icon = FindAvWidget<UImage>(WidgetTree, Names->Icon))
+	{
+		NormalizeCategoryWidgetGeometry(Icon);
+		Icon->SetColorAndOpacity(bActive ? AvCustomizePreview::CategoryActiveIcon : AvCustomizePreview::CategoryInactiveIcon);
+	}
+	if (UTextBlock* Text = FindAvWidget<UTextBlock>(WidgetTree, Names->Text))
+	{
+		NormalizeCategoryWidgetGeometry(Text);
+		Text->SetColorAndOpacity(FSlateColor(bActive ? AvCustomizePreview::CategoryActiveText : AvCustomizePreview::CategoryInactiveText));
+	}
+
+	NormalizeCategoryWidgetGeometry(FindAvWidget<UWidget>(WidgetTree, Names->Overlay));
+	NormalizeCategoryWidgetGeometry(FindAvWidget<UWidget>(WidgetTree, Names->Content));
+}
+
+void UAvCharacterCustomizationRootWidget::NormalizeCategoryButton(UButton* Button) const
+{
+	if (!Button)
+	{
+		return;
+	}
+
+	FButtonStyle Style = Button->GetStyle();
+	Style.PressedPadding = Style.NormalPadding;
+	Button->SetStyle(Style);
+	Button->OnHovered.RemoveAll(this);
+	Button->OnUnhovered.RemoveAll(this);
+	Button->OnPressed.RemoveAll(this);
+	Button->OnReleased.RemoveAll(this);
+	NormalizeCategoryWidgetGeometry(Button);
+}
+
+void UAvCharacterCustomizationRootWidget::NormalizeCategoryWidgetGeometry(UWidget* Widget) const
+{
+	if (!Widget)
+	{
+		return;
+	}
+
+	Widget->SetRenderTranslation(FVector2D::ZeroVector);
+	Widget->SetRenderScale(FVector2D(1.f, 1.f));
+	Widget->SetRenderTransformPivot(FVector2D(0.5f, 0.5f));
+}
+
+void UAvCharacterCustomizationRootWidget::RefreshFullscreenLayout()
+{
+	APlayerController* PC = GetOwningPlayer();
+	if (!PC)
+	{
+		return;
+	}
+
+	int32 ViewportX = 0;
+	int32 ViewportY = 0;
+	PC->GetViewportSize(ViewportX, ViewportY);
+	if (ViewportX <= 0 || ViewportY <= 0)
+	{
+		return;
+	}
+
+	SetAnchorsInViewport(FAnchors(0.f, 0.f, 1.f, 1.f));
+	SetAlignmentInViewport(FVector2D::ZeroVector);
+	SetPositionInViewport(FVector2D::ZeroVector, false);
+	SetDesiredSizeInViewport(FVector2D(static_cast<float>(ViewportX), static_cast<float>(ViewportY)));
+
+	const FIntPoint NewViewportSize(ViewportX, ViewportY);
+	if (bHasAppliedResponsiveLayout && CachedViewportSize == NewViewportSize)
+	{
+		return;
+	}
+
+	CachedViewportSize = NewViewportSize;
+	bHasAppliedResponsiveLayout = true;
+	UpdateResponsiveLayout(NewViewportSize);
+}
+
+void UAvCharacterCustomizationRootWidget::UpdateResponsiveLayout(const FIntPoint& ViewportSize)
+{
+	const float ViewW = static_cast<float>(ViewportSize.X);
+	const float ViewH = static_cast<float>(ViewportSize.Y);
+	if (ViewW <= 0.f || ViewH <= 0.f)
+	{
+		return;
+	}
+
+	if (FullscreenDarkImage)
+	{
+		ApplyCanvasSlot(FullscreenDarkImage, FVector2D::ZeroVector, FVector2D(ViewW, ViewH), 0);
+	}
+
+	if (!SafeContentContainer)
+	{
+		return;
+	}
+
+	const float Scale = ComputeUIScale(ViewportSize.Y);
+	const float Aspect = ViewW / ViewH;
+	const float SafeW = ViewW;
+	const float SafeX = (ViewW - SafeW) * 0.5f;
+	const float SafeH = ViewH;
+
+	ApplyCanvasSlot(SafeContentContainer.Get(), FVector2D(SafeX, 0.f), FVector2D(SafeW, SafeH), 10);
+
+	const float Pad = FMath::Clamp(32.f * Scale, 20.f, 44.f);
+	const float Gap = FMath::Clamp(18.f * Scale, 12.f, 24.f);
+	const float TopY = FMath::Max(10.f, 16.f * Scale);
+	const float TopH = FMath::Clamp(64.f * Scale, 48.f, 72.f);
+	const float TopLineH = FMath::Max(2.f, 2.f * Scale);
+	const float BodyY = TopY + TopH + Gap;
+	const float BottomH = FMath::Clamp(132.f * Scale, 92.f, SafeH * 0.18f);
+	const float BottomY = FMath::Max(BodyY + 260.f * Scale, SafeH - BottomH - Gap);
+	const float BodyH = FMath::Max(220.f * Scale, BottomY - BodyY - Gap);
+
+	const float LeftW = FMath::Clamp(330.f * Scale, 280.f, 380.f);
+	const float RightW = FMath::Clamp(620.f * Scale, 560.f, 700.f);
+	const float MinPreviewW = FMath::Clamp(520.f * Scale, 420.f, 680.f);
+	const float WideRequiredW = Pad * 2.f + LeftW + Gap + MinPreviewW + Gap + RightW;
+	const bool bNarrow = Aspect < 1.45f || SafeW < WideRequiredW;
+	const bool bVeryNarrow = SafeW < 900.f * Scale;
+
+	ApplyCanvasSlot(TopNavigation, FVector2D(Pad, TopY), FVector2D(FMath::Max(1.f, SafeW - Pad * 2.f), TopH), 20);
+	ApplyCanvasSlot(TopOrangeLine, FVector2D(Pad, TopY + TopH + 4.f * Scale), FVector2D(FMath::Max(1.f, SafeW - Pad * 2.f), TopLineH), 21);
+	ApplyCanvasSlot(BottomEquipmentPanel, FVector2D(Pad, BottomY), FVector2D(FMath::Max(1.f, SafeW - Pad * 2.f), BottomH), 30);
+
+	if (!bNarrow)
+	{
+		const float LeftX = Pad;
+		const float PreviewX = LeftX + LeftW + Gap;
+		const float RightX = SafeW - Pad - RightW;
+		const float PreviewW = FMath::Max(1.f, RightX - Gap - PreviewX);
+
+		ApplyCanvasSlot(LeftCategoryPanel, FVector2D(LeftX, BodyY), FVector2D(LeftW, BodyH), 30);
+		ApplyCanvasSlot(CenterPreviewPanel, FVector2D(PreviewX, BodyY), FVector2D(PreviewW, BodyH), 30);
+		ApplyCanvasSlot(RightOptionsPanel, FVector2D(RightX, BodyY), FVector2D(RightW, BodyH), 30);
+		return;
+	}
+
+	if (bVeryNarrow)
+	{
+		const float FullW = FMath::Max(1.f, SafeW - Pad * 2.f);
+		const float LeftH = FMath::Clamp(180.f * Scale, 130.f, BodyH * 0.28f);
+		const float RightH = FMath::Clamp(320.f * Scale, 230.f, BodyH * 0.44f);
+		const float PreviewY = BodyY + LeftH + Gap;
+		const float PreviewH = FMath::Max(160.f * Scale, BodyH - LeftH - RightH - Gap * 2.f);
+		const float RightY = PreviewY + PreviewH + Gap;
+
+		ApplyCanvasSlot(LeftCategoryPanel, FVector2D(Pad, BodyY), FVector2D(FullW, LeftH), 30);
+		ApplyCanvasSlot(CenterPreviewPanel, FVector2D(Pad, PreviewY), FVector2D(FullW, PreviewH), 30);
+		ApplyCanvasSlot(RightOptionsPanel, FVector2D(Pad, RightY), FVector2D(FullW, RightH), 30);
+		return;
+	}
+
+	const float NarrowLeftW = FMath::Min(LeftW, SafeW * 0.30f);
+	const float ContentX = Pad + NarrowLeftW + Gap;
+	const float ContentW = FMath::Max(1.f, SafeW - ContentX - Pad);
+	const float RightH = FMath::Clamp(360.f * Scale, 260.f, BodyH * 0.48f);
+	const float PreviewH = FMath::Max(180.f * Scale, BodyH - RightH - Gap);
+	const float RightY = BodyY + PreviewH + Gap;
+
+	ApplyCanvasSlot(LeftCategoryPanel, FVector2D(Pad, BodyY), FVector2D(NarrowLeftW, BodyH), 30);
+	ApplyCanvasSlot(CenterPreviewPanel, FVector2D(ContentX, BodyY), FVector2D(ContentW, PreviewH), 30);
+	ApplyCanvasSlot(RightOptionsPanel, FVector2D(ContentX, RightY), FVector2D(ContentW, RightH), 30);
+}
+
+void UAvCharacterCustomizationRootWidget::ApplyCanvasSlot(UWidget* Widget, const FVector2D& Position, const FVector2D& Size, int32 ZOrder) const
+{
+	if (!Widget)
+	{
+		return;
+	}
+
+	if (UCanvasPanelSlot* CanvasSlot = Cast<UCanvasPanelSlot>(Widget->Slot))
+	{
+		CanvasSlot->SetAutoSize(false);
+		CanvasSlot->SetAnchors(FAnchors(0.f, 0.f, 0.f, 0.f));
+		CanvasSlot->SetAlignment(FVector2D::ZeroVector);
+		CanvasSlot->SetPosition(Position);
+		CanvasSlot->SetSize(Size);
+		CanvasSlot->SetZOrder(ZOrder);
+	}
+
+	Widget->SetVisibility(ESlateVisibility::Visible);
+}
+
+void UAvCharacterCustomizationRootWidget::RebuildBottomEquipmentPanel()
+{
+	if (!WidgetTree || !BottomEquipmentPanel)
+	{
+		return;
+	}
+
+	UVerticalBox* BottomBar = WidgetTree->ConstructWidget<UVerticalBox>(UVerticalBox::StaticClass(), TEXT("BottomBar_Responsive"));
+	if (!BottomBar)
+	{
+		return;
+	}
+
+	UHorizontalBox* HeaderRow = WidgetTree->ConstructWidget<UHorizontalBox>(UHorizontalBox::StaticClass(), TEXT("HeaderRow_Equipment"));
+	if (UVerticalBoxSlot* HeaderSlot = BottomBar->AddChildToVerticalBox(HeaderRow))
+	{
+		HeaderSlot->SetSize(FSlateChildSize(ESlateSizeRule::Automatic));
+		HeaderSlot->SetPadding(FMargin(22.f, 14.f, 22.f, 4.f));
+	}
+
+	if (HeaderRow)
+	{
+		UWidget* TitleWidget = GetOrCreateBottomTextWidget(TEXT("EquipmentTitle"), FText::FromString(TEXT("ЭКИПИРОВКА")));
+		if (TitleWidget)
+		{
+			TitleWidget->RemoveFromParent();
+			if (UHorizontalBoxSlot* TitleSlot = HeaderRow->AddChildToHorizontalBox(TitleWidget))
+			{
+				TitleSlot->SetSize(FSlateChildSize(ESlateSizeRule::Automatic));
+				TitleSlot->SetVerticalAlignment(VAlign_Center);
+			}
+		}
+
+		USpacer* HeaderSpacer = WidgetTree->ConstructWidget<USpacer>(USpacer::StaticClass(), TEXT("HeaderRowSpacer"));
+		if (UHorizontalBoxSlot* SpacerSlot = HeaderRow->AddChildToHorizontalBox(HeaderSpacer))
+		{
+			SpacerSlot->SetSize(FSlateChildSize(ESlateSizeRule::Fill));
+		}
+	}
+
+	UWrapBox* ControlsRow = WidgetTree->ConstructWidget<UWrapBox>(UWrapBox::StaticClass(), TEXT("ControlsRow"));
+	ControlsRow->SetInnerSlotPadding(FVector2D(12.f, 10.f));
+	if (UVerticalBoxSlot* ControlsSlot = BottomBar->AddChildToVerticalBox(ControlsRow))
+	{
+		ControlsSlot->SetSize(FSlateChildSize(ESlateSizeRule::Fill));
+		ControlsSlot->SetPadding(FMargin(22.f, 4.f, 22.f, 14.f));
+	}
+
+	UWidget* RandomizeWidget = Btn_RandomizeAppearance.Get();
+	if (!RandomizeWidget)
+	{
+		RandomizeWidget = GetOrCreateBottomTextWidget(TEXT("Btn_RandomizeAppearance_Fallback"), FText::FromString(TEXT("СЛУЧАЙНЫЙ ВНЕШНИЙ ВИД")));
+	}
+
+	AddWidgetToBottomControls(RandomizeWidget, ControlsRow, 260.f, FMargin(0.f));
+
+	USpacer* ControlsSpacer = WidgetTree->ConstructWidget<USpacer>(USpacer::StaticClass(), TEXT("ControlsRowSpacer"));
+	ControlsSpacer->SetSize(FVector2D(18.f, 1.f));
+	AddWidgetToBottomControls(ControlsSpacer, ControlsRow, 18.f, FMargin(0.f));
+
+	UWidget* Jacket = EquipmentSlot_Jacket.Get();
+	if (!Jacket) { Jacket = GetOrCreateBottomTextWidget(TEXT("EquipmentSlot_Jacket_Fallback"), FText::FromString(TEXT("КУРТКА"))); }
+	AddWidgetToBottomControls(Jacket, ControlsRow, 132.f, FMargin(0.f));
+
+	UWidget* Pants = EquipmentSlot_Pants.Get();
+	if (!Pants) { Pants = GetOrCreateBottomTextWidget(TEXT("EquipmentSlot_Pants_Fallback"), FText::FromString(TEXT("ШТАНЫ"))); }
+	AddWidgetToBottomControls(Pants, ControlsRow, 132.f, FMargin(0.f));
+
+	UWidget* Boots = EquipmentSlot_Boots.Get();
+	if (!Boots) { Boots = GetOrCreateBottomTextWidget(TEXT("EquipmentSlot_Boots_Fallback"), FText::FromString(TEXT("ОБУВЬ"))); }
+	AddWidgetToBottomControls(Boots, ControlsRow, 132.f, FMargin(0.f));
+
+	UWidget* Helmet = EquipmentSlot_Helmet.Get();
+	if (!Helmet) { Helmet = GetOrCreateBottomTextWidget(TEXT("EquipmentSlot_Helmet_Fallback"), FText::FromString(TEXT("КАСКА"))); }
+	AddWidgetToBottomControls(Helmet, ControlsRow, 132.f, FMargin(0.f));
+
+	UWidget* Mask = EquipmentSlot_Mask.Get();
+	if (!Mask) { Mask = GetOrCreateBottomTextWidget(TEXT("EquipmentSlot_Mask_Fallback"), FText::FromString(TEXT("МАСКА"))); }
+	AddWidgetToBottomControls(Mask, ControlsRow, 132.f, FMargin(0.f));
+
+	if (UContentWidget* ContentHost = Cast<UContentWidget>(BottomEquipmentPanel.Get()))
+	{
+		ContentHost->SetContent(BottomBar);
+	}
+	else if (UPanelWidget* PanelHost = Cast<UPanelWidget>(BottomEquipmentPanel.Get()))
+	{
+		PanelHost->ClearChildren();
+		PanelHost->AddChild(BottomBar);
+	}
+}
+
+UWidget* UAvCharacterCustomizationRootWidget::GetOrCreateBottomTextWidget(FName WidgetName, const FText& Text)
+{
+	if (!WidgetTree)
+	{
+		return nullptr;
+	}
+
+	if (UWidget* Existing = WidgetTree->FindWidget(WidgetName))
+	{
+		if (UTextBlock* ExistingText = Cast<UTextBlock>(Existing))
+		{
+			ExistingText->SetText(Text);
+			ExistingText->SetAutoWrapText(false);
+		}
+		return Existing;
+	}
+
+	UTextBlock* TextBlock = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass(), WidgetName);
+	if (TextBlock)
+	{
+		TextBlock->SetText(Text);
+		TextBlock->SetAutoWrapText(false);
+		FSlateFontInfo Font = TextBlock->GetFont();
+		Font.Size = WidgetName == TEXT("EquipmentTitle") ? 26 : 22;
+		TextBlock->SetFont(Font);
+		TextBlock->SetColorAndOpacity(FSlateColor(FLinearColor(0.95f, 0.42f, 0.04f, 1.f)));
+	}
+	return TextBlock;
+}
+
+void UAvCharacterCustomizationRootWidget::AddWidgetToBottomControls(UWidget* Widget, UWrapBox* ControlsRow, float MinWidth, const FMargin& SlotPadding) const
+{
+	if (!Widget || !ControlsRow || !WidgetTree)
+	{
+		return;
+	}
+
+	Widget->RemoveFromParent();
+
+	USizeBox* SizeBox = WidgetTree->ConstructWidget<USizeBox>(USizeBox::StaticClass());
+	SizeBox->SetMinDesiredWidth(MinWidth);
+	SizeBox->SetMinDesiredHeight(42.f);
+	SizeBox->AddChild(Widget);
+
+	if (UWrapBoxSlot* WrapSlot = ControlsRow->AddChildToWrapBox(SizeBox))
+	{
+		WrapSlot->SetPadding(SlotPadding);
+	}
+}
+
+float UAvCharacterCustomizationRootWidget::ComputeUIScale(int32 ViewportHeight) const
+{
+	struct FDpiPoint
+	{
+		int32 Height;
+		float Scale;
+	};
+
+	static constexpr FDpiPoint Points[] = {
+		{ 720, 0.80f },
+		{ 768, 0.85f },
+		{ 900, 0.93f },
+		{ 1080, 1.00f },
+		{ 1440, 1.00f },
+		{ 2160, 1.10f },
+	};
+
+	if (ViewportHeight <= Points[0].Height)
+	{
+		return Points[0].Scale;
+	}
+
+	for (int32 Index = 1; Index < UE_ARRAY_COUNT(Points); ++Index)
+	{
+		const FDpiPoint& Prev = Points[Index - 1];
+		const FDpiPoint& Next = Points[Index];
+		if (ViewportHeight <= Next.Height)
+		{
+			const float Alpha = static_cast<float>(ViewportHeight - Prev.Height) / static_cast<float>(Next.Height - Prev.Height);
+			return FMath::Lerp(Prev.Scale, Next.Scale, Alpha);
+		}
+	}
+
+	return Points[UE_ARRAY_COUNT(Points) - 1].Scale;
+}

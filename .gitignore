@@ -173,6 +173,10 @@ __pycache__/
 
 # Local AI/editor state
 .mcp.json
+.codex-account-a/
+.codex-account-b/
+.codex-personal/
+.codex-second/
 .claude/settings.local.json
 .claude/scheduled_tasks.lock
 .claude/**/*.log
