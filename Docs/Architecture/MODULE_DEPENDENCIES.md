@@ -12,12 +12,16 @@ Public dependency modules:
 - `Core`
 - `CoreUObject`
 - `Engine`
+- `ApplicationCore`
 - `InputCore`
+- `EnhancedInput`
 - `NetCore`
 - `EngineCameras`
 - `OnlineSubsystem`
 - `OnlineSubsystemUtils`
 - `UMG`
+- `Slate`
+- `SlateCore`
 - `Niagara`
 - `AssetRegistry`
 <!-- AUTO-GENERATED:MODULE_DEPENDENCIES:END -->

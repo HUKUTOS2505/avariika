@@ -2,7 +2,7 @@
 
 Primary context: [PROJECT_BRAIN.md](../../PROJECT_BRAIN.md).
 
-The current engineering mission is to stabilize "Avariika" as a maintainable UE5.7 co-op project. The immediate non-gameplay mission is documentation integrity: keep the repository understandable to humans and AI agents without forcing them to read the entire codebase first.
+The current engineering mission is to stabilize "Avariika" as a maintainable UE5.8 co-op project. The immediate non-gameplay mission is documentation integrity: keep the repository understandable to humans and AI agents without forcing them to read the entire codebase first.
 
 Reference:
 

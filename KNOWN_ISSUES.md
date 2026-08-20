@@ -12,7 +12,7 @@ Known problems and risks collected from the documentation corpus. See `PROJECT_B
 
 ## Code
 
-- Current dirty worktree build health is unknown.
+- The clean source-control snapshot has not received a new UBT run during the 2026-08-20 documentation-only audit; rely on the last dated UE 5.8 validation until a fresh build is run.
 - Historical audits list many fixed issues, but fixes still need regression validation against current code.
 - Full-world scans in HUD/tick paths were repeatedly flagged as performance risks.
 - Session handling and online backend behavior need validation beyond Null/LAN.
@@ -52,5 +52,4 @@ Known problems and risks collected from the documentation corpus. See `PROJECT_B
 - `Scripts/` mixes reusable tools, diagnostics, generated outputs, and one-off experiments.
 - Documentation archive contains valuable history but may contradict current `PROJECT_BRAIN.md`.
 - Some PowerShell reads display older Russian text as mojibake; preserve files but verify encoding when editing.
-- Markdown links are currently verified, but no permanent automated check is installed yet.
-
+- Project Markdown links are checked by `Scripts/update_project_docs.py`; its generic workspace scan also sees local `.codex-*` support files, so those external-to-project findings must be filtered when assessing project documentation.

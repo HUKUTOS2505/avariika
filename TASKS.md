@@ -4,10 +4,10 @@ Prioritized backlog. For context and architecture, see `PROJECT_BRAIN.md`.
 
 ## P0
 
-### P0-1 Validate Current Build Health
+### P0-1 Revalidate Current Build Health Before Gameplay Work
 
-- Description: Establish whether the current dirty worktree compiles and opens cleanly.
-- Dependencies: Unreal Engine 5.7 installed; editor closed for full UBT build.
+- Description: Revalidate that the current clean branch compiles and opens cleanly before the next gameplay change.
+- Dependencies: Unreal Engine 5.8 installed; editor closed for full UBT build.
 - Complexity: Medium.
 - Expected files: none if validation-only; possible follow-up in `Source/` if build breaks.
 - Verification: UBT build succeeds; editor loads project; active map opens.
@@ -111,4 +111,3 @@ Prioritized backlog. For context and architecture, see `PROJECT_BRAIN.md`.
 - Complexity: High.
 - Expected files: `Docs/Audits/ASSET_AND_PACK_AUDITS.md`, `PROJECT_STATE.md`.
 - Verification: Every production asset category has an ownership decision.
-

@@ -242,8 +242,8 @@ Treat save schema changes carefully. Validate migration or reset behavior when c
 
 Project:
 
-- Engine: Unreal Engine 5.7.
-- Root: `C:/unrealEngine/avariika`.
+- Engine: Unreal Engine 5.8 (`avariika.uproject` `EngineAssociation`).
+- Root: `C:/unrealEngine/avariika_UE58_sandbox`.
 - UProject: `avariika.uproject`.
 - Runtime module: `Avaryo`.
 
@@ -279,13 +279,13 @@ Do not move Unreal-required folders manually.
 
 ## 16. Plugins
 
-Enabled plugins from `avariika.uproject` include:
+Enabled plugins from `avariika.uproject` at the documentation pass include:
 
-- Editor/tools: `ModelingToolsEditorMode`, `Claudius`, `meshy`, `AudioToolkitPro`, `UnrealMonsterAssetInstaller`, `UltimateLevelArtTool`, `TriangleCountViewMode`.
-- Gameplay/framework: `GameplayStateTree`, `WorldBLD`, `BlockoutToolsPlugin`, `Narrative`, `StageZero`, `n00dEmotes`, `Imperfecter`.
-- Online/audio/voice: `OnlineSubsystem`, `OnlineSubsystemNull`, `OnlineSubsystemUtils`, `EOSCore`, `AudioCapture`, `UniversalVoiceChatPro`, `RuntimeAudioImporter`, `RuntimeSpeechRecognizer`, `RuntimeTextToSpeech`.
-- Rendering/upscaling: `DLSS`, `NIS`, `StreamlineCore`, `StreamlineNGXCommon`, `StreamlineDLSSG`, `StreamlineReflex`, `StreamlineDeepDVC`.
-- Utility: `JsonBlueprintUtilities`, `TickOptToolkit`.
+- Core/input/animation: `EnhancedInput`, `AnimationWarping`, `AnimationLocomotionLibrary`.
+- Runtime/gameplay: `Niagara`, `GameplayStateTree`, `OnlineSubsystem`, `OnlineSubsystemNull`, `OnlineSubsystemUtils`, `AudioCapture`.
+- Editor/utility: `EditorScriptingUtilities`, `ModelingToolsEditorMode`, `JsonBlueprintUtilities`.
+
+Marketplace and optional plugins remain declared but disabled, including EOSCore, DLSS/Streamline, voice, Dungeon Architect, Narrative, TickOptToolkit, and UI/tooling packages. Treat a declared or installed plugin as inactive until its `Enabled` state and integration are verified.
 
 Plugin status may differ between enabled, installed, actively used, and production-approved. Verify before relying on a plugin for core gameplay.
 
@@ -311,7 +311,7 @@ For C++ tasks:
 4. Build:
 
 ```powershell
-"C:\Program Files\Epic Games\UE_5.7\Engine\Build\BatchFiles\Build.bat" avariikaEditor Win64 Development -project="C:\unrealEngine\avariika\avariika.uproject" -WaitMutex
+"C:\Program Files\Epic Games\UE_5.8\Engine\Build\BatchFiles\Build.bat" avariikaEditor Win64 Development -project="C:\unrealEngine\avariika_UE58_sandbox\avariika.uproject" -WaitMutex
 ```
 
 5. Read errors, fix, rebuild until clean.

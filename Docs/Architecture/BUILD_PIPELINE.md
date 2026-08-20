@@ -5,6 +5,7 @@ Canonical project context: [PROJECT_BRAIN.md](../../PROJECT_BRAIN.md).
 ## Project Files
 
 - Project: `avariika.uproject`
+- Engine association: UE 5.8
 - Runtime target: `Source/avariika.Target.cs`
 - Editor target: `Source/avariikaEditor.Target.cs`
 - Runtime module: `Source/Avaryo/Avaryo.Build.cs`

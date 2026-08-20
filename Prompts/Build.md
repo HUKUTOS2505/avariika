@@ -13,7 +13,7 @@ Use this prompt when compiling the project.
 Run:
 
 ```powershell
-"C:\Program Files\Epic Games\UE_5.7\Engine\Build\BatchFiles\Build.bat" avariikaEditor Win64 Development -project="C:\unrealEngine\avariika\avariika.uproject" -WaitMutex
+"C:\Program Files\Epic Games\UE_5.8\Engine\Build\BatchFiles\Build.bat" avariikaEditor Win64 Development -project="C:\unrealEngine\avariika_UE58_sandbox\avariika.uproject" -WaitMutex
 ```
 
 ## Failure Policy

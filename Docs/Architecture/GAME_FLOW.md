@@ -6,7 +6,7 @@ This file describes the runtime flow implied by the current code.
 
 ## Boot
 
-1. Unreal loads `avariika.uproject` with EngineAssociation `5.7`.
+1. Unreal loads `avariika.uproject` with EngineAssociation `5.8`.
 2. The `Avaryo` runtime module is loaded.
 3. Enabled plugins are initialized by Unreal before gameplay startup.
 4. GameInstance subsystems initialize:

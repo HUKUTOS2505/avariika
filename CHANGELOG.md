@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 2026-08-20
+
+- Refreshed generated C++ architecture inventory: 52 public classes and 15 module dependencies are indexed from source.
+- Corrected the current project engine/build references to UE 5.8 and the sandbox project path.
+- Restored the current world/map reference document and updated project-state/worktree guidance from the clean Git snapshot.
+- No gameplay, C++, config, plugin, Blueprint, map, or other Unreal asset was changed.
+
 ## 2026-06-27
 
 - Expanded `PROJECT_BRAIN.md` into the canonical long-term project knowledge base.
