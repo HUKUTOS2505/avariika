@@ -1,0 +1,129 @@
+﻿НОВЫЕ НАХОДКИ ДЛЯ КООП-ХОРРОР-КОМЕДИИ (Аварийная бригада)
+═══════════════════════════════════════════════════════════════
+
+📦 PROPS (Игровые пропсы)
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+▸ Hospital – COMBO Prop Pack (VOL 1-6) — Полный набор больничного оборудования и мебели
+▸ R2 – REALISTIC HOUSE PACK — Реалистичные домашние предметы для жилых сцен
+▸ Modern Hospital Props VOL.2 – Medications and Tools — Медикаменты и инструменты для спасательных сцен  
+▸ Hospital Props VOL.1 – Interior & Equipment — Крупное больничное оборудование (каталки, мониторы)
+▸ Factory Interior + Warehouse Props Vol 1 – BUNDLE — Промышленное оборудование для заводских уровней
+▸ Industrial Fuse Box Pack — Электрические щиты для индастриальных сценариев
+▸ Garage Tools Props — Слесарные инструменты для аварийной бригады
+▸ [SCANS] Industrial Abandoned Buildings – Modular — Модульные части заброшенных зданий
+
+🎨 МАТЕРИАЛЫ (Хоррор-декали и текстуры)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+▸ Horror and Decay VOL.3 – Quarantine/Hospital — Загрязнение и ржавчина для больничных стен
+▸ Industrial Rust & Corrosion Vol. 7 — 53 фотосканированных декаля ржавчины
+▸ Horror and Decay VOL.5 – Urban Surfaces — Урбанские поверхности с загрязнением
+▸ 40 Pcs Professional Blood Decal Bundle — Кровь и травмы для комедийных сцен
+▸ Realistic Blood Decals — Реалистичные кровяные пятна
+▸ Horror Collection: Blood — Дополнительный набор кровяных эффектов
+▸ Gothic Texture Pack — Тёмные индастриальные текстуры
+▸ Industrial Decal Pack — Промышленные декали (масло, грязь, потеки)
+
+👥 ПЕРСОНАЖИ (Гражданские NPC)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+▸ Survival NPC – Maria Estrada — Реалистичная женская фигура для спасательной сцены
+▸ Survival NPC – Hank Murphy — Мужской рабочий характер для команды
+▸ Agents Characters Pack — Пакет агентов/специалистов
+▸ Male Mega Realistic Character Pack 01 — Множество реалистичных мужских моделей
+▸ Modular Characters MegaPack — Кастомизируемые гражданские персонажи
+▸ Construction NPC Animations — Анимации рабочих для интерьеров
+
+🛠️ ЛЕВЕЛ-ТУЛЗЫ (Конструкция уровней)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+▸ Interior Toolkit — Основной инструмент для построения интерьеров домов/больниц/заводов
+▸ Residential Houses – Modular Pack — Модульные части жилых домов
+▸ Modular Sewers & Tunnels — Подземные ходы и канализация для заводов
+▸ Modular abandoned factory — Готовые детали заброшенной фабрики
+▸ KDath: Modular Buildings 01 — Модульные здания под снос
+▸ Spline Mesh Tool – Modular Path Builder — Спланевые инструменты для построения путей
+
+🎵 АУДИО (Звук и атмосфера)
+━━━━━━━━━━━━━━━━━━━━━━━━━
+▸ Video-Presets 3100 Cinematic Sound Effects — 3100 звуковых эффектов для атмосферы
+▸ Boom Library – Armageddon — Взрывы и разрушительные звуки
+▸ Chains Sound Pack — Звуки цепей для индастриальных сцен
+▸ Metal Core Alliance — Металлические и механические звуки
+▸ Rope Stress and Creak Sound Pack — Звуки натяжения и скрипа
+
+✨ VFX (Визуальные эффекты)
+━━━━━━━━━━━━━━━━━━━━━━━
+▸ Stylized Water and Liquid VFX — Вода, утечки, затопления
+▸ Ultimate Fire Pack Vol 1 — Огонь и взрывы
+▸ Lightning & Electric Effect Alembics Pack — Электрические разряды
+▸ Smoke and Fire Spline – Niagara Fluids — Дым через помещения
+
+🎮 UI (Интерфейс)
+━━━━━━━━━━━━━━
+▸ Radial Menu (Wheel) — Круговое меню для аварийной команды
+▸ Journeyman's Minimap 1.2 — Мини-карта для навигации в комплексе
+▸ Basic Interaction, Widgets & Notes — Базовые интерактивные виджеты
+▸ Inventory Examine Interface — Интерфейс экзаминации снаряжения
+
+⚙️ ПЛАГИНЫ (Игровые механики)
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+▸ Dynamic AI System (5.7) — Система ИИ для гражданских NPC и противников
+▸ Hyper Scalable Interaction System v3 — Интерактивные объекты (двери, переключатели)
+▸ Inventory Framework Plugin — Фреймворк инвентаря для оборудования
+▸ Plug and Play AI Bundle — Готовое поведение ИИ для товарищей
+▸ Mission & Objectives 1.5 — Система миссий и задач для кооп
+▸ Advanced Jigsaw Inventory system — Продвинутый инвентарь по сетке
+
+
+🏆 ЖЕМЧУЖИНЫ (ТОП-10 САМЫХ ЦЕННЫХ НАХОДОК)
+═══════════════════════════════════════════════════════════════
+
+1. 🏥 Hospital – COMBO Prop Pack (VOL 1-6)
+   └─ КРИТИЧНО для сеттинга: полный больничный комплекс с реалистичным оборудованием
+
+2. 🏭 Factory Interior + Warehouse Props Vol 1 – BUNDLE  
+   └─ Один из трёх основных сеттингов: полный набор фабричного оборудования и структур
+
+3. 🪜 Industrial Rust & Corrosion Vol. 7 (53 Photoscanned Decals)
+   └─ ЖЕМЧУЖИНА материалов: фотосканированная ржавчина для индастриального реализма
+
+4. 👥 Survival NPC – Hank Murphy / Maria Estrada
+   └─ Реалистичные гражданские персонажи для построения команды аварийной бригады
+
+5. 🛠️ Interior Toolkit
+   └─ Основной инструмент для быстрого построения интерьеров дома/заводов/больниц
+
+6. 🗺️ [SCANS] Industrial Abandoned Buildings – Modular Environment
+   └─ Модульная разрушенная индастриальная среда — готовая база для заводских уровней
+
+7. 🩸 40 Pcs Professional Blood Decal Bundle + Horror and Decay VOL.3
+   └─ ЖЕМЧУЖИНА хоррора: комбо для создания мрачной атмосферы в разрушенных локациях
+
+8. 🎯 Dynamic AI System (5.7) + Hyper Scalable Interaction System v3
+   └─ Комбо плагинов для живого мира: ИИ NPC + интерактивные объекты
+
+9. 🎵 Video-Presets 3100 Cinematic Sound Effects
+   └─ ОГРОМНЫЙ набор звуков для создания атмосферы во всех локациях
+
+10. 🌊 Stylized Water and Liquid VFX
+    └─ Утечки, затопления, лужи — критично для реалистичных аварийных сценариев
+
+
+📋 РЕКОМЕНДАЦИЯ ПРИОРИТЕТА
+════════════════════════════
+
+НЕМЕДЛЕННО:
+  • Hospital COMBO (основной сеттинг)
+  • Factory Interior Bundle (второй сеттинг)
+  • Industrial Rust & Corrosion Vol.7 (материалы)
+  • Interior Toolkit (левел-дизайн)
+
+ВЫСОКИЙ:
+  • NPC Survival пакеты (персонажи)
+  • Horror & Decay VOL.3/5 (атмосфера)
+  • Industrial Abandoned Buildings (модули)
+  • Dynamic AI System (ИИ)
+
+СРЕДНИЙ:
+  • Звуковые пакеты
+  • VFX пакеты
+  • UI системы
+  • Дополнительные пропсы

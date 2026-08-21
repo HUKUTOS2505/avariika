@@ -1,6 +1,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Game/AvariikaSaveGame.h"
+#include "Components/WorkerAppearanceComponent.h"
 #include "GameFramework/Character.h"
 #include "AvaryoCharacter.generated.h"
 
@@ -21,6 +23,7 @@ class USceneCaptureComponent2D;
 class UTextureRenderTarget2D;
 class UVitalsComponent;
 class UWorkerAppearanceComponent;
+class UAnimInstance;
 class UAnimMontage;
 
 /**
@@ -46,6 +49,7 @@ public:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaSeconds) override;
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
+	virtual void AddControllerYawInput(float Val) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 	virtual bool CanJumpInternal_Implementation() const override;
@@ -454,6 +458,113 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Movement")
 	float SprintSpeed;
 
+	/** Turn-in-place (free-look): standing head aim absorbs camera/body yaw until this threshold,
+	 *  then a Mobility Pro root-motion turn montage rotates the body with footwork. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Movement")
+	float TurnInPlaceStartAngle = 45.f;
+
+	/** Angle treated as aligned again after a turn. Used to clear animation-facing state. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Movement")
+	float TurnInPlaceStopAngle = 10.f;
+
+	/** Legacy tuning value kept for Blueprint defaults; standing rotation is montage-driven. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Movement")
+	float TurnInPlaceStandInterpSpeed = 7.f;
+
+	/** Скорость доворота тела в движении (град/с) — встаём по камере быстро. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Movement")
+	float TurnInPlaceMoveRate = 720.f;
+
+	/** Play rate for Mobility Pro turn-in-place montages. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Movement", meta=(ClampMin="0.1"))
+	float TurnInPlaceMontagePlayRate = 1.15f;
+
+	/** Minimum delay after a turn before another turn can start. Prevents rapid retrigger. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Movement", meta=(ClampMin="0.0"))
+	float TurnInPlaceCooldown = 0.25f;
+
+	/** Short lockout after landing so airborne camera yaw does not immediately trigger a planted turn. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Movement|TurnInPlace", meta=(ClampMin="0.0"))
+	float TurnInPlaceLandingCooldown = 0.35f;
+
+	/** How long the yaw threshold must stay valid before committing to a standing turn. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Movement|TurnInPlace", meta=(ClampMin="0.0"))
+	float TurnInPlaceIntentDelay = 0.13f;
+
+	/** During a turn, yaw input that pushes the camera farther away from the body is scaled by this. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Movement|TurnInPlace", meta=(ClampMin="0.0", ClampMax="1.0"))
+	float TurnInPlaceCameraEscapeInputScale = 0.45f;
+
+	/** Soft relative camera/body yaw limit while an idle turn is active. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Movement|TurnInPlace", meta=(ClampMin="0.0"))
+	float TurnInPlaceCameraSoftLimit = 105.f;
+
+	/** Short blend-out used when movement/falling/busy state interrupts an active turn. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Movement|TurnInPlace", meta=(ClampMin="0.0"))
+	float TurnInPlaceBlendOutTime = 0.18f;
+
+	/** Before commit, cancel an active turn if camera/body yaw returns inside this release zone. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Movement|TurnInPlace", meta=(ClampMin="0.0"))
+	float TurnCancelReleaseYaw = 45.f;
+
+	/** Normalized yaw-drive progress after which the planted turn is committed. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Movement|TurnInPlace", meta=(ClampMin="0.0", ClampMax="1.0"))
+	float TurnCommitNormalizedAlpha = 0.25f;
+
+	/** Short montage blend-out for early turn cancel and movement interruption. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Movement|TurnInPlace", meta=(ClampMin="0.0"))
+	float TurnCancelBlendOut = 0.10f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Movement|TurnInPlace", meta=(ClampMin="0.01"))
+	float TurnInPlaceAimFadeOutTime = 0.18f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Movement|TurnInPlace", meta=(ClampMin="0.01"))
+	float TurnInPlaceAimFadeInTime = 0.15f;
+
+	/** Normalized montage position where the 90-degree actor yaw driver starts. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Movement|TurnInPlace", meta=(ClampMin="0.0"))
+	float TurnInPlace90YawStartAlpha = 0.08f;
+
+	/** Normalized montage position where the 90-degree actor yaw driver reaches the target. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Movement|TurnInPlace", meta=(ClampMin="0.0"))
+	float TurnInPlace90YawEndAlpha = 0.72f;
+
+	/** Is a standing turn-in-place montage currently active. */
+	UPROPERTY(BlueprintReadOnly, Category="Avaryo|Movement")
+	bool bTurning = false;
+
+	/** True while the active or requested turn is leftward. */
+	UPROPERTY(BlueprintReadOnly, Category="Avaryo|Movement")
+	bool bTurnMirror = false;
+
+	/** Multiplier for ABP_Worker's spine/neck AimYaw contribution. */
+	UPROPERTY(BlueprintReadOnly, Category="Avaryo|Movement|TurnInPlace")
+	float TurnInPlaceAimAlpha = 1.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Movement|TurnInPlace")
+	TObjectPtr<UAnimMontage> TurnLeft45Montage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Movement|TurnInPlace")
+	TObjectPtr<UAnimMontage> TurnLeft90Montage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Movement|TurnInPlace")
+	TObjectPtr<UAnimMontage> TurnLeft135Montage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Movement|TurnInPlace")
+	TObjectPtr<UAnimMontage> TurnLeft180Montage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Movement|TurnInPlace")
+	TObjectPtr<UAnimMontage> TurnRight45Montage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Movement|TurnInPlace")
+	TObjectPtr<UAnimMontage> TurnRight90Montage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Movement|TurnInPlace")
+	TObjectPtr<UAnimMontage> TurnRight135Montage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Movement|TurnInPlace")
+	TObjectPtr<UAnimMontage> TurnRight180Montage;
+
 	/** Множитель скорости с тяжёлым предметом. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Movement")
 	float HeavyCarryMultiplier;
@@ -477,6 +588,17 @@ public:
 	/** Множитель скорости, пока тащишь раненого. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|Movement")
 	float DragSpeedMultiplier;
+
+	/** UI request for modular worker appearance. Routes through the same server authority path as AvWear. */
+	void RequestWorkerAppearanceSlot(const FString& SlotName, const FString& Option);
+	void RequestWorkerAppearanceColor(const FString& SlotName, const FLinearColor& Color);
+	void RequestSaveWorkerAppearance();
+	void RequestSaveWorkerAppearance(const FWorkerAppearance& NewAppearance);
+	bool RequestApplyWorkerAppearance(
+		const FWorkerAppearance& NewAppearance,
+		bool bHasMeaningfulAppearance = true,
+		FName BasePresetId = NAME_None,
+		EAvAppearanceOrigin AppearanceOrigin = EAvAppearanceOrigin::ManualCustomized);
 
 protected:
 	/** Тяжёлый слот (один предмет), реплицируется. */
@@ -609,6 +731,41 @@ protected:
 
 	/** Плавно ведёт высоту FP-меша по состоянию присяда (камера опускается «как реально»). */
 	void UpdateCrouchEye(float DeltaSeconds);
+
+	// ---------- Foot IK (заземление ступней; ПОКА активен только в приседе) ----------
+	// C++ трейсит пол под ступнями и считает смещения; анимграф (Two Bone IK + ModifyBone таза)
+	// читает эти члены. Вне приседа все смещения = 0 → IK-ноды no-op (стоячую локомоцию не трогаем).
+
+	/** Z-смещение левой/правой ступни к полу (component-space, см). Кормит Two Bone IK. */
+	UPROPERTY(BlueprintReadOnly, Category="Avaryo|FootIK")
+	float FootIKOffsetL = 0.f;
+	UPROPERTY(BlueprintReadOnly, Category="Avaryo|FootIK")
+	float FootIKOffsetR = 0.f;
+
+	/** Подъём таза в приседе (+вверх, см). Кормит ModifyBone(pelvis). */
+	UPROPERTY(BlueprintReadOnly, Category="Avaryo|FootIK")
+	float PelvisIKOffset = 0.f;
+
+	/** Подъём таза в приседе. 0 = ВЫКЛ (band-aid отложен): глубину приседа берём с мокапа,
+	 *  а Foot-IK заземления добьём отдельной террейн-фичей (склоны/лестницы). См. WORKLOG.
+	 *  Инфраструктура (трейс UpdateFootIK + фид в ABP + нода таза) остаётся — поднять >0 чтобы включить. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|FootIK")
+	float CrouchPelvisRaise = 0.f;
+
+	/** Дальность трейса вниз от ступни до пола, см. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|FootIK")
+	float FootIKTraceDist = 60.f;
+
+	/** Кламп смещения ступни, см (защита от выбросов). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|FootIK")
+	float FootIKMaxOffset = 45.f;
+
+	/** Скорость сглаживания смещений (FInterpTo). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Avaryo|FootIK")
+	float FootIKInterpSpeed = 14.f;
+
+	/** Трейсит пол под foot_l/foot_r, считает смещения ступней + подъём таза, сглаживает. */
+	void UpdateFootIK(float DeltaSeconds);
 
 	/** Был ли ранен в прошлый кадр (для авто-сброса тяжёлого при ранении). */
 	bool bWasWounded;
@@ -870,6 +1027,32 @@ protected:
 
 	/** Пересчитать скорость движения из состояния (тяжесть, бег, ранение, дебафы). */
 	void RefreshMoveSpeed();
+	void UpdateStandingBodyYaw(float DeltaSeconds);
+
+	/** Turn-in-place: стоя смотрим головой (aim-offset) свободно; когда угол «камера−тело»
+	 *  переваливает порог — тело доворачивается за камерой (AimYaw сам падает → голова возвращается).
+	 *  В движении тело быстро встаёт по камере (вперёд = куда смотришь). */
+	void UpdateTurnInPlace(float DeltaSeconds);
+
+	/** Select the nearest Mobility Pro turn montage by signed camera/body yaw delta. */
+	UAnimMontage* PickTurnInPlaceMontage(float DeltaYaw, float& OutTurnAngle) const;
+
+	void ClearTurnInPlaceState(float CooldownUntil);
+	void CancelActiveTurnInPlace(UAnimInstance* AnimInst, float BlendOutTime, float CooldownUntil);
+	float GetTurnInPlaceYawDriveAlpha(UAnimInstance* AnimInst) const;
+	void UpdateTurnInPlaceDrivenYaw(UAnimInstance* AnimInst);
+	void ResetTurnInPlaceIntent();
+	void UpdateTurnInPlaceAimAlpha(float DeltaSeconds);
+	bool IsTurnInPlaceBlocked(bool bMoving, bool bFalling, bool bBusy) const;
+
+	UPROPERTY(Transient)
+	TObjectPtr<UAnimMontage> ActiveTurnInPlaceMontage;
+
+	float TurnInPlaceNextAllowedTime = 0.f;
+	float TurnInPlaceStartYaw = 0.f;
+	float TurnInPlaceTargetYaw = 0.f;
+	float TurnInPlaceIntentTime = 0.f;
+	bool bTurnInPlaceIntentActive = false;
 
 	// Обёртки для биндов клавиш 1-5
 	void EquipSlot1() { EquipSlot(0); }
@@ -1003,6 +1186,14 @@ protected:
 	UFUNCTION(Exec) void AvWorkerPreview();
 	/** Дев: снять собранного рабочего. */
 	UFUNCTION(Exec) void AvWorkerClear();
+	/** Дев: сменить часть одежды/волос. `AvWear hair long`, `AvWear torso jacket`, `AvWear head helmet`, `AvWear face respirator`, `AvWear legs jumpsuit`, `AvWear glasses aviator`, `AvWear beard 2`, `AvWear gloves brown`, `AvWear vest orange`. Вариант `none` — снять. */
+	UFUNCTION(Exec) void AvWear(const FString& SlotName, const FString& Option);
+	/** Дев: список вариантов для слота: `AvWearList hair`. */
+	UFUNCTION(Exec) void AvWearList(const FString& SlotName);
+	/** Дев: перекрасить слот (тинт через материал). `AvColor torso 1 0 0` = красный торс (0..1 RGB). Локально (репликация — позже). */
+	UFUNCTION(Exec) void AvColor(const FString& SlotName, float R, float G, float B);
+	/** Открыть/закрыть экран кастомизации (одежда/волосы, клики мышью). */
+	UFUNCTION(Exec) void AvCustomize();
 
 	UFUNCTION(Server, Reliable)
 	void ServerAvVital(const FString& Which, float Value);
@@ -1030,6 +1221,28 @@ protected:
 
 	UFUNCTION(Server, Reliable)
 	void ServerAvWorkerClear();
+
+	UFUNCTION(Server, Reliable)
+	void ServerAvWear(const FString& SlotName, const FString& Option);
+
+	UFUNCTION(Server, Reliable)
+	void ServerAvColor(const FString& SlotName, float R, float G, float B);
+
+	UFUNCTION(Server, Reliable)
+	void ServerSaveWorkerAppearance();
+
+	UFUNCTION(Server, Reliable)
+	void ServerSaveWorkerAppearanceData(const FWorkerAppearance& NewAppearance);
+
+	UFUNCTION(Server, Reliable)
+	void ServerApplyWorkerAppearanceData(
+		const FWorkerAppearance& NewAppearance,
+		bool bHasMeaningfulAppearance,
+		FName BasePresetId,
+		EAvAppearanceOrigin AppearanceOrigin);
+
+	UFUNCTION(Client, Reliable)
+	void ClientWorkerAppearanceApplySucceeded();
 
 	UFUNCTION(Server, Reliable)
 	void ServerAvGive(const FString& What);

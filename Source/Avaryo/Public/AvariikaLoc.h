@@ -4,14 +4,7 @@
 #include "Internationalization/Internationalization.h"
 #include "Internationalization/Culture.h"
 
-/**
- * Лёгкая RU/EN-локализация для Canvas-HUD (DrawText принимает FString, не FText).
- * Прагматично: каждая строка несёт обе версии инлайн — FAvLoc::T(TEXT("Продолжить"), TEXT("Resume")).
- * Переключается по текущему языку (его ставит EasyOptionsMenu / SetCurrentLanguage). По умолчанию RU.
- *
- * Это MVP под 2 языка без gather/locres-пайплайна. Для масштаба (UMG, много языков) — миграция на
- * FText + String Tables + .locres (см. LOCALIZATION.md).
- */
+/** Canonical project localization accessors backed by the gathered AvariikaUI String Table. */
 struct FAvLoc
 {
 	/** true, если текущий язык — английский. */
@@ -20,19 +13,31 @@ struct FAvLoc
 		return FInternationalization::Get().GetCurrentLanguage()->GetTwoLetterISOLanguageName() == TEXT("en");
 	}
 
-	/** Вернуть EN если язык английский, иначе RU. */
+	/** Legacy two-language helper. New UI must use Text/S so pseudo cultures and future locales work. */
 	static FString T(const FString& Ru, const FString& En)
 	{
 		return IsEnglish() ? En : Ru;
 	}
 
-	/**
-	 * Локализованная строка из String Table "AvariikaUI" по ключу (исходник — Content/Avariika/Localization/AvariikaUI.csv).
-	 * Возвращает текст текущей культуры (перевод из .locres) либо исходный русский (фоллбэк).
-	 * Это путь на 13 языков — постепенно вытесняет FAvLoc::T (инлайн ru/en).
-	 */
+	/** Culture-aware FText retaining its String Table identity across live culture changes. */
+	static FText Text(const TCHAR* Key)
+	{
+		return FText::FromStringTable(TEXT("AvariikaUI"), Key);
+	}
+
+	static FText Text(const FString& Key)
+	{
+		return FText::FromStringTable(TEXT("AvariikaUI"), Key);
+	}
+
+	/** FString bridge for APIs such as Canvas DrawText. Avoid for persistent UMG labels. */
 	static FString S(const TCHAR* Key)
 	{
-		return FText::FromStringTable(TEXT("AvariikaUI"), Key).ToString();
+		return Text(Key).ToString();
+	}
+
+	static FString S(const FString& Key)
+	{
+		return Text(Key).ToString();
 	}
 };

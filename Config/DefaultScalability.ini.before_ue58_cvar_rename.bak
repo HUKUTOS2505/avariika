@@ -1,0 +1,80 @@
+; ============================================================================
+;  Avariika — масштабирование качества (Scalability) + апскейл «ФСР»-уровня
+; ============================================================================
+;  Идея (по ТЗ): на СЛАБОЙ машине режем качество и рендерим в меньшем
+;  разрешении, апскейлер TSR дотягивает картинку до экрана; на СИЛЬНОЙ —
+;  Epic/Cinematic = полное качество (красивая вода FluidFlux, Lumen, тени VSM).
+;
+;  Про «ФСР»:
+;   • Встроенный апскейлер UE 5.7 — TSR (Temporal Super Resolution). Это и есть
+;     наш бесплатный аналог FSR/DLSS. Включён глобально в DefaultEngine.ini
+;     (r.AntiAliasingMethod=4). Коэффициент апскейла = ResolutionQuality ниже
+;     (это r.ScreenPercentage: 50 = рендер в半, 100 = нативное).
+;   • AMD FSR3 / NVIDIA DLSS (Streamline) НЕ входят в движок — это отдельные
+;     плагины с FAB / NVIDIA Developer. Их можно докинуть позже как доп.опцию
+;     апскейла в меню настроек; TSR покрывает базу уже сейчас.
+;
+;  Уровни групп: @0=Low @1=Medium @2=High @3=Epic @Cine=Cinematic
+;  Активный уровень выбирается авто-бенчмарком железа или из меню настроек
+;  (GameUserSettings). Здесь мы только ОПРЕДЕЛЯЕМ, что значит каждый уровень —
+;  ничего не форсим, поэтому на сильной машине (Epic) картинка не меняется.
+; ============================================================================
+
+[ResolutionQuality@0]
+ResolutionQuality=50
+
+[ResolutionQuality@1]
+ResolutionQuality=67
+
+[ResolutionQuality@2]
+ResolutionQuality=80
+
+[ResolutionQuality@3]
+ResolutionQuality=100
+
+[ResolutionQuality@Cine]
+ResolutionQuality=100
+
+; --- Эффекты: гейт для тяжёлой воды/Niagara. FluidFlux и плотные брызги
+;     держим на High+; на Low/Medium — упрощённая вода (NS_Water) и меньше партиклов.
+;     (Саму воду FluidFlux переключаем по уровню в логике актёра/материала —
+;      ориентир: показывать FluidFlux при EffectsQuality >= 2.)
+[EffectsQuality@0]
+r.TranslucencyLightingVolumeDim=24
+r.RefractionQuality=0
+r.SceneColorFringeQuality=0
+r.EmitterSpawnRateScale=0.5
+r.ParticleLightQuality=0
+r.DetailMode=0
+
+[EffectsQuality@1]
+r.TranslucencyLightingVolumeDim=32
+r.RefractionQuality=0
+r.SceneColorFringeQuality=1
+r.EmitterSpawnRateScale=0.75
+r.ParticleLightQuality=1
+r.DetailMode=1
+
+[EffectsQuality@2]
+r.TranslucencyLightingVolumeDim=48
+r.RefractionQuality=2
+r.SceneColorFringeQuality=1
+r.EmitterSpawnRateScale=1.0
+r.ParticleLightQuality=2
+r.DetailMode=2
+
+[EffectsQuality@3]
+r.TranslucencyLightingVolumeDim=64
+r.RefractionQuality=2
+r.SceneColorFringeQuality=1
+r.EmitterSpawnRateScale=1.0
+r.ParticleLightQuality=2
+r.DetailMode=3
+
+[EffectsQuality@Cine]
+r.TranslucencyLightingVolumeDim=64
+r.RefractionQuality=2
+r.SceneColorFringeQuality=1
+r.EmitterSpawnRateScale=1.0
+r.ParticleLightQuality=2
+r.DetailMode=3

@@ -1,0 +1,138 @@
+# Codex Handoff Current
+
+## AvCustomize responsive UI
+
+Current task:
+
+- Continue only responsive UI fixes for AvCustomize.
+- Do not work on levels, Dungeon Architect, Menu System Pro, ModuFusion, Steam, SaveGame, or SceneCapture.
+
+Status:
+
+- Responsive layout code change has been made.
+- Responsive UI changes have been built and partially checked manually.
+- Automated screenshot checks through MCP/editor viewport are not valid for UMG verification in this project: `take_screenshot`, `HighResShot`, and editor viewport captures can miss or misrepresent the UMG layer.
+- Further visual verification must be performed manually by the user through New Editor Window (PIE), not through Simulate or MCP screenshots.
+
+Changed files:
+
+- `Source/Avaryo/Private/UI/AvCharacterCustomizationRootWidget.cpp`
+- `Source/Avaryo/Private/UI/AvaryoHUD.cpp`
+
+Implemented changes:
+
+- `UAvCharacterCustomizationRootWidget::NativeTick` now reacts to the widget `Geometry` size, so windowed resize can trigger responsive layout recalculation.
+- Removed the `MaxSafeWidth = 2200` cap; the safe content width now uses the full viewport width.
+- Increased the right options panel target width to roughly the 620 px content width instead of the previous too-small width.
+- `AAvaryoHUD::SetCustomize` now adds the widget with `AddToViewport(100)` instead of `AddToPlayerScreen(...)`.
+
+Risks / follow-up checks:
+
+- `NativeTick` may be unnecessary or more expensive than needed; consider replacing with a lower-frequency or explicit viewport resize path if it causes overhead.
+- Increasing `RightPanel` width may hurt Full HD layouts or force narrow layout sooner than intended.
+- Warning: CommonUI is running without `CommonGameViewportClient`; input routing may behave incorrectly. Do not fix this yet and do not change `GameViewportClient` unless explicitly requested.
+- Required visual checks:
+  - 1920x1080 fullscreen.
+  - 2560x1440 fullscreen.
+  - 2K windowed resize, including resizing after the widget is already open.
+
+Do not continue with new AvCustomize changes until these checks are performed or explicitly requested.
+
+## Dungeon Architect / UE 5.8
+
+- Dungeon Architect установлен как project plugin: `Plugins/DungeonArchitect`
+- В `avariika.uproject` включён `"DungeonArchitect": true`
+- Descriptor был адаптирован под UE 5.8.0
+- Были внесены минимальные compatibility-патчи; ниже перечислены точные файлы и суть изменений
+- `avariikaEditor Win64 Development` успешно собран
+- Smoke-запуск Editor прошёл, DungeonArchitect загрузился
+- Старые ошибки `AnimBP_Dog_GH` и `LogAutomationTest` не относятся к Dungeon Architect
+
+### Точные compatibility-патчи
+
+> Примечание: основной набор патчей лежит в рабочем дереве плагина; `git diff` по корню проекта показывает изменение `avariika.uproject`, а изменения внутри `Plugins/DungeonArchitect` находятся в копии плагина, подключенной как project plugin.
+
+- `Plugins/DungeonArchitect/Source/DungeonArchitectRuntime/Public/Frameworks/PCG/Data/PCGSGFTextureData.h`
+  - `UPCGDungeonSGFTextureData` переведён с `UPCGBaseTextureData` на `UPCGTexture2DSingleBaseData`
+  - `IsValid()` больше не помечен `override`
+  - Добавлены UE 5.8 overrides: `GetTexture()`, `GetTextureRHI()`, `GetTextureResourceType()`, `RequestCPUReadback()`
+- `Plugins/DungeonArchitect/Source/DungeonArchitectRuntime/Private/Frameworks/PCG/Data/PCGSGFTextureData.cpp`
+  - helper sampler обновлён под `UPCGTexture2DSingleBaseData*`
+- `Plugins/DungeonArchitect/Source/DungeonArchitectRuntime/Public/Frameworks/Canvas/UI/Viewport/DungeonCanvasViewportClient.h`
+- `Plugins/DungeonArchitect/Source/DungeonArchitectRuntime/Private/Frameworks/Canvas/UI/Viewport/DungeonCanvasViewportClient.cpp`
+  - `InputGesture` обновлён под UE 5.8, добавлен параметр `EGesturePhase GesturePhase`
+- `Plugins/DungeonArchitect/Source/DungeonArchitectGameplay/Public/Interaction/DAGPlayerInteractionScannerComponent.h`
+  - `InteractionScanRate = 0.100f` вместо неявного `0.100`
+- `Plugins/DungeonArchitect/Source/DungeonArchitectRuntime/DungeonArchitectRuntime.Build.cs`
+  - `bWarningsAsErrors = false`
+- `Plugins/DungeonArchitect/Source/DungeonArchitectEditor/DungeonArchitectEditor.Build.cs`
+  - `bWarningsAsErrors = false`
+  - добавлен `PCG` в `PrivateDependencyModuleNames`
+- `Plugins/DungeonArchitect/Source/DungeonArchitectGameplay/DungeonArchitectGameplay.Build.cs`
+  - `bWarningsAsErrors = false`
+- `Plugins/DungeonArchitect/Source/DungeonArchitectGameplaySupport/DungeonArchitectGameplaySupport.Build.cs`
+  - `bWarningsAsErrors = false`
+- `Plugins/DungeonArchitect/Source/DungeonArchitectEditor/Private/Core/Editors/SnapMapEditor/AppModes/DebugAppMode.cpp`
+- `Plugins/DungeonArchitect/Source/DungeonArchitectEditor/Private/Core/Editors/SnapMapEditor/AppModes/GraphDesignAppMode.cpp`
+- `Plugins/DungeonArchitect/Source/DungeonArchitectEditor/Private/Core/Editors/SnapMapEditor/AppModes/VisualizeAppMode.cpp`
+- `Plugins/DungeonArchitect/Source/DungeonArchitectEditor/Private/Core/Editors/ThemeEditor/AppModes/MarkerGenerator/MarkerGeneratorAppMode.cpp`
+- `Plugins/DungeonArchitect/Source/DungeonArchitectEditor/Private/Core/Editors/ThemeEditor/AppModes/ThemeGraph/ThemeGraphAppMode.cpp`
+  - private `FApplicationMode::RegisterTabFactories(...)` заменён на protected `RegisterTabFactoriesWithAppAndManager(...)`
+
+## Созданный Snap Grid Flow POC
+
+Точные созданные ассеты:
+
+- `Content/Avariika/LevelGeneration/DA_Test/Assets/SC_Avariika_Test_Door_240.uasset`
+- `Content/Avariika/LevelGeneration/DA_Test/Assets/SGF_MB_Avariika_Test_1200x600x300.uasset`
+- `Content/Avariika/LevelGeneration/DA_Test/Assets/SGF_DB_Avariika_Test_EntryHallGarage.uasset`
+- `Content/Avariika/LevelGeneration/DA_Test/Assets/SGF_Avariika_EntryHallGarage.uasset`
+- `Content/Avariika/LevelGeneration/DA_Test/Modules/M_Test_Entry.umap`
+- `Content/Avariika/LevelGeneration/DA_Test/Modules/M_Test_Hall.umap`
+- `Content/Avariika/LevelGeneration/DA_Test/Modules/M_Test_Garage.umap`
+- `Content/Avariika/LevelGeneration/DA_Test/Lvl_DA_SnapGrid_Test.umap`
+
+## Проверенный статус POC
+
+- `M_Test_Entry`: 1 bounds actor, 1 snap connection, 8 greybox mesh actors
+- `M_Test_Hall`: 1 bounds actor, 2 snap connections, 10 greybox mesh actors
+- `M_Test_Garage`: 1 bounds actor, 1 snap connection, 8 greybox mesh actors
+- Door locations проверены по сетке:
+  - `(1200,300,0)`
+  - `(2400,300,0)`
+- `Lvl_DA_SnapGrid_Test` сохранена и содержит три тестовые секции и два маркера проверки стыков
+
+## Что НЕ завершено
+
+- Полный editor-time `Build Dungeon` через Snap Grid Flow не был автоматически завершён
+- Причина: cached поля `FSnapGridFlowModuleDatabaseConnectionInfo.Transform` и часть module database cache в Dungeon Architect read-only / `VisibleAnywhere` и не выставляются Unreal Python
+
+## Следующий ручной шаг в Unreal Editor
+
+1. Открыть `SGF_DB_Avariika_Test_EntryHallGarage`
+2. Нажать штатную кнопку `Build / Rebuild / Update Module Database Cache`
+3. Проверить, что база видит:
+   - `M_Test_Entry`
+   - `M_Test_Hall`
+   - `M_Test_Garage`
+4. Открыть `SGF_Avariika_EntryHallGarage`
+5. Проверить flow: `Entry -> Hall -> Garage`
+6. Открыть `Lvl_DA_SnapGrid_Test`
+7. Выбрать Dungeon Architect actor и нажать `Build Dungeon`
+8. Проверить, что проходы совпадают и стены не перекрывают двери
+
+## Принятые решения
+
+- Dungeon Architect используем только editor-time
+- Runtime generation не использовать
+- `Lvl_FirstPerson` не трогать
+- Сначала доказать POC из трёх модулей
+- Только после успешного ручного `Build Dungeon` переходить к настоящему модулю `MainHall_Stairs`
+- Цель будущего уровня: компактная миссия Avariika на 15–20 минут, а не большой процедурный лабиринт
+
+## Важно для следующего Codex
+
+- Не форсировать закрытие `UnrealEditor.exe`
+- Не запускать PowerShell `Invoke-WebRequest` к localhost MCP без `-UseBasicParsing`
+- Не делать новые уровни, пока POC не собран вручную
+- Не делать commit без отдельной команды пользователя

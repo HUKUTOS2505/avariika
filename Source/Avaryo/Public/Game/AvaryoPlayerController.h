@@ -23,17 +23,31 @@ public:
 	void ClosePauseMenu();
 	bool IsPauseMenuOpen() const { return bPauseMenuOpen; }
 
+	/** Открыть/закрыть экран кастомизации (одежда/волосы) — дев-команда AvCustomize. */
+	void ToggleCustomize();
+	UFUNCTION(Exec)
+	void AvCustomize();
+	bool IsCustomizeOpen() const { return bCustomizeOpen; }
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void AcknowledgePossession(APawn* P) override;
+	virtual bool InputKey(const FInputKeyEventArgs& Params) override;
 	virtual void SetupInputComponent() override;
 
 	/** Принудительно: игровой ввод, курсор скрыт (только для локального контроллера). */
 	void ForceGameInput();
 
 	void OnEscapePressed();
+	void OnCustomizePressed();
+	void OpenCustomizationForNewGame();
+	void LookYaw(float Value);
+	void LookPitch(float Value);
 	/** Режим ввода под меню (курсор+UI-клики) или игру. */
 	void SetMenuInputMode(bool bMenu);
 
 	bool bPauseMenuOpen = false;
+	bool bCustomizeOpen = false;
+	FTimerHandle NewGameCustomizationTimer;
+	int32 NewGameCustomizationAttempts = 0;
 };

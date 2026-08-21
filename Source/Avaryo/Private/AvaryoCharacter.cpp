@@ -12,12 +12,14 @@
 #include "Sound/SoundBase.h"
 #include "Animation/AnimMontage.h"
 #include "Animation/AnimInstance.h"
+#include "Animation/AnimSequence.h"
 #include "Engine/SkeletalMesh.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Engine/TextureRenderTarget2D.h"
 #include "World/AExitZone.h"
 #include "Components/VitalsComponent.h"
 #include "Components/WorkerAppearanceComponent.h"
+#include "Game/AvaryoPlayerController.h"
 #include "Components/InputComponent.h"
 #include "Components/PrimitiveComponent.h"
 #include "Engine/DamageEvents.h"
@@ -140,7 +142,7 @@ AAvaryoCharacter::AAvaryoCharacter()
 	bOffering = false;
 
 	// Приседание (Ctrl/C) — пригодится против монстра-слухача
-	GetCharacterMovement()->GetNavAgentPropertiesRef().bCanCrouch = true;
+	GetCharacterMovement()->GetNavAgentPropertiesRef().bCanCrouch = false;
 	GetCharacterMovement()->MaxWalkSpeedCrouched = 250.f;
 	GetCharacterMovement()->CrouchedHalfHeight = 50.f; // заметно ниже стоя (камера реально опустится)
 
@@ -167,6 +169,11 @@ AAvaryoCharacter::AAvaryoCharacter()
 	HeartbeatAudio->bAutoActivate = false;
 	HeartbeatAudio->bAllowSpatialization = false; // личное, без 3D-затухания
 	HeartbeatAudio->SetVolumeMultiplier(0.f);
+
+	bUseControllerRotationYaw = true;
+	GetCharacterMovement()->bOrientRotationToMovement = false;
+	GetCharacterMovement()->RotationRate = FRotator(0.f, 720.f, 0.f);
+
 	static ConstructorHelpers::FObjectFinder<USoundBase> HeartSnd(TEXT("/Game/Audio/SFX/Heartbeat.Heartbeat"));
 	if (HeartSnd.Succeeded())
 	{
@@ -230,6 +237,13 @@ void AAvaryoCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	bUseControllerRotationYaw = true;
+	if (UCharacterMovementComponent* Move = GetCharacterMovement())
+	{
+		Move->bOrientRotationToMovement = false;
+		Move->RotationRate = FRotator(0.f, 720.f, 0.f);
+	}
+
 	// Монтажи-реакции: грузим один раз (UE4-mann скелет → играют на CitizenNPC через compatible skeleton).
 	// Слот 'DefaultSlot' в ABP_CitizenNPC_male уже подключён. Если задано в Blueprint — не перезатираем.
 	{
@@ -246,6 +260,14 @@ void AAvaryoCharacter::BeginPlay()
 		if (!SprayWorkMontage)  SprayWorkMontage  = LoadM(TEXT("/Game/Avariika/Anim/Work/M_Work_Spray.M_Work_Spray"));
 		if (!CarryWorkMontage)  CarryWorkMontage  = LoadM(TEXT("/Game/Avariika/Anim/Work/M_Work_CarryBag.M_Work_CarryBag"));
 		if (!TiredWorkMontage)  TiredWorkMontage  = LoadM(TEXT("/Game/Avariika/Anim/Work/M_Work_Tired.M_Work_Tired"));
+		if (!TurnLeft45Montage)    TurnLeft45Montage    = LoadM(TEXT("/Game/Avariika/Anim/Locomotion/Mobility/TurnMontages/M_Turn_L_45.M_Turn_L_45"));
+		if (!TurnLeft90Montage)    TurnLeft90Montage    = LoadM(TEXT("/Game/Avariika/Anim/Locomotion/Mobility/TurnMontages/M_Turn_L_90.M_Turn_L_90"));
+		if (!TurnLeft135Montage)   TurnLeft135Montage   = LoadM(TEXT("/Game/Avariika/Anim/Locomotion/Mobility/TurnMontages/M_Turn_L_135.M_Turn_L_135"));
+		if (!TurnLeft180Montage)   TurnLeft180Montage   = LoadM(TEXT("/Game/Avariika/Anim/Locomotion/Mobility/TurnMontages/M_Turn_L_180.M_Turn_L_180"));
+		if (!TurnRight45Montage)   TurnRight45Montage   = LoadM(TEXT("/Game/Avariika/Anim/Locomotion/Mobility/TurnMontages/M_Turn_R_45.M_Turn_R_45"));
+		if (!TurnRight90Montage)   TurnRight90Montage   = LoadM(TEXT("/Game/Avariika/Anim/Locomotion/Mobility/TurnMontages/M_Turn_R_90.M_Turn_R_90"));
+		if (!TurnRight135Montage)  TurnRight135Montage  = LoadM(TEXT("/Game/Avariika/Anim/Locomotion/Mobility/TurnMontages/M_Turn_R_135.M_Turn_R_135"));
+		if (!TurnRight180Montage)  TurnRight180Montage  = LoadM(TEXT("/Game/Avariika/Anim/Locomotion/Mobility/TurnMontages/M_Turn_R_180.M_Turn_R_180"));
 	}
 
 	// Реакции ранения/подъёма привязываем на сервере (там считается витал и шлётся мультикаст всем).
@@ -253,6 +275,20 @@ void AAvaryoCharacter::BeginPlay()
 	{
 		VitalsComponent->OnWounded.AddDynamic(this, &AAvaryoCharacter::HandleWounded);
 		VitalsComponent->OnRevived.AddDynamic(this, &AAvaryoCharacter::HandleRevived);
+	}
+
+	if (HasAuthority() && WorkerAppearance)
+	{
+		if (const UGameInstance* GI = GetGameInstance())
+		{
+			if (const UCompanyLedgerSubsystem* Ledger = GI->GetSubsystem<UCompanyLedgerSubsystem>())
+			{
+				if (Ledger->HasSavedWorkerAppearance())
+				{
+					WorkerAppearance->ApplyAppearance(Ledger->GetSavedWorkerAppearance());
+				}
+			}
+		}
 	}
 
 	// Камера от 1-го лица из Blueprint — к ней крепится предмет в руках.
@@ -357,7 +393,7 @@ void AAvaryoCharacter::BeginPlay()
 	// перебить дефолт компонента в Blueprint (тогда Crouch() молча не работает = «присяда нету»).
 	if (UCharacterMovementComponent* Move = GetCharacterMovement())
 	{
-		Move->GetNavAgentPropertiesRef().bCanCrouch = true;
+		Move->GetNavAgentPropertiesRef().bCanCrouch = false;
 		Move->MaxWalkSpeedCrouched = 250.f;
 		Move->CrouchedHalfHeight = 50.f; // заметно ниже стоя
 	}
@@ -383,6 +419,15 @@ void AAvaryoCharacter::Tick(float DeltaSeconds)
 
 	// Присед: плавно опускаем «глаз» (FP-меш с камерой) — локально у владельца.
 	UpdateCrouchEye(DeltaSeconds);
+
+	// Скорость пересчитываем каждый кадр: бег (Shift) активен ТОЛЬКО при движении вперёд,
+	// а направление меняется на лету (гейт в RefreshMoveSpeed по ускорению vs «вперёд»).
+	RefreshMoveSpeed();
+
+	// Turn-in-place is disabled for now. Camera look should not auto-trigger body/head turn montages.
+
+	// Foot IK: трейс пола под ступнями → смещения для Two Bone IK (пока активно только в приседе).
+	UpdateFootIK(DeltaSeconds);
 
 	// Рабочие анимации действий (ремонт/спрей/тяжёлое/выдох) ВРЕМЕННО ВЫКЛ — анимы пака не подходят:
 	// предмет спереди, «чешет ногу», скольжение при ходьбе (full-body монтаж ломает локомоцию).
@@ -411,7 +456,9 @@ void AAvaryoCharacter::Tick(float DeltaSeconds)
 			&& GetVelocity().Size2D() > 10.f && (!VitalsComponent || !VitalsComponent->IsWounded());
 		if (bMoving)
 		{
-			const bool bRun = VitalsComponent && VitalsComponent->IsSprinting();
+			// «Бег» для звука — по ФАКТИЧЕСКОЙ скорости, не по намерению IsSprinting():
+			// иначе Shift вбок/назад (скорость гейтится до ходьбы) всё равно давал звук бега.
+			const bool bRun = GetVelocity().Size2D() > (BaseWalkSpeed + SprintSpeed) * 0.5f;
 			USoundBase* Want = (bRun && FootstepRunSound) ? FootstepRunSound : FootstepWalkSound;
 			if (FootstepAudio->Sound != Want)
 			{
@@ -660,6 +707,9 @@ void AAvaryoCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+	PlayerInputComponent->BindAxis(TEXT("Turn"), this, &AAvaryoCharacter::AddControllerYawInput);
+	PlayerInputComponent->BindAxis(TEXT("LookUp"), this, &AAvaryoCharacter::AddControllerPitchInput);
+
 	// Временные хардкод-бинды для теста; позже заменим на Enhanced Input
 	PlayerInputComponent->BindKey(EKeys::F, IE_Pressed, this, &AAvaryoCharacter::ToggleFlashlight);
 	PlayerInputComponent->BindKey(EKeys::E, IE_Pressed, this, &AAvaryoCharacter::OnInteractPressed);
@@ -698,6 +748,65 @@ void AAvaryoCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	PlayerInputComponent->BindKey(EKeys::Three, IE_Pressed, this, &AAvaryoCharacter::EquipSlot3);
 	PlayerInputComponent->BindKey(EKeys::Four, IE_Pressed, this, &AAvaryoCharacter::EquipSlot4);
 	PlayerInputComponent->BindKey(EKeys::Five, IE_Pressed, this, &AAvaryoCharacter::EquipSlot5);
+}
+
+void AAvaryoCharacter::AddControllerYawInput(float Val)
+{
+	Super::AddControllerYawInput(Val);
+}
+
+void AAvaryoCharacter::UpdateStandingBodyYaw(float DeltaSeconds)
+{
+	if (!Controller || DeltaSeconds <= 0.f)
+	{
+		return;
+	}
+
+	UCharacterMovementComponent* Move = GetCharacterMovement();
+	const bool bMoving = GetVelocity().SizeSquared2D() > FMath::Square(10.f)
+		|| (Move && Move->GetCurrentAcceleration().SizeSquared2D() > FMath::Square(10.f));
+	const bool bFalling = Move && Move->IsFalling();
+	const bool bBusy = bInteractionLocked || IsRepairing() || IsUsingItem() || CurrentToilet || DraggedTeammate
+		|| (VitalsComponent && VitalsComponent->IsWounded());
+	if (bFalling || bBusy)
+	{
+		return;
+	}
+
+	const float DesiredYaw = Controller->GetControlRotation().Yaw;
+	const float CurrentYaw = GetActorRotation().Yaw;
+	const float DeltaYaw = FMath::FindDeltaAngleDegrees(CurrentYaw, DesiredYaw);
+
+	if (bMoving)
+	{
+		if (FMath::Abs(DeltaYaw) < 1.f)
+		{
+			return;
+		}
+
+		const float NewYaw = FMath::FixedTurn(CurrentYaw, DesiredYaw, 720.f * DeltaSeconds);
+		SetActorRotation(FRotator(0.f, NewYaw, 0.f));
+		return;
+	}
+
+	if (bIsCrouched)
+	{
+		return;
+	}
+
+	constexpr float StopAngle = 8.f;
+	constexpr float StartAngle = 55.f;
+	if (FMath::Abs(DeltaYaw) < StopAngle)
+	{
+		return;
+	}
+
+	const float TurnSpeed = FMath::GetMappedRangeValueClamped(
+		FVector2D(StopAngle, StartAngle),
+		FVector2D(90.f, 360.f),
+		FMath::Abs(DeltaYaw));
+	const float NewYaw = FMath::FixedTurn(CurrentYaw, DesiredYaw, TurnSpeed * DeltaSeconds);
+	SetActorRotation(FRotator(0.f, NewYaw, 0.f));
 }
 
 void AAvaryoCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -878,6 +987,12 @@ bool AAvaryoCharacter::CanJumpInternal_Implementation() const
 void AAvaryoCharacter::Landed(const FHitResult& Hit)
 {
 	Super::Landed(Hit);
+	if (IsLocallyControlled())
+	{
+		const float Now = GetWorld() ? GetWorld()->GetTimeSeconds() : 0.f;
+		TurnInPlaceNextAllowedTime = FMath::Max(TurnInPlaceNextAllowedTime, Now + TurnInPlaceLandingCooldown);
+		ResetTurnInPlaceIntent();
+	}
 	// Звук приземления — локально на каждой машине для приземлившегося персонажа (как шаги)
 	if (JumpSound)
 	{
@@ -886,6 +1001,244 @@ void AAvaryoCharacter::Landed(const FHitResult& Hit)
 }
 
 // ---------- Движение ----------
+
+void AAvaryoCharacter::UpdateTurnInPlace(float DeltaSeconds)
+{
+	// Поворот тела ведёт ТОЛЬКО владелец пешки; остальным он приходит репликацией трансформа.
+	// (На симах ControlRotation — низкочастотная реплика, крутить по ней нельзя.)
+	AController* C = GetController();
+	if (!C || !IsLocallyControlled())
+	{
+		return;
+	}
+
+	const float DesiredYaw = C->GetControlRotation().Yaw;     // куда смотрит камера
+	const float CurrentYaw = GetActorRotation().Yaw;          // куда стоит тело
+	const float Delta = FMath::FindDeltaAngleDegrees(CurrentYaw, DesiredYaw);
+	UCharacterMovementComponent* Move = GetCharacterMovement();
+	UAnimInstance* AnimInst = GetMesh() ? GetMesh()->GetAnimInstance() : nullptr;
+
+	const bool bMoving = GetVelocity().Size2D() > 10.f;
+	const bool bMovementInput = Move && Move->GetCurrentAcceleration().Size2D() > 10.f;
+	const bool bFalling = Move && Move->IsFalling();
+	const bool bBusy = bInteractionLocked || IsRepairing() || IsUsingItem() || CurrentToilet || DraggedTeammate
+		|| (VitalsComponent && VitalsComponent->IsWounded());
+	const bool bTurnPlaying = ActiveTurnInPlaceMontage && AnimInst && AnimInst->Montage_IsPlaying(ActiveTurnInPlaceMontage);
+	const float Now = GetWorld() ? GetWorld()->GetTimeSeconds() : 0.f;
+
+	if (bFalling)
+	{
+		bTurning = false;
+		ResetTurnInPlaceIntent();
+		TurnInPlaceNextAllowedTime = FMath::Max(TurnInPlaceNextAllowedTime, Now + TurnInPlaceLandingCooldown);
+		return;
+	}
+
+	if (ActiveTurnInPlaceMontage)
+	{
+		ResetTurnInPlaceIntent();
+		if (bTurnPlaying)
+		{
+			bTurning = true;
+
+			if (bMovementInput)
+			{
+				CancelActiveTurnInPlace(AnimInst, TurnCancelBlendOut, Now + TurnCancelBlendOut);
+				return;
+			}
+
+			if (bFalling || bIsCrouched || bBusy)
+			{
+				CancelActiveTurnInPlace(AnimInst, TurnInPlaceBlendOutTime, Now + TurnInPlaceCooldown);
+				return;
+			}
+
+			const float ActiveTurnDirection = bTurnMirror ? -1.f : 1.f;
+			const float CurrentDelta = FMath::FindDeltaAngleDegrees(CurrentYaw, DesiredYaw);
+			const bool bBeforeCommit = GetTurnInPlaceYawDriveAlpha(AnimInst) < TurnCommitNormalizedAlpha;
+			const bool bReturnedInsideRelease = FMath::Abs(CurrentDelta) <= TurnCancelReleaseYaw;
+			const bool bChangedToOppositeDirection = !FMath::IsNearlyZero(CurrentDelta, KINDA_SMALL_NUMBER)
+				&& FMath::Sign(CurrentDelta) != ActiveTurnDirection;
+			if (bBeforeCommit && (bReturnedInsideRelease || bChangedToOppositeDirection))
+			{
+				CancelActiveTurnInPlace(AnimInst, TurnCancelBlendOut, Now + TurnCancelBlendOut);
+				return;
+			}
+
+			UpdateTurnInPlaceDrivenYaw(AnimInst);
+			return;
+		}
+
+		SetActorRotation(FRotator(0.f, TurnInPlaceTargetYaw, 0.f));
+		ClearTurnInPlaceState(Now + TurnInPlaceCooldown);
+		return;
+	}
+
+	// В движении тело быстро встаёт по камере (8-way блендспейс корректен).
+	if (bMoving)
+	{
+		bTurning = false; // в движении turn-in-place стоя сбрасываем
+		ResetTurnInPlaceIntent();
+		const float NewYaw = FMath::FixedTurn(CurrentYaw, DesiredYaw, TurnInPlaceMoveRate * DeltaSeconds);
+		SetActorRotation(FRotator(0.f, NewYaw, 0.f));
+		return;
+	}
+
+	bTurnMirror = (Delta < 0.f);
+	if (FMath::Abs(Delta) < TurnInPlaceStopAngle)
+	{
+		bTurning = false;
+		ResetTurnInPlaceIntent();
+		return;
+	}
+
+	if (!AnimInst || IsTurnInPlaceBlocked(bMoving, bFalling, bBusy) || Now < TurnInPlaceNextAllowedTime)
+	{
+		bTurning = false;
+		ResetTurnInPlaceIntent();
+		return;
+	}
+
+	if (AnimInst->IsAnyMontagePlaying())
+	{
+		bTurning = false;
+		ResetTurnInPlaceIntent();
+		return;
+	}
+
+	const float EffectiveStartAngle = FMath::Min(TurnInPlaceStartAngle, 45.f);
+	if (FMath::Abs(Delta) >= EffectiveStartAngle)
+	{
+		if (!bTurnInPlaceIntentActive)
+		{
+			bTurnInPlaceIntentActive = true;
+			TurnInPlaceIntentTime = 0.f;
+			return;
+		}
+
+		TurnInPlaceIntentTime += DeltaSeconds;
+		if (TurnInPlaceIntentTime < TurnInPlaceIntentDelay)
+		{
+			return;
+		}
+
+		float TurnAngle = 0.f;
+		if (UAnimMontage* Montage = PickTurnInPlaceMontage(Delta, TurnAngle))
+		{
+			const float PlayRate = FMath::Max(0.1f, TurnInPlaceMontagePlayRate);
+			if (PlayAnimMontage(Montage, PlayRate) > 0.f)
+			{
+				const bool bLeftTurn = Delta < 0.f;
+				ActiveTurnInPlaceMontage = Montage;
+				TurnInPlaceStartYaw = CurrentYaw;
+				TurnInPlaceTargetYaw = CurrentYaw + (bLeftTurn ? -TurnAngle : TurnAngle);
+				bTurnMirror = bLeftTurn;
+				bTurning = true;
+				ResetTurnInPlaceIntent();
+			}
+		}
+	}
+	else
+	{
+		ResetTurnInPlaceIntent();
+	}
+}
+
+UAnimMontage* AAvaryoCharacter::PickTurnInPlaceMontage(float DeltaYaw, float& OutTurnAngle) const
+{
+	const bool bLeft = DeltaYaw < 0.f;
+	const float AbsYaw = FMath::Abs(DeltaYaw);
+
+	OutTurnAngle = 45.f;
+	if (AbsYaw >= 157.5f)
+	{
+		OutTurnAngle = 180.f;
+		return bLeft ? TurnLeft180Montage : TurnRight180Montage;
+	}
+	if (AbsYaw >= 112.5f)
+	{
+		OutTurnAngle = 135.f;
+		return bLeft ? TurnLeft135Montage : TurnRight135Montage;
+	}
+	if (AbsYaw >= 67.5f)
+	{
+		OutTurnAngle = 90.f;
+		return bLeft ? TurnLeft90Montage : TurnRight90Montage;
+	}
+
+	return bLeft ? TurnLeft45Montage : TurnRight45Montage;
+}
+
+void AAvaryoCharacter::ClearTurnInPlaceState(float CooldownUntil)
+{
+	ActiveTurnInPlaceMontage = nullptr;
+	TurnInPlaceStartYaw = 0.f;
+	TurnInPlaceTargetYaw = 0.f;
+	bTurning = false;
+	TurnInPlaceNextAllowedTime = CooldownUntil;
+	ResetTurnInPlaceIntent();
+}
+
+void AAvaryoCharacter::ResetTurnInPlaceIntent()
+{
+	bTurnInPlaceIntentActive = false;
+	TurnInPlaceIntentTime = 0.f;
+}
+
+void AAvaryoCharacter::CancelActiveTurnInPlace(UAnimInstance* AnimInst, float BlendOutTime, float CooldownUntil)
+{
+	if (AnimInst && ActiveTurnInPlaceMontage)
+	{
+		AnimInst->Montage_Stop(BlendOutTime, ActiveTurnInPlaceMontage);
+	}
+
+	ClearTurnInPlaceState(CooldownUntil);
+}
+
+void AAvaryoCharacter::UpdateTurnInPlaceAimAlpha(float DeltaSeconds)
+{
+	const float TargetAlpha = bTurning ? 0.f : 1.f;
+	const float BlendTime = bTurning ? TurnInPlaceAimFadeOutTime : TurnInPlaceAimFadeInTime;
+	if (BlendTime <= KINDA_SMALL_NUMBER)
+	{
+		TurnInPlaceAimAlpha = TargetAlpha;
+		return;
+	}
+
+	TurnInPlaceAimAlpha = FMath::FInterpConstantTo(TurnInPlaceAimAlpha, TargetAlpha, DeltaSeconds, 1.f / BlendTime);
+}
+
+bool AAvaryoCharacter::IsTurnInPlaceBlocked(bool bMoving, bool bFalling, bool bBusy) const
+{
+	return bMoving || bFalling || bIsCrouched || bBusy;
+}
+
+float AAvaryoCharacter::GetTurnInPlaceYawDriveAlpha(UAnimInstance* AnimInst) const
+{
+	if (!AnimInst || !ActiveTurnInPlaceMontage)
+	{
+		return 0.f;
+	}
+
+	const float MontageLength = FMath::Max(KINDA_SMALL_NUMBER, ActiveTurnInPlaceMontage->GetPlayLength());
+	const float MontageAlpha = FMath::Clamp(AnimInst->Montage_GetPosition(ActiveTurnInPlaceMontage) / MontageLength, 0.f, 1.f);
+	const float WindowStart = FMath::Clamp(TurnInPlace90YawStartAlpha, 0.f, 0.99f);
+	const float WindowEnd = FMath::Clamp(TurnInPlace90YawEndAlpha, WindowStart + KINDA_SMALL_NUMBER, 1.f);
+	return FMath::Clamp((MontageAlpha - WindowStart) / (WindowEnd - WindowStart), 0.f, 1.f);
+}
+
+void AAvaryoCharacter::UpdateTurnInPlaceDrivenYaw(UAnimInstance* AnimInst)
+{
+	if (!AnimInst || !ActiveTurnInPlaceMontage)
+	{
+		return;
+	}
+
+	const float WindowAlpha = GetTurnInPlaceYawDriveAlpha(AnimInst);
+	const float EasedAlpha = FMath::InterpEaseInOut(0.f, 1.f, WindowAlpha, 2.f);
+	const float NewYaw = FMath::Lerp(TurnInPlaceStartYaw, TurnInPlaceTargetYaw, EasedAlpha);
+	SetActorRotation(FRotator(0.f, NewYaw, 0.f));
+}
 
 void AAvaryoCharacter::RefreshMoveSpeed()
 {
@@ -897,7 +1250,20 @@ void AAvaryoCharacter::RefreshMoveSpeed()
 
 	// Во время применения бег запрещён, скорость зависит от предмета
 	const bool bCastingUse = IsUsingItem();
-	float Speed = (VitalsComponent->IsSprinting() && !bCastingUse) ? SprintSpeed : BaseWalkSpeed;
+
+	// Бег (Shift) — ТОЛЬКО когда движемся вперёд (не вбок/назад): спринт боком/спиной
+	// выглядит неестественно. Сравниваем желаемое направление (ускорение) с «вперёд» тела.
+	bool bSprintForward = false;
+	if (VitalsComponent->IsSprinting() && !bCastingUse)
+	{
+		const FVector Accel = Move->GetCurrentAcceleration();
+		if (!Accel.IsNearlyZero())
+		{
+			const float FwdDot = FVector::DotProduct(Accel.GetSafeNormal2D(), GetActorForwardVector().GetSafeNormal2D());
+			bSprintForward = FwdDot > 0.64f; // конус ~±50° вокруг «вперёд»
+		}
+	}
+	float Speed = bSprintForward ? SprintSpeed : BaseWalkSpeed;
 
 	if (bCastingUse)
 	{
@@ -1672,6 +2038,237 @@ void AAvaryoCharacter::AvWorkerClear()
 	if (WorkerAppearance) { WorkerAppearance->ClearAll(); }
 }
 void AAvaryoCharacter::ServerAvWorkerClear_Implementation() { AvWorkerClear(); }
+
+void AAvaryoCharacter::RequestWorkerAppearanceSlot(const FString& SlotName, const FString& Option)
+{
+	AvWear(SlotName, Option);
+}
+
+void AAvaryoCharacter::RequestWorkerAppearanceColor(const FString& SlotName, const FLinearColor& Color)
+{
+	AvColor(SlotName, Color.R, Color.G, Color.B);
+}
+
+void AAvaryoCharacter::RequestSaveWorkerAppearance()
+{
+	if (!HasAuthority())
+	{
+		ServerSaveWorkerAppearance();
+		return;
+	}
+	if (!WorkerAppearance)
+	{
+		return;
+	}
+	if (UGameInstance* GI = GetGameInstance())
+	{
+		if (UCompanyLedgerSubsystem* Ledger = GI->GetSubsystem<UCompanyLedgerSubsystem>())
+		{
+			Ledger->SetSavedWorkerAppearance(WorkerAppearance->GetAppearance());
+			UE_LOG(LogTemp, Warning, TEXT("[AvCustomize] Внешность рабочего сохранена."));
+		}
+	}
+}
+
+void AAvaryoCharacter::ServerSaveWorkerAppearance_Implementation()
+{
+	RequestSaveWorkerAppearance();
+}
+
+void AAvaryoCharacter::RequestSaveWorkerAppearance(const FWorkerAppearance& NewAppearance)
+{
+	if (!HasAuthority())
+	{
+		ServerSaveWorkerAppearanceData(NewAppearance);
+		return;
+	}
+
+	if (UGameInstance* GI = GetGameInstance())
+	{
+		if (UCompanyLedgerSubsystem* Ledger = GI->GetSubsystem<UCompanyLedgerSubsystem>())
+		{
+			Ledger->SetSavedWorkerAppearance(NewAppearance);
+			UE_LOG(LogTemp, Warning, TEXT("[AvCustomize] Pending worker appearance saved."));
+		}
+	}
+}
+
+void AAvaryoCharacter::ServerSaveWorkerAppearanceData_Implementation(const FWorkerAppearance& NewAppearance)
+{
+	RequestSaveWorkerAppearance(NewAppearance);
+}
+
+static void AvLogApplyWorkerAppearanceVisibility(const AAvaryoCharacter* Character, const TCHAR* Phase)
+{
+	if (!Character)
+	{
+		return;
+	}
+
+	const USkeletalMeshComponent* BaseMesh = Character->GetMesh();
+	const UWorkerAppearanceComponent* Appearance = Character->WorkerAppearance;
+	const USkeletalMeshComponent* RuntimeBody = Appearance ? Appearance->GetBodyComponent() : nullptr;
+	const USkeletalMesh* BaseAsset = BaseMesh ? BaseMesh->GetSkeletalMeshAsset() : nullptr;
+	const USkeletalMesh* RuntimeAsset = RuntimeBody ? RuntimeBody->GetSkeletalMeshAsset() : nullptr;
+
+	UE_LOG(LogTemp, Warning,
+		TEXT("[AvApplyVisibility] %s Character=%s ThirdPerson=%d HasAppearanceBody=%d Base=%s Mesh=%s Visible=%d OwnerNoSee=%d RuntimeBody=%s Mesh=%s Visible=%d OwnerNoSee=%d"),
+		Phase ? Phase : TEXT("Unknown"),
+		*GetNameSafe(Character),
+		Character->IsThirdPerson() ? 1 : 0,
+		Appearance && Appearance->HasActiveBodyMesh() ? 1 : 0,
+		*GetNameSafe(BaseMesh),
+		*GetNameSafe(BaseAsset),
+		BaseMesh && BaseMesh->IsVisible() ? 1 : 0,
+		BaseMesh && BaseMesh->bOwnerNoSee ? 1 : 0,
+		*GetNameSafe(RuntimeBody),
+		*GetNameSafe(RuntimeAsset),
+		RuntimeBody && RuntimeBody->IsVisible() ? 1 : 0,
+		RuntimeBody && RuntimeBody->bOwnerNoSee ? 1 : 0);
+}
+
+bool AAvaryoCharacter::RequestApplyWorkerAppearance(
+	const FWorkerAppearance& NewAppearance,
+	bool bHasMeaningfulAppearance,
+	FName BasePresetId,
+	EAvAppearanceOrigin AppearanceOrigin)
+{
+	if (!HasAuthority())
+	{
+		ServerApplyWorkerAppearanceData(NewAppearance, bHasMeaningfulAppearance, BasePresetId, AppearanceOrigin);
+		return false;
+	}
+
+	if (WorkerAppearance)
+	{
+		AvLogApplyWorkerAppearanceVisibility(this, TEXT("BeforeApply"));
+		WorkerAppearance->ApplyAppearance(NewAppearance);
+		if (UGameInstance* GI = GetGameInstance())
+		{
+			if (UCompanyLedgerSubsystem* Ledger = GI->GetSubsystem<UCompanyLedgerSubsystem>())
+			{
+				Ledger->SetActiveCharacterAppearance(
+					NewAppearance,
+					bHasMeaningfulAppearance,
+					BasePresetId,
+					AppearanceOrigin);
+				UE_LOG(LogTemp, Warning, TEXT("[AvCustomize] Applied worker appearance saved as default."));
+			}
+		}
+		AvLogApplyWorkerAppearanceVisibility(this, TEXT("AfterApplyBeforeCameraView"));
+		ApplyCameraView();
+		AvLogApplyWorkerAppearanceVisibility(this, TEXT("AfterApplyCameraView"));
+		if (!IsLocallyControlled())
+		{
+			ClientWorkerAppearanceApplySucceeded();
+		}
+		return true;
+	}
+
+	return false;
+}
+
+void AAvaryoCharacter::ServerApplyWorkerAppearanceData_Implementation(
+	const FWorkerAppearance& NewAppearance,
+	bool bHasMeaningfulAppearance,
+	FName BasePresetId,
+	EAvAppearanceOrigin AppearanceOrigin)
+{
+	RequestApplyWorkerAppearance(NewAppearance, bHasMeaningfulAppearance, BasePresetId, AppearanceOrigin);
+}
+
+void AAvaryoCharacter::ClientWorkerAppearanceApplySucceeded_Implementation()
+{
+	if (AAvaryoPlayerController* PC = Cast<AAvaryoPlayerController>(GetController()))
+	{
+		if (PC->IsCustomizeOpen())
+		{
+			PC->ToggleCustomize();
+		}
+	}
+}
+
+// Имя слота из консоли -> EWorkerSlot.
+static bool AvParseSlot(const FString& S, EWorkerSlot& Out)
+{
+	const FString L = S.ToLower();
+	if (L == TEXT("hair")) Out = EWorkerSlot::Hair;
+	else if (L == TEXT("beard")) Out = EWorkerSlot::Beard;
+	else if (L == TEXT("torso") || L == TEXT("shirt") || L == TEXT("jacket") || L == TEXT("top") || L == TEXT("clothes")) Out = EWorkerSlot::Torso;
+	else if (L == TEXT("legs") || L == TEXT("pants") || L == TEXT("jeans")) Out = EWorkerSlot::Legs;
+	else if (L == TEXT("feet") || L == TEXT("boots") || L == TEXT("shoes")) Out = EWorkerSlot::Feet;
+	else if (L == TEXT("gloves")) Out = EWorkerSlot::Gloves;
+	else if (L == TEXT("head") || L == TEXT("facebase")) Out = EWorkerSlot::Head;
+	else if (L == TEXT("headgear") || L == TEXT("helmet") || L == TEXT("hat") || L == TEXT("cap")) Out = EWorkerSlot::Headgear;
+	else if (L == TEXT("face") || L == TEXT("mask") || L == TEXT("respirator")) Out = EWorkerSlot::FaceMask;
+	else if (L == TEXT("glasses")) Out = EWorkerSlot::Glasses;
+	else if (L == TEXT("headphones") || L == TEXT("headset") || L == TEXT("earmuffs")) Out = EWorkerSlot::Headphones;
+	else if (L == TEXT("watch") || L == TEXT("watches") || L == TEXT("wristwatch")) Out = EWorkerSlot::Watch;
+	else if (L == TEXT("fulloutfit") || L == TEXT("outfit")) Out = EWorkerSlot::FullOutfit;
+	else if (L == TEXT("overalls") || L == TEXT("overall")) Out = EWorkerSlot::Overalls;
+	else if (L == TEXT("hip") || L == TEXT("hipaccessory")) Out = EWorkerSlot::HipAccessory;
+	else if (L == TEXT("vest")) Out = EWorkerSlot::Vest;
+	else if (L == TEXT("body")) Out = EWorkerSlot::Body;
+	else return false;
+	return true;
+}
+
+void AAvaryoCharacter::AvWear(const FString& SlotName, const FString& Option)
+{
+	if (!HasAuthority()) { ServerAvWear(SlotName, Option); return; }
+	if (!WorkerAppearance) return;
+	EWorkerSlot Slot;
+	if (!AvParseSlot(SlotName, Slot))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[AvWear] неизвестный слот '%s'. Доступно: body/head/hair/beard/torso/legs/feet/gloves/headgear/face/glasses/headphones/vest/hip/fulloutfit/overalls"), *SlotName);
+		return;
+	}
+	const bool bOK = WorkerAppearance->SetSlotByKey(Slot, Option);
+	UE_LOG(LogTemp, Warning, TEXT("[AvWear] %s = '%s' -> %s"), *SlotName, *Option, bOK ? TEXT("OK") : TEXT("не найдено (см. AvWearList)"));
+}
+void AAvaryoCharacter::ServerAvWear_Implementation(const FString& SlotName, const FString& Option) { AvWear(SlotName, Option); }
+
+void AAvaryoCharacter::AvColor(const FString& SlotName, float R, float G, float B)
+{
+	if (!HasAuthority()) { ServerAvColor(SlotName, R, G, B); return; }
+	if (!WorkerAppearance) return;
+	const FString LowerSlot = SlotName.ToLower();
+	if (LowerSlot == TEXT("skin") || LowerSlot == TEXT("skintone") || LowerSlot == TEXT("skincolor"))
+	{
+		WorkerAppearance->SetSkinColor(FLinearColor(R, G, B, 1.f));
+		UE_LOG(LogTemp, Warning, TEXT("[AvColor] skin = (%.2f, %.2f, %.2f)"), R, G, B);
+		return;
+	}
+
+	EWorkerSlot Slot;
+	if (!AvParseSlot(SlotName, Slot))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[AvColor] неизвестный слот '%s'. Доступно: hair/beard/torso/legs/feet/gloves/head/face/glasses/vest/body"), *SlotName);
+		return;
+	}
+	// Локальный перекрас (динамик-материал «Color Correction»). Репликация бригаде — follow-up.
+	WorkerAppearance->SetSlotColor(Slot, FLinearColor(R, G, B, 1.f));
+	UE_LOG(LogTemp, Warning, TEXT("[AvColor] %s = (%.2f, %.2f, %.2f)"), *SlotName, R, G, B);
+}
+void AAvaryoCharacter::ServerAvColor_Implementation(const FString& SlotName, float R, float G, float B) { AvColor(SlotName, R, G, B); }
+
+void AAvaryoCharacter::AvWearList(const FString& SlotName)
+{
+	if (!WorkerAppearance) return;
+	EWorkerSlot Slot;
+	if (!AvParseSlot(SlotName, Slot)) { UE_LOG(LogTemp, Warning, TEXT("[AvWearList] неизвестный слот '%s'"), *SlotName); return; }
+	const TArray<FString> Opts = WorkerAppearance->GetOptionsForSlot(Slot);
+	UE_LOG(LogTemp, Warning, TEXT("[AvWearList] %s — %d вариантов:"), *SlotName, Opts.Num());
+	for (const FString& O : Opts) { UE_LOG(LogTemp, Warning, TEXT("    %s"), *O); }
+}
+
+void AAvaryoCharacter::AvCustomize()
+{
+	if (AAvaryoPlayerController* PC = Cast<AAvaryoPlayerController>(GetController()))
+	{
+		PC->ToggleCustomize();
+	}
+}
 
 void AAvaryoCharacter::AvGive(const FString& What)
 {
@@ -3059,21 +3656,12 @@ void AAvaryoCharacter::FumbleHeavy()
 
 void AAvaryoCharacter::StartCrouchInput()
 {
-	// В прыжке/падении присесть нельзя (движок буферит присед до приземления, и тогда
-	// камера резко дёргается). Поэтому в воздухе Ctrl просто игнорируем.
-	if (UCharacterMovementComponent* Move = GetCharacterMovement())
-	{
-		if (Move->IsFalling())
-		{
-			return;
-		}
-	}
-	Crouch();
+	return;
 }
 
 void AAvaryoCharacter::StopCrouchInput()
 {
-	UnCrouch();
+	return;
 }
 
 void AAvaryoCharacter::UpdateCrouchEye(float DeltaSeconds)
@@ -3114,6 +3702,55 @@ void AAvaryoCharacter::UpdateCrouchEye(float DeltaSeconds)
 	FVector RL = FirstPersonMeshComp->GetRelativeLocation();
 	RL.Z = FPMeshStandingZ + CrouchEyeOffset;
 	FirstPersonMeshComp->SetRelativeLocation(RL);
+}
+
+void AAvaryoCharacter::UpdateFootIK(float DeltaSeconds)
+{
+	USkeletalMeshComponent* M = GetMesh();
+	UCapsuleComponent* Cap = GetCapsuleComponent();
+	UWorld* W = GetWorld();
+	if (!M || !Cap || !W)
+	{
+		return;
+	}
+
+	const bool bAir = GetCharacterMovement() && GetCharacterMovement()->IsFalling();
+	// Пока заземляем ТОЛЬКО в приседе: стоячая локомоция со свингом ног — отдельный заход.
+	const bool bActive = bIsCrouched && !bAir;
+
+	float TgtPelvis = 0.f, TgtL = 0.f, TgtR = 0.f;
+	if (bActive)
+	{
+		TgtPelvis = CrouchPelvisRaise; // поднять таз (присед перестаёт быть «глубоким сквотом»)
+
+		const float Half = Cap->GetScaledCapsuleHalfHeight();
+		const FVector C = GetActorLocation();   // центр капсулы (корень = капсула)
+		const float FloorBase = C.Z - Half;     // низ капсулы = ожидаемый пол
+
+		// Дельта по Z: на сколько подвинуть ступню, чтобы она села на РЕАЛЬНЫЙ пол.
+		// + = поднять (ступня провалилась ниже пола), - = опустить (ступня выше — напр. от подъёма таза).
+		auto FootGround = [&](const FName Bone) -> float
+		{
+			const FVector F = M->GetSocketLocation(Bone);
+			const FVector Start(F.X, F.Y, C.Z + Half);
+			const FVector End(F.X, F.Y, FloorBase - FootIKTraceDist);
+			FHitResult Hit;
+			FCollisionQueryParams P(FName(TEXT("FootIK")), false, this);
+			if (W->LineTraceSingleByChannel(Hit, Start, End, ECC_Visibility, P))
+			{
+				return Hit.ImpactPoint.Z - F.Z;
+			}
+			return 0.f;
+		};
+
+		TgtL = FMath::Clamp(FootGround(TEXT("foot_l")), -FootIKMaxOffset, FootIKMaxOffset);
+		TgtR = FMath::Clamp(FootGround(TEXT("foot_r")), -FootIKMaxOffset, FootIKMaxOffset);
+	}
+
+	const float S = FMath::Max(0.1f, FootIKInterpSpeed);
+	PelvisIKOffset = FMath::FInterpTo(PelvisIKOffset, TgtPelvis, DeltaSeconds, S);
+	FootIKOffsetL  = FMath::FInterpTo(FootIKOffsetL,  TgtL,      DeltaSeconds, S);
+	FootIKOffsetR  = FMath::FInterpTo(FootIKOffsetR,  TgtR,      DeltaSeconds, S);
 }
 
 bool AAvaryoCharacter::IsHoldingGasDetector() const
@@ -3200,6 +3837,7 @@ void AAvaryoCharacter::ApplyCameraView()
 	}
 	if (ThirdPersonCamera) { ThirdPersonCamera->SetActive(bThirdPersonView); }
 	if (ViewCamera) { ViewCamera->SetActive(!bThirdPersonView); }
+	const bool bHasWorkerAppearanceBody = WorkerAppearance && WorkerAppearance->HasActiveBodyMesh();
 	// Тело (CharacterMesh0). ГЛАВНОЕ: в шаблоне UE5.5 first-person тело помечено
 	// FirstPersonPrimitiveType=WorldSpaceRepresentation — движок прячет его ОТ ВЛАДЕЛЬЦА
 	// (оставляя тень), поэтому в 3-м лице была «только тень», а owner_no_see ни при чём.
@@ -3210,8 +3848,12 @@ void AAvaryoCharacter::ApplyCameraView()
 		Body->SetFirstPersonPrimitiveType(bThirdPersonView
 			? EFirstPersonPrimitiveType::None
 			: EFirstPersonPrimitiveType::WorldSpaceRepresentation);
-		Body->SetOwnerNoSee(!bThirdPersonView);
-		if (bThirdPersonView)
+		Body->SetOwnerNoSee(bHasWorkerAppearanceBody || !bThirdPersonView);
+		if (bHasWorkerAppearanceBody)
+		{
+			Body->SetVisibility(false, true);
+		}
+		else if (bThirdPersonView)
 		{
 			Body->SetVisibility(true, true);
 		}
@@ -3233,6 +3875,24 @@ void AAvaryoCharacter::ApplyCameraView()
 		if (!Part || Part == GetMesh() || Part == FirstPersonMeshComp)
 		{
 			continue;
+		}
+		const bool bManagedAppearancePart = WorkerAppearance && WorkerAppearance->IsManagedVisualComponent(Part);
+		if (bHasWorkerAppearanceBody && !bManagedAppearancePart)
+		{
+			const USkeletalMesh* PartMesh = Part->GetSkeletalMeshAsset();
+			const FString PartMeshPath = PartMesh ? PartMesh->GetPathName() : FString();
+			const FString PartName = Part->GetName();
+			const bool bLegacyWorkerPart =
+				PartName.Contains(TEXT("WorkerHead")) ||
+				PartName.Contains(TEXT("WorkerHand")) ||
+				PartMeshPath.Contains(TEXT("/CitizenNPC/CharacterParts/")) ||
+				PartMeshPath.Contains(TEXT("/Modular_Workers/"));
+			if (bLegacyWorkerPart)
+			{
+				Part->SetVisibility(false, true);
+				Part->SetOwnerNoSee(true);
+				continue;
+			}
 		}
 		Part->SetFirstPersonPrimitiveType(bThirdPersonView
 			? EFirstPersonPrimitiveType::None

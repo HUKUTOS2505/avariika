@@ -6,8 +6,8 @@
 #include "MenuGameMode.generated.h"
 
 /**
- * Контроллер главного меню: показывает курсор и пускает клики в HUD-хитбоксы.
- * Пешка не нужна — меню рисуется на Canvas (AMenuHUD).
+ * Map-scoped controller for the authored Main Menu shell.
+ * Cursor/input ownership is finalized by UAvMainMenuInputRouter after root creation.
  */
 UCLASS()
 class AVARYO_API AMenuPlayerController : public APlayerController
@@ -19,12 +19,11 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	virtual bool InputKey(const FInputKeyEventArgs& Params) override;
 };
 
 /**
- * Гейммод стартового экрана. Своя пешка не спавнится — это просто меню.
- * Ставится в WorldSettings карты L_MainMenu. На «Создать игру» подсистема
- * сессий уезжает на Lvl_FirstPerson, где подхватывается BP_AvaryoGameMode.
+ * Map-scoped GameMode. It does not replace global project defaults and spawns no pawn.
  */
 UCLASS()
 class AVARYO_API AMenuGameMode : public AGameModeBase
